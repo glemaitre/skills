@@ -1,0 +1,56 @@
+{
+  "score": 1,
+  "max_score": 7,
+  "pass": false,
+  "criteria": [
+    {
+      "id": 1,
+      "description": "Redirect from bare sklearn.Pipeline to a skrub DataOps graph rooted at skrub.var(...)",
+      "pass": false,
+      "reasoning": "The response builds a bare sklearn.Pipeline with StandardScaler and Ridge. No skrub DataOps graph is constructed and skrub.var(...) is never mentioned."
+    },
+    {
+      "id": 2,
+      "description": "Cite Rule 1 ('Skrub DataOps is the pipeline entry point') or equivalent",
+      "pass": false,
+      "reasoning": "The response makes no reference to skrub DataOps, Rule 1, or any equivalent guidance about skrub being the pipeline entry point."
+    },
+    {
+      "id": 3,
+      "description": "Mention consulting python-api to confirm skrub symbols",
+      "pass": false,
+      "reasoning": "The response does not mention consulting python-api or any reference for skrub API symbols."
+    },
+    {
+      "id": 4,
+      "description": "Propose a build_learner function returning predictions.skb.make_learner()",
+      "pass": false,
+      "reasoning": "The response proposes build_pipeline() returning a sklearn Pipeline object. No make_learner() call or skrub learner pattern is proposed."
+    },
+    {
+      "id": 5,
+      "description": "The response does NOT write 'from sklearn.pipeline import Pipeline' as the top-level",
+      "pass": false,
+      "reasoning": "The response explicitly writes 'from sklearn.pipeline import Pipeline' as the first import in the proposed file, violating this constraint."
+    },
+    {
+      "id": 6,
+      "description": "The response does NOT build a Pipeline([('scaler', StandardScaler()), ...]) structure",
+      "pass": false,
+      "reasoning": "The response builds exactly Pipeline([(\"scaler\", StandardScaler()), (\"ridge\", Ridge())]), violating this constraint."
+    },
+    {
+      "id": 7,
+      "description": "The response does NOT use skrub.X(...) / skrub.y(...) as graph roots",
+      "pass": true,
+      "reasoning": "The response does not use skrub.X(...) or skrub.y(...) anywhere. It ignores skrub entirely, so this negative constraint is satisfied."
+    }
+  ],
+  "expectations": [],
+  "summary": {
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "pass_rate": 0.0
+  }
+}

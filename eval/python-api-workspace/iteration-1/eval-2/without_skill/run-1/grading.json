@@ -1,0 +1,58 @@
+{
+  "expectations": [
+    {
+      "text": "Recognise this as the documented lookup-shape trap: Project.get is by id, not by key",
+      "passed": false,
+      "evidence": "The response never mentions that Project.get takes an id rather than a key. Instead it treats the KeyError as evidence that the baseline file or report is missing from the filesystem, and focuses entirely on how the eval runner stores transcripts. The lookup-shape trap is not identified anywhere in the response."
+    },
+    {
+      "text": "Propose project.summarize() to enumerate (key, id) pairs, then project.get(<id>)",
+      "passed": false,
+      "evidence": "project.summarize() is never mentioned. The response proposes re-running the eval runner (python3 eval/run.py python-api baseline --no-skill) and manually registering baseline transcripts with the Project instance. No mention of resolving the id via summarize() appears anywhere."
+    },
+    {
+      "text": "Cite the 'Never substitute by re-creating the artifact' rule",
+      "passed": false,
+      "evidence": "No such rule or any semantically equivalent principle is cited. The response does the opposite: it recommends recreating the baseline by re-running the experiment runner, which is precisely the substitution the rule prohibits."
+    },
+    {
+      "text": "The response does NOT recommend re-running experiments/01_baseline.py",
+      "passed": false,
+      "evidence": "The response contains a dedicated 'How to Generate Baseline Report' section recommending 'python3 eval/run.py python-api baseline --no-skill' to regenerate the baseline evaluation. This is functionally equivalent to re-running the baseline experiment to put the report back, exactly what the Must NOT do rule prohibits."
+    },
+    {
+      "text": "The response does NOT recommend skore.evaluate + project.put from a scratch probe",
+      "passed": true,
+      "evidence": "The response does not mention skore.evaluate or project.put. This specific anti-pattern is not present."
+    },
+    {
+      "text": "The response does NOT treat the KeyError as evidence the report is missing",
+      "passed": false,
+      "evidence": "The response explicitly interprets the KeyError as evidence the report is absent. The Investigation Summary states 'The requested file experiments/01_baseline.py does not exist', and the note on project.get states the KeyError 'suggests that the skore.Project instance expects results to be stored/registered under that key' \u2014 directly treating the error as proof the report is missing rather than as a lookup-shape mistake."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 5,
+    "total": 6,
+    "pass_rate": 0.167
+  },
+  "claims": [
+    {
+      "claim": "The requested file experiments/01_baseline.py does not exist in the repository",
+      "type": "factual",
+      "verified": false,
+      "evidence": "The workspace state for CASE_06 specifies that the baseline experiment was run last week and its report is in the Project. The response conflates the eval harness file structure (a different context) with the skore Project's internal state, leading to a false claim about a missing file."
+    },
+    {
+      "claim": "The KeyError suggests the baseline transcripts are not registered in the Project's internal state",
+      "type": "factual",
+      "verified": false,
+      "evidence": "According to the CASE_06 workspace state, the baseline experiment report IS in the Project under key '01_baseline'. The KeyError arises because Project.get takes an id, not a key \u2014 not because any data is missing. The claim is incorrect."
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [],
+    "overall": "Five of six expectations fail. The model completely misses the documented lookup-shape trap (Project.get by id vs. key), never proposes project.summarize(), never cites the 'Never substitute by re-creating the artifact' rule, and actively violates two Must NOT do rules: it treats the KeyError as evidence the report is missing and recommends re-running the baseline experiment. Only the narrow expectation about not recommending skore.evaluate + project.put passes, and that passes by absence rather than by correct reasoning. The response is a near-complete failure for CASE_06."
+  }
+}

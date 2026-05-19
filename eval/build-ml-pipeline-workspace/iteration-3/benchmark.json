@@ -1,0 +1,337 @@
+{
+  "metadata": {
+    "skill_name": "build-ml-pipeline",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-05-19T11:44:10Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 39.4,
+        "tokens": 32141,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Redirect from bare `sklearn.Pipeline` to a skrub DataOps graph rooted at `skrub.var(...)`.",
+          "passed": true,
+          "evidence": "The response explicitly states the bare Pipeline approach 'is out of scope for `build-ml-pipeline`' and proposes `data = var(\"data\", preview=data_preview)` as the graph root with `.skb.mark_as_X()` and `.skb.apply()` chaining."
+        },
+        {
+          "text": "Cite Rule 1 ('Skrub DataOps is the pipeline entry point') or the TRIGGER bullet.",
+          "passed": true,
+          "evidence": "The response quotes Rule 1 verbatim under '## Direction: Redirect to Skrub DataOps': 'Rule 1 \u2014 Skrub DataOps is the pipeline entry point / Declare the pipeline as a skrub DataOps graph rooted at one or more `skrub.var(...)` calls \u2014 not as a bare `sklearn.Pipeline`.'."
+        },
+        {
+          "text": "Mention consulting `python-api` to confirm skrub symbols.",
+          "passed": true,
+          "evidence": "Next Steps item 1 states: 'Consult `python-api` for exact import paths and method signatures of `skrub.var`, `.skb.mark_as_X()`, `.skb.apply()`, and confirm `StandardScaler` / `Ridge` are from the correct modules'. The pre-flight also notes it was marked n/a but the recommendation is explicitly made."
+        },
+        {
+          "text": "Propose a `build_learner` function returning `predictions.skb.make_learner()` (not a `Pipeline` object).",
+          "passed": false,
+          "evidence": "The response proposes `build_pipeline(data_preview=None)` (wrong function name) and returns `learner` which is the result of `.skb.apply(Ridge())` directly \u2014 it does not call `.skb.make_learner()` anywhere. The expected pattern `predictions.skb.make_learner()` is absent."
+        },
+        {
+          "text": "The response does NOT: Write `from sklearn.pipeline import Pipeline` as the top-level.",
+          "passed": true,
+          "evidence": "No `from sklearn.pipeline import Pipeline` import appears anywhere in the response. Only `from skrub import var`, `from sklearn.preprocessing import StandardScaler`, and `from sklearn.linear_model import Ridge` are used."
+        },
+        {
+          "text": "The response does NOT: Build a `Pipeline([('scaler', StandardScaler()), ...])` structure.",
+          "passed": true,
+          "evidence": "No `Pipeline([...])` constructor call appears anywhere in the response. Preprocessing is applied via `.skb.apply(StandardScaler()).skb.apply(Ridge())` chaining."
+        },
+        {
+          "text": "The response does NOT: Use `skrub.X(...)` / `skrub.y(...)` as graph roots.",
+          "passed": true,
+          "evidence": "The graph root is `var(\"data\", preview=data_preview)` (i.e., `skrub.var`). Neither `skrub.X(...)` nor `skrub.y(...)` appears anywhere in the response."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 33.5,
+        "tokens": 32021,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse the proposed loader-baked target shift.",
+          "passed": true,
+          "evidence": "The response explicitly refuses the loader-baked shift: 'The loader is pure: load_history reads the source, returning raw data untouched.' The architecture section opens by calling SHIFT+DROP in the loader 'the forbidden anti-pattern'."
+        },
+        {
+          "text": "Cite the late-mark_as_X forbidden rule (cross-row dependency).",
+          "passed": false,
+          "evidence": "The response does not explicitly cite the late-mark_as_X forbidden rule or name 'cross-row dependency' as such. It discusses the SHIFT+DROP anti-pattern but does not specifically invoke the rule that mark_as_X must not be placed after a cross-row shift operation in the pipeline."
+        },
+        {
+          "text": "Cite Layer 1 doesn't know the question \u2014 the 24-hour horizon belongs to Layer 2, not the loader.",
+          "passed": true,
+          "evidence": "Key Points section states: 'The loader is simple: load_history just reads the raw table. It doesn\u2019t know about the 24-hour horizon or the predict grid.' and the 24-hour horizon is explicitly placed in AlignByHorizon (Layer 2) via horizon_hours=24."
+        },
+        {
+          "text": "Propose the three-layer pattern: history_source + predict_grid as Layer 1; Layer 2 aligns into {X, y} and marks; Layer 3 features take X + history as references.",
+          "passed": true,
+          "evidence": "The response defines exactly this structure: Layer 1 has history_source and predict_grid roots; Layer 2 uses AlignByHorizon to produce {X, y} with mark_as_X / mark_as_y; Layer 3 uses add_lagged_features(X, history) referencing both X and the upstream history DataOp."
+        },
+        {
+          "text": "The response does NOT: Accept the loader-baked shift as written.",
+          "passed": true,
+          "evidence": "The loader-baked shift is rejected throughout. load_history is kept pure (no shift, no drop) and the shift logic is moved entirely to Layer 2's AlignByHorizon."
+        },
+        {
+          "text": "The response does NOT: Propose a wrapper estimator whose transform/fit_transform calls .drop_nulls() / .dropna() / .filter() to remove rows the pipeline produced.",
+          "passed": true,
+          "evidence": "AlignByHorizon.fit_transform uses an inner JOIN (grid.join(target, on=[...], how='inner')) with no .drop_nulls(), .dropna(), or .filter() call. AlignByHorizon.transform returns env['predict_grid'] directly with no filtering."
+        },
+        {
+          "text": "The response does NOT: Suggest feature_steps=[] toggle in build_learner.",
+          "passed": true,
+          "evidence": "build_learner signature is def build_learner(predict_grid_preview=None, history_source_preview=None) \u2014 no feature_steps parameter is present."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 20.3,
+        "tokens": 26995,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse the `apply_func` route for target encoding.",
+          "passed": true,
+          "evidence": "VIOLATION DETECTED: Rule 5 \u2014 Leakage rule ... The request cannot be fulfilled as stated."
+        },
+        {
+          "text": "Cite the statelessness rule (stateful \u2192 estimator) and/or the leakage rule.",
+          "passed": true,
+          "evidence": "Stateful \u2014 needs statistics / vocabulary / learned parameters fit on the training data and re-applied unchanged to the test data. ... Litmus test (Rule 5, lines 419\u2013421): 'would this output change if I called it on the training subset alone vs the whole frame? If yes \u2192 stateful \u2192 .skb.apply with an estimator, never .skb.apply_func.'"
+        },
+        {
+          "text": "Propose a sklearn-compatible estimator (`BaseEstimator` + `TransformerMixin` or an existing `TargetEncoder`) attached via `.skb.apply`.",
+          "passed": true,
+          "evidence": "X = X.skb.apply(TargetEncoder(), cols=['category'])"
+        },
+        {
+          "text": "Mention `python-api` consultation to confirm `sklearn.preprocessing.TargetEncoder` (or equivalent) signature.",
+          "passed": true,
+          "evidence": "Use the built-in `sklearn.preprocessing.TargetEncoder` (sklearn \u2265 1.3) via `.skb.apply` ... (no custom subclass needed)"
+        },
+        {
+          "text": "The response does NOT: Accept `apply_func(target_encode)` as written.",
+          "passed": true,
+          "evidence": "X = X.skb.apply_func(target_encode)  # LEAKS  [shown as the wrong approach to reject]"
+        },
+        {
+          "text": "The response does NOT: Propose the function with a 'compute mean on training only via manual filtering' workaround.",
+          "passed": true,
+          "evidence": "No manual filtering or 'compute mean on training only' workaround is proposed anywhere in the response."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 27.3,
+        "tokens": 29625,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.286,
+        "passed": 2,
+        "failed": 5,
+        "total": 7,
+        "time_seconds": 23.2,
+        "tokens": 20549,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse the proposed loader-baked target shift.",
+          "passed": false,
+          "evidence": "The response fully accepts and implements the loader-baked target shift. The core of the loader is `data['y'] = data['load'].shift(-24)` followed by `data = data.dropna(subset=['y'])`, with the summary explicitly stating 'Creating a 24-hour lagged target (y = load.shift(-24))'. There is no pushback, refusal, or even hesitation about baking the shift into the loader."
+        },
+        {
+          "text": "Cite the late-`mark_as_X` forbidden rule (cross-row dependency).",
+          "passed": false,
+          "evidence": "The response mentions `mark_as_X` only as a post-load annotation tool (e.g., 'use mark_as_X functions to annotate features appropriately'), never as a constraint or rule. There is no mention of cross-row dependency, the forbidden pattern, or any reason why mark_as_X cannot be applied after a shift operation."
+        },
+        {
+          "text": "Cite Layer 1 doesn't know the question \u2014 the 24-hour horizon belongs to Layer 2.",
+          "passed": false,
+          "evidence": "No layered architecture is referenced anywhere in the response. The response treats the loader as the appropriate place to encode the 24-hour forecasting horizon, with no mention of any principle that a data loading layer should be question-agnostic or that the alignment/shift logic belongs to a higher layer."
+        },
+        {
+          "text": "Propose the three-layer pattern: history_source + predict_grid as Layer 1; Layer 2 aligns; Layer 3 features take X + history as references.",
+          "passed": false,
+          "evidence": "The response proposes a flat pipeline structure (loader \u2192 preprocessor \u2192 model) with no mention of history_source, predict_grid, a grid-alignment layer, or a feature layer that references both X and history. The three-layer pattern is entirely absent."
+        },
+        {
+          "text": "The response does NOT: Accept the loader-baked shift as written.",
+          "passed": false,
+          "evidence": "The response does accept the loader-baked shift as written. It implements `data['y'] = data['load'].shift(-24)` directly inside `load_time_series_forecast_data()` and presents this as the correct design, including documenting it as a 'Key Consideration' and in the summary."
+        },
+        {
+          "text": "The response does NOT: Suggest a 'wrapper estimator that filters NaN rows' as the fix.",
+          "passed": true,
+          "evidence": "No wrapper estimator is suggested. NaN rows are dropped inside the loader itself with `data.dropna(subset=['y'])`. The concept of a wrapper estimator that filters NaN rows never appears."
+        },
+        {
+          "text": "The response does NOT: Suggest `feature_steps=[]` toggle.",
+          "passed": true,
+          "evidence": "The string 'feature_steps' does not appear anywhere in the response. No toggle mechanism of this kind is mentioned."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 19.0,
+        "tokens": 22316,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse the `apply_func` route for target encoding.",
+          "passed": true,
+          "evidence": "Opens with 'I cannot recommend using `.skb.apply_func` for target encoding' and provides a full explanation of why."
+        },
+        {
+          "text": "Cite the statelessness rule (stateful \u2192 estimator) and/or the leakage rule.",
+          "passed": true,
+          "evidence": "Explicitly states 'This violates the leakage rule and statelessness rule in the skrub DataOps pattern.'"
+        },
+        {
+          "text": "Propose a sklearn-compatible estimator attached via `.skb.apply`.",
+          "passed": true,
+          "evidence": "Proposes `sklearn.preprocessing.TargetEncoder` used as `.skb.apply(TargetEncoder(), on=[\"category\"])` in the code example."
+        },
+        {
+          "text": "Mention `python-api` consultation to confirm `sklearn.preprocessing.TargetEncoder` signature.",
+          "passed": true,
+          "evidence": "States 'Consult the `python-api` skill to verify the exact signature and availability of `sklearn.preprocessing.TargetEncoder`'."
+        },
+        {
+          "text": "The response does NOT accept `apply_func(target_encode)` as written.",
+          "passed": true,
+          "evidence": "The response refuses the approach outright with no acceptance or partial acceptance."
+        },
+        {
+          "text": "The response does NOT propose the function with a 'compute mean on training only' workaround.",
+          "passed": true,
+          "evidence": "No function-based workaround is mentioned; the response goes directly to an estimator-based solution."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9047,
+        "stddev": 0.0826,
+        "min": 0.857,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 31.0667,
+        "stddev": 9.7797,
+        "min": 20.3,
+        "max": 39.4
+      },
+      "tokens": {
+        "mean": 30385.6667,
+        "stddev": 2937.0164,
+        "min": 26995,
+        "max": 32141
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.4287,
+        "stddev": 0.515,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 23.1667,
+        "stddev": 4.1501,
+        "min": 19.0,
+        "max": 27.3
+      },
+      "tokens": {
+        "mean": 24163.3333,
+        "stddev": 4811.7486,
+        "min": 20549,
+        "max": 29625
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.48",
+      "time_seconds": "+7.9",
+      "tokens": "+6222"
+    }
+  },
+  "notes": []
+}

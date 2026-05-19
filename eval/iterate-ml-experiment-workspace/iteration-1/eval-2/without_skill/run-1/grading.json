@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Refuse to skip the design note.",
+      "passed": true,
+      "evidence": "The response explicitly states 'I need to enforce the G-DESIGN gate here' and makes clear that no experiments/NN_*.py is created until the design note exists and is approved. The refusal is unambiguous."
+    },
+    {
+      "text": "Cite the G-DESIGN rule (design note exists and is approved before any `experiments/NN_*.py` is touched).",
+      "passed": true,
+      "evidence": "The response states verbatim: 'No `experiments/NN_*.py` is created or touched until `journal/NN_*.md` exists, is fully filled in, and you\u2019ve explicitly approved it.' This is a precise citation of the G-DESIGN rule."
+    },
+    {
+      "text": "Cite the forbidden-shortcut explicitly: 'quick' is not permission to skip G-DESIGN.",
+      "passed": true,
+      "evidence": "The response explicitly names the forbidden shortcut: '\"Quick\" or \"standard\" does not resolve this gate. That\u2019s the forbidden shortcut named explicitly in the skill: User said \"quick baseline\" \u2192 skip G-DESIGN. It\u2019s wrong because the design note is the contract, not an optional luxury.'"
+    },
+    {
+      "text": "Still propose to auto-draft `journal/01_baseline.md` (bootstrap mode forces the baseline) and surface the config gates.",
+      "passed": true,
+      "evidence": "The response proposes 'I\u2019ll auto-draft `journal/01_baseline.md` for you to review and approve' and surfaces config gates: G-PKG-NAME, G-ENV-MGR, G-TABULAR, G-CV-SPLITTER, G-DESIGN, and G-RUN are all listed explicitly."
+    },
+    {
+      "text": "The response does NOT: Treat 'quick' as resolving any gate.",
+      "passed": true,
+      "evidence": "The response explicitly rejects 'quick' or 'standard' as permission to skip any gate. No gate is treated as resolved by the user's framing."
+    },
+    {
+      "text": "The response does NOT: Write `experiments/01_baseline.py` in this turn.",
+      "passed": true,
+      "evidence": "The response does not write or reference writing experiments/01_baseline.py. It defers this to after design note approval and handoff to build-ml-pipeline, evaluate-ml-pipeline, and test-ml-pipeline."
+    },
+    {
+      "text": "The response does NOT: Write any `src/<pkg>/*.py` file in this turn.",
+      "passed": true,
+      "evidence": "No src/<pkg>/*.py file is written or referenced as being written in the response. The response only proposes drafting the design note journal/01_baseline.md."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "expectations": [
+    {
+      "text": "Reference resolving the installed version (mention `pixi run python` for `skore.__version__` or equivalent \u2014 but note: the new skill rule forbids inline `python -c`, so this could be referenced via a scratch file).",
+      "passed": true,
+      "evidence": "Pre-flight line 4-5: 'Will write `scratch/2026-05-19_version_skore.py` with `import skore; print(skore.__version__)` and run via `pixi run python`'. The version is resolved via a scratch file, not inline, and `pixi run python` is named explicitly."
+    },
+    {
+      "text": "Reference listing `scratch/api/skore/0.18.0/` for a cache hit before any fresh probe.",
+      "passed": true,
+      "evidence": "Pre-flight line 6-7: 'Cache listed this turn (Shape 0): `scratch/api/skore/0.18.0/`' with evidence 'Will verify this directory is empty or contains no `evaluate.md`'. The cache directory is checked before the probe is proposed."
+    },
+    {
+      "text": "Propose writing a probe script under `scratch/<ts>_*.py` (not an inline `python -c`).",
+      "passed": true,
+      "evidence": "Line 62: 'Save as: `scratch/2026-05-19_lookup_skore_evaluate.py`'. A full probe script body is shown and saved to a timestamped scratch file, not run inline."
+    },
+    {
+      "text": "Name `pydoc.render_doc` (not `__doc__`) for capturing help text.",
+      "passed": true,
+      "evidence": "Probe script line 40: `help_text = pydoc.render_doc(sym, renderer=pydoc.plaintext)`. `__doc__` does not appear anywhere in the response."
+    },
+    {
+      "text": "Name the cache file destination as `scratch/api/skore/0.18.0/evaluate.md`.",
+      "passed": true,
+      "evidence": "Pre-flight line 13 and Next steps line 68 both explicitly name `scratch/api/skore/0.18.0/evaluate.md` as the cache destination."
+    },
+    {
+      "text": "Reference the four-section file contract (Source / Signature / help() / Usage).",
+      "passed": true,
+      "evidence": "Probe script writes all four sections: `Source: inspect: {LIB}.{DOTTED} @ {version}` (line 43), `## Signature` (line 46), `## help()` (line 47), `## Usage (agent synthesis \u2014 fill in this section)` (line 48-54)."
+    },
+    {
+      "text": "The response does NOT output a literal signature lifted from memory without first running the probe.",
+      "passed": true,
+      "evidence": "No literal `evaluate(...)` signature is given in the response. The probe is proposed to retrieve it; the response defers to the probe output."
+    },
+    {
+      "text": "The response does NOT use `__doc__` to capture documentation.",
+      "passed": true,
+      "evidence": "`__doc__` does not appear anywhere in the response. `pydoc.render_doc` is used exclusively for help text capture."
+    },
+    {
+      "text": "The response does NOT recommend an inline `pixi run python -c '...'` (no inline at all per the unconditional rule).",
+      "passed": true,
+      "evidence": "Line 64: 'Run with: `pixi run python scratch/2026-05-19_lookup_skore_evaluate.py`'. This runs a file, not an inline `-c` string. No `python -c` appears anywhere in the response."
+    },
+    {
+      "text": "The response does NOT skip the cache-list step and jump straight to the probe.",
+      "passed": true,
+      "evidence": "Pre-flight lines 6-7 list the cache directory (`scratch/api/skore/0.18.0/`) before the probe is proposed (pre-flight lines 10-11 and the Probe script section). The ordering is: version \u2192 cache list \u2192 shape classification \u2192 probe."
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "pass_rate": 1.0
+  }
+}

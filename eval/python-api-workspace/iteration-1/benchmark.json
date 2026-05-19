@@ -1,0 +1,352 @@
+{
+  "metadata": {
+    "skill_name": "python-api",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-05-18T22:29:05Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 61.8,
+        "tokens": 37114,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Reference resolving the installed version (mention `pixi run python` for `skore.__version__` or equivalent \u2014 but note: the new skill rule forbids inline `python -c`, so this could be referenced via a scratch file).",
+          "passed": true,
+          "evidence": "Pre-flight line 4-5: 'Will write `scratch/2026-05-19_version_skore.py` with `import skore; print(skore.__version__)` and run via `pixi run python`'. The version is resolved via a scratch file, not inline, and `pixi run python` is named explicitly."
+        },
+        {
+          "text": "Reference listing `scratch/api/skore/0.18.0/` for a cache hit before any fresh probe.",
+          "passed": true,
+          "evidence": "Pre-flight line 6-7: 'Cache listed this turn (Shape 0): `scratch/api/skore/0.18.0/`' with evidence 'Will verify this directory is empty or contains no `evaluate.md`'. The cache directory is checked before the probe is proposed."
+        },
+        {
+          "text": "Propose writing a probe script under `scratch/<ts>_*.py` (not an inline `python -c`).",
+          "passed": true,
+          "evidence": "Line 62: 'Save as: `scratch/2026-05-19_lookup_skore_evaluate.py`'. A full probe script body is shown and saved to a timestamped scratch file, not run inline."
+        },
+        {
+          "text": "Name `pydoc.render_doc` (not `__doc__`) for capturing help text.",
+          "passed": true,
+          "evidence": "Probe script line 40: `help_text = pydoc.render_doc(sym, renderer=pydoc.plaintext)`. `__doc__` does not appear anywhere in the response."
+        },
+        {
+          "text": "Name the cache file destination as `scratch/api/skore/0.18.0/evaluate.md`.",
+          "passed": true,
+          "evidence": "Pre-flight line 13 and Next steps line 68 both explicitly name `scratch/api/skore/0.18.0/evaluate.md` as the cache destination."
+        },
+        {
+          "text": "Reference the four-section file contract (Source / Signature / help() / Usage).",
+          "passed": true,
+          "evidence": "Probe script writes all four sections: `Source: inspect: {LIB}.{DOTTED} @ {version}` (line 43), `## Signature` (line 46), `## help()` (line 47), `## Usage (agent synthesis \u2014 fill in this section)` (line 48-54)."
+        },
+        {
+          "text": "The response does NOT output a literal signature lifted from memory without first running the probe.",
+          "passed": true,
+          "evidence": "No literal `evaluate(...)` signature is given in the response. The probe is proposed to retrieve it; the response defers to the probe output."
+        },
+        {
+          "text": "The response does NOT use `__doc__` to capture documentation.",
+          "passed": true,
+          "evidence": "`__doc__` does not appear anywhere in the response. `pydoc.render_doc` is used exclusively for help text capture."
+        },
+        {
+          "text": "The response does NOT recommend an inline `pixi run python -c '...'` (no inline at all per the unconditional rule).",
+          "passed": true,
+          "evidence": "Line 64: 'Run with: `pixi run python scratch/2026-05-19_lookup_skore_evaluate.py`'. This runs a file, not an inline `-c` string. No `python -c` appears anywhere in the response."
+        },
+        {
+          "text": "The response does NOT skip the cache-list step and jump straight to the probe.",
+          "passed": true,
+          "evidence": "Pre-flight lines 6-7 list the cache directory (`scratch/api/skore/0.18.0/`) before the probe is proposed (pre-flight lines 10-11 and the Probe script section). The ordering is: version \u2192 cache list \u2192 shape classification \u2192 probe."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 11.3,
+        "tokens": 26251,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Recognise this as the documented lookup-shape trap: Project.get is by id, not by key.",
+          "passed": true,
+          "evidence": "First paragraph: 'skore.Project.get() resolves by id, not by user-facing key. The string \"01_baseline\" is a user-facing key, not an id.'"
+        },
+        {
+          "text": "Propose project.summarize() to enumerate (key, id) pairs, then project.get(<id>) with the resolved id.",
+          "passed": true,
+          "evidence": "Step 1 proposes `df = project.summarize()` with explanation 'returns a DataFrame indexed by id with a key column. Locate the baseline row and its id.' Step 2 shows `report = project.get(id_value)`."
+        },
+        {
+          "text": "Cite the 'Never substitute by re-creating the artifact' rule.",
+          "passed": true,
+          "evidence": "'Do not re-run the experiment to recreate the artifact. Re-running writes a duplicate row to the Project, violating the data integrity contract.'"
+        },
+        {
+          "text": "Does NOT recommend re-running experiments/01_baseline.py.",
+          "passed": true,
+          "evidence": "No mention of re-running the experiment script anywhere in the response."
+        },
+        {
+          "text": "Does NOT recommend calling skore.evaluate(...) + project.put(...) to regenerate the report.",
+          "passed": true,
+          "evidence": "No mention of skore.evaluate or project.put anywhere in the response."
+        },
+        {
+          "text": "Does NOT treat the KeyError as evidence the report is missing.",
+          "passed": true,
+          "evidence": "Explicitly opens with: 'The KeyError from project.get(\"01_baseline\") does not indicate the report is missing.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 17.4,
+        "tokens": 26721,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse the inline `python -c` invocation.",
+          "passed": true,
+          "evidence": "Response opens with 'Constraint violation detected' and explicitly states the request is 'forbidden', refusing to execute the inline invocation."
+        },
+        {
+          "text": "Cite the Stop condition that all Python execution goes to `scratch/` regardless of length.",
+          "passed": true,
+          "evidence": "Quotes SKILL.md Stop conditions (lines 117\u2013132): 'All Python execution goes to scratch/<YYYY-MM-DD>_<HHMMSS>_<short>.py. No exceptions... regardless of length.'"
+        },
+        {
+          "text": "Cite that `inspect.signature(...)` run inline is NOT a python-api consultation \u2014 the deliverable is a `scratch/api/skore/0.18.0/evaluate.md` cache file.",
+          "passed": true,
+          "evidence": "Quotes SKILL.md lines 133\u2013140 verbatim: 'inspect.signature / dir(...) / pydoc.render_doc / help(...) executed inline is NOT a python-api consultation.' Names exact deliverable path scratch/api/skore/0.18.0/evaluate.md."
+        },
+        {
+          "text": "Propose the Shape 1 probe template instead, writing `scratch/<ts>_lookup_skore_evaluate.py`.",
+          "passed": true,
+          "evidence": "Section 'The correct approach' lists Shape 1 steps, step 1 being: 'Write a probe script to scratch/<YYYY-MM-DD>_<HHMMSS>_lookup_skore_evaluate.py'."
+        },
+        {
+          "text": "The response does NOT run the inline `pixi run python -c '...'` as requested.",
+          "passed": true,
+          "evidence": "Response refuses and redirects; no command execution occurred."
+        },
+        {
+          "text": "The response does NOT treat 'it's one line' as resolving the rule.",
+          "passed": true,
+          "evidence": "Explicitly addresses this: 'The rule is unconditional \u2014 it does not carve out exceptions for short commands. Length is not the criterion; traceability is.'"
+        },
+        {
+          "text": "The response does NOT recommend Shape 1a as a carve-out (Shape 1a is removed).",
+          "passed": true,
+          "evidence": "No mention of Shape 1a anywhere in the response. Only Shape 1 is proposed."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 0,
+        "total": 0,
+        "time_seconds": 72.6,
+        "tokens": 22121,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.167,
+        "passed": 1,
+        "failed": 5,
+        "total": 6,
+        "time_seconds": 33.0,
+        "tokens": 25608,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Recognise this as the documented lookup-shape trap: Project.get is by id, not by key",
+          "passed": false,
+          "evidence": "The response never mentions that Project.get takes an id rather than a key. Instead it treats the KeyError as evidence that the baseline file or report is missing from the filesystem, and focuses entirely on how the eval runner stores transcripts. The lookup-shape trap is not identified anywhere in the response."
+        },
+        {
+          "text": "Propose project.summarize() to enumerate (key, id) pairs, then project.get(<id>)",
+          "passed": false,
+          "evidence": "project.summarize() is never mentioned. The response proposes re-running the eval runner (python3 eval/run.py python-api baseline --no-skill) and manually registering baseline transcripts with the Project instance. No mention of resolving the id via summarize() appears anywhere."
+        },
+        {
+          "text": "Cite the 'Never substitute by re-creating the artifact' rule",
+          "passed": false,
+          "evidence": "No such rule or any semantically equivalent principle is cited. The response does the opposite: it recommends recreating the baseline by re-running the experiment runner, which is precisely the substitution the rule prohibits."
+        },
+        {
+          "text": "The response does NOT recommend re-running experiments/01_baseline.py",
+          "passed": false,
+          "evidence": "The response contains a dedicated 'How to Generate Baseline Report' section recommending 'python3 eval/run.py python-api baseline --no-skill' to regenerate the baseline evaluation. This is functionally equivalent to re-running the baseline experiment to put the report back, exactly what the Must NOT do rule prohibits."
+        },
+        {
+          "text": "The response does NOT recommend skore.evaluate + project.put from a scratch probe",
+          "passed": true,
+          "evidence": "The response does not mention skore.evaluate or project.put. This specific anti-pattern is not present."
+        },
+        {
+          "text": "The response does NOT treat the KeyError as evidence the report is missing",
+          "passed": false,
+          "evidence": "The response explicitly interprets the KeyError as evidence the report is absent. The Investigation Summary states 'The requested file experiments/01_baseline.py does not exist', and the note on project.get states the KeyError 'suggests that the skore.Project instance expects results to be stored/registered under that key' \u2014 directly treating the error as proof the report is missing rather than as a lookup-shape mistake."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.429,
+        "passed": 3,
+        "failed": 4,
+        "total": 7,
+        "time_seconds": 24.7,
+        "tokens": 20503,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse the inline `python -c` invocation.",
+          "passed": false,
+          "evidence": "The response does not refuse on principle. It says it is 'Unable to retrieve the signature' due to no active Python environment \u2014 a practical failure, not a principled refusal citing any rule or Stop condition."
+        },
+        {
+          "text": "Cite the Stop condition that all Python execution goes to `scratch/` regardless of length.",
+          "passed": false,
+          "evidence": "No mention of any Stop condition or the `scratch/` rule anywhere in the response."
+        },
+        {
+          "text": "Cite that `inspect.signature(...)` run inline is NOT a python-api consultation \u2014 the deliverable is a cache file.",
+          "passed": false,
+          "evidence": "The response makes no distinction between inline execution and a proper python-api consultation, and does not mention a cache file deliverable."
+        },
+        {
+          "text": "Propose the Shape 1 probe template instead.",
+          "passed": false,
+          "evidence": "No Shape 1 probe template is proposed. The response only shows the inline command that 'would' retrieve the signature, with no alternative approach offered."
+        },
+        {
+          "text": "The response does NOT: Run the inline `pixi run python -c '...'` as requested.",
+          "passed": true,
+          "evidence": "The response did not execute the command. It presents the command only as something that 'would retrieve it', indicating it was not run."
+        },
+        {
+          "text": "The response does NOT: Treat 'it's one line' as resolving the rule.",
+          "passed": true,
+          "evidence": "The response does not invoke brevity or the 'it's one line' argument to justify running the command."
+        },
+        {
+          "text": "The response does NOT: Recommend Shape 1a as a carve-out.",
+          "passed": true,
+          "evidence": "No Shape 1a carve-out is recommended. The response simply reports an environment failure and shows the command without proposing any carve-out."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 30.1667,
+        "stddev": 27.5645,
+        "min": 11.3,
+        "max": 61.8
+      },
+      "tokens": {
+        "mean": 30028.6667,
+        "stddev": 6140.577,
+        "min": 26251,
+        "max": 37114
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.1987,
+        "stddev": 0.2162,
+        "min": 0.0,
+        "max": 0.429
+      },
+      "time_seconds": {
+        "mean": 43.4333,
+        "stddev": 25.5977,
+        "min": 24.7,
+        "max": 72.6
+      },
+      "tokens": {
+        "mean": 22744.0,
+        "stddev": 2608.8988,
+        "min": 20503,
+        "max": 25608
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.80",
+      "time_seconds": "-13.3",
+      "tokens": "+7285"
+    }
+  },
+  "notes": []
+}

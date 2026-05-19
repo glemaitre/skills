@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Redirect from bare `sklearn.Pipeline` to a skrub DataOps graph rooted at `skrub.var(...)`.",
+      "passed": true,
+      "evidence": "The response explicitly states the bare Pipeline approach 'is out of scope for `build-ml-pipeline`' and proposes `data = var(\"data\", preview=data_preview)` as the graph root with `.skb.mark_as_X()` and `.skb.apply()` chaining."
+    },
+    {
+      "text": "Cite Rule 1 ('Skrub DataOps is the pipeline entry point') or the TRIGGER bullet.",
+      "passed": true,
+      "evidence": "The response quotes Rule 1 verbatim under '## Direction: Redirect to Skrub DataOps': 'Rule 1 — Skrub DataOps is the pipeline entry point / Declare the pipeline as a skrub DataOps graph rooted at one or more `skrub.var(...)` calls — not as a bare `sklearn.Pipeline`.'."
+    },
+    {
+      "text": "Mention consulting `python-api` to confirm skrub symbols.",
+      "passed": true,
+      "evidence": "Next Steps item 1 states: 'Consult `python-api` for exact import paths and method signatures of `skrub.var`, `.skb.mark_as_X()`, `.skb.apply()`, and confirm `StandardScaler` / `Ridge` are from the correct modules'. The pre-flight also notes it was marked n/a but the recommendation is explicitly made."
+    },
+    {
+      "text": "Propose a `build_learner` function returning `predictions.skb.make_learner()` (not a `Pipeline` object).",
+      "passed": false,
+      "evidence": "The response proposes `build_pipeline(data_preview=None)` (wrong function name) and returns `learner` which is the result of `.skb.apply(Ridge())` directly — it does not call `.skb.make_learner()` anywhere. The expected pattern `predictions.skb.make_learner()` is absent."
+    },
+    {
+      "text": "The response does NOT: Write `from sklearn.pipeline import Pipeline` as the top-level.",
+      "passed": true,
+      "evidence": "No `from sklearn.pipeline import Pipeline` import appears anywhere in the response. Only `from skrub import var`, `from sklearn.preprocessing import StandardScaler`, and `from sklearn.linear_model import Ridge` are used."
+    },
+    {
+      "text": "The response does NOT: Build a `Pipeline([('scaler', StandardScaler()), ...])` structure.",
+      "passed": true,
+      "evidence": "No `Pipeline([...])` constructor call appears anywhere in the response. Preprocessing is applied via `.skb.apply(StandardScaler()).skb.apply(Ridge())` chaining."
+    },
+    {
+      "text": "The response does NOT: Use `skrub.X(...)` / `skrub.y(...)` as graph roots.",
+      "passed": true,
+      "evidence": "The graph root is `var(\"data\", preview=data_preview)` (i.e., `skrub.var`). Neither `skrub.X(...)` nor `skrub.y(...)` appears anywhere in the response."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "total": 7,
+    "pass_rate": 0.857
+  }
+}

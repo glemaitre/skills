@@ -104,10 +104,11 @@ The tuning skill discovers the knobs by walking the graph.
 ## 6. Custom sklearn transformer
 
 Author one **only when** (a) no built-in fits and (b) the
-operation is stateful. Subclass `BaseEstimator` + `TransformerMixin`,
-implement `fit(self, X, y=None)` to learn state and `transform(self, X)`
-to apply it; add `get_feature_names_out` if downstream consumers
-need feature names.
+operation is stateful. Subclass `TransformerMixin` + `BaseEstimator`
+(Mixin first — sklearn convention so the mixin's `fit_transform`
+wins MRO; see SKILL.md Rule 5). Implement `fit(self, X, y=None)` to
+learn state and `transform(self, X)` to apply it; add
+`get_feature_names_out` if downstream consumers need feature names.
 
 For a stateless op, write a function and use `.skb.apply_func` —
 don't author a transformer.
@@ -115,7 +116,7 @@ don't author a transformer.
 ```python
 from sklearn.base import BaseEstimator, TransformerMixin
 
-class QuantileRankEncoder(BaseEstimator, TransformerMixin):
+class QuantileRankEncoder(TransformerMixin, BaseEstimator):
     """Encode numeric columns by their training-set quantile rank."""
 
     def __init__(self, n_bins: int = 100):

@@ -1,0 +1,94 @@
+{
+  "skill_name": "python-env-manager",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Project root has `pixi.toml` + `pixi.lock`.\n- `skrub` is missing from the env.\n- `JOURNAL.md` Status records `env manager: pixi`, `env scope:\n  default` from prior session.]\n\nAdd skrub to the project's deps.",
+      "expected_output": "Behavioural response satisfying: - Detect pixi from the manifest. - Recognise the pre-recorded `Workspace decisions` (skip G-ENV-MGR re-ask). - Confirm scope for THIS install (`G-ENV-SCOPE` \u2014 even with recorded default, each install confirms the target scope). It must NOT: - Run `pip install skrub` in a pixi project (wrong-manager install). - Run `uv add skrub` / `poetry add skrub`. - Silently dump skrub into the default env without confirming scope.",
+      "files": [],
+      "expectations": [
+        "Detect pixi from the manifest.",
+        "Recognise the pre-recorded `Workspace decisions` (skip G-ENV-MGR re-ask).",
+        "Confirm scope for THIS install (`G-ENV-SCOPE` \u2014 even with recorded default, each install confirms the target scope).",
+        "Propose `pixi add skrub` (or `pixi add -f <feature> skrub` if a non-default feature is picked).",
+        "The response does NOT: Run `pip install skrub` in a pixi project (wrong-manager install).",
+        "The response does NOT: Run `uv add skrub` / `poetry add skrub`.",
+        "The response does NOT: Silently dump skrub into the default env without confirming scope."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder.\n- No `pyproject.toml`, no `pixi.toml`, no `poetry.lock`, no `uv.lock`.\n- pixi is on PATH.]\n\nInstall pandas.",
+      "expected_output": "Behavioural response satisfying: - Detect that no manager is in place. - Fire **`G-ENV-MGR`** structured `AskUserQuestion` \u2014 manager sub-pick (pixi recommended default; uv / poetry / hatch / conda / pip+venv as alternatives) + scope sub-pick. - Wait for explicit user confirmation before running `pixi init` or any bootstrap. It must NOT: - Run `pixi init` silently. - Run `pip install pandas` to \"just get started\". - Pick a manager based on PATH alone.",
+      "files": [],
+      "expectations": [
+        "Detect that no manager is in place.",
+        "Fire **`G-ENV-MGR`** structured `AskUserQuestion` \u2014 manager sub-pick (pixi recommended default; uv / poetry / hatch / conda / pip+venv as alternatives) + scope sub-pick.",
+        "Wait for explicit user confirmation before running `pixi init` or any bootstrap.",
+        "Mention that pixi being on PATH is detection context, not permission.",
+        "The response does NOT: Run `pixi init` silently.",
+        "The response does NOT: Run `pip install pandas` to \"just get started\".",
+        "The response does NOT: Pick a manager based on PATH alone.",
+        "The response does NOT: Run the bootstrap installer (`curl | sh`) itself."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Project uses pixi (`pixi.toml` + `pixi.lock` at root).\n- pixi env is active.]\n\nJust run `pip install scikit-learn` \u2014 quickest path.",
+      "expected_output": "Behavioural response satisfying: - Refuse `pip install` in a pixi-managed project. - Cite the Stop condition: \"Wrong-manager install is forbidden. Mixing managers creates env state the manifest won't track.\" - Propose `pixi add scikit-learn` instead. It must NOT: - Run `pip install scikit-learn`. - Add a `requirements.txt` to the project. - Bypass the manifest with `--user` / `--break-system-packages`.",
+      "files": [],
+      "expectations": [
+        "Refuse `pip install` in a pixi-managed project.",
+        "Cite the Stop condition: \"Wrong-manager install is forbidden. Mixing managers creates env state the manifest won't track.\"",
+        "Propose `pixi add scikit-learn` instead.",
+        "Explain that the next `pixi install` would silently undo the pip install.",
+        "The response does NOT: Run `pip install scikit-learn`.",
+        "The response does NOT: Add a `requirements.txt` to the project.",
+        "The response does NOT: Bypass the manifest with `--user` / `--break-system-packages`."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- pixi project, `Workspace decisions` records `env manager: pixi`,\n  `env scope: default`.\n- `pixi.toml` has features: `default`, `dev`, `notebooks`.]\n\nAdd jupyterlab to the project.",
+      "expected_output": "Behavioural response satisfying: - Fire **`G-ENV-SCOPE`** for this specific install. - Enumerate the existing features (default / dev / notebooks) and \"create a new feature\". - Propose `notebooks` as a likely target (jupyterlab is a dev tool often siloed) but require user confirmation. It must NOT: - Silently `pixi add jupyterlab` into `default`. - Treat the recorded `env scope: default` from `Workspace decisions` as resolving this per-install scope question. - Assume jupyterlab \"belongs\" in any specific feature without asking.",
+      "files": [],
+      "expectations": [
+        "Fire **`G-ENV-SCOPE`** for this specific install.",
+        "Enumerate the existing features (default / dev / notebooks) and \"create a new feature\".",
+        "Propose `notebooks` as a likely target (jupyterlab is a dev tool often siloed) but require user confirmation.",
+        "The response does NOT: Silently `pixi add jupyterlab` into `default`.",
+        "The response does NOT: Treat the recorded `env scope: default` from `Workspace decisions` as resolving this per-install scope question.",
+        "The response does NOT: Assume jupyterlab \"belongs\" in any specific feature without asking."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Project root has `pixi.toml` (pixi-managed).\n- A conda env named `myenv` is active in the user's shell.\n- `pip --version` shows pip from conda's env, not pixi's.]\n\nInstall lightgbm.",
+      "expected_output": "Behavioural response satisfying: - Detect ambient state (conda active despite pixi being the project manager). - Surface the conflict to the user \u2014 which env should this install target? - Fire `AskUserQuestion` to resolve the manager ambiguity (err on side of asking when borderline, per Stop conditions). It must NOT: - Pick pixi silently because `pixi.toml` exists. - Pick conda silently because the conda env is active. - Treat one as \"obviously right\" without flagging the conflict.",
+      "files": [],
+      "expectations": [
+        "Detect ambient state (conda active despite pixi being the project manager).",
+        "Surface the conflict to the user \u2014 which env should this install target?",
+        "Fire `AskUserQuestion` to resolve the manager ambiguity (err on side of asking when borderline, per Stop conditions).",
+        "Recommend `pixi add lightgbm` if the user picks pixi.",
+        "The response does NOT: Pick pixi silently because `pixi.toml` exists.",
+        "The response does NOT: Pick conda silently because the conda env is active.",
+        "The response does NOT: Treat one as \"obviously right\" without flagging the conflict."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Fresh scaffold from `organize-ml-workspace`.\n- `pyproject.toml` declares `src/<pkg>/`.\n- `pixi.toml` exists.\n- pixi is the manager (recorded).]\n\nThe workspace was just scaffolded. Wire the editable install for\n`src/<pkg>/`.",
+      "expected_output": "Behavioural response satisfying: - Recognise this as the **Editable workspace package** sub-routine. - Propose `pixi add --pypi --editable .` (the pixi-specific editable install). - Explain that this lets `from <pkg>.pipeline import build_learner` work from any CWD without `PYTHONPATH=src` hacks. It must NOT: - Run `pip install -e .` (wrong manager in a pixi project). - Skip the editable install (then the scaffold's `PROJECT_ROOT` resolution would break). - Modify `pyproject.toml`'s `[project]` block ad-hoc to make the package \"findable\" by inference.",
+      "files": [],
+      "expectations": [
+        "Recognise this as the **Editable workspace package** sub-routine.",
+        "Propose `pixi add --pypi --editable .` (the pixi-specific editable install).",
+        "Explain that this lets `from <pkg>.pipeline import build_learner` work from any CWD without `PYTHONPATH=src` hacks.",
+        "The response does NOT: Run `pip install -e .` (wrong manager in a pixi project).",
+        "The response does NOT: Skip the editable install (then the scaffold's `PROJECT_ROOT` resolution would break).",
+        "The response does NOT: Modify `pyproject.toml`'s `[project]` block ad-hoc to make the package \"findable\" by inference."
+      ]
+    }
+  ]
+}

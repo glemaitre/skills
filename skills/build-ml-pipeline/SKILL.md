@@ -90,16 +90,70 @@ predictor.
   additional `apply_func` argument (rule 2's three-layer model).
   Otherwise predict-time replay drops cold-start rows silently.
 
-  **Symptoms of late `mark_as_X`** (all tells that the topology is
-  wrong, fix the *graph*, do not paper over):
-  - a `feature_steps=[]` toggle in `build_learner` "to make predict
-    work for cold-start";
-  - a temp-dir gymnastic at predict time to fake history;
-  - a wrapper estimator whose only job is to filter NaN rows the
-    pipeline itself produced.
+  **Anti-pattern symptoms — name each so you can see you're about
+  to write it.** Each block below is a *named anti-pattern* the
+  skill explicitly forbids; if your code is starting to look like
+  one of these, STOP and route to `references/layer_examples.md`
+  for the three-layer fix.
+
+  ❌ **DON'T: wrapper estimator that filters NaN rows the pipeline
+  produced** (the most common shape — Layer 2 misused as a
+  band-aid for cold-start drops):
+
+  ```python
+  # Anti-pattern. Forbidden.
+  class TargetShiftAndDropNaN(TransformerMixin, BaseEstimator):
+      def fit_transform(self, X, y=None):
+          X = X.with_columns(y=pl.col("load").shift(-HORIZON))
+          return X.drop_nulls("y")     # filtering NaN the graph itself made
+      def transform(self, X):
+          return X.with_columns(y=pl.col("load").shift(-HORIZON)).drop_nulls("y")
+  ```
+
+  ✅ **DO instead:** two Layer-1 roots (`history_source` +
+  `predict_grid`); Layer 2 aligns `(grid, history) → {X, y}` via a
+  **JOIN at target-time**, not a SHIFT+DROP. The inner-join's
+  shape naturally produces only rows where the target exists in
+  history — *there are no NaN rows to drop*. Layer 3 features take
+  X *and* the upstream history as `apply_func` arguments.
+
+  **Renaming the class does not escape this rule.** If your
+  Layer-2 estimator's `transform` / `fit_transform` calls
+  `.drop_nulls()` / `.dropna()` / `.filter()` to remove rows the
+  pipeline itself produced, you've built the forbidden wrapper-
+  NaN-filter pattern **regardless of the class name**. The test:
+
+  - Does `transform` filter rows from data the pipeline produced?
+    → forbidden. Rewrite as a JOIN.
+  - Does the inner-join shape mean no row-filtering is needed?
+    → correct.
+
+  Concrete code for the canonical JOIN-style aligner (the body of
+  the `align_xy` estimator referenced in the orchestration code):
+  `references/layer_examples.md` § "Inside the aligner — JOIN,
+  not SHIFT+DROP".
+
+  ❌ **DON'T: `feature_steps=[]` toggle in `build_learner` "to make
+  predict work for cold-start"**:
+
+  ```python
+  # Anti-pattern. Forbidden.
+  def build_learner(data_dir_preview=None, feature_steps=None):
+      ...
+      if feature_steps is None:
+          feature_steps = ["lag_24h", "rolling_mean"]    # disabled at predict
+      for step in feature_steps:
+          X = X.skb.apply_func(step)
+      ...
+  ```
+
+  ✅ **DO instead:** features reference the upstream history node
+  by argument, so the same code runs at fit and predict against
+  the same `history_source` binding. No toggle needed.
 
   The smoke test (`smoke-test-ml-pipeline`) is the executable proof
-  that the topology is right; CV alone passes either shape.
+  that the topology is right; CV alone passes any of the above
+  shapes by happy accident.
 - **Layer 1 doesn't know the question.** The source describes
   *what data exists*; the predict grid describes *which rows we
   want answers for*. Anything that requires the latter — any
@@ -326,14 +380,56 @@ function, it is stateful — promote it.
 Any computation using statistics learned from the data (means,
 medians, quantiles, vocabularies, target distribution) MUST be
 stateful. Calling such a computation as a plain function over the
-whole frame leaks test into training. Classic traps by name:
+whole frame leaks test into training.
 
-- target encoding (must `fit` on training y only),
-- target-aware or quantile-based imputation,
-- quantile binning / `KBinsDiscretizer(strategy="quantile")`,
-- `OrdinalEncoder` / `LabelEncoder` whose categories come from
-  the full dataset rather than `fit` on training only,
-- vocabulary-building text tokenizers, TF-IDF, IDF weights.
+**Classic traps by name — and the built-in estimator to use,
+*before* you reach for a custom subclass.** Always consult
+`python-api` for the exact import path and signature against the
+installed sklearn / skrub version (don't guess); the names below
+are the lookup targets.
+
+| Trap | Use this built-in first | Subclass only if … |
+|---|---|---|
+| Target encoding (categorical → mean of y per category) | **`sklearn.preprocessing.TargetEncoder`** (sklearn ≥ 1.3) | the built-in doesn't fit your target type or smoothing strategy |
+| Quantile binning | `sklearn.preprocessing.KBinsDiscretizer(strategy="quantile")` | non-default binning policy |
+| Target-aware / quantile imputation | `sklearn.impute.SimpleImputer`, `KNNImputer`, `IterativeImputer` | none of the above fits |
+| Categorical → integer codes | `sklearn.preprocessing.OrdinalEncoder` (X-side) — *not* `LabelEncoder` (y-side only) | unknown-category policy needs custom |
+| Categorical → one-hot | `sklearn.preprocessing.OneHotEncoder` (with `handle_unknown="ignore"`) | sparse policy / category-pruning |
+| Text vectorization | `sklearn.feature_extraction.text.{Tfidf,Count}Vectorizer`, skrub `TextEncoder` | tokenizer / embedding-backed |
+| Standard / robust scaling | `sklearn.preprocessing.{StandardScaler, RobustScaler}` | rarely needed |
+
+**Authoring order**, always:
+
+1. Look up the built-in via `python-api` (Shape 0 cache first, then
+   Shape 1 if missing). Confirm the name exists in the installed
+   sklearn / skrub version.
+2. If a built-in fits → use it. Attach via `.skb.apply` (with
+   `cols=...` for column subsets). Done.
+3. Only when *no* built-in covers the operation **and** it is
+   stateful: subclass `TransformerMixin` + `BaseEstimator`. The
+   hand-rolled path is the exception, not the default.
+
+   **Class declaration order: `(Mixin, BaseEstimator)`** — the
+   mixin goes first, `BaseEstimator` on the right. This is sklearn
+   convention so the mixin's methods (e.g. `TransformerMixin`'s
+   `fit_transform`) win MRO over `BaseEstimator`'s defaults.
+   Reversing the order is a real bug, not just style.
+
+   ```python
+   # ✅ Correct: Mixin first, BaseEstimator on the right
+   class MyEncoder(TransformerMixin, BaseEstimator):
+       def fit(self, X, y=None): ...
+       def transform(self, X): ...
+
+   # ❌ Wrong: BaseEstimator first — Mixin's fit_transform loses MRO
+   class MyEncoder(BaseEstimator, TransformerMixin):
+       ...
+   ```
+
+**The most-common skip:** hand-rolling a `TargetEncoder` subclass
+when `sklearn.preprocessing.TargetEncoder` exists. If you're
+about to write `class TargetEncoder(TransformerMixin, BaseEstimator):`
+— STOP, look up the sklearn built-in via `python-api` first.
 
 **Litmus test:** would this output change if I called it on the
 training subset alone vs the whole frame? If yes → stateful →
@@ -419,8 +515,9 @@ the precise signature. Full catalogue with code:
    tuning skill owns search.
 6. **Custom sklearn transformer** — author only when (a) no
    built-in fits and (b) the operation is stateful. Subclass
-   `BaseEstimator` + `TransformerMixin`. For a stateless op,
-   write a function and use `.skb.apply_func`.
+   `TransformerMixin` + `BaseEstimator` (Mixin first — see
+   Rule 5). For a stateless op, write a function and use
+   `.skb.apply_func`.
 
 ## Companion skills
 

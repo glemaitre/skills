@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Refuse the proposed loader-baked target shift.",
+      "passed": true,
+      "evidence": "The response explicitly refuses the loader-baked shift: 'The loader is pure: load_history reads the source, returning raw data untouched.' The architecture section opens by calling SHIFT+DROP in the loader 'the forbidden anti-pattern'."
+    },
+    {
+      "text": "Cite the late-mark_as_X forbidden rule (cross-row dependency).",
+      "passed": false,
+      "evidence": "The response does not explicitly cite the late-mark_as_X forbidden rule or name 'cross-row dependency' as such. It discusses the SHIFT+DROP anti-pattern but does not specifically invoke the rule that mark_as_X must not be placed after a cross-row shift operation in the pipeline."
+    },
+    {
+      "text": "Cite Layer 1 doesn't know the question — the 24-hour horizon belongs to Layer 2, not the loader.",
+      "passed": true,
+      "evidence": "Key Points section states: 'The loader is simple: load_history just reads the raw table. It doesn’t know about the 24-hour horizon or the predict grid.' and the 24-hour horizon is explicitly placed in AlignByHorizon (Layer 2) via horizon_hours=24."
+    },
+    {
+      "text": "Propose the three-layer pattern: history_source + predict_grid as Layer 1; Layer 2 aligns into {X, y} and marks; Layer 3 features take X + history as references.",
+      "passed": true,
+      "evidence": "The response defines exactly this structure: Layer 1 has history_source and predict_grid roots; Layer 2 uses AlignByHorizon to produce {X, y} with mark_as_X / mark_as_y; Layer 3 uses add_lagged_features(X, history) referencing both X and the upstream history DataOp."
+    },
+    {
+      "text": "The response does NOT: Accept the loader-baked shift as written.",
+      "passed": true,
+      "evidence": "The loader-baked shift is rejected throughout. load_history is kept pure (no shift, no drop) and the shift logic is moved entirely to Layer 2's AlignByHorizon."
+    },
+    {
+      "text": "The response does NOT: Propose a wrapper estimator whose transform/fit_transform calls .drop_nulls() / .dropna() / .filter() to remove rows the pipeline produced.",
+      "passed": true,
+      "evidence": "AlignByHorizon.fit_transform uses an inner JOIN (grid.join(target, on=[...], how='inner')) with no .drop_nulls(), .dropna(), or .filter() call. AlignByHorizon.transform returns env['predict_grid'] directly with no filtering."
+    },
+    {
+      "text": "The response does NOT: Suggest feature_steps=[] toggle in build_learner.",
+      "passed": true,
+      "evidence": "build_learner signature is def build_learner(predict_grid_preview=None, history_source_preview=None) — no feature_steps parameter is present."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "total": 7,
+    "pass_rate": 0.857
+  }
+}

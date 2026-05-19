@@ -1,0 +1,90 @@
+{
+  "skill_name": "python-code-style",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `src/claim_predictor/pipeline.py` was modified this turn.\n- `ruff.toml` exists at project root.\n- `pixi run ruff --version` succeeds (ruff is installed).]\n\nI just edited `src/claim_predictor/pipeline.py`. Run the style\npass.",
+      "expected_output": "Behavioural response satisfying: - List the three ruff commands in order: 1. `pixi run ruff format src/claim_predictor/pipeline.py` 2. `pixi run ruff check --fix src/claim_predictor/pipeline.py` 3. `pixi run ruff check src/claim_predictor/pipeline.py` - Cite the one-fix-per-file rule (max 2 passes per warning). - Mention the touched-file scope only (not the whole `src/`). It must NOT: - Recommend `black` / `isort` / `flake8` / `pydocstyle` / `pylint`. - Set up a PostToolUse / PreToolUse hook. - Lint the entire repo / glob unrelated files.",
+      "files": [],
+      "expectations": [
+        "List the three ruff commands in order: 1. `pixi run ruff format src/claim_predictor/pipeline.py` 2. `pixi run ruff check --fix src/claim_predictor/pipeline.py` 3. `pixi run ruff check src/claim_predictor/pipeline.py`",
+        "Cite the one-fix-per-file rule (max 2 passes per warning).",
+        "Mention the touched-file scope only (not the whole `src/`).",
+        "The response does NOT: Recommend `black` / `isort` / `flake8` / `pydocstyle` / `pylint`.",
+        "The response does NOT: Set up a PostToolUse / PreToolUse hook.",
+        "The response does NOT: Lint the entire repo / glob unrelated files."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `pyproject.toml` exists, `src/<pkg>/`, `experiments/`, `journal/`\n  scaffolded.\n- No `ruff.toml` at the project root.\n- ruff is installed via the env manager.]\n\nSet up the linter config for this freshly scaffolded workspace.\nHere's the content of `.agents/skills/python-code-style/templates/ruff.toml`\nfrom the bundle (I just read it for you):\n\n```toml\nline-length = 88\ntarget-version = \"py312\"\n\n[lint]\nselect = [\"E\", \"F\", \"W\", \"I\", \"B\", \"UP\", \"D\"]\nignore = [\n    # Imports do not have to live at the top of the file \u2014 `# %%` cells\n    # in `experiments/` interleave imports between code blocks.\n    \"E402\",\n    # Bare expressions are intentional in `# %%` notebook cells (display output).\n    \"B018\",\n]\n\n[lint.pydocstyle]\nconvention = \"numpy\"\n\n[format]\ndocstring-code-format = true\n```",
+      "expected_output": "Behavioural response satisfying: - Identify this as **Initial setup** \u2014 drop the bundled template. - Write the content shown above **verbatim** to `<project-root>/ruff.toml` (no added sections, no invented per-file ignores, no syntax changes). - Run a verify step (e.g. `pixi run ruff check --show-settings .`). It must NOT: - Inline ruff config into `pyproject.toml` automatically. - Add sections / rules / per-file ignores that aren't in the template content above (especially: `[build]` is NOT a valid ruff section; `[lint.per-file-ignores]` for `experiments/**` is NOT in this template \u2014 the template handles experiment cells via the global `E402` / `B018` ignores). - Add `D100` / `D103` per-file ignores not in the template.",
+      "files": [],
+      "expectations": [
+        "Identify this as **Initial setup** \u2014 drop the bundled template.",
+        "Write the content shown above **verbatim** to `<project-root>/ruff.toml` (no added sections, no invented per-file ignores, no syntax changes).",
+        "Run a verify step (e.g. `pixi run ruff check --show-settings .`).",
+        "The response does NOT: Inline ruff config into `pyproject.toml` automatically.",
+        "The response does NOT: Add sections / rules / per-file ignores that aren't in the template content above (especially: `[build]` is NOT a valid ruff section; `[lint.per-file-ignores]` for `experiments/**` is NOT in this template \u2014 the template handles experiment cells via the global `E402` / `B018` ignores).",
+        "The response does NOT: Add `D100` / `D103` per-file ignores not in the template.",
+        "The response does NOT: Author a \"richer\" ruff.toml from memory ignoring the template."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `ruff.toml` exists, `.claude/settings.local.json` present.]\n\nWire up a PostToolUse hook so ruff runs automatically every time\nany `.py` file is edited.",
+      "expected_output": "Behavioural response satisfying: - Refuse to configure the hook in this skill. - Cite the Stop condition (this skill is intentionally manual; hook tightens the loop in ways that bite). - Redirect the user to `update-config` if they really want a hook later, BUT note the default is no hook. It must NOT: - Edit `.claude/settings.local.json` to add a PostToolUse hook. - Add a `PreToolUse` hook either. - Silently agree without surfacing the trade-off.",
+      "files": [],
+      "expectations": [
+        "Refuse to configure the hook in this skill.",
+        "Cite the Stop condition (this skill is intentionally manual; hook tightens the loop in ways that bite).",
+        "Redirect the user to `update-config` if they really want a hook later, BUT note the default is no hook.",
+        "The response does NOT: Edit `.claude/settings.local.json` to add a PostToolUse hook.",
+        "The response does NOT: Add a `PreToolUse` hook either.",
+        "The response does NOT: Silently agree without surfacing the trade-off."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- ruff is already installed.]\n\nI prefer `black` and `isort`. Set those up instead of ruff.",
+      "expected_output": "Behavioural response satisfying: - Refuse the substitution. - Cite that ruff is the canonical linter in this stack (Tier 1 mandatory per `data-science-python-stack`). - Explain: ruff covers both formatting (black-equivalent) and import sorting (isort-equivalent) plus the lint rules. It must NOT: - `pip install black` / `pip install isort` (or any install command). - Add `black` / `isort` to the manager's manifest. - Set up alternative configs (`.black.toml`, `.isort.cfg`).",
+      "files": [],
+      "expectations": [
+        "Refuse the substitution.",
+        "Cite that ruff is the canonical linter in this stack (Tier 1 mandatory per `data-science-python-stack`).",
+        "Explain: ruff covers both formatting (black-equivalent) and import sorting (isort-equivalent) plus the lint rules.",
+        "The response does NOT: `pip install black` / `pip install isort` (or any install command).",
+        "The response does NOT: Add `black` / `isort` to the manager's manifest.",
+        "The response does NOT: Set up alternative configs (`.black.toml`, `.isort.cfg`)."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- File is `src/claim_predictor/predictor.py`.\n- `ruff.toml` exists with `pydocstyle.convention = \"numpy\"`.]\n\nI just wrote `def predict_price(X, model): ...` \u2014 what should the\ndocstring look like? Just a one-line summary is fine.",
+      "expected_output": "Behavioural response satisfying: - Show the numpydoc shape: one-line summary + `Parameters` / `Returns` sections, parameter shapes in the type slot, blank line between summary and the rest. - Cite that a one-line summary alone won't satisfy ruff's `D` rules for a public function (D100/D103 don't apply but the numpy convention expects the sections). - Note: imperative mood (\"Predict ...\" not \"Predicts ...\"), trailing period (numpy convention writes it). It must NOT: - Approve a bare one-line docstring for a public function. - Suggest Google-style or RST-style docstrings. - Recommend disabling the `D` rules to avoid writing the sections.",
+      "files": [],
+      "expectations": [
+        "Show the numpydoc shape: one-line summary + `Parameters` / `Returns` sections, parameter shapes in the type slot, blank line between summary and the rest.",
+        "Cite that a one-line summary alone won't satisfy ruff's `D` rules for a public function (D100/D103 don't apply but the numpy convention expects the sections).",
+        "Note: imperative mood (\"Predict ...\" not \"Predicts ...\"), trailing period (numpy convention writes it).",
+        "The response does NOT: Approve a bare one-line docstring for a public function.",
+        "The response does NOT: Suggest Google-style or RST-style docstrings.",
+        "The response does NOT: Recommend disabling the `D` rules to avoid writing the sections."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `pipeline.py` was edited this turn.\n- `evaluate.py` has pre-existing `D` warnings on untouched code.]\n\nWhile running ruff on the edited `pipeline.py`, I noticed\n`evaluate.py` has 7 unrelated `D` warnings. Fix all of them.",
+      "expected_output": "Behavioural response satisfying: - Fix the warnings in `pipeline.py` (in-scope; touched this turn). - **Surface** the `evaluate.py` warnings to the user \u2014 list them briefly \u2014 and ask whether to address them as a separate task. - Cite the \"don't widen scope on touched files\" rule. It must NOT: - Auto-fix `evaluate.py` in this turn without asking. - Run `ruff check --fix evaluate.py` as part of this turn. - Silently ignore the `evaluate.py` warnings (the user should know they exist).",
+      "files": [],
+      "expectations": [
+        "Fix the warnings in `pipeline.py` (in-scope; touched this turn).",
+        "**Surface** the `evaluate.py` warnings to the user \u2014 list them briefly \u2014 and ask whether to address them as a separate task.",
+        "Cite the \"don't widen scope on touched files\" rule.",
+        "The response does NOT: Auto-fix `evaluate.py` in this turn without asking.",
+        "The response does NOT: Run `ruff check --fix evaluate.py` as part of this turn.",
+        "The response does NOT: Silently ignore the `evaluate.py` warnings (the user should know they exist)."
+      ]
+    }
+  ]
+}

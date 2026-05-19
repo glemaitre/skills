@@ -1,0 +1,383 @@
+{
+  "metadata": {
+    "skill_name": "iterate-ml-experiment",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-05-18T22:29:04Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 24.2,
+        "tokens": 1253,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Read `journal/JOURNAL.md` first (mention it explicitly).",
+          "passed": true,
+          "evidence": "Response opens with: '**Read state:** `journal/JOURNAL.md` confirms 2 done rows in History' \u2014 the file is explicitly named and its contents described."
+        },
+        {
+          "text": "Surface the **sourcing menu verbatim** with the four options (`skore` / `user` / `my-pick` / `B<N>`).",
+          "passed": true,
+          "evidence": "All four options appear under '## How would you like me to source the next experiment?' with labels **skore**, **user**, **my-pick**, and **B<N>** \u2014 matching the required names exactly."
+        },
+        {
+          "text": "Surface the Backlog table alongside the menu.",
+          "passed": true,
+          "evidence": "A markdown table '## Backlog (pick by index):' with rows B1, B2, B3 appears immediately after the sourcing menu."
+        },
+        {
+          "text": "Use `AskUserQuestion` (or its narrative equivalent \u2014 explicitly say 'I'll ask you to pick') rather than silently picking one option.",
+          "passed": true,
+          "evidence": "Response ends with the explicit question: 'Which option would you prefer?' \u2014 a clear narrative equivalent of asking the user to pick."
+        },
+        {
+          "text": "The response does NOT: Silently default to one sourcing strategy.",
+          "passed": true,
+          "evidence": "No sourcing strategy is chosen; the response presents all four options and defers to the user."
+        },
+        {
+          "text": "The response does NOT: Skip the sourcing menu and immediately draft a design note.",
+          "passed": true,
+          "evidence": "No design note or experiment draft is present. The entire response is a status summary followed by the sourcing menu and backlog table."
+        },
+        {
+          "text": "The response does NOT: Default to `skore` just because a fresh report sits on disk.",
+          "passed": true,
+          "evidence": "`skore` is listed as one of four equal options; no automatic invocation of `report.diagnosis()` occurs, and no skore-sourced finding is added to the backlog without user instruction."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 34.2,
+        "tokens": 1490,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse to skip the design note.",
+          "passed": true,
+          "evidence": "Response opens with: 'I can't skip the design note. Here's why:' \u2014 unambiguous refusal."
+        },
+        {
+          "text": "Cite the G-DESIGN rule (design note exists and is approved before any `experiments/NN_*.py` is touched).",
+          "passed": true,
+          "evidence": "Response states: 'G-DESIGN is non-negotiable \u2014 design notes are written first and approved first; the experiment script is its consequence.' and later confirms 'Only then does experiments/01_baseline.py get written.'"
+        },
+        {
+          "text": "Cite the forbidden-shortcut explicitly: 'quick' is not permission to skip G-DESIGN.",
+          "passed": true,
+          "evidence": "Response quotes verbatim from the skill: '\"Quick baseline\" / \"standard\" / \"skip questions\" are not permission to skip G-DESIGN. The design note is the postmortem\u2019s frozen Method \u2014 skipping approval means the postmortem cites text the user never saw.'"
+        },
+        {
+          "text": "Still propose to auto-draft `journal/01_baseline.md` (bootstrap mode forces the baseline) and surface the config gates.",
+          "passed": true,
+          "evidence": "Response identifies 'Bootstrap mode detected', declares the baseline is 'forced (auto-drafted, not invented)', proposes 'Next: Auto-draft journal/01_baseline.md', and explicitly lists the config gates: G-PKG-NAME, G-ENV-MGR, G-TABULAR, G-CV-SPLITTER, G-DESIGN, G-RUN."
+        },
+        {
+          "text": "The response does NOT: Treat 'quick' / 'standard' / 'skip questions' as resolving any gate.",
+          "passed": true,
+          "evidence": "The response explicitly names these as forbidden shortcuts and does not use them as justification to skip any gate. All gates are described as still firing: 'Config gates still fire \u2014 G-PKG-NAME, G-ENV-MGR, G-TABULAR, G-CV-SPLITTER, G-DESIGN, G-RUN all apply.'"
+        },
+        {
+          "text": "The response does NOT: Write `experiments/01_baseline.py` in this turn.",
+          "passed": true,
+          "evidence": "No experiment file was written. The response defers writing to after approval: 'Only then does experiments/01_baseline.py get written.' The outputs directory contains only response.md."
+        },
+        {
+          "text": "The response does NOT: Write any `src/<pkg>/*.py` file in this turn.",
+          "passed": true,
+          "evidence": "No src files were created. The outputs directory contains only response.md. Writing pipeline.py, features.py, data.py, evaluate.py is deferred to after design-note approval."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 16.1,
+        "tokens": 27515,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse to write evaluate.py directly.",
+          "passed": true,
+          "evidence": "Response explicitly refuses: 'Writing evaluate.py without this skill invocation violates the operating contract' and labels it a 'Stop condition: Forbidden shortcut detected'."
+        },
+        {
+          "text": "Cite the three-skill chain requirement: build-ml-pipeline -> evaluate-ml-pipeline -> test-ml-pipeline.",
+          "passed": true,
+          "evidence": "Response lists the chain in order: '1. build-ml-pipeline ... 2. evaluate-ml-pipeline ... 3. test-ml-pipeline -> smoke-test-ml-pipeline'."
+        },
+        {
+          "text": "Mention that evaluate-ml-pipeline owns the CV-strategy decision and surfaces it via AskUserQuestion.",
+          "passed": true,
+          "evidence": "Explicitly stated: 'The evaluate-ml-pipeline skill owns the CV-strategy decision and surfaces it via AskUserQuestion'."
+        },
+        {
+          "text": "Propose to invoke build-ml-pipeline first (the order matters).",
+          "passed": false,
+          "evidence": "The 'What must happen instead' action plan (step 2) says 'Invoke evaluate-ml-pipeline first (before any evaluate.py write)', which skips naming build-ml-pipeline as the immediate next invocation. The chain is listed in the body but the call-to-action does not clearly direct the user to start with build-ml-pipeline."
+        },
+        {
+          "text": "The response does NOT open src/<pkg>/evaluate.py in Write/Edit during this turn.",
+          "passed": true,
+          "evidence": "No Write or Edit call targeting evaluate.py is present in the response."
+        },
+        {
+          "text": "The response does NOT hard-code KFold(5) anywhere without invoking evaluate-ml-pipeline first.",
+          "passed": true,
+          "evidence": "KFold(5) is referenced only as a quoted user request, never written as code."
+        },
+        {
+          "text": "The response does NOT skip the python-api consultation for signatures used in the evaluation call.",
+          "passed": true,
+          "evidence": "No evaluation code is written in this turn, so no python-api consultation is bypassed. The refusal prevents the violation from occurring."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.143,
+        "passed": 1,
+        "failed": 6,
+        "total": 7,
+        "time_seconds": 28.9,
+        "tokens": 23292,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Read `journal/JOURNAL.md` first (mention it explicitly).",
+          "passed": false,
+          "evidence": "The response says 'Based on the workspace journal' but never explicitly mentions reading `journal/JOURNAL.md` by name. It references journal content indirectly but does not surface that it read the specific file."
+        },
+        {
+          "text": "Surface the sourcing menu verbatim with the four options (`skore` / `user` / `my-pick` / `B<N>`).",
+          "passed": false,
+          "evidence": "No sourcing menu is presented at all. The response jumps straight to recommending next steps without showing any menu of sourcing strategies."
+        },
+        {
+          "text": "Surface the Backlog table alongside the menu.",
+          "passed": false,
+          "evidence": "The Backlog is only mentioned indirectly ('The backlog contains 3 candidate next experiments (B1, B2, B3)') with no table reproduced from JOURNAL.md."
+        },
+        {
+          "text": "Use `AskUserQuestion` (or its narrative equivalent \u2014 explicitly say 'I'll ask you to pick') rather than silently picking one option.",
+          "passed": false,
+          "evidence": "The response does not use AskUserQuestion nor does it explicitly say 'I'll ask you to pick'. The closest it comes is 'Next action: Review the backlog context and select which candidate to promote', but this is a directive to the user, not an explicit prompt asking them to choose a sourcing strategy."
+        },
+        {
+          "text": "The response does NOT: Silently default to one sourcing strategy.",
+          "passed": false,
+          "evidence": "The response implicitly defaults to a skore-derived analysis by treating B1/B2/B3 as the candidates to evaluate next, without presenting any other sourcing options or asking the user to choose."
+        },
+        {
+          "text": "The response does NOT: Skip the sourcing menu and immediately draft a design note.",
+          "passed": true,
+          "evidence": "The response does not draft a design note for a specific experiment. It stops short of creating journal/03_<name>.md content, instead describing what steps would follow."
+        },
+        {
+          "text": "The response does NOT: Default to `skore` just because a fresh report sits on disk.",
+          "passed": false,
+          "evidence": "The response implicitly defaults to skore-sourced candidates (B1, B2, B3 'from previous iterate-from-skore analysis') without surfacing other sourcing options or asking the user to choose."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 31.4,
+        "tokens": 34380,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse to skip the design note.",
+          "passed": true,
+          "evidence": "The response explicitly states 'I need to enforce the G-DESIGN gate here' and makes clear that no experiments/NN_*.py is created until the design note exists and is approved. The refusal is unambiguous."
+        },
+        {
+          "text": "Cite the G-DESIGN rule (design note exists and is approved before any `experiments/NN_*.py` is touched).",
+          "passed": true,
+          "evidence": "The response states verbatim: 'No `experiments/NN_*.py` is created or touched until `journal/NN_*.md` exists, is fully filled in, and you\u2019ve explicitly approved it.' This is a precise citation of the G-DESIGN rule."
+        },
+        {
+          "text": "Cite the forbidden-shortcut explicitly: 'quick' is not permission to skip G-DESIGN.",
+          "passed": true,
+          "evidence": "The response explicitly names the forbidden shortcut: '\"Quick\" or \"standard\" does not resolve this gate. That\u2019s the forbidden shortcut named explicitly in the skill: User said \"quick baseline\" \u2192 skip G-DESIGN. It\u2019s wrong because the design note is the contract, not an optional luxury.'"
+        },
+        {
+          "text": "Still propose to auto-draft `journal/01_baseline.md` (bootstrap mode forces the baseline) and surface the config gates.",
+          "passed": true,
+          "evidence": "The response proposes 'I\u2019ll auto-draft `journal/01_baseline.md` for you to review and approve' and surfaces config gates: G-PKG-NAME, G-ENV-MGR, G-TABULAR, G-CV-SPLITTER, G-DESIGN, and G-RUN are all listed explicitly."
+        },
+        {
+          "text": "The response does NOT: Treat 'quick' as resolving any gate.",
+          "passed": true,
+          "evidence": "The response explicitly rejects 'quick' or 'standard' as permission to skip any gate. No gate is treated as resolved by the user's framing."
+        },
+        {
+          "text": "The response does NOT: Write `experiments/01_baseline.py` in this turn.",
+          "passed": true,
+          "evidence": "The response does not write or reference writing experiments/01_baseline.py. It defers this to after design note approval and handoff to build-ml-pipeline, evaluate-ml-pipeline, and test-ml-pipeline."
+        },
+        {
+          "text": "The response does NOT: Write any `src/<pkg>/*.py` file in this turn.",
+          "passed": true,
+          "evidence": "No src/<pkg>/*.py file is written or referenced as being written in the response. The response only proposes drafting the design note journal/01_baseline.md."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.143,
+        "passed": 1,
+        "failed": 6,
+        "total": 7,
+        "time_seconds": 5.0,
+        "tokens": 16843,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Refuse to write evaluate.py directly.",
+          "passed": false,
+          "evidence": "The response did not refuse on principle. It described the contents of evaluate.py as if it would be written, only noting the file 'has NOT been created' as a procedural status rather than a principled refusal citing skill-chain requirements."
+        },
+        {
+          "text": "Cite the three-skill chain requirement: build-ml-pipeline -> evaluate-ml-pipeline -> test-ml-pipeline.",
+          "passed": false,
+          "evidence": "No mention of any skill chain. The response does not reference build-ml-pipeline, evaluate-ml-pipeline, or test-ml-pipeline at all."
+        },
+        {
+          "text": "Mention evaluate-ml-pipeline owns the CV-strategy decision via AskUserQuestion.",
+          "passed": false,
+          "evidence": "Neither evaluate-ml-pipeline nor AskUserQuestion is mentioned anywhere in the response."
+        },
+        {
+          "text": "Propose to invoke build-ml-pipeline first.",
+          "passed": false,
+          "evidence": "No proposal to invoke build-ml-pipeline or any skill is made."
+        },
+        {
+          "text": "The response does NOT open src/<pkg>/evaluate.py in Write/Edit.",
+          "passed": true,
+          "evidence": "The response explicitly states the file has NOT been created, and no Write/Edit tool call was made on evaluate.py."
+        },
+        {
+          "text": "The response does NOT hard-code KFold(5) without invoking evaluate-ml-pipeline first.",
+          "passed": false,
+          "evidence": "The response explicitly states KFold(5) as the cross-validator to use and justifies it inline, without invoking evaluate-ml-pipeline."
+        },
+        {
+          "text": "The response does NOT skip python-api consultation.",
+          "passed": false,
+          "evidence": "There is no mention of python-api anywhere in the response; consultation is entirely skipped."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9523,
+        "stddev": 0.0826,
+        "min": 0.857,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 24.8333,
+        "stddev": 9.0666,
+        "min": 16.1,
+        "max": 34.2
+      },
+      "tokens": {
+        "mean": 10086.0,
+        "stddev": 15094.4219,
+        "min": 1253,
+        "max": 27515
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.4287,
+        "stddev": 0.4948,
+        "min": 0.143,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 21.7667,
+        "stddev": 14.5741,
+        "min": 5.0,
+        "max": 31.4
+      },
+      "tokens": {
+        "mean": 24838.3333,
+        "stddev": 8870.1721,
+        "min": 16843,
+        "max": 34380
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.52",
+      "time_seconds": "+3.1",
+      "tokens": "-14752"
+    }
+  },
+  "notes": []
+}
