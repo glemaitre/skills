@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pytest-skill-eval"
+version = "0.1.0"
+description = "Run Claude skill evals directly with pytest."
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Probabl", email = "guillaume@probabl.ai" }]
+dependencies = [
+    "pytest>=7",
+    "python-dotenv>=1.0",
+]
+
+[project.entry-points.pytest11]
+skill_eval = "pytest_skill_eval.plugin"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pytest_skill_eval"]

@@ -2,3 +2,8 @@
 scratch/
 eval/*-workspace/
 eval/*/transcripts/
+
+# Local secrets (API keys, etc.) — committed template is .env.example
+.env
+.env.local
+.env.*.local
