@@ -13,10 +13,10 @@ platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
 python = ">=3.11,<3.14"
 
 [tasks]
-hash = { cmd = "python tools/hash_skills.py", description = "Refresh per-skill and aggregate SHA-256 hashes in catalog.json." }
-hash-check = { cmd = "python tools/hash_skills.py --check", description = "Verify catalog.json hashes match the on-disk skills (non-zero exit on drift)." }
-validate = { cmd = "python tools/validate_catalog.py", description = "Validate catalog.json structure: skill/folder symmetry, categories, workflow references." }
-check-versions = { cmd = "python tools/check_versions.py", description = "Verify the version matches across catalog.json, pixi.toml, and the Claude/Cursor plugin manifests." }
+hash = { cmd = "python tools/hash_skills.py", description = "Refresh per-skill and aggregate SHA-256 hashes in .catalog.json." }
+hash-check = { cmd = "python tools/hash_skills.py --check", description = "Verify .catalog.json hashes match the on-disk skills (non-zero exit on drift)." }
+validate = { cmd = "python tools/validate_catalog.py", description = "Validate .catalog.json structure: skill/folder symmetry, categories, workflow references." }
+check-versions = { cmd = "python tools/check_versions.py", description = "Verify the version matches across .catalog.json, pixi.toml, and the Claude/Cursor plugin manifests." }
 bump-major = { cmd = "python tools/bump_version.py major", description = "Bump the major version across all version sources." }
 bump-minor = { cmd = "python tools/bump_version.py minor", description = "Bump the minor version across all version sources." }
 bump-patch = { cmd = "python tools/bump_version.py patch", description = "Bump the patch version across all version sources." }
