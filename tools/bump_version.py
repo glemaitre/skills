@@ -2,7 +2,7 @@
 """Bump the package version across every declaring source.
 
 Increments the semver ``major``, ``minor``, or ``patch`` component and
-writes the new version consistently to ``catalog.json``, ``pixi.toml``,
+writes the new version consistently to ``.catalog.json``, ``pixi.toml``,
 ``.claude-plugin/plugin.json``, ``.claude-plugin/marketplace.json``, and
 ``.cursor-plugin/plugin.json``.
 
@@ -32,7 +32,7 @@ from check_versions import check, collect_versions  # noqa: E402
 SEMVER_RE = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 
 VERSION_FILES: tuple[str, ...] = (
-    "catalog.json",
+    ".catalog.json",
     "pixi.toml",
     ".claude-plugin/plugin.json",
     ".claude-plugin/marketplace.json",

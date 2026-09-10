@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compute SHA-256 hashes for each skill in ``catalog.json``.
+"""Compute SHA-256 hashes for each skill in ``.catalog.json``.
 
 For every entry in the catalog's ``skills`` array, this script walks the
 skill's ``path`` directory, hashes every file's relative path + content
@@ -12,14 +12,14 @@ whole catalog.
 
 Usage
 -----
-    # Update catalog.json in place
+    # Update .catalog.json in place
     python tools/hash_skills.py
 
     # Check mode: exit non-zero if any hash is stale (no writes)
     python tools/hash_skills.py --check
 
     # Use a non-default catalog path
-    python tools/hash_skills.py --catalog path/to/catalog.json
+    python tools/hash_skills.py --catalog path/to/.catalog.json
 
 Notes
 -----
@@ -194,12 +194,12 @@ def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     summary = (__doc__ or "").splitlines()[0] if __doc__ else ""
     parser = argparse.ArgumentParser(description=summary)
-    default_catalog = Path(__file__).resolve().parent.parent / "catalog.json"
+    default_catalog = Path(__file__).resolve().parent.parent / ".catalog.json"
     parser.add_argument(
         "--catalog",
         type=Path,
         default=default_catalog,
-        help="Path to catalog.json (default: %(default)s).",
+        help="Path to .catalog.json (default: %(default)s).",
     )
     parser.add_argument(
         "--check",

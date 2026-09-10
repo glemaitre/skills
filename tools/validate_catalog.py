@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Validate ``catalog.json`` against the on-disk ``skills/`` directory.
+"""Validate ``.catalog.json`` against the on-disk ``skills/`` directory.
 
 The validator enforces four invariants:
 
 1. Every directory under ``skills/`` has a matching entry in
-   ``catalog.json``'s ``skills`` array, and vice versa.
+   ``.catalog.json``'s ``skills`` array, and vice versa.
 2. Every catalog entry's ``path`` resolves to a directory containing a
    ``SKILL.md`` file.
 3. Every skill entry uses a known ``category`` and a permitted
@@ -64,13 +64,13 @@ def validate(catalog_path: Path) -> list[str]:
     missing_in_catalog = folder_ids - catalog_ids
     if missing_in_catalog:
         errors.append(
-            f"skill folders without a catalog.json entry: {sorted(missing_in_catalog)}"
+            f"skill folders without a .catalog.json entry: {sorted(missing_in_catalog)}"
         )
 
     missing_folders = catalog_ids - folder_ids
     if missing_folders:
         errors.append(
-            "catalog.json entries without a matching skills/ folder: "
+            ".catalog.json entries without a matching skills/ folder: "
             f"{sorted(missing_folders)}"
         )
 
@@ -115,12 +115,12 @@ def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     summary = (__doc__ or "").splitlines()[0] if __doc__ else ""
     parser = argparse.ArgumentParser(description=summary)
-    default_catalog = Path(__file__).resolve().parent.parent / "catalog.json"
+    default_catalog = Path(__file__).resolve().parent.parent / ".catalog.json"
     parser.add_argument(
         "--catalog",
         type=Path,
         default=default_catalog,
-        help="Path to catalog.json (default: %(default)s).",
+        help="Path to .catalog.json (default: %(default)s).",
     )
     return parser.parse_args()
 

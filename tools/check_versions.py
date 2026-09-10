@@ -7,7 +7,7 @@ bump can never leave one source lagging behind another.
 
 Sources checked
 ---------------
-1. ``catalog.json``                 -> top-level ``version``.
+1. ``.catalog.json``                -> top-level ``version``.
 2. ``pixi.toml``                    -> ``[workspace] version``.
 3. ``.claude-plugin/plugin.json``   -> ``version``.
 4. ``.claude-plugin/marketplace.json`` -> each ``plugins[].version``.
@@ -50,12 +50,12 @@ def collect_versions(repo_root: Path) -> tuple[dict[str, str], list[str]]:
     versions: dict[str, str] = {}
     errors: list[str] = []
 
-    catalog_path = repo_root / "catalog.json"
+    catalog_path = repo_root / ".catalog.json"
     try:
         catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-        versions["catalog.json"] = catalog["version"]
+        versions[".catalog.json"] = catalog["version"]
     except (OSError, json.JSONDecodeError, KeyError) as exc:
-        errors.append(f"catalog.json: could not read version ({exc})")
+        errors.append(f".catalog.json: could not read version ({exc})")
 
     pixi_path = repo_root / "pixi.toml"
     try:
