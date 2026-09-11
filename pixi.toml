@@ -49,7 +49,7 @@ python-dotenv = ">=1.0"
 # `--skill-judge-model`, `--skill-mode`, and `--skill-pass-ratio`.
 [feature.eval.activation.env]
 # Small, cheap models: the skills must stay legible to these.
-SKILL_EVAL_MODELS = "openrouter/deepseek/deepseek-v4.1-flash,openrouter/z-ai/glm-5.3-flash,openrouter/qwen/qwen3.8-27b"
+SKILL_EVAL_MODELS = "openrouter/deepseek/deepseek-v4.1-flash"  # ,openrouter/z-ai/glm-5.3-flash,openrouter/qwen/qwen3.8-27b"
 SKILL_EVAL_JUDGE_MODEL = "openrouter/anthropic/claude-opus-5"
 SKILL_EVAL_MODE = "with"
 SKILL_EVAL_PASS_RATIO = "0.8"

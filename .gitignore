@@ -2,8 +2,8 @@
 scratch/
 eval/*-workspace/
 
-# Eval transcripts (local only): .transcript/<skill>/<run-id>/
-.transcript/
+# Eval transcripts (local only): .transcripts/<run-id>/<skill>/
+.transcripts/
 
 # Local secrets (API keys, etc.) — committed template is .env.example
 .env

@@ -92,7 +92,7 @@ traceback. The session summary lists failed `(skill, case, title)` rows.
 
 Transcripts are written even when the visible reply is empty (reasoning
 models sometimes fill `reasoning_content` only). They land under
-`.transcript/<skill>/<run-id>/` and are gitignored. Each case
+`.transcripts/<run-id>/<skill>/` and are gitignored. Each case
 writes a `.json` payload and a sibling `.md` with the prompt, grouped
 expectations, `finish_reason` / `judged_from` / usage, the raw reply,
 and each metric's score and reason. If `content` is empty, GEval judges

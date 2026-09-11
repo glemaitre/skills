@@ -74,7 +74,9 @@ def pytest_configure(config: pytest.Config) -> None:
 
 @pytest.fixture(scope="session")
 def eval_run_id() -> str:
-    return new_run_id()
+    run_id = new_run_id()
+    ensure_transcript_dirs(run_id)
+    return run_id
 
 
 def _load_dotenv(config: pytest.Config) -> None:

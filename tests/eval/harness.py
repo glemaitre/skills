@@ -15,7 +15,7 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILLS_DIR = REPO_ROOT / "skills"
-TRANSCRIPT_DIR = REPO_ROOT / ".transcript"
+TRANSCRIPT_DIR = REPO_ROOT / ".transcripts"
 
 DEFAULT_TARGET_MODEL = "openrouter/deepseek/deepseek-v4.1-flash"
 DEFAULT_JUDGE_MODEL = "openrouter/anthropic/claude-opus-5"
@@ -220,22 +220,28 @@ def new_run_id() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
-def ensure_transcript_dirs(skill_names: Sequence[str] | None = None) -> Path:
-    """Create `.transcript/<skill>/` for each skill that has evals."""
+def ensure_transcript_dirs(
+    run_id: str | None = None,
+    skill_names: Sequence[str] | None = None,
+) -> Path:
+    """Create `.transcripts/` and, when ``run_id`` is set, `<run-id>/<skill>/`."""
     TRANSCRIPT_DIR.mkdir(parents=True, exist_ok=True)
+    if run_id is None:
+        return TRANSCRIPT_DIR
     names = (
         list(skill_names)
         if skill_names is not None
         else [path.parent.parent.name for path in SKILLS_DIR.glob("*/evals/evals.json")]
     )
+    session = TRANSCRIPT_DIR / run_id
     for name in names:
-        (TRANSCRIPT_DIR / name).mkdir(parents=True, exist_ok=True)
-    return TRANSCRIPT_DIR
+        (session / name).mkdir(parents=True, exist_ok=True)
+    return session
 
 
 def transcript_path(case: EvalCase, *, run_id: str, mode: str, model: str) -> Path:
     name = f"case{case.case_id}-{mode}-{_short_model(model)}.json"
-    return TRANSCRIPT_DIR / case.skill_name / run_id / name
+    return TRANSCRIPT_DIR / run_id / case.skill_name / name
 
 
 def write_transcript(path: Path, payload: dict) -> Path:
