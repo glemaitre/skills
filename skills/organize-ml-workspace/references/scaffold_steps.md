@@ -1,6 +1,6 @@
 # Scaffold steps — full Decision flow with rationale
 
-SKILL.md has the 13-step compact form. This file elaborates the
+SKILL.md has the 12-step compact form. This file elaborates the
 rationale and examples per step. Load when the inline version
 doesn't answer a "why does this step do X?" question.
 
@@ -67,7 +67,7 @@ Copy `templates/experiment.py`, **substituting `<pkg>`** with the
 package name from step 2. This substitution is load-bearing: the
 `<pkg>` literals appear in `from <pkg> import ...` statements and
 are Python syntax errors if left in place — `python-code-style`'s
-ruff pass at step 12 will fail on them.
+ruff pass at step 11 will fail on them.
 
 The other placeholders (`<short title>`, `YYYY-MM-DD`,
 `<project-name>`, `<experiment-key>`) sit inside markdown comments
@@ -106,31 +106,19 @@ template — each skill owns its own template surface.
 `journal/01_baseline.md`, validated **before** the experiment
 script runs.
 
-## Step 8 — `overview/summary.md` placeholder
-
-Drop `templates/summary.md`. The placeholder documents the
-expected structure (project narrative + cross-experiment metrics
-table + per-experiment Status blocks) and carries a "_No
-experiments recorded yet._" line so the file is meaningful at
-scaffold time.
-
-`iterate-ml-experiment` § 4 rewrites it by hand on every outcome
-recording. **No Python script in `overview/`** — `summary.md` is
-agent-authored prose, not script output.
-
-## Step 9 — Empty `scratch/`
+## Step 8 — Empty `scratch/`
 
 Just `mkdir scratch`. **Do NOT drop a README inside** — the
-scratch convention is owned by `python-api` § "Scratch
-traceability" and lives in that skill, not in a file on disk.
+scratch convention is owned by `python-api` § "`scratch/`
+conventions" and lives in that skill, not in a file on disk.
 The folder is the agent's ad-hoc workspace; its contents are
-gitignored entirely via step 11.
+gitignored entirely via step 10.
 
-## Step 10 — Empty `reports/`
+## Step 9 — Empty `reports/`
 
 Just `mkdir reports`. Skore writes into it on the first run.
 
-## Step 11 — `.gitignore`
+## Step 10 — `.gitignore`
 
 If the project root has no `.gitignore`, drop `templates/.gitignore`
 (includes `reports/` and `scratch/` lines by default).
@@ -154,7 +142,20 @@ the default; ask before omitting. There is no
 `!scratch/README.md` exception — `scratch/` is gitignored in its
 entirety.
 
-## Step 12 — `ruff.toml` + first ruff pass
+**Never ignore the whole `data/` folder.** The EDA deliverables
+(`data/eda.py`, `data/eda.md`, `data/eda_*.html`, owned by
+`explore-ml-data`) live under `data/` and must stay committable; a
+`data/` (whole-folder) ignore makes them silently untracked, and a
+naive `!data/eda.md` negation does NOT re-include them when the
+parent directory is ignored. If raw **inputs** must be kept out of
+git (large / local-only), ignore specific input paths instead
+(`data/raw/`, `data/*.parquet`, …) and ask the user first. If an
+existing `.gitignore` already ignores the whole `data/`, surface the
+fix (switch to specific input patterns) rather than silently editing.
+`explore-ml-data` re-checks this at EDA time
+(`git check-ignore data/eda.md`).
+
+## Step 11 — `ruff.toml` + first ruff pass
 
 **Hand off to `python-code-style` § "Initial setup".** That skill
 owns its own `templates/ruff.toml`, writes it to the project
@@ -171,7 +172,7 @@ the one-line summary); the config alone only enforces ruff's
 The skill is **mandatory** at this step; skipping it is the most
 common way agents drop the NumPyDoc contract on Day 1.
 
-## Step 13 — Hand back
+## Step 12 — Hand back
 
 Hand off to the relevant sibling skill:
 

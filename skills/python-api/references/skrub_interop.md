@@ -33,7 +33,11 @@ report = skore.evaluate(LogisticRegression(), X, y, splitter=0.2)
 
 `X` and `y` are passed positionally (or by keyword). `splitter` is
 either a numeric `test_size`, a scikit-learn cross-validator, or
-left at the default.
+omitted. When omitted, `evaluate` reuses the splitter declared on the
+learner's DataOp via `mark_as_X(cv=...)` if present (→
+`CrossValidationReport`), else falls back to a single 80/20 holdout
+(→ `EstimatorReport`). An explicit `splitter=` overrides any DataOp
+`cv`.
 
 ### Env-dict-style — `data={"<var>": ...}`
 
@@ -89,7 +93,11 @@ The return type depends on `splitter`:
 |---|---|
 | `float` (e.g. `0.2`) or `None` | `EstimatorReport` — single train/test split |
 | A scikit-learn cross-validator (`KFold`, `TimeSeriesSplit`, custom) | `CrossValidationReport` — multi-fold |
+| omitted, DataOp has `mark_as_X(cv=...)` | `CrossValidationReport` — reuses the DataOp `cv` + `split_kwargs` |
+| omitted, no DataOp `cv` | `EstimatorReport` — single 80/20 holdout |
 | Multi-key comparison | `ComparisonReport` |
+
+An explicit `splitter=` always overrides a DataOp `cv`.
 
 Confirm the exact dispatch rules via `python-api`
 (`inspect.signature(skore.evaluate)` + the docstring) against the
@@ -99,23 +107,68 @@ installed skore version — the dispatch table can evolve.
 
 Every report goes under a **stable key** in the workspace's
 `skore.Project` so future runs can read it back (the
-`iterate-from-skore` skill mines these reports for diagnostics).
+`audit-ml-pipeline` skill renders each report to a markdown
+digest, and `iterate-from-skore` mines that digest for Backlog
+candidates).
+
+The Project init form depends on the workspace's `skore mode:`
+decision (recorded in `JOURNAL.md` Status `Workspace decisions`;
+gate owned by `organize-ml-workspace` § "G-SKORE-MODE"). Three
+forms; pick the one matching the workspace:
 
 ```python
-project = skore.Project(workspace="reports", name="load-forecast", mode="local")
+# local mode
+project = skore.Project(
+    name="load-forecast",
+    mode="local",
+    workspace=str(PROJECT_ROOT / "reports"),
+)
 project.put("01_baseline", report)
+```
+
+```python
+# hub mode
+from skore import login
+login(mode="hub")  # interactive on first run; cached after
+project = skore.Project(
+    name="load-forecast",
+    mode="hub",
+    workspace="<hub-workspace>",  # the Skore Hub org/team identifier
+)
+project.put("01_baseline", report)
+```
+
+```python
+# mlflow mode  (no login — auth is the MLflow server's concern)
+project = skore.Project(
+    name="load-forecast",            # MLflow experiment name
+    mode="mlflow",
+    tracking_uri="http://127.0.0.1:5000",  # recorded at G-SKORE-MODE
+)
+project.put("01_baseline", report)   # key = MLflow run name
 ```
 
 - **Key convention**: file stem of the experiment script. Re-using
   the key in a later run overwrites the previous report — fork into
-  a new experiment file if you want both.
-- **`workspace="reports"`** — the relative path to the Project store
-  on disk. Created on first `put`.
-- **`name="<project-name>"`** — short, stable, per-workspace name.
-  Set once at project bootstrap inside each experiment script's
-  `skore.Project(..., name=...)` call (the agent reads the value
-  from `experiments/01_baseline.py` when needed; there is no
-  auto-discovery script).
+  a new experiment file if you want both. (In mlflow mode the key
+  is the run name under the experiment.)
+- **`workspace=`** — required by local and hub modes, with a
+  different meaning each: local takes an **on-disk directory**
+  (`str(PROJECT_ROOT / "reports")`, created on first `put`), hub
+  takes the **Skore Hub org/team identifier** (`workspace="<hub-workspace>"`).
+  **Not** a valid kwarg in mlflow mode.
+- **mlflow-mode `tracking_uri=`** — the MLflow tracking server URI
+  (HTTP(S) server, `sqlite:///…`, or `file:./mlruns` backend).
+  mlflow-only kwarg; no `login()`. `skore[mlflow]` extra required.
+  `project.delete(...)` is supported for mlflow-mode projects (it
+  removes the matching experiment; raises `LookupError` if none
+  exists at the `tracking_uri`).
+- **`name=`** — short, stable, per-workspace name, used directly as
+  the bare project name in **all** modes (mlflow uses it as the
+  experiment name). Set once at project bootstrap inside each
+  experiment script's `skore.Project(...)` call (the agent reads
+  the value from `experiments/01_baseline.py` when needed; there is
+  no auto-discovery script).
 
 ## Reading back later
 
@@ -126,12 +179,18 @@ the id:
 ```python
 import skore
 
-project = skore.Project(workspace="reports", name="load-forecast", mode="local")
+# Project init form follows the workspace's `skore mode:` decision.
+# Local-mode form shown here; for hub mode see the previous section.
+project = skore.Project(
+    name="load-forecast",
+    mode="local",
+    workspace=str(PROJECT_ROOT / "reports"),
+)
 df = project.summarize().reset_index()
 id_ = df[df["key"] == "01_baseline"]["id"].iloc[0]
 report = project.get(id_)
-report.metrics.summarize().frame()  # mean ± std per CV metric
-report.diagnosis()                   # the structured diagnostic surface
+report.metrics.summarize().frame()  # task-appropriate headline metrics
+report.checks.summarize().frame()    # automated checks (passed / issue / tip)
 ```
 
 `project.summarize()` returns a pandas DataFrame indexed by id with
@@ -164,7 +223,11 @@ DATA_DIR = PROJECT_ROOT / "data"
 # ## Project
 
 # %%
-project = skore.Project(workspace="reports", name="load-forecast", mode="local")
+project = skore.Project(
+    name="load-forecast",
+    mode="local",
+    workspace=str(PROJECT_ROOT / "reports"),
+)  # local-mode form; see `organize-ml-workspace` § "G-SKORE-MODE" for hub
 
 # %% [markdown]
 # ## Learner
@@ -200,7 +263,7 @@ Note the clean separation:
 - **`splitter`** is the project's chosen cross-validator (the
   walk-forward splitter in `src/load_forecast/evaluate.py`).
 - **No agent-only `print` calls** — inspection is the agent's
-  scratch problem (see `python-api` § "Scratch traceability"),
+  scratch problem (see `python-api` § "`scratch/` conventions"),
   not the script's. The bare `report` line is jupytext display,
   not a debug print.
 
@@ -222,5 +285,8 @@ version — the kwargs differ between `EstimatorReport` (uses
   source-bound vars vs materialized `(X, y)` bindings.
 - `evaluate-ml-pipeline` — the methodology side: cross-validator
   choice, default metrics, structural metadata (`split_kwargs`).
-- `iterate-from-skore` — reads the persisted report's
-  `report.diagnosis()` to surface backlog candidates.
+- `iterate-from-skore` — reads the audit digest at
+  `scratch/audit/<stem>/audit.md` (produced by `audit-ml-pipeline`)
+  and converts each `issue` / `tip` row from the report's
+  `checks.summarize()` into a Backlog candidate, following the
+  check's `documentation_url` for the mitigation.

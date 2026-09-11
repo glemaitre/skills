@@ -20,6 +20,14 @@ reporting is owned by `skore` reports.
 - The task is **tracking** (params, metrics, artifacts, run
   comparison) → use `skore`'s Project API. Don't reach for
   `mlflow.log_param` / `mlflow.log_metric` / `mlflow.start_run`.
+  Note: if the team wants their skore reports **stored on an MLflow
+  tracking server**, that is still a skore-owned operation — use
+  `skore.Project(mode="mlflow", tracking_uri=...)` (the
+  `skore[mlflow]` backend) and keep calling `project.put(...)`. The
+  mode is picked at `organize-ml-workspace` § "G-SKORE-MODE"; you
+  still never call the raw `mlflow.log_*` API yourself. Install with an
+  explicit `mlflow>=3` pin (`skore[mlflow]` alone can resolve mlflow
+  2.x, which the backend doesn't support).
 - You only need to evaluate a model and produce a report → use
   `skore`'s `EstimatorReport` / `CrossValidationReport` /
   `ComparisonReport`.

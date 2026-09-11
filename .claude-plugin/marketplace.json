@@ -11,9 +11,9 @@
   "plugins": [
     {
       "name": "probabl-skills",
-      "source": ".",
-      "description": "Workflow skills for ML experimentation with skrub, scikit-learn, and skore: pipeline build / evaluate / test, iteration loop, workspace + tooling.",
-      "version": "0.1.0",
+      "source": "./",
+      "description": "Workflow skills for ML experimentation with skrub, scikit-learn, and skore: pipeline build / evaluate / test / audit, iteration loop, workspace + tooling.",
+      "version": "0.7.0",
       "author": {
         "name": "Probabl",
         "url": "https://probabl.ai"

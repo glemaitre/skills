@@ -30,18 +30,17 @@ DATA_DIR = PROJECT_ROOT / "data"
 # %% [markdown]
 # ## Project
 #
-# One project per workspace; each experiment writes its report under a
-# stable key (the file stem). Parameters:
-#
-# - `workspace="reports"` — the folder that holds the Project store.
-# - `name=...` — a short, stable project name inferred from the
-#   package / dataset / working directory; reused across all
-#   experiments in this workspace.
-# - `mode="local"` — current default. See `skore-api` for the full
-#   constructor and other supported modes.
+# Open the project that stores this experiment's report under a stable
+# key (the file stem). All reports for this workspace live together so
+# they can be compared across experiments.
 
 # %%
-project = skore.Project(workspace="reports", name="<project-name>", mode="local")
+# <SKORE_PROJECT_INIT>
+project = skore.Project(
+    name="<project-name>",
+    mode="local",
+    workspace=str(PROJECT_ROOT / "reports"),
+)
 
 # %% [markdown]
 # ## Data and learner
@@ -58,9 +57,9 @@ learner = build_learner(data_dir_preview=DATA_DIR)
 # ## Evaluate
 #
 # Cross-validator and any metric overrides are imported from
-# `<pkg>.evaluate`. The experiment script does not redefine them.
-# `SkrubLearner.fit` takes a single environment dict (it does *not*
-# implement `fit(X, y)`), so we pass the bindings via `data=`. Use
+# `<pkg>.evaluate`. `SkrubLearner.fit` takes a single environment dict
+# (it does *not* implement `fit(X, y)`), so we pass the bindings via
+# `data=`. Use
 # the source-bound form (`data={"data_dir": str(DATA_DIR)}`) when the
 # pipeline binds a source identifier; use `data={"X": X, "y": y}` for
 # materialized bindings.
