@@ -1,7 +1,9 @@
 .DS_Store
 scratch/
 eval/*-workspace/
-eval/*/transcripts/
+
+# Eval transcripts (local only): .transcript/<skill>/<run-id>/
+.transcript/
 
 # Local secrets (API keys, etc.) — committed template is .env.example
 .env

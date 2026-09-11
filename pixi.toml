@@ -21,3 +21,41 @@ bump-major = { cmd = "python tools/bump_version.py major", description = "Bump t
 bump-minor = { cmd = "python tools/bump_version.py minor", description = "Bump the minor version across all version sources." }
 bump-patch = { cmd = "python tools/bump_version.py patch", description = "Bump the patch version across all version sources." }
 check = { depends-on = ["hash-check", "validate", "check-versions"], description = "Run every CI check: hash verification + catalog structure validation + version consistency." }
+
+# Optional LLM evals (DeepEval). Not part of `pixi run check` / catalog CI.
+[feature.eval.pypi-dependencies]
+deepeval = "*"
+litellm = "*"
+pytest = ">=8"
+python-dotenv = ">=1.0"
+
+# Model ids for the evals. Secrets never go here — keys live in `.env`
+# (see `.env.example`). Names are LiteLLM ids; `openrouter/<vendor>/<model>`
+# routes through OpenRouter and needs only `OPENROUTER_API_KEY`.
+#
+# SKILL_EVAL_MODELS       comma-separated target models (models under test,
+#                         one pytest node per model x case x mode)
+# SKILL_EVAL_JUDGE_MODEL  single judge model for DeepEval GEval; kept
+#                         independent of the targets, so a strong judge can
+#                         grade weak targets
+# SKILL_EVAL_MODE         with     SKILL.md as the system prompt
+#                         without  empty system prompt (baseline)
+#                         both     run each case twice and report the
+#                                  pass-rate delta in the pytest summary
+# SKILL_EVAL_PASS_RATIO   Must-do GEval threshold in [0, 1] (partial
+#                         credit). Must-NOT stays all-or-nothing.
+#
+# Overridable per run with `--skill-model` (repeatable),
+# `--skill-judge-model`, `--skill-mode`, and `--skill-pass-ratio`.
+[feature.eval.activation.env]
+# Small, cheap models: the skills must stay legible to these.
+SKILL_EVAL_MODELS = "openrouter/deepseek/deepseek-v4.1-flash,openrouter/z-ai/glm-5.3-flash,openrouter/qwen/qwen3.8-27b"
+SKILL_EVAL_JUDGE_MODEL = "openrouter/anthropic/claude-opus-5"
+SKILL_EVAL_MODE = "with"
+SKILL_EVAL_PASS_RATIO = "0.8"
+
+[feature.eval.tasks]
+eval = { cmd = "pytest tests/eval -m eval", description = "Run DeepEval skill evaluations (requires provider API keys)." }
+
+[environments]
+eval = { features = ["eval"] }

@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "title": "Article-link branch with synthesis confirmation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` has 2 done experiments in History (iterate\n  mode).\n- The arxiv link is to a paper on \"Temporal Fusion Transformers\".]\n\nHere's the idea I want to try: https://arxiv.org/abs/2106.04545 \u2014\ncan we adapt it for our forecasting pipeline?",
       "expected_output": "Behavioural response satisfying: - Recognise this as `article-link` branch (URL pasted directly \u2192 entry point pre-resolved per parent's free-text handling). - Mention WebFetching the URL. - Walk the three shaping questions: (1) what to learn, (2) why now, (3) what changes in `src/<pkg>/`. It must NOT: - Write `journal/NN_*.md` directly. - Return the Proposal before the user confirms. - Add new deps to `Method outline` as fait accompli.",
       "files": [],
@@ -21,6 +22,7 @@
     },
     {
       "id": 2,
+      "title": "GitHub issue resolution + gh auth check",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` has done experiments.\n- `gh` CLI installed but `gh auth status` not run this turn.]\n\nLet's pick up `probabl-ai/skore#42` for our next experiment.",
       "expected_output": "Behavioural response satisfying: - Recognise `org/repo#N` shorthand resolution priority \u2014 this wins over current context. - Check `gh auth status` (cheap, cached) before any fetch. - Plan `gh issue view 42 --json title,body,labels,url` (+ comments if body is under-specified). It must NOT: - Fetch the issue without checking auth. - Treat the issue body as the whole picture if it links comments (\"see comment thread\" is a real signal to pull comments). - Crawl unrelated files in the `skore` repo.",
       "files": [],
@@ -39,6 +41,7 @@
     },
     {
       "id": 3,
+      "title": "Free-text idea, walk shaping questions",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` Status currently records the goal as\n  \"minimize RMSE for point-estimate prediction\".]\n\nI want to try fitting a quantile regression so we get prediction\nintervals instead of point estimates.",
       "expected_output": "Behavioural response satisfying: - Recognise this as `free-text` branch (concrete idea typed inline \u2192 pre-resolved). - Walk the three shaping questions in plain language, quoting the user. - **Flag the goal shift**: point-estimate \u2192 prediction interval is a different output shape; this should update `JOURNAL.md` Status. Surface as a question before returning the Proposal. It must NOT: - Silently change the goal in the returned Proposal. - Author acceptance criteria (coverage target, interval width budget \u2014 those are post-run user judgement). - Skip the confirmation gate (\"idea is obvious, just return\").",
       "files": [],
@@ -56,6 +59,7 @@
     },
     {
       "id": 4,
+      "title": "Domain-specific assertion needs confirmation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` shows a regression task on tabular financial\n  data.]\n\nRead this paper: https://example.com/paper-on-target-monotonicity\nThey claim feature X is monotone in the target for option pricing.\nUse that as a constraint in our model.",
       "expected_output": "Behavioural response satisfying: - Recognise `article-link` branch. - Fetch and map to three shaping questions. - **List the \"feature X is monotone in the target\" claim under `Open gaps`** with `[needs user confirmation]` \u2014 the paper alone can't establish this for *our* dataset. It must NOT: - Ship the monotonicity assertion as a `Method outline` fact. - Treat the paper's framing as evidence for this workspace's data. - Author the constraint silently without flagging.",
       "files": [],
@@ -71,6 +75,7 @@
     },
     {
       "id": 5,
+      "title": "New dependency gated, not assumed",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Synthesis from prior turn proposed adapting a paper's technique;\n  `lightgbm` was the paper's choice.\n- Current env has `sklearn`, `skrub`, `skore` but NOT `lightgbm`.]\n\nThe article we just discussed uses `lightgbm`. Let's add it to the\npipeline.",
       "expected_output": "Behavioural response satisfying: - Refuse to silently include `lightgbm` in `Method outline`. - Flag `lightgbm` as an **open gap**: \"this approach needs `lightgbm`; OK to add, or should we adapt to the existing stack?\" - Defer the resolution to `data-science-python-stack` + the user (one of: add the dep, swap for `HistGradientBoostingRegressor`, pick a different model). It must NOT: - Add `lightgbm` to the Proposal's `Method outline` as fait accompli. - Run `pixi add lightgbm` in this turn. - Pre-empt the data-science-python-stack consultation.",
       "files": [],
@@ -85,6 +90,7 @@
     },
     {
       "id": 6,
+      "title": "Pre-resolved entry, skip inner AskUserQuestion",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Parent (`iterate-ml-experiment`) already collected the URL via\n  its sourcing-menu free-text handler.]\n\n[parent passes: branch=resource-link, content=https://github.com/scikit-learn/scikit-learn/issues/12345]\nHand this off to iterate-from-user with the resource-link branch\npre-resolved.",
       "expected_output": "Behavioural response satisfying: - Recognise the pre-resolved entry-point dispatch (skip the inner AskUserQuestion). - Proceed directly to the `resource-link` branch with the URL in hand. - Run `gh auth status` then `gh issue view 12345 ...`. It must NOT: - Fire the entry-point `AskUserQuestion` (article-link / resource-link / free-text) \u2014 it's been pre-resolved. - Skip the confirmation gate (still required even with pre-resolved entry).",
       "files": [],

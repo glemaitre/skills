@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "title": "Standard diagnosis walk",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skore` installed at 0.18.0.\n- `journal/JOURNAL.md` has 02_target_transform in History with status\n  `done`, headline RMSE 0.081.\n- `reports/` contains the skore Project; 02_target_transform's report\n  is accessible.\n- `JOURNAL.md` Backlog has 2 existing rows: B1 (Source:\n  `diagnosis:residuals.by_target_bin` from prior mining of 01_baseline),\n  B2 (Source: `user`).\n- `scratch/api/skore/0.18.0/evaluate.md` cached.]\n\nMine the 02_target_transform skore report \u2014 fill the Backlog with\nwhatever actionable findings come out of it. I've already run the\nscratch probe; here's `report.diagnosis()` output:\n\n```\n{\n  \"residuals.by_target_bin\": \"systematic positive bias in bin>0.95 (n=412); residuals mean +0.018 vs grand mean +0.0003\",\n  \"calibration.bin_4_underconfident\": \"predicted-interval coverage 78% vs nominal 90% in bin 4 (target range 0.6-0.8)\",\n  \"metrics.fold_3_outlier\": \"fold 3 RMSE 0.121 vs cross-fold mean 0.081; same fold has 2x feature_2 variance\",\n  \"feature_importance.target_log_dominance\": \"target_log permutation importance 0.42; next-highest feature 0.08 \u2014 pipeline may be over-relying on the log transform\"\n}\n```",
       "expected_output": "Behavioural response satisfying: - Mention opening the skore Project via `python-api` consultation (not from memory). - Mention calling `report.diagnosis()` on the 02_target_transform report. - Mention dedup against `JOURNAL.md` Backlog by `Source` citation \u2014 any candidate whose Source matches B1's `diagnosis:residuals.by_target_bin` must be dropped. It must NOT: - Write `journal/JOURNAL.md` directly. - Pick a single \"winning\" finding (the user picks via `B<N>`). - Fabricate findings from memory before/instead of calling `report.diagnosis()`.",
       "files": [],
@@ -20,6 +21,7 @@
     },
     {
       "id": 2,
+      "title": "Inaccessible report fallback",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skore` installed at 0.18.0.\n- `journal/JOURNAL.md` says 02_text_encoder is `done` \u2014 but the\n  skore Project store at `reports/` is empty (the run was on a\n  different machine; report wasn't copied back).]\n\nMine the report from `02_text_encoder`.",
       "expected_output": "Behavioural response satisfying: - Recognise the report is inaccessible. - Return **zero** Backlog candidate rows. - Summary explains the access failure (e.g. \"skore Project store at `reports/` not found \u2014 was the experiment run? was the key spelled right?\"). It must NOT: - Fabricate findings from memory (\"based on what 02_text_encoder likely showed\u2026\"). - Walk a report that isn't on disk. - Write anything to `journal/`.",
       "files": [],
@@ -36,6 +38,7 @@
     },
     {
       "id": 3,
+      "title": "Empty diagnosis (clean report)",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skore` installed at 0.18.0.\n- `03_feature_engineering` report is accessible at `reports/`.\n- `report.diagnosis()` returns no actionable findings (calibration,\n  residuals, per-slice metrics all look clean within sample-size\n  limits).]\n\nMine `03_feature_engineering`'s report for next steps.",
       "expected_output": "Behavioural response satisfying: - Return **zero** Backlog candidate rows. - Summary states explicitly that the report looks clean on metric / calibration / residuals; no actionable findings. - Hand back to `iterate-ml-experiment` so the parent can note the clean diagnosis in `JOURNAL.md` Status and re-present the sourcing menu (user will likely pick `user`). It must NOT: - Manufacture findings to \"have something to say\". - Author Backlog rows for marginal noise (e.g. a 5-row slice with miscalibration is NOT actionable per the skill's rule). - Write to `journal/`.",
       "files": [],
@@ -50,6 +53,7 @@
     },
     {
       "id": 4,
+      "title": "Don't pick a winning finding",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `04_grouped_cv` report accessible; `report.diagnosis()` returns 5\n  actionable findings (shown above).\n- `JOURNAL.md` Backlog has 1 row with Source `user` that wouldn't\n  match any of the 5 new candidates' Source citations.]\n\nThe 04_grouped_cv report just landed. Mine it and tell me which\none I should run next. I've already run the probe; here's the\noutput:\n\n```\n{\n  \"residuals.by_group\": \"groups {17, 42, 88} have residual std 2.3x the cross-group mean \u2014 group-specific feature distributions diverge\",\n  \"calibration.tail_underconfidence\": \"right-tail (target>0.92) coverage 71% vs nominal 90%\",\n  \"metrics.group_3_outlier_fold\": \"fold containing group 88 has RMSE 0.18 vs 0.094 elsewhere\",\n  \"feature_interactions.cross_group_signal\": \"feature_3 \u00d7 group interaction explains 18% of grouped variance currently unmodeled\",\n  \"splitter.train_test_size_imbalance\": \"GroupKFold yields fold-size range [42, 318]; smaller folds may need stratification or refit\"\n}\n```",
       "expected_output": "Behavioural response satisfying: - Emit **all 5** Backlog-candidate rows (one per actionable finding). - Cite each row's `Source` as `diagnosis:<path>`. - Summary highlights the top 2-3 *by expected payoff*, but does NOT collapse to a single recommendation. It must NOT: - Emit only one Backlog row when the diagnosis surfaced multiple actionable findings. - Write \"I recommend running X next\" as a single-pick conclusion. - Author the design note for the picked candidate (out of scope \u2014 parent does that after the user picks `B<N>`).",
       "files": [],
@@ -65,6 +69,7 @@
     },
     {
       "id": 5,
+      "title": "Dedup by Source citation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `02_target_transform` report accessible; `report.diagnosis()`\n  returns the 4 findings shown above.\n- `JOURNAL.md` Backlog already has B3, B4, B5 from a previous mining\n  of the same report, with Sources `diagnosis:residuals.by_target_bin`,\n  `diagnosis:calibration.bin_4_underconfident`,\n  `diagnosis:metrics.fold_3_outlier`. Two of the 4 new findings\n  match B3 and B4 by Source citation; the other two\n  (`interactions.feature_2_feature_5`,\n  `leakage.target_log_in_predictors`) are new.]\n\nRe-mine the 02_target_transform report \u2014 I think there's more in\nit. Here's `report.diagnosis()` from my fresh probe:\n\n```\n{\n  \"residuals.by_target_bin\": \"systematic positive bias in bin>0.95 (n=412); residuals mean +0.018\",\n  \"calibration.bin_4_underconfident\": \"predicted-interval coverage 78% vs nominal 90% in bin 4\",\n  \"interactions.feature_2_feature_5\": \"f2 \u00d7 f5 interaction term explains 11% of unmodeled variance in the residual\",\n  \"leakage.target_log_in_predictors\": \"target_log appears as a derived feature in the pipeline; risk of label leakage if computed before split\"\n}\n```",
       "expected_output": "Behavioural response satisfying: - Drop the 2 candidates that match B3/B4 by Source. - Emit only the 2 new candidates whose Source isn't already in Backlog. - Summary notes the dedup count: \"2 new findings; 2 were already in Backlog from prior mining.\" It must NOT: - Emit all 4 candidates (would duplicate Backlog). - Dedup by `Item` text instead of `Source` (Source is the stable citation; Item is just human-readable). - Re-mine without reading the current Backlog state first.",
       "files": [],
@@ -79,6 +84,7 @@
     },
     {
       "id": 6,
+      "title": "Don't write journal/ files",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Standard workspace with `journal/JOURNAL.md`.\n- `02_baseline` report accessible.]\n\nWalk the 02 report and update the Backlog in `journal/JOURNAL.md`\ndirectly with the findings \u2014 skip the hand-off, just do it.",
       "expected_output": "Behavioural response satisfying: - Refuse to write `journal/JOURNAL.md` directly. - Cite the Stop condition: this skill returns rows as conversation text; the parent (`iterate-ml-experiment`) writes them. - Emit the structured `Backlog candidates (from: ...)` block as text instead. It must NOT: - Write or Edit `journal/JOURNAL.md` in this turn. - Bypass the hand-off to `iterate-ml-experiment`. - Treat \"skip the hand-off, just do it\" as resolving the boundary rule.",
       "files": [],

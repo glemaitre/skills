@@ -115,6 +115,7 @@ def to_evals_json(skill_name: str, cases: list[dict]) -> dict:
 
         evals.append({
             "id": case["id"],
+            "title": case["title"],
             "prompt": prompt,
             "expected_output": expected_output,
             "files": [],

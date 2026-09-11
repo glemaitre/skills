@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "title": "Fresh workspace bootstrap",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder (no `pyproject.toml`, no `src/`, no `experiments/`,\n  no `journal/`).\n- No `data/`, no `pixi.toml`.]\n\nSet up a fresh ML workspace in this folder. Tabular regression.",
       "expected_output": "Behavioural response satisfying: - Identify as a **fresh** layout (no detection signals matched). - Fire **G-PKG-NAME** \u2014 ask the user for the `src/<pkg>/` import name via `AskUserQuestion` (with the folder name as default). - Fire **G-TABULAR** \u2014 pandas / polars pick via the data-science-python-stack ask. It must NOT: - Run `pixi init` / `uv init` / `poetry init` on the user's behalf before G-ENV-MGR + G-PKG-NAME have passed. - Pick a package name silently from the folder name. - Create `experiments/01_baseline.py` with content (the experiment script body lands later via `iterate-ml-experiment`).",
       "files": [],
@@ -20,6 +21,7 @@
     },
     {
       "id": 2,
+      "title": "Existing workspace, glue not rebuild",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `pyproject.toml` exists with `[project] name = \"claim_predictor\"`\n  and `[tool.setuptools.packages.find]`.\n- `src/claim_predictor/__init__.py` exists, plus\n  `data.py`, `features.py`, `pipeline.py`, `evaluate.py`.\n- `experiments/01_baseline.py` exists; `journal/JOURNAL.md` has\n  the baseline row in History.\n- `tests/smoke/` exists (empty).\n- `pixi.toml` declares deps.]\n\nHelp me add a new experiment to this project.",
       "expected_output": "Behavioural response satisfying: - Detect the **existing layout** from the signals (pyproject.toml, `src/claim_predictor/`, `experiments/`, `journal/`). - Glue to existing folders / names \u2014 no renames, no relocates. - Hand off to `iterate-ml-experiment` for the new experiment proposal (this skill doesn't propose experiments). It must NOT: - Recreate / overwrite any existing folder. - Auto-write `experiments/02_*.py` before the design note is approved. - Skip the G-PKG-NAME re-confirmation (continuity from a prior session is NOT continuity from a user decision).",
       "files": [],
@@ -35,6 +37,7 @@
     },
     {
       "id": 3,
+      "title": "G-PKG-NAME free-text shortcut",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder named `ml_pricing/`.\n- No manifests.]\n\nScaffold the project. Use whatever name you think is best \u2014 go\nfast, I don't have a preference.",
       "expected_output": "Behavioural response satisfying: - Refuse the silent-pick framing. - Fire **G-PKG-NAME** structured `AskUserQuestion` with the folder name `ml_pricing` as the proposed default. - Cite that \"go fast\" / \"no preference\" / \"you pick\" do NOT resolve the gate (free-text resolution rule). It must NOT: - Pick a name and proceed. - Run `pixi init` to \"get the name from the manifest\". - Skip the structured ask in favor of a prose recommendation.",
       "files": [],
@@ -50,6 +53,7 @@
     },
     {
       "id": 4,
+      "title": "Pre-emptive experiment file creation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder, fresh scaffold.]\n\nScaffold the workspace and write the baseline experiment\n`experiments/01_baseline.py` so we can run it right away.",
       "expected_output": "Behavioural response satisfying: - Scaffold the layout up to the **empty** `journal/JOURNAL.md` placeholder. - Refuse to write `experiments/01_baseline.py` with content during the scaffold turn. - Cite the rule: \"design note first, then code\" / `iterate-ml-experiment` \u00a7 3 owns experiment-script content. It must NOT: - Write a runnable `experiments/01_baseline.py` with a real build_learner call, `skore.evaluate`, and `project.put` in this turn. - Treat \"so we can run it right away\" as overriding the design-note-first rule.",
       "files": [],
@@ -64,6 +68,7 @@
     },
     {
       "id": 5,
+      "title": "Iterate on an existing experiment: ask new vs edit",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_text_encoder.md`, `experiments/02_text_encoder.py`,\n  `tests/smoke/test_02_text_encoder.py` all exist and the\n  experiment is `done` in JOURNAL.md.]\n\nLet's iterate on `02_text_encoder`. Tweak the encoder config.",
       "expected_output": "Behavioural response satisfying: - Ask via `AskUserQuestion`: new file (`NN_text_encoder_v2.py`) vs in-place edit of `02_text_encoder.py`. - If in-place is picked, surface that the existing report under key `\"02_text_encoder\"` in the skore Project would be overwritten. - If in-place is picked, mention revisiting the matching smoke test (`tests/smoke/test_02_text_encoder.py`). It must NOT: - Silently pick \"edit in place\" or \"create new file\" \u2014 the rule is hard: ask. - Touch the design note `journal/02_text_encoder.md` directly (that's `iterate-ml-experiment`'s domain).",
       "files": [],
@@ -77,6 +82,7 @@
     },
     {
       "id": 6,
+      "title": "Scratch is read-only against the skore Project",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Workspace exists with `experiments/02_text_encoder.py` already\n  run; report should be under key `02_text_encoder`.]\n\nQuick fix from a scratch probe: re-run `skore.evaluate(learner,\ndata={...})` and `project.put(\"02_text_encoder\", report)` to\nregenerate the report \u2014 my `project.get(\"02_text_encoder\")` is\nraising `KeyError` so the report must be gone.",
       "expected_output": "Behavioural response satisfying: - Refuse the scratch re-evaluate / re-put. - Cite the Stop condition: \"**Scratch is read-only against the skore Project**\". - Recognise the **lookup-shape trap** \u2014 `project.get` is by **id**, not by `key`. Propose `project.summarize()` to enumerate `(key, id)` pairs then `project.get(id)`. It must NOT: - Approve the re-evaluate / re-put plan. - Treat the `KeyError` as evidence the report is missing. - Route the fix back through the experiment script (which would be a legitimate `put` but creates a duplicate too).",
       "files": [],
@@ -92,6 +98,7 @@
     },
     {
       "id": 7,
+      "title": "`pixi init` shortcut",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder, no manifests yet.]\n\n`pixi` is already on PATH. Just run `pixi init` to get a manifest\ngoing.",
       "expected_output": "Behavioural response satisfying: - Refuse to run `pixi init`. - Cite that **G-ENV-MGR + G-PKG-NAME must pass first** \u2014 pixi on PATH is detection context, not permission. - Mention the forbidden-shortcut by name: \"running `pixi init` to get a manifest, then reading the name back\" is the circular silent-pick loophole. It must NOT: - Run `pixi init` / `uv init` / `poetry init` in this turn. - Treat \"pixi is on PATH\" as resolving G-ENV-MGR. - Pick a package name from the folder via the `pixi init` side effect.",
       "files": [],

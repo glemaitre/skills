@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "title": "Standard smoke-test dispatch (post-approval)",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_text_encoder.md` exists with status `approved`.\n- `experiments/02_text_encoder.py` exists (scaffold from\n  `organize-ml-workspace`).\n- `tests/smoke/` exists, empty.\n- `pytest` is on the manifest.]\n\nThe design note `journal/02_text_encoder.md` was just approved.\nWire the smoke test.",
       "expected_output": "Behavioural response satisfying: - Confirm the approved design note exists. - Pick test category: **smoke**. - Decide test file stem: `tests/smoke/test_02_text_encoder.py`. It must NOT: - Write assertion bodies in this skill (subskill owns that). - Overwrite an existing test file (the rule is 1:1 pairing). - Create a `test_NN_<short_name>_v2.py` variant (stem rule is hard).",
       "files": [],
@@ -19,6 +20,7 @@
     },
     {
       "id": 2,
+      "title": "No design note \u2192 refuse + hand off",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `experiments/03_target_transform.py` exists (someone wrote it directly).\n- `journal/03_target_transform.md` does **not** exist.\n- `tests/smoke/` exists.]\n\nWrite the smoke test for `experiments/03_target_transform.py`.",
       "expected_output": "Behavioural response satisfying: - Refuse to create the test file. - Cite the Stop condition: \"No test without an approved design note.\" - Hand off back to `iterate-ml-experiment` to author + approve the design note first. It must NOT: - Create `tests/smoke/test_03_target_transform.py` even as a stub. - Treat the existence of the script as resolving the design-note requirement.",
       "files": [],
@@ -32,6 +34,7 @@
     },
     {
       "id": 3,
+      "title": "Stem-rule enforcement (no v2 / no _2 suffix)",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_text_encoder.md` exists, approved.\n- `experiments/02_text_encoder.py` exists.\n- `tests/smoke/test_02_text_encoder.py` exists (current shape).]\n\nThe smoke test for `02_text_encoder` needs a major rewrite \u2014 the\nnew assertions don't fit. Create\n`tests/smoke/test_02_text_encoder_v2.py` with the new shape.",
       "expected_output": "Behavioural response satisfying: - Refuse to create `test_02_text_encoder_v2.py`. - Cite the stem rule: pairing is 1:1, the file basename is hard. - Recommend editing `tests/smoke/test_02_text_encoder.py` in place, via the `smoke-test-ml-pipeline` subskill for the new body. It must NOT: - Create the `_v2.py` file as written. - Create `test_02_text_encoder_2.py` (same anti-pattern by different syntax). - Auto-edit the existing file without surfacing the choice.",
       "files": [],
@@ -46,6 +49,7 @@
     },
     {
       "id": 4,
+      "title": "Dispatch table: future categories not implemented",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/03_target_transform.md` exists, approved, done with metrics.\n- `tests/smoke/` exists with prior smoke tests.]\n\nThe metrics drifted between 02 and 03. Can we lock that in with a\nregression test?",
       "expected_output": "Behavioural response satisfying: - Recognise this as a **regression test** category per the dispatch table. - Surface that `regression-test-ml-pipeline` is **future / not implemented in v1**. - Offer alternatives (e.g. propose a `tests/smoke/` assertion that catches the drift indirectly, or note the gap to be filled when the regression subskill ships). It must NOT: - Silently dispatch to `regression-test-ml-pipeline` as if it exists. - Default to `smoke-test-ml-pipeline` without flagging the category mismatch. - Author the regression test body inline (this skill is the router, not the body owner).",
       "files": [],
@@ -60,6 +64,7 @@
     },
     {
       "id": 5,
+      "title": "pytest is the runner (no `# %%` scripts)",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_text_encoder.md` approved.\n- `tests/smoke/` exists.]\n\nLet's just write the smoke test as a jupytext `# %%` script under\n`experiments/02_text_encoder_smoke.py` so I can step through it.",
       "expected_output": "Behavioural response satisfying: - Refuse the `# %%` script form for tests. - Cite the Stop condition: tests are pytest tests, not jupytext. - Surface the convention split: `experiments/` = `# %%`, `tests/smoke/` = pytest. It must NOT: - Create `experiments/02_text_encoder_smoke.py`. - Mix the two conventions.",
       "files": [],
@@ -74,6 +79,7 @@
     },
     {
       "id": 6,
+      "title": "Default to smoke when user is open-ended",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` approved.\n- `experiments/01_baseline.py` exists.\n- `tests/smoke/` empty.]\n\nShould this experiment have a test? It's just a quick baseline.",
       "expected_output": "Behavioural response satisfying: - Recognise the open-ended question. - Default to **smoke** category (smoke is required at every iteration; everything else is opt-in). - Cite the required-test-per-experiment rule (smoke gate before `done`). It must NOT: - Treat \"just a quick baseline\" as waiving the smoke-test requirement. - Skip the test entirely. - Pick regression / distribution by default.",
       "files": [],
