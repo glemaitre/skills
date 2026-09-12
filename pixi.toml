@@ -15,12 +15,13 @@ python = ">=3.11,<3.14"
 [tasks]
 hash = { cmd = "python tools/hash_skills.py", description = "Refresh per-skill and aggregate SHA-256 hashes in .catalog.json." }
 hash-check = { cmd = "python tools/hash_skills.py --check", description = "Verify .catalog.json hashes match the on-disk skills (non-zero exit on drift)." }
+evals-check = { cmd = "python eval/convert_to_evals_json.py --check", description = "Verify skills/*/evals/evals.json match eval/*/prompts.md (non-zero exit on drift)." }
 validate = { cmd = "python tools/validate_catalog.py", description = "Validate .catalog.json structure: skill/folder symmetry, categories, workflow references." }
 check-versions = { cmd = "python tools/check_versions.py", description = "Verify the version matches across .catalog.json, pixi.toml, and the Claude/Cursor plugin manifests." }
 bump-major = { cmd = "python tools/bump_version.py major", description = "Bump the major version across all version sources." }
 bump-minor = { cmd = "python tools/bump_version.py minor", description = "Bump the minor version across all version sources." }
 bump-patch = { cmd = "python tools/bump_version.py patch", description = "Bump the patch version across all version sources." }
-check = { depends-on = ["hash-check", "validate", "check-versions"], description = "Run every CI check: hash verification + catalog structure validation + version consistency." }
+check = { depends-on = ["hash-check", "evals-check", "validate", "check-versions"], description = "Run every CI check: hash verification + evals.json drift + catalog structure validation + version consistency." }
 
 # Optional LLM evals (DeepEval). Not part of `pixi run check` / catalog CI.
 [feature.eval.pypi-dependencies]
@@ -36,9 +37,11 @@ python-dotenv = ">=1.0"
 #
 # SKILL_EVAL_MODELS       comma-separated target models (models under test,
 #                         one pytest node per model x case x mode)
-# SKILL_EVAL_JUDGE_MODEL  single judge model for DeepEval GEval; kept
-#                         independent of the targets, so a strong judge can
-#                         grade weak targets
+# SKILL_EVAL_JUDGE_MODEL  single judge model for DeepEval GEval. Same class
+#                         of model as the targets — cheap, and good enough
+#                         for these rubrics. Self-grades when DeepSeek is
+#                         also a target; override with --skill-judge-model
+#                         for an independent read.
 # SKILL_EVAL_MODE         with     SKILL.md as the system prompt
 #                         without  empty system prompt (baseline)
 #                         both     run each case twice and report the
@@ -50,13 +53,14 @@ python-dotenv = ">=1.0"
 # `--skill-judge-model`, `--skill-mode`, and `--skill-pass-ratio`.
 [feature.eval.activation.env]
 # Small, cheap models: the skills must stay legible to these.
-SKILL_EVAL_MODELS = "openrouter/deepseek/deepseek-v4.1-flash,openrouter/z-ai/glm-5.3-flash,openrouter/qwen/qwen3.8-27b"
+# Full sweep: "openrouter/deepseek/deepseek-v4.1-flash,openrouter/z-ai/glm-5.3-flash,openrouter/qwen/qwen3.8-27b"
+SKILL_EVAL_MODELS = "openrouter/deepseek/deepseek-v4.1-flash"
 SKILL_EVAL_JUDGE_MODEL = "openrouter/deepseek/deepseek-v4.1-flash"
 SKILL_EVAL_MODE = "with"
 SKILL_EVAL_PASS_RATIO = "0.7"
 
 [feature.eval.tasks]
-eval = { cmd = "pytest tests/eval -m eval", description = "Run DeepEval skill evaluations (requires provider API keys)." }
+eval = { cmd = "pytest tests/eval -m eval -n auto", description = "Run DeepEval skill evaluations (requires provider API keys)." }
 
 [environments]
 eval = { features = ["eval"] }

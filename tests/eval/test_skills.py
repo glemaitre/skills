@@ -12,6 +12,7 @@ from tests.eval.harness import (
     EvalCase,
     MetricOutcome,
     NO_TOOLS_NOTE,
+    call_with_retries,
     compose_user_prompt,
     format_eval_failure,
     generate_response,
@@ -84,15 +85,21 @@ def _must_not_metric(items: Sequence[str], *, judge: LiteLLMModel) -> GEval:
 
 def _run_metric(metric: GEval, test_case: LLMTestCase) -> MetricOutcome:
     try:
-        metric.measure(test_case)
+        call_with_retries(lambda: metric.measure(test_case))
     except Exception as exc:
-        if type(exc).__name__ != "MissingTestCaseParamsError":
-            raise
+        if type(exc).__name__ == "MissingTestCaseParamsError":
+            return MetricOutcome(
+                name=metric.name,
+                score=None,
+                threshold=float(metric.threshold),
+                reason=str(exc),
+                passed=False,
+            )
         return MetricOutcome(
             name=metric.name,
             score=None,
             threshold=float(metric.threshold),
-            reason=str(exc),
+            reason=f"judge error: {exc}",
             passed=False,
         )
     score = metric.score
@@ -101,12 +108,14 @@ def _run_metric(metric: GEval, test_case: LLMTestCase) -> MetricOutcome:
         passed = bool(metric.success)
     else:
         passed = score is not None and score >= threshold
+    cost = getattr(metric, "evaluation_cost", None)
     return MetricOutcome(
         name=metric.name,
         score=None if score is None else float(score),
         threshold=threshold,
         reason=str(metric.reason or ""),
         passed=passed,
+        evaluation_cost=None if cost is None else float(cost),
     )
 
 
@@ -118,6 +127,7 @@ def _outcomes_payload(outcomes: Sequence[MetricOutcome]) -> list[dict]:
             "threshold": item.threshold,
             "reason": item.reason,
             "passed": item.passed,
+            "evaluation_cost": item.evaluation_cost,
         }
         for item in outcomes
     ]
@@ -219,6 +229,7 @@ def test_skill_case(
 
     payload["metrics"] = _outcomes_payload(outcomes)
     passed = all(item.passed for item in outcomes)
+    judge_error = any(item.reason.startswith("judge error:") for item in outcomes)
     payload["passed"] = passed
     write_transcript(path, payload)
 
@@ -226,7 +237,9 @@ def test_skill_case(
         record_eval_result(mode=skill_mode, case=eval_case, passed=True)
         return
 
-    record_eval_result(mode=skill_mode, case=eval_case, passed=False)
+    record_eval_result(
+        mode=skill_mode, case=eval_case, passed=False, judge_error=judge_error
+    )
     pytest.fail(
         format_eval_failure(
             case=eval_case,

@@ -14,13 +14,14 @@ Mapping:
 Usage:
     python3 eval/convert_to_evals_json.py                 # all skills with eval/<name>/prompts.md
     python3 eval/convert_to_evals_json.py python-api …    # just the named skills
+    python3 eval/convert_to_evals_json.py --check         # exit non-zero if evals.json is stale
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
-import sys
 from pathlib import Path
 
 REPO = Path(__file__).parent.parent.resolve()
@@ -124,35 +125,73 @@ def to_evals_json(skill_name: str, cases: list[dict]) -> dict:
     return {"skill_name": skill_name, "evals": evals}
 
 
-def convert_skill(skill: str) -> Path | None:
+def convert_skill(skill: str, *, check: bool = False) -> int:
+    """Write or check ``evals.json`` for one skill. Return 1 on check drift."""
     prompts_path = REPO / "eval" / skill / "prompts.md"
     if not prompts_path.exists():
         print(f"  [skip] {skill}: no prompts.md")
-        return None
+        return 0
 
     cases = parse_prompts_md(prompts_path.read_text())
     if not cases:
         print(f"  [skip] {skill}: no cases parsed")
-        return None
+        return 0
 
     evals = to_evals_json(skill, cases)
-    out_dir = REPO / "skills" / skill / "evals"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / "evals.json"
-    out.write_text(json.dumps(evals, indent=2) + "\n")
+    rendered = json.dumps(evals, indent=2) + "\n"
+    out = REPO / "skills" / skill / "evals" / "evals.json"
+    if check:
+        if not out.is_file():
+            print(f"  [stale] {skill}: {out.relative_to(REPO)} is missing")
+            return 1
+        current = out.read_text()
+        if current != rendered:
+            print(f"  [stale] {skill}: {out.relative_to(REPO)} does not match prompts.md")
+            return 1
+        print(f"  [ok]   {skill}: {len(cases)} cases")
+        return 0
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(rendered)
     print(f"  [ok]   {skill}: {len(cases)} cases → {out.relative_to(REPO)}")
-    return out
+    return 0
+
+
+def _skill_names(requested: list[str]) -> list[str]:
+    if requested:
+        return requested
+    return sorted(
+        p.name
+        for p in (REPO / "eval").iterdir()
+        if p.is_dir() and (p / "prompts.md").exists()
+    )
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
+    parser.add_argument(
+        "skills",
+        nargs="*",
+        help="Skill folder names under eval/. Default: every skill with prompts.md.",
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Exit non-zero if any evals.json is stale; do not write.",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    skills = _skill_names(args.skills)
+    verb = "Checking" if args.check else "Converting"
+    print(f"{verb} {len(skills)} skill(s):")
+    status = 0
+    for skill in skills:
+        status |= convert_skill(skill, check=args.check)
+    return status
 
 
 if __name__ == "__main__":
-    requested = sys.argv[1:]
-    if requested:
-        skills = requested
-    else:
-        skills = sorted(
-            p.name for p in (REPO / "eval").iterdir()
-            if p.is_dir() and (p / "prompts.md").exists()
-        )
-    print(f"Converting {len(skills)} skill(s):")
-    for s in skills:
-        convert_skill(s)
+    raise SystemExit(main())

@@ -36,6 +36,7 @@ Markdown transcripts.
 ```bash
 python3 eval/convert_to_evals_json.py              # every skill with prompts.md
 python3 eval/convert_to_evals_json.py python-api   # named skills only
+python3 eval/convert_to_evals_json.py --check      # fail if evals.json is stale
 ```
 
 That writes `skills/<skill>/evals/evals.json`.
@@ -51,14 +52,25 @@ pixi install -e eval
 ```
 
 The optional `eval` pixi environment is separate from catalog CI
-(`pixi run check`). Evals are not run in GitHub Actions.
+(`pixi run check`). Evals themselves are not run in GitHub Actions, but
+`pixi run check` now includes `evals-check` so a stale `evals.json` fails
+CI.
+
+The eval task runs pytest with `-n auto`. Transcripts for one session
+share a single `.transcripts/<run-id>/` directory across workers.
+
+DeepEval's 180s per-task timeout is disabled (`DEEPEVAL_DISABLE_TIMEOUTS`).
+Target generation uses `temperature=0` and a 600s LiteLLM transport
+timeout so a hung socket still fails and retries.
 
 Defaults (override in `pixi.toml` or on the CLI):
 
-- targets: `openrouter/deepseek/deepseek-v4.1-flash`,
-  `openrouter/z-ai/glm-5.3-flash`, `openrouter/qwen/qwen3.8-27b` — small,
-  cheap models, because the skills have to stay legible to them
-- judge: `openrouter/anthropic/claude-opus-5` (independent of the targets)
+- target: `openrouter/deepseek/deepseek-v4.1-flash` — a small, cheap
+  model, because the skills have to stay legible to it. A three-model
+  sweep (`glm-5.3-flash`, `qwen3.8-27b`) is commented in `pixi.toml`.
+- judge: `openrouter/deepseek/deepseek-v4.1-flash` (same class of
+  model as the targets; override `--skill-judge-model` for an
+  independent read)
 - mode: `with` (SKILL.md as system prompt)
 - Must-do pass ratio: `0.7` (Must-NOT is always all-or-nothing)
 

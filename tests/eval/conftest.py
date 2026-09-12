@@ -63,6 +63,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 def pytest_configure(config: pytest.Config) -> None:
     os.environ.setdefault("DEEPEVAL_TELEMETRY_OPT_OUT", "YES")
     os.environ.setdefault("DEEPEVAL_UPDATE_WARNING_OPT_OUT", "YES")
+    os.environ.setdefault("DEEPEVAL_DISABLE_TIMEOUTS", "YES")
+    os.environ.setdefault("SKILL_EVAL_RUN_ID", new_run_id())
     config.addinivalue_line(
         "markers",
         "eval: LLM-backed skill evaluations (opt-in; requires provider API keys)",
@@ -74,7 +76,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 @pytest.fixture(scope="session")
 def eval_run_id() -> str:
-    run_id = new_run_id()
+    run_id = os.environ.get("SKILL_EVAL_RUN_ID") or new_run_id()
     ensure_transcript_dirs(run_id)
     return run_id
 
@@ -166,29 +168,52 @@ def skill_pass_ratio(pytestconfig: pytest.Config) -> float:
     return _pass_ratio(pytestconfig)
 
 
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    workeroutput = getattr(session.config, "workeroutput", None)
+    if workeroutput is not None:
+        workeroutput["skill_eval_results"] = {
+            mode: list(rows) for mode, rows in EVAL_RESULTS.items()
+        }
+
+
+def pytest_testnodedown(node, error) -> None:
+    workeroutput = getattr(node, "workeroutput", None)
+    if not workeroutput:
+        return
+    incoming = workeroutput.get("skill_eval_results") or {}
+    for mode, rows in incoming.items():
+        EVAL_RESULTS[mode].extend(rows)
+
+
 def pytest_terminal_summary(
     terminalreporter, exitstatus: int, config: pytest.Config
 ) -> None:
+    if getattr(config, "workerinput", None) is not None:
+        return
     if not EVAL_RESULTS:
         return
     terminalreporter.write_sep("=", "skill-eval summary")
-    counts: dict[str, tuple[int, int]] = {}
+    counts: dict[str, tuple[int, int, int]] = {}
     for mode, rows in EVAL_RESULTS.items():
-        passed = sum(1 for _, _, _, ok in rows if ok)
+        passed = sum(1 for *_, ok, _err in rows if ok)
+        errored = sum(1 for *_, _ok, err in rows if err)
         total = len(rows)
-        counts[mode] = (passed, total)
+        counts[mode] = (passed, total, errored)
         pct = (100 * passed / total) if total else 0
-        terminalreporter.write_line(f"  {mode:<8s} {passed}/{total} ({pct:.0f}%)")
+        line = f"  {mode:<8s} {passed}/{total} ({pct:.0f}%)"
+        if errored:
+            line += f"  {errored} judge-error"
+        terminalreporter.write_line(line)
     if "with" in counts and "without" in counts:
-        with_p, with_t = counts["with"]
-        without_p, without_t = counts["without"]
+        with_p, with_t, _ = counts["with"]
+        without_p, without_t, _ = counts["without"]
         if with_t and without_t:
             delta_pp = (with_p / with_t - without_p / without_t) * 100
             terminalreporter.write_line(f"  delta    {delta_pp:+.0f}pp")
     failed = [
         (mode, skill, case_id, title)
         for mode, rows in EVAL_RESULTS.items()
-        for skill, case_id, title, ok in rows
+        for skill, case_id, title, ok, _err in rows
         if not ok
     ]
     if failed:

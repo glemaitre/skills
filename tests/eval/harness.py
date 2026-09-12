@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -18,7 +19,7 @@ SKILLS_DIR = REPO_ROOT / "skills"
 TRANSCRIPT_DIR = REPO_ROOT / ".transcripts"
 
 DEFAULT_TARGET_MODEL = "openrouter/deepseek/deepseek-v4.1-flash"
-DEFAULT_JUDGE_MODEL = "openrouter/anthropic/claude-opus-5"
+DEFAULT_JUDGE_MODEL = "openrouter/deepseek/deepseek-v4.1-flash"
 DEFAULT_PASS_RATIO = 0.7
 MUST_NOT_PREFIX = "The response does NOT"
 NO_TOOLS_NOTE = (
@@ -109,11 +110,12 @@ def load_eval_cases() -> list[EvalCase]:
         skill_md = skill_dir / "SKILL.md"
         for raw in data.get("evals") or []:
             expectations = tuple(str(item) for item in (raw.get("expectations") or []))
+            case_id = raw["id"]
             cases.append(
                 EvalCase(
                     skill_name=skill_name,
                     skill_md_path=skill_md,
-                    case_id=raw.get("id"),
+                    case_id=case_id,
                     title=str(raw.get("title") or ""),
                     prompt=raw["prompt"],
                     expectations=expectations,
@@ -122,7 +124,15 @@ def load_eval_cases() -> list[EvalCase]:
     return cases
 
 
-EVAL_RESULTS: dict[str, list[tuple[str, object, str, bool]]] = defaultdict(list)
+EVAL_RESULTS: dict[str, list[tuple[str, object, str, bool, bool]]] = defaultdict(list)
+
+
+def record_eval_result(
+    *, mode: str, case: EvalCase, passed: bool, judge_error: bool = False
+) -> None:
+    EVAL_RESULTS[mode].append(
+        (case.skill_name, case.case_id, case.title, passed, judge_error)
+    )
 
 
 def require_keys(*models: str) -> None:
@@ -135,10 +145,6 @@ def require_keys(*models: str) -> None:
             seen.add(env_name)
     if missing:
         pytest.skip("missing API key(s): " + ", ".join(missing))
-
-
-def record_eval_result(*, mode: str, case: EvalCase, passed: bool) -> None:
-    EVAL_RESULTS[mode].append((case.skill_name, case.case_id, case.title, passed))
 
 
 def case_node_id(case: EvalCase, *, mode: str, model: str) -> str:
@@ -157,6 +163,7 @@ class MetricOutcome:
     threshold: float
     reason: str
     passed: bool
+    evaluation_cost: float | None = None
 
 
 def format_eval_failure(
@@ -220,22 +227,16 @@ def new_run_id() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
-def ensure_transcript_dirs(
-    run_id: str | None = None,
-    skill_names: Sequence[str] | None = None,
-) -> Path:
-    """Create `.transcripts/` and, when ``run_id`` is set, `<run-id>/<skill>/`."""
+def ensure_transcript_dirs(run_id: str | None = None) -> Path:
+    """Create `.transcripts/` and, when ``run_id`` is set, `<run-id>/`.
+
+    Per-skill directories are created lazily by ``write_transcript``.
+    """
     TRANSCRIPT_DIR.mkdir(parents=True, exist_ok=True)
     if run_id is None:
         return TRANSCRIPT_DIR
-    names = (
-        list(skill_names)
-        if skill_names is not None
-        else [path.parent.parent.name for path in SKILLS_DIR.glob("*/evals/evals.json")]
-    )
     session = TRANSCRIPT_DIR / run_id
-    for name in names:
-        (session / name).mkdir(parents=True, exist_ok=True)
+    session.mkdir(parents=True, exist_ok=True)
     return session
 
 
@@ -302,10 +303,12 @@ def _format_transcript_md(payload: dict) -> str:
             threshold = metric.get("threshold")
             threshold_s = "" if threshold is None else f"{float(threshold):.2f}"
             verdict = "ok" if metric.get("passed") else "FAIL"
+            cost = metric.get("evaluation_cost")
+            cost_s = "" if cost is None else f"  cost: {cost}"
             lines += [
                 f"### {metric.get('name')}",
                 "",
-                f"score: {score_s} (threshold {threshold_s})  {verdict}",
+                f"score: {score_s} (threshold {threshold_s})  {verdict}{cost_s}",
                 "",
                 str(metric.get("reason") or "(no reason from judge)"),
                 "",
@@ -335,6 +338,27 @@ def visible_text(result: GenerationResult) -> tuple[str, str]:
     return "", "empty"
 
 
+TARGET_TRANSPORT_TIMEOUT = 600.0
+RETRY_ATTEMPTS = 3
+RETRY_BACKOFF_SECONDS = (1.0, 3.0, 9.0)
+
+
+def call_with_retries(fn, *, attempts: int = RETRY_ATTEMPTS):
+    """Retry ``fn`` on transient failures with exponential backoff."""
+    last_exc: BaseException | None = None
+    for attempt in range(attempts):
+        try:
+            return fn()
+        except Exception as exc:  # noqa: BLE001 — provider SDKs raise many types
+            last_exc = exc
+            if attempt >= attempts - 1:
+                break
+            delay = RETRY_BACKOFF_SECONDS[min(attempt, len(RETRY_BACKOFF_SECONDS) - 1)]
+            time.sleep(delay)
+    assert last_exc is not None
+    raise last_exc
+
+
 def generate_response(*, model: str, system: str, user: str) -> GenerationResult:
     """Call the target with no max_tokens cap so reasoning models can finish."""
     from litellm import completion
@@ -343,10 +367,16 @@ def generate_response(*, model: str, system: str, user: str) -> GenerationResult
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": user})
-    response = completion(
-        model=litellm_model_name(model),
-        messages=messages,
-    )
+
+    def _once():
+        return completion(
+            model=litellm_model_name(model),
+            messages=messages,
+            temperature=0,
+            timeout=TARGET_TRANSPORT_TIMEOUT,
+        )
+
+    response = call_with_retries(_once)
     choice = response.choices[0]
     message = choice.message
     usage = getattr(response, "usage", None)
