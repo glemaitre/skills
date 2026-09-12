@@ -37,28 +37,28 @@
       "id": 3,
       "title": "Stack orientation routes to the right submodule",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/skrub/` is empty.\n- `skrub` is installed at version `0.9.0`.]\n\nI have a mixed-type tabular DataFrame (numeric + categorical + text\ncolumns). I want a one-call default-everything featuriser/learner from\nskrub. Which entry point should I reach for, and where does it live?",
-      "expected_output": "Behavioural response satisfying: - Name `tabular_pipeline` (top-level skrub) as the entry point \u2014 i.e. `skrub.tabular_pipeline`. (Acceptable alternative: name `TableVectorizer` as the featuriser-only sibling.) - After naming the symbol, propose a Shape 1 probe to confirm the signature against the installed version before writing the call. - Mention the cache write at `scratch/api/skrub/0.9.0/tabular_pipeline.md`. It must NOT: - Invent a name like `tabular_learner`, `auto_tabular`, or `TabularLearner` from memory. - Recommend writing code with the symbol before running the Shape 1 probe.",
+      "expected_output": "Behavioural response satisfying: - Name `tabular_pipeline` (top-level skrub) as the entry point \u2014 i.e. `skrub.tabular_pipeline`. (Acceptable alternative: name `TableVectorizer` as the featuriser-only sibling.) - After naming the symbol, propose a Shape 1 probe to confirm the signature against the installed version before writing the call. - Mention the cache write at `scratch/api/skrub/0.9.0/tabular_pipeline.md`. It must NOT: - Recommend `tabular_learner`, `auto_tabular`, or `TabularLearner` as the entry point (naming them only as a renamed trap is fine). - Recommend writing code with the symbol before proposing the Shape 1 probe.",
       "files": [],
       "expectations": [
         "Name `tabular_pipeline` (top-level skrub) as the entry point \u2014 i.e. `skrub.tabular_pipeline`. (Acceptable alternative: name `TableVectorizer` as the featuriser-only sibling.)",
         "After naming the symbol, propose a Shape 1 probe to confirm the signature against the installed version before writing the call.",
         "Mention the cache write at `scratch/api/skrub/0.9.0/tabular_pipeline.md`.",
-        "The response does NOT: Invent a name like `tabular_learner`, `auto_tabular`, or `TabularLearner` from memory.",
-        "The response does NOT: Recommend writing code with the symbol before running the Shape 1 probe."
+        "The response does NOT: Recommend `tabular_learner`, `auto_tabular`, or `TabularLearner` as the entry point (naming them only as a renamed trap is fine).",
+        "The response does NOT: Recommend writing code with the symbol before proposing the Shape 1 probe."
       ]
     },
     {
       "id": 4,
       "title": "Shape 3 narrative, versioned docs URL",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/skore/0.18.0/` exists but contains only `project.md`\n  (no `evaluate.md` yet).\n- `skore` is installed at version `0.18.0`.]\n\nWhat does `skore.evaluate` return when I pass a `KFold` splitter? Is it\nthe same return type as the train/test-split case?",
-      "expected_output": "Behavioural response satisfying: - Identify this as a Shape 3 / narrative question (signatures alone do not answer \"is the return type the same\") OR explicitly check the cache first then escalate to WebSearch on miss. - Propose a WebSearch query that includes the version, like `skore 0.18 docs evaluate splitter` (the major.minor pattern). - State that the WebFetch target must be a version-pinned docs URL \u2014 a path carrying `/0.18/` or `/0.18.0/` \u2014 and that `/latest/` or `/stable/` is rejected. It must NOT: - Answer the return-type question from memory without a fetch. - Use a URL containing `/latest/` or `/stable/` as the cached source. - Paraphrase the docs into the cache file (the cache should hold a verbatim extract).",
+      "expected_output": "Behavioural response satisfying: - Identify this as a Shape 3 / narrative question (signatures alone do not answer \"is the return type the same\") OR explicitly check the cache first then escalate to WebSearch on miss. - Propose a WebSearch query that includes the version, like `skore 0.18 docs evaluate splitter` (the major.minor pattern). - State that the WebFetch target must be a version-pinned docs URL \u2014 a path carrying `/0.18/` or `/0.18.0/` \u2014 and that `/latest/` or `/stable/` is rejected. It must NOT: - Answer the return-type question from memory (state which type is returned for `KFold` vs holdout). A refusal that withholds the type is allowed even if a class name appears only as an example of what is omitted. - Use a URL containing `/latest/` or `/stable/` as the cached source. - Paraphrase the docs into the cache file (the cache should hold a verbatim extract).",
       "files": [],
       "expectations": [
         "Identify this as a Shape 3 / narrative question (signatures alone do not answer \"is the return type the same\") OR explicitly check the cache first then escalate to WebSearch on miss.",
         "Propose a WebSearch query that includes the version, like `skore 0.18 docs evaluate splitter` (the major.minor pattern).",
         "State that the WebFetch target must be a version-pinned docs URL \u2014 a path carrying `/0.18/` or `/0.18.0/` \u2014 and that `/latest/` or `/stable/` is rejected.",
         "Name the cache destination `scratch/api/skore/0.18.0/evaluate.md` and state that the source URL goes on its first line.",
-        "The response does NOT: Answer the return-type question from memory without a fetch.",
+        "The response does NOT: Answer the return-type question from memory (state which type is returned for `KFold` vs holdout). A refusal that withholds the type is allowed even if a class name appears only as an example of what is omitted.",
         "The response does NOT: Use a URL containing `/latest/` or `/stable/` as the cached source.",
         "The response does NOT: Paraphrase the docs into the cache file (the cache should hold a verbatim extract)."
       ]
@@ -106,7 +106,7 @@
         "The response does NOT: Recommend three separate inline `pixi run python -c \"...\"` calls.",
         "The response does NOT: Recommend ANY inline `python -c` (rule is unconditional now \u2014 see Stop conditions, no length carve-out).",
         "The response does NOT: Write three separate cache files (`put.md`, `get.md`, `summarize.md`).",
-        "The response does NOT: Skip the cache write entirely (treat the probe as the conclusion)."
+        "The response does NOT: Treat the probe as the conclusion without naming a cache destination. Naming `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) as the next-turn deliverable counts even when this turn cannot Write."
       ]
     },
     {

@@ -27,7 +27,8 @@ NO_TOOLS_NOTE = (
     "turn - no shell, no file reads, no scratch scripts. Treat the workspace "
     "state described above as already verified. Do not emit tool calls or "
     "wait for results; give your complete final answer in this message, "
-    "filling any checklist from the information given."
+    "filling any checklist from the information given. Put the complete "
+    "deliverable in the assistant message, not only in a thinking channel."
 )
 
 _PROVIDER_ENV = {
@@ -328,15 +329,37 @@ def _format_transcript_md(payload: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+_FENCE_RE = re.compile(r"```(?:[^\n`]*)\n.*?```", re.DOTALL)
+_REASONING_TAIL_CHARS = 2000
+
+
 def visible_text(result: GenerationResult) -> tuple[str, str]:
-    """Prefer assistant content; fall back to reasoning if content is empty."""
+    """Prefer assistant content; fall back to reasoning if content is empty.
+
+    When only reasoning exists, prefer the last fenced code block plus a
+    short tail so the judge scores the deliverable, not the monologue.
+    Full reasoning stays on the transcript payload.
+    """
     content = (result.content or "").strip()
     if content:
         return content, "content"
     reasoning = (result.reasoning or "").strip()
-    if reasoning:
-        return reasoning, "reasoning"
-    return "", "empty"
+    if not reasoning:
+        return "", "empty"
+    extracted = _reasoning_deliverable(reasoning)
+    return extracted, "reasoning"
+
+
+def _reasoning_deliverable(reasoning: str) -> str:
+    fences = list(_FENCE_RE.finditer(reasoning))
+    if not fences:
+        return reasoning
+    last = fences[-1]
+    extracted = last.group(0)
+    tail = reasoning[last.end() :].strip()
+    if tail:
+        extracted = extracted + "\n\n" + tail[:_REASONING_TAIL_CHARS]
+    return extracted
 
 
 TARGET_TRANSPORT_TIMEOUT = 600.0

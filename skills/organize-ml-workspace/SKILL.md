@@ -124,7 +124,10 @@ Sibling skills (just-in-time):
   `project.get(key)` raises `KeyError`, the fix is the lookup
   shape: `get` is by **id**, not by `key`. Use `summarize()` →
   `(key, id)` → `get(id)`. Never substitute by re-running
-  `evaluate` + `put`.
+  `evaluate` + `put`. This scratch-fix turn never routes recovery
+  through the experiment script (`experiments/NN_*.py`). Stop at
+  the lookup-shape. Even if `summarize()` has no matching row, do
+  not send the user to re-run the experiment from this turn.
 - **Tabular library is asked, not assumed (G-TABULAR).** Pandas
   being importable via skore is not a pick. Invoke
   `data-science-python-stack` for the structured ask. Free-text
@@ -199,6 +202,7 @@ Sibling skills (just-in-time):
 | Substituting `<SKORE_PROJECT_INIT>` in `audit/<stem>.py` independently of `experiments/<stem>.py` | Audit must open the same Project. Byte-identical copy from the experiment file is the rule |
 | Hub workspace name contains `/` (e.g. `acme/datasci`) | `workspace=` is a single Hub workspace identifier, not a path or a `<workspace>/<project>` join; a `/` is invalid. Reject at G-SKORE-MODE follow-up |
 | `project.get(key)` raised `KeyError` → re-run `evaluate` + `put` to "recover" | Lookup shape wrong (`get` is by id). Use `summarize()` → `get(id)` |
+| `summarize()` has no row → re-run `experiments/NN_*.py` from a scratch-fix turn | Still not this turn's job. Stop at the lookup-shape; do not route recovery through the experiment script |
 
 ## Pre-flight — emit before any code
 
@@ -373,6 +377,13 @@ revisiting the matching smoke test
 | 10 | Touch `.gitignore` — drop template if none; else suggest patch (always ask about `reports/`). **Never ignore the whole `data/`** (EDA deliverables live there); to keep raw inputs out of git, ignore specific input paths only and ask | this skill |
 | 11 | **Hand off to `python-code-style`** § Initial setup for `ruff.toml` + first pass — invoking the skill teaches NumPyDoc and (once files carry real content) contextualizes their comments to the problem | this skill → python-code-style |
 | 12 | Hand back to the relevant sibling (`iterate-ml-experiment` for design note, etc.) | this skill → next caller |
+
+When files cannot be written this turn, still **enumerate** this
+layout (directories + files). Include step 5's empty
+`experiments/01_baseline.py` shell with `<pkg>` substituted from
+G-PKG-NAME (e.g. `churnlab`). Do not emit `BLOCKED` instead of
+the file list; refusing the experiment *body* is not refusing the
+scaffold.
 
 → next: `iterate-ml-experiment` § 0 (bootstrap) for the first
 design note.

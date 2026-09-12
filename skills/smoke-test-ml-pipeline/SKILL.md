@@ -47,6 +47,14 @@ description: >
 The minimal pytest that catches the "load → featurize → split"
 anti-pattern at iteration time, before it reaches production.
 
+**Deliverable first.** After the pre-flight checklist, the first
+user-visible content is the complete test file in a fenced block
+(`assert len(predictions) == n_predict_grid_rows`, predict env
+with no pre-history buffer, real `data/` source, soft assertion
+with the CV-mean hardcoded as a literal, no `skore` import).
+Do not stop at a plan or leave the file only in a thinking
+channel.
+
 ## Stop conditions — read before anything else
 
 - **No smoke test without an approved design note + script.** The pairing

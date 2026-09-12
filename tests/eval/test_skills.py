@@ -105,10 +105,9 @@ def _run_metric(metric: GEval, test_case: LLMTestCase) -> MetricOutcome:
         )
     score = metric.score
     threshold = float(metric.threshold)
-    if getattr(metric, "success", None) is not None:
-        passed = bool(metric.success)
-    else:
-        passed = score is not None and score >= threshold
+    # GEval.success can be False even when score meets threshold
+    # (non-strict must-do). Trust the numeric score.
+    passed = score is not None and float(score) >= threshold
     cost = getattr(metric, "evaluation_cost", None)
     return MetricOutcome(
         name=metric.name,

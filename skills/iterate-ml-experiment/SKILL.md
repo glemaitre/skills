@@ -460,8 +460,10 @@ turn.** Surface the implication, ask via `AskUserQuestion`:
 - **draft it now** — re-enter § 1 with the implication as seed.
 - **not yet** — record the implication in Backlog, stop.
 
-The user controls cadence; this skill records, it doesn't
-propose-and-record in one breath.
+Listing those two options is **not** proposing the next
+experiment. Auto-propose means writing the next design note or
+experiment body in this turn. The user controls cadence; this
+skill records, it doesn't propose-and-record in one breath.
 
 ## Dispatch table — which iterate-from-* skill
 

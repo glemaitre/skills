@@ -45,6 +45,27 @@ touched, no hook involved.
 
 ## Stop conditions — read before anything else
 
+- **Untouched-file ask (copy this shape).** When the user asks to
+  also fix warnings on a file that was **not** edited this turn
+  (e.g. `evaluate.py` while `pipeline.py` was touched):
+
+  ```
+  In-scope this turn: pipeline.py
+  pixi run ruff format pipeline.py
+  pixi run ruff check --fix pipeline.py
+  pixi run ruff check pipeline.py
+
+  Out of scope: evaluate.py — D100, D103, D103, D205, D400, D401, D415
+  AskUserQuestion: address evaluate.py as a separate task? yes | no
+
+  Rule: don't widen scope on touched files.
+  ```
+
+  Do **not** list a ruff trio for the untouched file. Do **not**
+  write a remediation table or docstring drafts for it. The
+  deliverable is the ask, not the fix. This overrides "describing
+  the work is not doing it" for out-of-scope files.
+
 - **Describing the work is not doing it.** "In my response, list the
   7 D warnings" is not listing them; "run `ruff format` next turn"
   is not formatting. Produce the diagnostics and the diff, or report
@@ -333,9 +354,22 @@ A common case: Claude edits one function in a file that already had
 unrelated `D`-rule violations. Ruff will report those too.
 
 - **In scope of this turn**: the lines Claude touched. Fix those.
+  The in-scope file is the one edited this turn.
 - **Out of scope**: pre-existing warnings in untouched code.
   Mention them in the response so the user can choose to address
   them, but don't drag every warning into the current task.
+- **When the user reports codes on an untouched file** (e.g.
+  seven `D*` warnings on `evaluate.py` while `pipeline.py` was
+  edited this turn):
+  1. Name `pipeline.py` as this turn's in-scope file and **list**
+     the ruff trio for it (`ruff format`, `ruff check --fix`,
+     `ruff check`). Naming the commands is the deliverable when
+     the shell cannot run. Do not defer naming them to a later
+     turn.
+  2. List the reported codes on the untouched file.
+  3. **Ask** (yes/no) whether to address that file as a **separate
+     task**. Do not schedule it alongside `pipeline.py`. Do not
+     say you will batch it into the next ruff pass.
 
 This keeps PR scope tight and avoids "while I was here" expansion
 that the user didn't ask for.

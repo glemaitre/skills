@@ -173,10 +173,12 @@ violated.
   `get_splitter`, `D415` on `get_splitter`.
 
 **Must do:**
-- Name the in-scope fix: `pipeline.py` is touched this turn, so its
-  warnings get formatted / fixed here.
-- **Surface** the `evaluate.py` warnings to the user — list the 7
-  codes — and ask whether to address them as a separate task.
+- Name `pipeline.py` as this turn's in-scope file and list the ruff
+  trio for it (`ruff format`, `ruff check --fix`, `ruff check`).
+  Naming the commands counts when the shell cannot run.
+- **Surface** the `evaluate.py` warnings — list the 7 codes — and
+  **ask** (yes/no) whether to address them as a separate task. Do
+  not schedule them alongside `pipeline.py`.
 - Cite the "don't widen scope on touched files" rule.
 
 **Must NOT do:**

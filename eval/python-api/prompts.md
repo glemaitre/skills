@@ -110,9 +110,9 @@ violation means a regression has snuck in).
 - Mention the cache write at `scratch/api/skrub/0.9.0/tabular_pipeline.md`.
 
 **Must NOT do:**
-- Invent a name like `tabular_learner`, `auto_tabular`, or
-  `TabularLearner` from memory.
-- Recommend writing code with the symbol before running the Shape 1
+- Recommend `tabular_learner`, `auto_tabular`, or `TabularLearner`
+  as the entry point (naming them only as a renamed trap is fine).
+- Recommend writing code with the symbol before proposing the Shape 1
   probe.
 
 ---
@@ -141,7 +141,10 @@ violation means a regression has snuck in).
   and state that the source URL goes on its first line.
 
 **Must NOT do:**
-- Answer the return-type question from memory without a fetch.
+- Answer the return-type question from memory (state which type
+  is returned for `KFold` vs holdout). A refusal that withholds
+  the type is allowed even if a class name appears only as an
+  example of what is omitted.
 - Use a URL containing `/latest/` or `/stable/` as the cached source.
 - Paraphrase the docs into the cache file (the cache should hold a
   verbatim extract).
@@ -229,7 +232,10 @@ violation means a regression has snuck in).
 - Recommend ANY inline `python -c` (rule is unconditional now —
   see Stop conditions, no length carve-out).
 - Write three separate cache files (`put.md`, `get.md`, `summarize.md`).
-- Skip the cache write entirely (treat the probe as the conclusion).
+- Treat the probe as the conclusion without naming a cache
+  destination. Naming `scratch/api/skore/0.18.0/project_local.md`
+  (or `project.md`) as the next-turn deliverable counts even when
+  this turn cannot Write.
 
 ---
 

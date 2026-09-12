@@ -119,9 +119,9 @@ violation in any transcript** (hard rule).
   needed.
 
 **Must NOT do:**
-- Auto-propose the next experiment in the same turn (the rule
-  "user controls cadence; this skill records, it doesn't
-  propose-and-record in one breath").
+- Write the next design note or experiment body in this turn.
+  Listing the cadence `AskUserQuestion` options ("draft it now" /
+  "not yet") is required and is not an auto-propose.
 - Edit `experiments/03_target_transform.py` to fix anything (the
   experiment script is frozen post-run).
 - Fabricate metric content if the user gave it — paraphrase only,

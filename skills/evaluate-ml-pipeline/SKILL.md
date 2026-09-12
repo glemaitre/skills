@@ -302,7 +302,9 @@ Pre-flight (evaluate-ml-pipeline):
 
    **Time-ordered data — `AskUserQuestion` is mandatory.** When
    the data is temporal, fire `AskUserQuestion` *before* picking
-   a splitter, with **four explicit options**:
+   a splitter. Paste these **four options verbatim** — keep the
+   token `gap=horizon` (do not substitute a numeric horizon such
+   as `gap=24`) and keep the phrase "safe default" on option 1:
 
    1. **`TimeSeriesSplit(gap=horizon)`** — growing-window train,
       contiguous test, embargo equal to the forecast horizon.

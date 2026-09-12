@@ -54,6 +54,49 @@ Three durable rules:
 3. **Bundled `references/` ≠ workspace cache.** Bundled refs are
    durable workflow patterns; cache files are per-version extracts.
 
+## This-turn contract (including no-tools evals)
+
+Checklist boxes are only `[x]`, `[ ]`, or `[n/a]`. Never `[~]`,
+"pending", or "deferred".
+
+**A cache hit is never `BLOCKED`.** If workspace state already
+lists `scratch/api/<lib>/<version>/<topic>.md` on disk, mark
+`Cache file lands on disk` as
+`[n/a] — cache hit, file already on disk` even if `Read` cannot
+run this turn. Next action: name
+`Read scratch/api/<lib>/<version>/<topic>.md`. Do not emit
+`BLOCKED`. A version given in workspace state counts as resolved.
+
+**When tools are missing, still write the plan.** Name the Shape,
+the probe path (`scratch/<ts>_….py` — version checks use
+`scratch/<ts>_version_<pkg>.py` exactly), the cache destination,
+and (Shape 3) the versioned WebSearch query. `BLOCKED` means: do
+**not** emit the looked-up fact (signature, arg list, return type,
+import, call). It does **not** mean skip naming those paths.
+
+**Do not preview the memory answer.** Do not write a return type
+or signature as a step of the live turn. Do not illustrate the
+omission with a class name — say "no return type until the cache
+file exists" and stop.
+
+**Stack orientation may name the entry point**
+(`skrub.tabular_pipeline`). Do not write `from skrub import …`
+or a call until a Shape 1 probe is proposed. Do not tabulate trap
+names (`tabular_learner`, `TabularLearner`) as candidates.
+
+**Named traps are leads, not lookups.** `tabular_learner` →
+`tabular_pipeline` in this skill does not confirm the install.
+Still propose a Shape 1 probe (or Shape 2 `dir(skrub)`) before
+treating the replacement as confirmed.
+
+**Version-check refusal (copy this).** When the user asks for
+`python -c "… __version__"`: refuse the inline command; cite
+**all Python execution goes to scratch** (version checks are
+enumerated in that Stop condition); propose
+`scratch/<ts>_version_<pkg>.py`; say even a one-line version
+check produces a scratch file. Do not `BLOCKED` the policy
+refusal.
+
 ## Next-step pointers
 
 | Came here for… | After lookup, next is… |
@@ -175,18 +218,21 @@ Status `Workspace decisions` is the precondition; see
 ## Blocked lookups
 
 When a mandatory lookup cannot run this turn — no tools available,
-the probe won't execute, the fetch is unreachable — there is exactly
-one sanctioned move. Say so and stop:
+the probe won't execute, the fetch is unreachable — emit:
 
 ```
 BLOCKED: <symbol> needs a python-api lookup that cannot run this
 turn (<why>). Run <probe or fetch> first.
 ```
 
-The pre-flight box stays `[ ]`. `[~]`, "pending", "deferred to the
-live turn" are not valid box states. Emit no signature, no arg
-list, no return type, not even a hedged one — an unrunnable lookup
-is a reason to stop, never a licence to answer from another source.
+Then **name the plan** (Shape, `scratch/<ts>_….py`, cache path,
+WebSearch query). Stop there: no signature, no arg list, no return
+type, no import, no call — not even a hedged one or "what the fetch
+will confirm". An unrunnable lookup is not a licence to answer from
+another source.
+
+`[~]`, "pending", "deferred to the live turn" are not valid box
+states. Rows that still apply stay `[ ]` until evidence exists.
 
 **`n/a` is a valid box state; `BLOCKED` is not a synonym for it.** A
 row that does not apply this turn gets `[n/a] — <why>`. The commonest
@@ -481,7 +527,9 @@ use-time.
 
 Tier-1 named entry points. Consult **before** a Shape 2 surface
 dump for "where does X live" — the named entry is often the right
-answer.
+answer. This section names *where* symbols live. It is not a
+licence to write the import/call, or to answer a Shape 3 return-type
+question from this list.
 
 ### scikit-learn
 
@@ -513,12 +561,9 @@ answer.
 
 ### skore
 
-- **Evaluation**: `skore.evaluate(estimator, X=None, y=None,
-  data=None, *, splitter=..., ...)` — dispatches by `splitter` to
-  `EstimatorReport` (holdout) / `CrossValidationReport` (CV
-  splitter) / `ComparisonReport` (multi-key). When `splitter` is
-  omitted it reuses a DataOp `mark_as_X(cv=...)` if present, else an
-  80/20 holdout; an explicit `splitter=` overrides the DataOp `cv`.
+- **Evaluation**: `skore.evaluate` — look up its signature and
+  return-type dispatch with Shape 1 / Shape 3. Do **not** name
+  report classes from this list.
 - **Project**: `skore.Project(name, *, mode="local", **kwargs)`
   (per-mode kwargs: `workspace=` for local dir / hub workspace name,
   `tracking_uri=` for mlflow) with `put(key, report)` /

@@ -187,6 +187,12 @@ prompt, or implicit in the parent message).
    confirmation]` in `Open gaps`.
 6. **Confirm before returning** — see § Confirm before returning.
 
+**If fetch cannot run this turn** (no tools, unreachable URL):
+still emit the three shaping questions (placeholders are fine),
+put domain claims under `Open gaps` with `[needs user
+confirmation]`, and show the § Confirm before returning
+restatement. Do not wait on the fetched body to skip those boxes.
+
 ### Branch B — resource-link
 
 The user picks `resource-link` and points at:
@@ -227,6 +233,12 @@ In all three resource sub-shapes:
    shaping questions, list it under `Open gaps`.
 4. **Confirm before returning** — see below.
 
+**If fetch cannot run this turn** (no `gh`, no `Read`): still
+name `gh auth status` then `gh issue view <N> …` (or `Read` the
+named file), emit the three shaping questions, list unanswered
+items under `Open gaps`, and show the confirmation restatement.
+Do not wait on the issue body to skip those boxes.
+
 ### Branch C — free-text
 
 The user picks `free-text` and types their idea directly.
@@ -262,7 +274,8 @@ The user's answer determines what happens next:
 This gate is non-optional. It is the user-side analogue of the
 parent's design-note approval gate — it catches misunderstandings
 *before* a design note is drafted, when the cost of revision is
-cheapest.
+cheapest. Show the restatement even when the source body was not
+fetched this turn.
 
 ## What is returned
 

@@ -184,6 +184,22 @@ bottom; any match means STOP.
 - **Proof:** smoke test (`smoke-test-ml-pipeline`) — pipeline
   with marker in the right place passes by construction.
 
+### Loader-baked target shift — refuse immediately
+
+When the user asks the loader to compute `y = col.shift(-H)` (or
+equivalent) then `mark_as_X` on the result:
+
+1. Refuse the loader-baked target shift.
+2. Cite **late-`mark_as_X` is forbidden** (S5 — cross-row
+   dependency) and **Layer 1 doesn't know the question** (S6 —
+   the forecasting horizon is not a loader concern).
+3. Propose the three-layer pattern: Layer 1 `history_source` +
+   `predict_grid`; Layer 2 aligns into `{X, y}` and marks;
+   Layer 3 features take X + history as references.
+
+Do not end on a generic three-layer sketch that terminates in an
+estimator and omits `history_source` / `predict_grid`.
+
 ### S6. Layer 1 doesn't know the question
 
 - **Rule:** Layer 1 (sources + loaders) describes *what data
@@ -502,6 +518,10 @@ examples: → `references/reproducibility_mechanics.md`):
   scoped: a step appended at the end, a single conditional, a
   stateless transform that adds columns without reshaping
   existing ones. **The flag's default mirrors prior behavior.**
+  Show it annotated:
+  `include_calendar_features: bool = False`. Mention
+  `tests/smoke/` (run **all** smoke tests) as the cheap check
+  that prior experiments still pass.
 - **Option 2 — add a new function called only from the new
   experiment.** Pick when the change doesn't fit cleanly behind a
   flag: new estimator at the tail, a step that reshapes the
