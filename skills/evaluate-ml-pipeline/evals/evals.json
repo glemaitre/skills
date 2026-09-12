@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "Standard skore.evaluate entry, IID tabular",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` approved.\n- `src/<pkg>/pipeline.py` exists with `build_learner` returning a\n  `SkrubLearner`. The X-marker has empty `split_kwargs`.\n- `experiments/01_baseline.py` is the scaffold placeholder.]\n\nWire `evaluate.py` for the baseline. Tabular regression, no\ngroups, no temporal ordering.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` approved.\n- `src/<pkg>/pipeline.py` exists with `build_learner` returning a\n  `SkrubLearner`. The X-marker has empty `split_kwargs`.\n- `experiments/01_baseline.py` is the scaffold placeholder.\n- Cache exists at `scratch/api/sklearn/1.8.0/cv_splitters.md`\n  covering `KFold` / `GroupKFold` / `TimeSeriesSplit`, and at\n  `scratch/api/skore/0.18.0/evaluate.md`.]\n\nWire `evaluate.py` for the baseline. Tabular regression, no\ngroups, no temporal ordering.",
       "expected_output": "Behavioural response satisfying: - Pick **`skore.evaluate(learner, data={...}, splitter=...)`** as the entry point (not `cross_val_score`, not `cross_validate`). - Map empty `split_kwargs` + IID \u2192 **`KFold`** per the mapping table. - Mention python-api consultation for `skore.evaluate` and `KFold` signatures. It must NOT: - Recommend `cross_val_score`, `cross_validate`, `classification_report`, or hand-rolled `print(mean_squared_error(...))`. - Default to `StratifiedKFold` (forbidden \u2014 compresses across-fold variance, even on imbalance). - Pre-pin metrics (e.g. `scoring=\"neg_mean_squared_error\"`) \u2014 trust skore defaults.",
       "files": [],
       "expectations": [

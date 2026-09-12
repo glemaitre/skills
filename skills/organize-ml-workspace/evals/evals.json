@@ -54,11 +54,11 @@
     {
       "id": 4,
       "title": "Pre-emptive experiment file creation",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder, fresh scaffold.]\n\nScaffold the workspace and write the baseline experiment\n`experiments/01_baseline.py` so we can run it right away.",
-      "expected_output": "Behavioural response satisfying: - Scaffold the layout up to the **empty** `journal/JOURNAL.md` placeholder. - Refuse to write `experiments/01_baseline.py` with content during the scaffold turn. - Cite the rule: \"design note first, then code\" / `iterate-ml-experiment` \u00a7 3 owns experiment-script content. It must NOT: - Write a runnable `experiments/01_baseline.py` with a real build_learner call, `skore.evaluate`, and `project.put` in this turn. - Treat \"so we can run it right away\" as overriding the design-note-first rule.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder, fresh scaffold.\n- The config gates are already resolved and recorded: G-PKG-NAME =\n  `churnlab`, G-ENV-MGR = pixi, G-TABULAR = pandas, G-SKORE-MODE =\n  local. Nothing is left to ask before the layout goes down.]\n\nScaffold the workspace and write the baseline experiment\n`experiments/01_baseline.py` so we can run it right away.",
+      "expected_output": "Behavioural response satisfying: - Lay out the scaffold up to the **empty** `journal/JOURNAL.md` placeholder (name the directories and files the Decision flow creates). - Refuse to write `experiments/01_baseline.py` with content during the scaffold turn. - Cite the rule: \"design note first, then code\" / `iterate-ml-experiment` \u00a7 3 owns experiment-script content. It must NOT: - Write a runnable `experiments/01_baseline.py` with a real build_learner call, `skore.evaluate`, and `project.put` in this turn. - Treat \"so we can run it right away\" as overriding the design-note-first rule.",
       "files": [],
       "expectations": [
-        "Scaffold the layout up to the **empty** `journal/JOURNAL.md` placeholder.",
+        "Lay out the scaffold up to the **empty** `journal/JOURNAL.md` placeholder (name the directories and files the Decision flow creates).",
         "Refuse to write `experiments/01_baseline.py` with content during the scaffold turn.",
         "Cite the rule: \"design note first, then code\" / `iterate-ml-experiment` \u00a7 3 owns experiment-script content.",
         "Mention that step 5 of the Decision flow drops a templated `01_baseline.py` shell (with `<pkg>` substituted), but the real body lands only after design-note approval.",
@@ -70,10 +70,10 @@
       "id": 5,
       "title": "Iterate on an existing experiment: ask new vs edit",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_text_encoder.md`, `experiments/02_text_encoder.py`,\n  `tests/smoke/test_02_text_encoder.py` all exist and the\n  experiment is `done` in JOURNAL.md.]\n\nLet's iterate on `02_text_encoder`. Tweak the encoder config.",
-      "expected_output": "Behavioural response satisfying: - Ask via `AskUserQuestion`: new file (`NN_text_encoder_v2.py`) vs in-place edit of `02_text_encoder.py`. - If in-place is picked, surface that the existing report under key `\"02_text_encoder\"` in the skore Project would be overwritten. - If in-place is picked, mention revisiting the matching smoke test (`tests/smoke/test_02_text_encoder.py`). It must NOT: - Silently pick \"edit in place\" or \"create new file\" \u2014 the rule is hard: ask. - Touch the design note `journal/02_text_encoder.md` directly (that's `iterate-ml-experiment`'s domain).",
+      "expected_output": "Behavioural response satisfying: - Name `AskUserQuestion` as the mechanism for the choice, and state its two options: new file (`NN_text_encoder_v2.py`) vs in-place edit of `02_text_encoder.py`. - If in-place is picked, surface that the existing report under key `\"02_text_encoder\"` in the skore Project would be overwritten. - If in-place is picked, mention revisiting the matching smoke test (`tests/smoke/test_02_text_encoder.py`). It must NOT: - Silently pick \"edit in place\" or \"create new file\" \u2014 the rule is hard: ask. - Touch the design note `journal/02_text_encoder.md` directly (that's `iterate-ml-experiment`'s domain).",
       "files": [],
       "expectations": [
-        "Ask via `AskUserQuestion`: new file (`NN_text_encoder_v2.py`) vs in-place edit of `02_text_encoder.py`.",
+        "Name `AskUserQuestion` as the mechanism for the choice, and state its two options: new file (`NN_text_encoder_v2.py`) vs in-place edit of `02_text_encoder.py`.",
         "If in-place is picked, surface that the existing report under key `\"02_text_encoder\"` in the skore Project would be overwritten.",
         "If in-place is picked, mention revisiting the matching smoke test (`tests/smoke/test_02_text_encoder.py`).",
         "The response does NOT: Silently pick \"edit in place\" or \"create new file\" \u2014 the rule is hard: ask.",

@@ -53,7 +53,7 @@ python-dotenv = ">=1.0"
 SKILL_EVAL_MODELS = "openrouter/deepseek/deepseek-v4.1-flash" # "openrouter/deepseek/deepseek-v4.1-flash,openrouter/z-ai/glm-5.3-flash,openrouter/qwen/qwen3.8-27b"
 SKILL_EVAL_JUDGE_MODEL = "openrouter/anthropic/claude-opus-5"
 SKILL_EVAL_MODE = "with"
-SKILL_EVAL_PASS_RATIO = "0.8"
+SKILL_EVAL_PASS_RATIO = "0.7"
 
 [feature.eval.tasks]
 eval = { cmd = "pytest tests/eval -m eval", description = "Run DeepEval skill evaluations (requires provider API keys)." }

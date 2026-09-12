@@ -167,9 +167,11 @@ violated.
   AskUserQuestion).
 - Proceed directly to the `resource-link` branch with the URL in
   hand.
-- Run `gh auth status` then `gh issue view 12345 ...`.
+- Name the fetch sequence: `gh auth status` then
+  `gh issue view 12345 ...`.
 - Map to three shaping questions.
-- Fire confirmation gate before returning.
+- Name the confirmation gate as required before returning, and show
+  the plain-text restatement it would carry.
 
 **Must NOT do:**
 - Fire the entry-point `AskUserQuestion` (article-link /

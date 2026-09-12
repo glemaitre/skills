@@ -57,6 +57,19 @@ read the report. The pipeline declaration is out of scope (see
   `ComparisonReport`) and any sklearn splitter name must come from a
   `Skill(python-api)` or `Skill(python-api)` call **in this turn**.
   "I remember `KFold(n_splits=5)`" is not acceptable.
+- **The rule-3 table is not a substitute for the lookup.** The
+  mapping table below tells you *which* splitter the data calls
+  for; `python-api` tells you what it is called and how it is
+  signed in the installed version. Naming `KFold(5)` because the
+  table says so, with the lookup deferred, is the same violation as
+  naming it from memory.
+- **A hedge does not license the content.** "No tools this turn",
+  "the live turn MUST run the lookup", a `[~]` box — none of these
+  make an unconfirmed splitter safe to write. If the lookup cannot
+  run, the box stays `[ ]`, no splitter name is written, and the
+  turn ends with a single line:
+  `BLOCKED: splitter needs a python-api lookup that cannot run this
+  turn (<why>). Run <probe or cache read> first.`
 - **Splitter choice is data-driven, not default-driven
   (`G-CV-SPLITTER`).** This is the **G-CV-SPLITTER** gate — owned by
   this skill, fired during `iterate-ml-experiment` § 3 (the build →

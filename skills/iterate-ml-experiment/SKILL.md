@@ -116,6 +116,14 @@ the **read** mode first, stop. Re-entering § 1 is a separate turn.
 - **No design note, no script.** Never create or edit
   `experiments/NN_*.py` until `journal/NN_*.md` exists, is filled,
   and the user has explicitly approved it.
+- **A dispatch is a handoff, not an offer.** When a sourcing branch
+  routes to a sibling skill, the sibling does its own fetching.
+  Don't ask the user to paste the issue body, the article text, or
+  "a short summary" so you can skip the hop — that is doing the
+  sibling's job through the user, and it discards the branch's
+  shaping questions and confirmation gate. If the dispatch can't
+  run this turn, say which hop is blocked and stop; don't substitute
+  a user prompt for it.
 - **`JOURNAL.md` is read at session start, not improvised.** Don't
   reconstruct history from `experiments/` filenames or `git log` —
   those don't carry the *why*.
@@ -298,6 +306,14 @@ these — fall through to structured `AskUserQuestion`.
 
 Every time § 2 runs in iterate mode, surface this menu with the
 JOURNAL.md Backlog table. **Never silently default.**
+
+**A resolved pick skips the menu entirely.** When the user's opening
+message already names the strategy — a URL, a `B<N>`, an explicit
+"my-pick" — § 2 is satisfied and the menu does not run. Reproducing
+it anyway "for the record", "for transparency", "so you can see what
+I skipped", or inside a collapsed block is *presenting* it: the
+reader sees four options and a prompt. Name the branch the input
+resolved to and move on.
 
 ```
 How would you like me to source the next experiment?

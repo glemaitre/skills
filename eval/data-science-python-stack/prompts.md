@@ -140,9 +140,11 @@ violated.
   / Tier 2 (they're third-party substitutes).
 - Recommend `sklearn.ensemble.HistGradientBoostingRegressor` as the
   in-stack equivalent.
-- If the user has a specific reason for xgboost, route to the
-  Tier-3 contested-job mechanism (add row to competing-jobs
-  table OR surface gap to user, then `AskUserQuestion`).
+- If the user has a specific reason for xgboost, route through the
+  § "Competing libraries — general rule" path: treat it as a new
+  competing-library job (add a row to the competing-jobs table OR
+  surface the gap to the user) and name `AskUserQuestion` as the
+  gate that resolves it.
 
 **Must NOT do:**
 - Run `pixi add xgboost` silently.

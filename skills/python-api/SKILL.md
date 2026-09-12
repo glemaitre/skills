@@ -115,6 +115,24 @@ Status `Workspace decisions` is the precondition; see
   the `Signature` / `help()` sections must remain blank or marked
   `<pending probe execution>`. Same rule for Shape 3: do not
   paraphrase docs from memory; cache file holds verbatim extracts.
+- **Bundled `references/` are never a signature or answer source.**
+  They carry durable workflow patterns, not the installed version's
+  surface. Do not quote, paraphrase, or "sketch roughly" a
+  signature, arg list, or return type out of them. This holds for
+  the answer text as much as for the cache file.
+- **A hedge does not license the content.** "Treat this as a lead,
+  not a signature", "⚠️ unverified", "don't paste this into your
+  script" — the reader copies the code block, not the caveat.
+  Printing an unverified signature or return type is the violation;
+  the disclaimer does not undo it. If the lookup did not run this
+  turn, the answer section stays `<pending probe execution>` and
+  the turn reports BLOCKED (see § Blocked lookups).
+- **Refusing a source does not license quoting it.** When you
+  explain why memory or a bundled reference is disqualified, name
+  the source and stop there — "the bundled orientation sketch",
+  "training memory". Never reproduce a fragment of what it says,
+  not even as the example of what you are refusing. An arg list
+  inside a refusal is still a copyable arg list.
 - **Version-correct first.** Resolve `<pkg>.__version__` before any
   lookup. The version subfolder is the cache freshness key.
 - **Cache hit before fresh fetch.** List
@@ -154,6 +172,22 @@ Status `Workspace decisions` is the precondition; see
   *conclusion*. Turn end without
   `scratch/api/<lib>/<version>/<topic>.md` on disk = incomplete.
 
+## Blocked lookups
+
+When a mandatory lookup cannot run this turn — no tools available,
+the probe won't execute, the fetch is unreachable — there is exactly
+one sanctioned move. Say so and stop:
+
+```
+BLOCKED: <symbol> needs a python-api lookup that cannot run this
+turn (<why>). Run <probe or fetch> first.
+```
+
+The pre-flight box stays `[ ]`. `[~]`, "pending", "deferred to the
+live turn" are not valid box states. Emit no signature, no arg
+list, no return type, not even a hedged one — an unrunnable lookup
+is a reason to stop, never a licence to answer from another source.
+
 ## Forbidden shortcuts
 
 | Shortcut | Why it's wrong |
@@ -161,6 +195,7 @@ Status `Workspace decisions` is the precondition; see
 | Recognise the symbol name from training data → write the call | Memory keyed to arbitrary version; install may have renamed / re-signatured |
 | Probe ran, answer on screen → stop without writing the cache | Probe is investigation; cache is conclusion. Next session repeats the probe |
 | Bundled `references/X.md` exists → treat as the cache | References are workflow patterns; cache is per-version extracts. Both must exist |
+| Quote a signature out of `references/X.md` behind a "treat this as a lead" hedge | Same defect as memory, one source removed. References are not keyed to the installed version; the hedge doesn't stop the reader copying it |
 | Version subfolder missing → write into the latest existing one | Subfolder is the freshness key. Create the right one |
 | Multi-symbol → string several `inspect.signature` into one inline `python -c` | All Python execution goes to scratch — no inline `-c` allowance. Multi-symbol → one scratch file → one consolidated cache file |
 | Used `python -c "import <pkg>; print(<pkg>.__version__)"` for a quick version check | Rule is unconditional. Length is not the criterion — traceability is. Version checks go to `scratch/<ts>_version_<pkg>.py` |

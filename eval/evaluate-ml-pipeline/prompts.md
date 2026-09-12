@@ -16,6 +16,9 @@ violated.
 - `src/<pkg>/pipeline.py` exists with `build_learner` returning a
   `SkrubLearner`. The X-marker has empty `split_kwargs`.
 - `experiments/01_baseline.py` is the scaffold placeholder.
+- Cache exists at `scratch/api/sklearn/1.8.0/cv_splitters.md`
+  covering `KFold` / `GroupKFold` / `TimeSeriesSplit`, and at
+  `scratch/api/skore/0.18.0/evaluate.md`.
 
 **Must do:**
 - Pick **`skore.evaluate(learner, data={...}, splitter=...)`** as

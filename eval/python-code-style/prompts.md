@@ -167,11 +167,16 @@ violated.
 **Assumed workspace state:**
 - `pipeline.py` was edited this turn.
 - `evaluate.py` has pre-existing `D` warnings on untouched code.
+  `ruff check evaluate.py` reported: `D100` (module docstring),
+  `D103` on `load_report`, `D103` on `summarize_folds`, `D205` on
+  `evaluate_baseline`, `D400` on `evaluate_baseline`, `D401` on
+  `get_splitter`, `D415` on `get_splitter`.
 
 **Must do:**
-- Fix the warnings in `pipeline.py` (in-scope; touched this turn).
-- **Surface** the `evaluate.py` warnings to the user — list them
-  briefly — and ask whether to address them as a separate task.
+- Name the in-scope fix: `pipeline.py` is touched this turn, so its
+  warnings get formatted / fixed here.
+- **Surface** the `evaluate.py` warnings to the user — list the 7
+  codes — and ask whether to address them as a separate task.
 - Cite the "don't widen scope on touched files" rule.
 
 **Must NOT do:**

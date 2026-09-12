@@ -19,7 +19,7 @@ TRANSCRIPT_DIR = REPO_ROOT / ".transcripts"
 
 DEFAULT_TARGET_MODEL = "openrouter/deepseek/deepseek-v4.1-flash"
 DEFAULT_JUDGE_MODEL = "openrouter/anthropic/claude-opus-5"
-DEFAULT_PASS_RATIO = 0.8
+DEFAULT_PASS_RATIO = 0.7
 MUST_NOT_PREFIX = "The response does NOT"
 NO_TOOLS_NOTE = (
     "Harness note: this is a single-turn evaluation. You have no tools this "

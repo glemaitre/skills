@@ -60,6 +60,14 @@ declaring the turn done.
 
 ## Stop conditions — read before anything else
 
+- **Describing an ambiguity is not resolving it.** Naming the
+  conflict ("conda `myenv` is active, but `pixi.toml` is at the
+  root") and then picking for the user is not asking. When two
+  managers are visible, the pick is the user's: fire the question
+  through `AskUserQuestion`. If that tool is unavailable, report
+  `BLOCKED: manager ambiguity needs a user decision (<why the tool
+  did not run>)` and stop — declaring one side "context, not a
+  pick" closes the question by fiat.
 - **Wrong-manager install is forbidden.** If the project uses pixi,
   do not `pip install`. If it uses poetry, do not `uv add`. Mixing
   managers creates state the manifest doesn't track, and the next
@@ -499,6 +507,9 @@ If detection found nothing AND the user picked `pixi` via G-ENV-MGR:
 6. Wire editable workspace package
    (`pixi add --pypi "<pkg> @ ."` then edit to
    `<pkg> = { path = ".", editable = true }`; then `pixi install`).
+   The point: `from <pkg>.pipeline import build_learner` then
+   resolves from any CWD, with no `PYTHONPATH=src` hack and no
+   re-install after each source edit.
 7. Drop `pyrightconfig.json` via `sed`-substitution of
    `<PYTHON_PATH>` for `.pixi/envs/lsp/bin/python`.
 8. Sync all 4 envs: `pixi install` then `pixi install -e dev` /

@@ -229,11 +229,13 @@ violation in any transcript** (hard rule).
 **Must do:**
 - Recognise the URL as a GitHub issue / resource link via the
   **Free-text handling** rule.
-- Route to `iterate-from-user` with the URL pre-resolved (skipping
-  its inner `AskUserQuestion`).
-- Eventually produce a design-note draft at
-  `journal/NN_<short_name>.md` (after `iterate-from-user` returns
-  a Proposal).
+- Name `iterate-from-user` as the dispatch target, with the URL
+  handed over pre-resolved so its inner `AskUserQuestion` doesn't
+  fire. The sibling fetches the issue — don't ask the user to paste
+  the issue body or a summary instead.
+- Name the design-note destination `journal/NN_<short_name>.md`,
+  with the correct `NN`, and state that the draft lands only after
+  `iterate-from-user` returns a Proposal.
 
 **Must NOT do:**
 - Re-present the sourcing menu in full (the URL already resolved

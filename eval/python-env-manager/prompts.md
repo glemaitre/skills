@@ -125,8 +125,9 @@ violated.
   manager).
 - Surface the conflict to the user — which env should this install
   target?
-- Fire `AskUserQuestion` to resolve the manager ambiguity (err on
-  side of asking when borderline, per Stop conditions).
+- Name `AskUserQuestion` as the mechanism for resolving the manager
+  ambiguity, and state the options it would carry (err on side of
+  asking when borderline, per Stop conditions).
 - Recommend `pixi add lightgbm` if the user picks pixi.
 
 **Must NOT do:**
@@ -150,8 +151,9 @@ violated.
 
 **Must do:**
 - Recognise this as the **Editable workspace package** sub-routine.
-- Propose `pixi add --pypi --editable .` (the pixi-specific
-  editable install).
+- Propose the documented pixi two-step: `pixi add --pypi "<pkg> @ ."`,
+  then `<pkg> = { path = ".", editable = true }` in `pixi.toml`,
+  then `pixi install`.
 - Explain that this lets `from <pkg>.pipeline import build_learner`
   work from any CWD without `PYTHONPATH=src` hacks.
 

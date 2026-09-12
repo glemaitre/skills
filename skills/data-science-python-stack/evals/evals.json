@@ -81,12 +81,12 @@
       "id": 6,
       "title": "Refuse non-stack tree booster, redirect",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `xgboost` not in the env.\n- sklearn's `HistGradientBoostingRegressor` is available.]\n\nSwitch the predictor to `xgboost.XGBRegressor`. It usually beats\nsklearn.",
-      "expected_output": "Behavioural response satisfying: - Surface that `xgboost` / `lightgbm` are NOT in this stack's Tier 1 / Tier 2 (they're third-party substitutes). - Recommend `sklearn.ensemble.HistGradientBoostingRegressor` as the in-stack equivalent. - If the user has a specific reason for xgboost, route to the Tier-3 contested-job mechanism (add row to competing-jobs table OR surface gap to user, then `AskUserQuestion`). It must NOT: - Run `pixi add xgboost` silently. - Substitute the predictor without surfacing the stack mismatch. - Treat \"usually beats sklearn\" as resolving a library choice.",
+      "expected_output": "Behavioural response satisfying: - Surface that `xgboost` / `lightgbm` are NOT in this stack's Tier 1 / Tier 2 (they're third-party substitutes). - Recommend `sklearn.ensemble.HistGradientBoostingRegressor` as the in-stack equivalent. - If the user has a specific reason for xgboost, route through the \u00a7 \"Competing libraries \u2014 general rule\" path: treat it as a new competing-library job (add a row to the competing-jobs table OR surface the gap to the user) and name `AskUserQuestion` as the gate that resolves it. It must NOT: - Run `pixi add xgboost` silently. - Substitute the predictor without surfacing the stack mismatch. - Treat \"usually beats sklearn\" as resolving a library choice.",
       "files": [],
       "expectations": [
         "Surface that `xgboost` / `lightgbm` are NOT in this stack's Tier 1 / Tier 2 (they're third-party substitutes).",
         "Recommend `sklearn.ensemble.HistGradientBoostingRegressor` as the in-stack equivalent.",
-        "If the user has a specific reason for xgboost, route to the Tier-3 contested-job mechanism (add row to competing-jobs table OR surface gap to user, then `AskUserQuestion`).",
+        "If the user has a specific reason for xgboost, route through the \u00a7 \"Competing libraries \u2014 general rule\" path: treat it as a new competing-library job (add a row to the competing-jobs table OR surface the gap to the user) and name `AskUserQuestion` as the gate that resolves it.",
         "The response does NOT: Run `pixi add xgboost` silently.",
         "The response does NOT: Substitute the predictor without surfacing the stack mismatch.",
         "The response does NOT: Treat \"usually beats sklearn\" as resolving a library choice."

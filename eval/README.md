@@ -16,8 +16,10 @@ Expectations from `prompts.md` are split on the prefix
 `The response does NOT`:
 
 - **Must-do** is a non-strict GEval with partial credit. The default
-  pass threshold is `0.8` (`SKILL_EVAL_PASS_RATIO`): a minor miss no
-  longer fails the case.
+  pass threshold is `0.7` (`SKILL_EVAL_PASS_RATIO`): a minor miss no
+  longer fails the case. Most cases carry 3-4 Must-do expectations,
+  so `0.7` buys exactly one item of tolerance; at `0.8` the ceiling
+  rounds that away and the metric is all-or-nothing again.
 - **Must-NOT** stays all-or-nothing (`threshold=1.0`, `strict_mode`).
   Any prohibition violated fails the case.
 
@@ -58,7 +60,7 @@ Defaults (override in `pixi.toml` or on the CLI):
   cheap models, because the skills have to stay legible to them
 - judge: `openrouter/anthropic/claude-opus-5` (independent of the targets)
 - mode: `with` (SKILL.md as system prompt)
-- Must-do pass ratio: `0.8` (Must-NOT is always all-or-nothing)
+- Must-do pass ratio: `0.7` (Must-NOT is always all-or-nothing)
 
 LiteLLM names are `openrouter/<vendor>/<model>`. Native `openai/...` or
 `anthropic/...` ids still work if you change the pixi env vars and set
@@ -81,7 +83,7 @@ pixi run -e eval eval -- \
   --skill-model openrouter/qwen/qwen3.8-27b \
   --skill-judge-model openrouter/anthropic/claude-opus-5 \
   --skill-mode both \
-  --skill-pass-ratio 0.8 \
+  --skill-pass-ratio 0.7 \
   -k python-api
 ```
 

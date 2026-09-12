@@ -65,6 +65,15 @@ plus an orthogonal **agent feature**:
   transitively" / "user said 'quick'" / "the folder has no
   preference signalled" are **not** waivers. A silent pick is a
   Stop-condition violation, full stop.
+- **A job the table doesn't cover is still an `AskUserQuestion`.**
+  When the user reaches for a library outside the stack (`xgboost`,
+  `lightgbm`, …) for a job a stack library already owns, naming the
+  in-stack equivalent is only half the answer. Surfacing the gap in
+  prose is not resolving it: the choice between the in-stack library
+  and the outside one goes to the user via `AskUserQuestion`, exactly
+  as a Tier 2 row would, and the answer is recorded in `Workspace
+  decisions`. "Tell me if you want the override" is a silent pick
+  with extra words.
 - **No substitute when import fails.** When code in this stack needs
   a library but `import` fails, install it; do not rewrite to a
   non-stack equivalent (see § "Missing dependency"). The most

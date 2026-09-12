@@ -72,6 +72,14 @@ Sibling skills (just-in-time):
 
 ## Stop conditions — read before anything else
 
+- **Describing the work is not doing it.** A plan for next turn does
+  not tick a pre-flight box. Scaffold the layout, or report
+  `BLOCKED: <what> cannot run this turn (<why>)` and stop — a `[~]`
+  box, "pending", or "deferred to the live turn" is not a valid
+  state. The same holds for the mechanism: when a gate calls for
+  `AskUserQuestion`, a prose question or a markdown table is not a
+  substitute. If the tool is unavailable, that is BLOCKED, not an
+  excuse to improvise the question inline.
 - **Missing dependency.** If `import skore` raises, STOP. Invoke
   `python-env-manager` for the install command. Do not drop
   `skore.Project` in favor of `mlflow` / pickles / "print metrics"
@@ -149,7 +157,7 @@ Sibling skills (just-in-time):
 | `pixi` on PATH → run `pixi init` to get a manifest, then read the name back | Violates G-ENV-MGR (silent manager pick) AND G-PKG-NAME (name from folder via init side-effect). Circular: the agent created the manifest it now claims to read |
 | Folder name = good name → skip the ask | Default *value* is fine; silent *pick* is not. G-PKG-NAME requires the structured ask even with folder as default |
 | `pandas` already importable via skore → write `import pandas` in `data.py` | Transitive presence is not a pick. Violates G-TABULAR |
-| Scaffold every skeleton in one turn, incl. `experiments/01_baseline.py` body | Scaffold stops at empty `journal/` placeholder. Experiment script content lands after design-note approval (`iterate-ml-experiment` § 3) |
+| Scaffold every skeleton in one turn, incl. `experiments/01_baseline.py` body | Scaffold drops the *empty templated shell* (Decision flow step 5) and stops at the empty `journal/` placeholder. The experiment **body** lands after design-note approval (`iterate-ml-experiment` § 3) |
 | Scaffold drops `audit/01_baseline.py` at workspace creation | Audit files placed by `audit-ml-pipeline` at § 4 record-outcome. Empty `audit/` at scaffold is correct |
 | Forget `audit/` in the scaffold layout | Four-way stem pairing breaks |
 | `pyproject.toml` exists with `name = <x>` → reuse without confirming | Always re-confirm via G-PKG-NAME |
@@ -332,7 +340,7 @@ revisiting the matching smoke test
 | 2a | **G-SKORE-MODE** ask: local | hub | mlflow (+ hub workspace name if hub; + MLflow tracking URI if mlflow). Determines `<SKORE_PROJECT_INIT>` form + skore install variant. → `references/g_skore_mode.md` | this skill |
 | 3 | Drop `pyproject.toml` from `templates/pyproject.toml` (substitute `<pkg>`). Hand off to `python-env-manager` for editable install | this skill → env-manager |
 | 4 | Create `src/<pkg>/` with skeletons from `templates/src_*.py` | this skill |
-| 5 | Create `experiments/01_baseline.py` from `templates/experiment.py` (substitute `<pkg>`, `<SKORE_PROJECT_INIT>` per G-SKORE-MODE, `<project-name>`) | this skill |
+| 5 | Create `experiments/01_baseline.py` as an **empty templated shell** from `templates/experiment.py` (substitute `<pkg>`, `<SKORE_PROJECT_INIT>` per G-SKORE-MODE, `<project-name>`). Imports and `# %%` cell markers only — the experiment body lands later, after design-note approval (`iterate-ml-experiment` § 3) | this skill |
 | 6 | Create empty `tests/smoke/`. Verify pytest on manifest | this skill |
 | 6a | Create empty `audit/` | this skill |
 | 7 | Create `journal/JOURNAL.md` one-line placeholder; `iterate-ml-experiment` rewrites it | this skill |

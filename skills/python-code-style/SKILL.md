@@ -45,6 +45,11 @@ touched, no hook involved.
 
 ## Stop conditions — read before anything else
 
+- **Describing the work is not doing it.** "In my response, list the
+  7 D warnings" is not listing them; "run `ruff format` next turn"
+  is not formatting. Produce the diagnostics and the diff, or report
+  `BLOCKED: <what> cannot run this turn (<why>)` and stop. A `[~]`
+  box, "pending", or "n/a this turn, no shell" is not a valid state.
 - **Do not configure a PostToolUse / PreToolUse hook for ruff.** This
   skill is intentionally manual. A hook tightens the loop in ways
   that bite (every micro-edit triggers a fix cycle, partial files

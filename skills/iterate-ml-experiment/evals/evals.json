@@ -103,12 +103,12 @@
       "id": 7,
       "title": "Free-text URL routes to iterate-from-user",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` has 2 done rows in History (so iterate mode,\n  not bootstrap).\n- Backlog is empty.]\n\nLet's try this idea: https://github.com/scikit-learn/scikit-learn/issues/12345",
-      "expected_output": "Behavioural response satisfying: - Recognise the URL as a GitHub issue / resource link via the **Free-text handling** rule. - Route to `iterate-from-user` with the URL pre-resolved (skipping its inner `AskUserQuestion`). - Eventually produce a design-note draft at `journal/NN_<short_name>.md` (after `iterate-from-user` returns a Proposal). It must NOT: - Re-present the sourcing menu in full (the URL already resolved the pick). - Treat the URL as a free-text idea (`user \u2192 free-text` branch); the issue-link branch is the correct one. - Draft `experiments/NN_*.py` before the design note is approved.",
+      "expected_output": "Behavioural response satisfying: - Recognise the URL as a GitHub issue / resource link via the **Free-text handling** rule. - Name `iterate-from-user` as the dispatch target, with the URL handed over pre-resolved so its inner `AskUserQuestion` doesn't fire. The sibling fetches the issue \u2014 don't ask the user to paste the issue body or a summary instead. - Name the design-note destination `journal/NN_<short_name>.md`, with the correct `NN`, and state that the draft lands only after `iterate-from-user` returns a Proposal. It must NOT: - Re-present the sourcing menu in full (the URL already resolved the pick). - Treat the URL as a free-text idea (`user \u2192 free-text` branch); the issue-link branch is the correct one. - Draft `experiments/NN_*.py` before the design note is approved.",
       "files": [],
       "expectations": [
         "Recognise the URL as a GitHub issue / resource link via the **Free-text handling** rule.",
-        "Route to `iterate-from-user` with the URL pre-resolved (skipping its inner `AskUserQuestion`).",
-        "Eventually produce a design-note draft at `journal/NN_<short_name>.md` (after `iterate-from-user` returns a Proposal).",
+        "Name `iterate-from-user` as the dispatch target, with the URL handed over pre-resolved so its inner `AskUserQuestion` doesn't fire. The sibling fetches the issue \u2014 don't ask the user to paste the issue body or a summary instead.",
+        "Name the design-note destination `journal/NN_<short_name>.md`, with the correct `NN`, and state that the draft lands only after `iterate-from-user` returns a Proposal.",
         "The response does NOT: Re-present the sourcing menu in full (the URL already resolved the pick).",
         "The response does NOT: Treat the URL as a free-text idea (`user \u2192 free-text` branch); the issue-link branch is the correct one.",
         "The response does NOT: Draft `experiments/NN_*.py` before the design note is approved."

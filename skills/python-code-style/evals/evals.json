@@ -80,12 +80,12 @@
     {
       "id": 6,
       "title": "Don't widen scope to untouched files",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `pipeline.py` was edited this turn.\n- `evaluate.py` has pre-existing `D` warnings on untouched code.]\n\nWhile running ruff on the edited `pipeline.py`, I noticed\n`evaluate.py` has 7 unrelated `D` warnings. Fix all of them.",
-      "expected_output": "Behavioural response satisfying: - Fix the warnings in `pipeline.py` (in-scope; touched this turn). - **Surface** the `evaluate.py` warnings to the user \u2014 list them briefly \u2014 and ask whether to address them as a separate task. - Cite the \"don't widen scope on touched files\" rule. It must NOT: - Auto-fix `evaluate.py` in this turn without asking. - Run `ruff check --fix evaluate.py` as part of this turn. - Silently ignore the `evaluate.py` warnings (the user should know they exist).",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `pipeline.py` was edited this turn.\n- `evaluate.py` has pre-existing `D` warnings on untouched code.\n  `ruff check evaluate.py` reported: `D100` (module docstring),\n  `D103` on `load_report`, `D103` on `summarize_folds`, `D205` on\n  `evaluate_baseline`, `D400` on `evaluate_baseline`, `D401` on\n  `get_splitter`, `D415` on `get_splitter`.]\n\nWhile running ruff on the edited `pipeline.py`, I noticed\n`evaluate.py` has 7 unrelated `D` warnings. Fix all of them.",
+      "expected_output": "Behavioural response satisfying: - Name the in-scope fix: `pipeline.py` is touched this turn, so its warnings get formatted / fixed here. - **Surface** the `evaluate.py` warnings to the user \u2014 list the 7 codes \u2014 and ask whether to address them as a separate task. - Cite the \"don't widen scope on touched files\" rule. It must NOT: - Auto-fix `evaluate.py` in this turn without asking. - Run `ruff check --fix evaluate.py` as part of this turn. - Silently ignore the `evaluate.py` warnings (the user should know they exist).",
       "files": [],
       "expectations": [
-        "Fix the warnings in `pipeline.py` (in-scope; touched this turn).",
-        "**Surface** the `evaluate.py` warnings to the user \u2014 list them briefly \u2014 and ask whether to address them as a separate task.",
+        "Name the in-scope fix: `pipeline.py` is touched this turn, so its warnings get formatted / fixed here.",
+        "**Surface** the `evaluate.py` warnings to the user \u2014 list the 7 codes \u2014 and ask whether to address them as a separate task.",
         "Cite the \"don't widen scope on touched files\" rule.",
         "The response does NOT: Auto-fix `evaluate.py` in this turn without asking.",
         "The response does NOT: Run `ruff check --fix evaluate.py` as part of this turn.",

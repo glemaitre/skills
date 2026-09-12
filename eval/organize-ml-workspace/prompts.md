@@ -109,10 +109,14 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 
 **Assumed workspace state:**
 - Empty folder, fresh scaffold.
+- The config gates are already resolved and recorded: G-PKG-NAME =
+  `churnlab`, G-ENV-MGR = pixi, G-TABULAR = pandas, G-SKORE-MODE =
+  local. Nothing is left to ask before the layout goes down.
 
 **Must do:**
-- Scaffold the layout up to the **empty** `journal/JOURNAL.md`
-  placeholder.
+- Lay out the scaffold up to the **empty** `journal/JOURNAL.md`
+  placeholder (name the directories and files the Decision flow
+  creates).
 - Refuse to write `experiments/01_baseline.py` with content
   during the scaffold turn.
 - Cite the rule: "design note first, then code" /
@@ -141,9 +145,9 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
   experiment is `done` in JOURNAL.md.
 
 **Must do:**
-- Ask via `AskUserQuestion`: new file
-  (`NN_text_encoder_v2.py`) vs in-place edit of
-  `02_text_encoder.py`.
+- Name `AskUserQuestion` as the mechanism for the choice, and state
+  its two options: new file (`NN_text_encoder_v2.py`) vs in-place
+  edit of `02_text_encoder.py`.
 - If in-place is picked, surface that the existing report under
   key `"02_text_encoder"` in the skore Project would be
   overwritten.

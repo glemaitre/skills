@@ -134,10 +134,11 @@ violation means a regression has snuck in).
   cache first then escalate to WebSearch on miss.
 - Propose a WebSearch query that includes the version, like
   `skore 0.18 docs evaluate splitter` (the major.minor pattern).
-- Propose WebFetch of a URL containing `/0.18/` or `/0.18.0/` — not
-  `/latest/`.
-- Cache the result at `scratch/api/skore/0.18.0/evaluate.md` with the
-  source URL on the first line.
+- State that the WebFetch target must be a version-pinned docs URL —
+  a path carrying `/0.18/` or `/0.18.0/` — and that `/latest/` or
+  `/stable/` is rejected.
+- Name the cache destination `scratch/api/skore/0.18.0/evaluate.md`
+  and state that the source URL goes on its first line.
 
 **Must NOT do:**
 - Answer the return-type question from memory without a fetch.
@@ -214,10 +215,10 @@ violation means a regression has snuck in).
 - `skore` installed at version `0.18.0`.
 
 **Must do:**
-- Write **one** probe script under `scratch/<ts>_*.py` that iterates
+- Propose **one** probe script under `scratch/<ts>_*.py` that iterates
   over the three dotted paths and consolidates their Signature + help()
   sections.
-- Produce **one** cache file at
+- Name **one** cache file destination at
   `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) covering
   all three symbols under one topic.
 - Mention the multi-symbol-consolidation rule (one topic file per
