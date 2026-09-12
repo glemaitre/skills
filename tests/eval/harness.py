@@ -7,10 +7,11 @@ import os
 import re
 import time
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -51,6 +52,10 @@ class EvalCase:
     title: str
     prompt: str
     expectations: tuple[str, ...]
+    tools: bool = False
+    sandbox: tuple[dict[str, Any], ...] = ()
+    expect_files: tuple[str, ...] = ()
+    expect_reads: tuple[str, ...] = ()
 
     @property
     def must_do(self) -> tuple[str, ...]:
@@ -75,8 +80,11 @@ def split_expectations(
     return tuple(must_do), tuple(must_not)
 
 
-def compose_user_prompt(prompt: str) -> str:
-    return f"{prompt.rstrip()}\n\n{NO_TOOLS_NOTE}"
+def compose_user_prompt(prompt: str, *, tools: bool = False) -> str:
+    from tests.eval.sandbox import TOOLS_NOTE
+
+    note = TOOLS_NOTE if tools else NO_TOOLS_NOTE
+    return f"{prompt.rstrip()}\n\n{note}"
 
 
 def slugify(text: str, max_len: int = 48) -> str:
@@ -112,6 +120,11 @@ def load_eval_cases() -> list[EvalCase]:
         for raw in data.get("evals") or []:
             expectations = tuple(str(item) for item in (raw.get("expectations") or []))
             case_id = raw["id"]
+            sandbox = tuple(
+                item for item in (raw.get("sandbox") or []) if isinstance(item, dict)
+            )
+            expect_files = tuple(str(item) for item in (raw.get("expect_files") or []))
+            expect_reads = tuple(str(item) for item in (raw.get("expect_reads") or []))
             cases.append(
                 EvalCase(
                     skill_name=skill_name,
@@ -120,6 +133,10 @@ def load_eval_cases() -> list[EvalCase]:
                     title=str(raw.get("title") or ""),
                     prompt=raw["prompt"],
                     expectations=expectations,
+                    tools=bool(raw.get("tools")),
+                    sandbox=sandbox,
+                    expect_files=expect_files,
+                    expect_reads=expect_reads,
                 )
             )
     return cases
@@ -222,6 +239,7 @@ class GenerationResult:
     reasoning: str
     finish_reason: str | None
     usage: dict[str, object] = field(default_factory=dict)
+    tool_trace: list[dict[str, Any]] = field(default_factory=list)
 
 
 def new_run_id() -> str:
@@ -278,6 +296,24 @@ def _format_transcript_md(payload: dict) -> str:
     user = payload.get("user")
     if user:
         lines += ["## User message", "", str(user).rstrip(), ""]
+    tools_on = payload.get("tools")
+    if tools_on:
+        lines += ["## Tools", "", "enabled", ""]
+        trace = payload.get("tool_trace") or []
+        if trace:
+            lines += ["## Tool trace", ""]
+            for i, item in enumerate(trace, 1):
+                args = item.get("arguments") or {}
+                lines.append(f"{i}. `{item.get('name')}` {args}")
+                result = str(item.get("result") or "")
+                if len(result) > 800:
+                    result = result[:800] + "\n…"
+                lines += ["", "```", result, "```", ""]
+        tree = payload.get("sandbox_tree") or []
+        if tree:
+            lines += ["## Sandbox tree", ""]
+            lines.extend(f"- {name}" for name in tree)
+            lines.append("")
     must_do = payload.get("must_do")
     must_not = payload.get("must_not")
     if must_do is None and must_not is None:
@@ -383,11 +419,54 @@ def call_with_retries(fn, *, attempts: int = RETRY_ATTEMPTS):
     raise last_exc
 
 
+def _usage_dict(response: Any) -> dict[str, object]:
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return {}
+    if hasattr(usage, "model_dump"):
+        return usage.model_dump()
+    if hasattr(usage, "__dict__"):
+        return {k: v for k, v in vars(usage).items() if not k.startswith("_")}
+    return {}
+
+
+def _merge_usage(left: Mapping[str, object], right: Mapping[str, object]) -> dict[str, object]:
+    merged = dict(left)
+    for key, value in right.items():
+        if isinstance(value, (int, float)) and isinstance(merged.get(key), (int, float)):
+            merged[key] = merged[key] + value  # type: ignore[operator]
+        else:
+            merged[key] = value
+    return merged
+
+
+def _assistant_message_dict(message: Any) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "role": getattr(message, "role", None) or "assistant",
+        "content": message.content or "",
+    }
+    tool_calls = getattr(message, "tool_calls", None) or []
+    if tool_calls:
+        payload["tool_calls"] = [
+            {
+                "id": getattr(tc, "id", "") or "",
+                "type": "function",
+                "function": {
+                    "name": getattr(getattr(tc, "function", None), "name", "") or "",
+                    "arguments": getattr(getattr(tc, "function", None), "arguments", "")
+                    or "",
+                },
+            }
+            for tc in tool_calls
+        ]
+    return payload
+
+
 def generate_response(*, model: str, system: str, user: str) -> GenerationResult:
     """Call the target with no max_tokens cap so reasoning models can finish."""
     from litellm import completion
 
-    messages: list[dict[str, str]] = []
+    messages: list[dict[str, Any]] = []
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": user})
@@ -403,16 +482,102 @@ def generate_response(*, model: str, system: str, user: str) -> GenerationResult
     response = call_with_retries(_once)
     choice = response.choices[0]
     message = choice.message
-    usage = getattr(response, "usage", None)
-    usage_dict: dict[str, object] = {}
-    if usage is not None:
-        if hasattr(usage, "model_dump"):
-            usage_dict = usage.model_dump()
-        elif hasattr(usage, "__dict__"):
-            usage_dict = {k: v for k, v in vars(usage).items() if not k.startswith("_")}
     return GenerationResult(
         content=message.content or "",
         reasoning=str(getattr(message, "reasoning_content", None) or ""),
         finish_reason=getattr(choice, "finish_reason", None),
-        usage=usage_dict,
+        usage=_usage_dict(response),
+    )
+
+
+def generate_agent_response(
+    *,
+    model: str,
+    system: str,
+    user: str,
+    sandbox: Any,
+) -> GenerationResult:
+    """Multi-turn LiteLLM tool loop against a temp workspace."""
+    from litellm import completion
+
+    from tests.eval.sandbox import (
+        TOOL_LOOP_CAP,
+        TOOL_SCHEMAS,
+        parse_tool_arguments,
+        parse_xml_tool_calls,
+    )
+
+    messages: list[dict[str, Any]] = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": user})
+
+    usage: dict[str, object] = {}
+    tool_trace: list[dict[str, Any]] = []
+    last_content = ""
+    last_reasoning = ""
+    last_finish: str | None = None
+
+    for step in range(TOOL_LOOP_CAP + 1):
+        use_tools = step < TOOL_LOOP_CAP
+
+        def _once(use_tools: bool = use_tools):
+            kwargs: dict[str, Any] = {
+                "model": litellm_model_name(model),
+                "messages": messages,
+                "temperature": 0,
+                "timeout": TARGET_TRANSPORT_TIMEOUT,
+            }
+            if use_tools:
+                kwargs["tools"] = TOOL_SCHEMAS
+            return completion(**kwargs)
+
+        response = call_with_retries(_once)
+        usage = _merge_usage(usage, _usage_dict(response))
+        choice = response.choices[0]
+        message = choice.message
+        last_content = message.content or ""
+        last_reasoning = str(getattr(message, "reasoning_content", None) or "")
+        last_finish = getattr(choice, "finish_reason", None)
+        tool_calls = list(getattr(message, "tool_calls", None) or [])
+        xml_calls = [] if tool_calls else parse_xml_tool_calls(last_content)
+        if not tool_calls and not xml_calls:
+            break
+        if tool_calls:
+            messages.append(_assistant_message_dict(message))
+            for tc in tool_calls:
+                fn = getattr(tc, "function", None)
+                name = getattr(fn, "name", "") or ""
+                args = parse_tool_arguments(getattr(fn, "arguments", "") or "")
+                result = sandbox.dispatch(name, args)
+                tool_trace.append({"name": name, "arguments": args, "result": result[:4000]})
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": getattr(tc, "id", "") or "",
+                        "content": result,
+                    }
+                )
+        else:
+            messages.append({"role": "assistant", "content": last_content})
+            for i, item in enumerate(xml_calls):
+                name = str(item.get("name") or "")
+                args = item.get("arguments") or {}
+                result = sandbox.dispatch(name, args)
+                tool_trace.append({"name": name, "arguments": args, "result": result[:4000]})
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": f"xml-{step}-{i}",
+                        "content": result,
+                    }
+                )
+        last_finish = "tool_calls"
+
+    return GenerationResult(
+        content=last_content,
+        reasoning=last_reasoning,
+        finish_reason=last_finish,
+        usage=usage,
+        tool_trace=tool_trace,
     )

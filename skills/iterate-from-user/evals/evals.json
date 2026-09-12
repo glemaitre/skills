@@ -5,7 +5,7 @@
       "id": 1,
       "title": "Article-link branch with synthesis confirmation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` has 2 done experiments in History (iterate\n  mode).\n- The arxiv link is to a paper on \"Temporal Fusion Transformers\".]\n\nHere's the idea I want to try: https://arxiv.org/abs/2106.04545 \u2014\ncan we adapt it for our forecasting pipeline?",
-      "expected_output": "Behavioural response satisfying: - Recognise this as `article-link` branch (URL pasted directly \u2192 entry point pre-resolved per parent's free-text handling). - Mention WebFetching the URL. - Walk the three shaping questions: (1) what to learn, (2) why now, (3) what changes in `src/<pkg>/`. It must NOT: - Write `journal/NN_*.md` directly. - Return the Proposal before the user confirms. - Add new deps to `Method outline` as fait accompli.",
+      "expected_output": "Behavioural response satisfying: - Recognise this as `article-link` branch (URL pasted directly \u2192 entry point pre-resolved per parent's free-text handling). - Mention WebFetching the URL. - Walk the three shaping questions: (1) what to learn, (2) why now, (3) what changes in `src/<pkg>/`. It must NOT: - Write `journal/NN_*.md` directly. - Emit a `Proposal (` header (or fenced Proposal block) before the user says yes \u2014 even labeled PENDING / NOT RETURNED. The synthesis paragraph is the gate; the parent does not have a Proposal until confirmation. - Add new deps to `Method outline` as fait accompli.",
       "files": [],
       "expectations": [
         "Recognise this as `article-link` branch (URL pasted directly \u2192 entry point pre-resolved per parent's free-text handling).",
@@ -15,10 +15,13 @@
         "Surface new dependencies as **open gaps**, not silent additions (e.g. `pytorch_forecasting` / `pytorch` / `pytorch_lightning` \u2014 not in current stack).",
         "Surface transfer risks (different modality / dataset / target type).",
         "The response does NOT: Write `journal/NN_*.md` directly.",
-        "The response does NOT: Return the Proposal before the user confirms.",
+        "The response does NOT: Emit a `Proposal (` header (or fenced Proposal block) before the user says yes \u2014 even labeled PENDING / NOT RETURNED. The synthesis paragraph is the gate; the parent does not have a Proposal until confirmation.",
         "The response does NOT: Add new deps to `Method outline` as fait accompli.",
         "The response does NOT: Author acceptance criteria / success criteria / target deltas."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 2,
@@ -37,7 +40,10 @@
         "The response does NOT: Treat the issue body as the whole picture if it links comments (\"see comment thread\" is a real signal to pull comments).",
         "The response does NOT: Crawl unrelated files in the `skore` repo.",
         "The response does NOT: Return a Proposal before the user confirms."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 3,
@@ -55,7 +61,10 @@
         "The response does NOT: Author acceptance criteria (coverage target, interval width budget \u2014 those are post-run user judgement).",
         "The response does NOT: Skip the confirmation gate (\"idea is obvious, just return\").",
         "The response does NOT: Skip the goal-shift surfacing."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 4,
@@ -71,7 +80,10 @@
         "The response does NOT: Ship the monotonicity assertion as a `Method outline` fact.",
         "The response does NOT: Treat the paper's framing as evidence for this workspace's data.",
         "The response does NOT: Author the constraint silently without flagging."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 5,
@@ -86,7 +98,10 @@
         "The response does NOT: Add `lightgbm` to the Proposal's `Method outline` as fait accompli.",
         "The response does NOT: Run `pixi add lightgbm` in this turn.",
         "The response does NOT: Pre-empt the data-science-python-stack consultation."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -102,7 +117,10 @@
         "Name the confirmation gate as required before returning, and show the plain-text restatement it would carry.",
         "The response does NOT: Fire the entry-point `AskUserQuestion` (article-link / resource-link / free-text) \u2014 it's been pre-resolved.",
         "The response does NOT: Skip the confirmation gate (still required even with pre-resolved entry)."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

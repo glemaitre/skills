@@ -5,17 +5,20 @@
       "id": 1,
       "title": "Bare `sklearn.Pipeline` \u2192 redirect to skrub DataOps",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Tabular regression task, mixed-type DataFrame, no cross-row\n  features (IID).\n- `skrub`, `scikit-learn`, `skore` are installed and importable.\n- No existing `src/<pkg>/pipeline.py`.]\n\nSet up the baseline pipeline using `sklearn.Pipeline` with a\n`StandardScaler` and `Ridge`. Just write `src/<pkg>/pipeline.py`\nwith a `build_pipeline()` function.",
-      "expected_output": "Behavioural response satisfying: - Redirect from bare `sklearn.Pipeline` to a **skrub DataOps graph** rooted at `skrub.var(...)`. - Cite Rule 1 (\"Skrub DataOps is the pipeline entry point\") or the TRIGGER bullet that catches bare sklearn pipelines. - Mention consulting `python-api` to confirm skrub symbols. It must NOT: - Write `from sklearn.pipeline import Pipeline` as the top-level. - Build a `Pipeline([(\"scaler\", StandardScaler()), ...])` structure. - Use `skrub.X(...)` / `skrub.y(...)` as graph roots.",
+      "expected_output": "Behavioural response satisfying: - Redirect from bare `sklearn.Pipeline` to a **skrub DataOps graph** rooted at `skrub.var(...)`. - Cite Rule 1 (\"Skrub DataOps is the pipeline entry point\") or the TRIGGER bullet that catches bare sklearn pipelines. - Mention consulting `python-api` to confirm skrub symbols. It must NOT: - Write `from sklearn.pipeline import Pipeline` as a live import in `pipeline.py`. - Return a `Pipeline([(\"scaler\", StandardScaler()), ...])` object from `build_learner` / `build_pipeline`. A docstring that only names the forbidden equivalent is not a violation. - Use `skrub.X(...)` / `skrub.y(...)` as graph roots.",
       "files": [],
       "expectations": [
         "Redirect from bare `sklearn.Pipeline` to a **skrub DataOps graph** rooted at `skrub.var(...)`.",
         "Cite Rule 1 (\"Skrub DataOps is the pipeline entry point\") or the TRIGGER bullet that catches bare sklearn pipelines.",
         "Mention consulting `python-api` to confirm skrub symbols.",
         "Propose a `build_learner` function returning `predictions.skb.make_learner()` (not a `Pipeline` object).",
-        "The response does NOT: Write `from sklearn.pipeline import Pipeline` as the top-level.",
-        "The response does NOT: Build a `Pipeline([(\"scaler\", StandardScaler()), ...])` structure.",
+        "The response does NOT: Write `from sklearn.pipeline import Pipeline` as a live import in `pipeline.py`.",
+        "The response does NOT: Return a `Pipeline([(\"scaler\", StandardScaler()), ...])` object from `build_learner` / `build_pipeline`. A docstring that only names the forbidden equivalent is not a violation.",
         "The response does NOT: Use `skrub.X(...)` / `skrub.y(...)` as graph roots."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 2,
@@ -31,12 +34,15 @@
         "The response does NOT: Introduce a `predict_grid` Layer 1 root when no cross-row features exist (over-engineering).",
         "The response does NOT: Use `skrub.X(...)` / `skrub.y(...)` as roots.",
         "The response does NOT: Bake the preview value as a literal string in `pipeline.py` (relative path that breaks CWD-dependent runs)."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 3,
       "title": "History-dependent late `mark_as_X` trap",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- skrub installed at 0.9.0.\n- The user is in early baseline construction.]\n\nTime-series load forecast. Each row = (timestamp, region, load).\nI want a 24-hour-ahead forecast. Write the loader so it computes\n`y = load.shift(-24)` then drops the rows with `NaN` in `y`, and\nwe'll do `mark_as_X` on the result.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- skrub installed at 0.9.0.\n- The user is in early baseline construction.\n- The skill's `references/` tree is on disk at the project root\n  (`references/layer_examples.md`). Open that file with `read_file`\n  before proposing Layer 2.]\n\nTime-series load forecast. Each row = (timestamp, region, load).\nI want a 24-hour-ahead forecast. Write the loader so it computes\n`y = load.shift(-24)` then drops the rows with `NaN` in `y`, and\nwe'll do `mark_as_X` on the result.",
       "expected_output": "Behavioural response satisfying: - Refuse the proposed loader-baked target shift. - Cite the **late-`mark_as_X` forbidden** rule (cross-row dependency). - Cite **Layer 1 doesn't know the question** \u2014 the 24-hour horizon belongs to Layer 2, not the loader. It must NOT: - Accept the loader-baked shift as written. - Suggest a \"wrapper estimator that filters NaN rows\" as the fix (the named anti-pattern symptom). - Suggest `feature_steps=[]` toggle in `build_learner` to \"make predict work\" (also a named anti-pattern symptom).",
       "files": [],
       "expectations": [
@@ -44,9 +50,22 @@
         "Cite the **late-`mark_as_X` forbidden** rule (cross-row dependency).",
         "Cite **Layer 1 doesn't know the question** \u2014 the 24-hour horizon belongs to Layer 2, not the loader.",
         "Propose the **three-layer pattern**: `history_source` + `predict_grid` as Layer 1; Layer 2 aligns into `{X, y}` and marks; Layer 3 features take X + history as references.",
+        "Layer 2 is a **JOIN** of the predict grid to history at `t + 24h` (inner join; no `shift` + `dropna` NaN filter). A small `align_xy` estimator is fine if it joins.",
         "The response does NOT: Accept the loader-baked shift as written.",
         "The response does NOT: Suggest a \"wrapper estimator that filters NaN rows\" as the fix (the named anti-pattern symptom).",
         "The response does NOT: Suggest `feature_steps=[]` toggle in `build_learner` to \"make predict work\" (also a named anti-pattern symptom)."
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "copy",
+          "source": "skills/build-ml-pipeline/references/layer_examples.md",
+          "path": "references/layer_examples.md"
+        }
+      ],
+      "expect_files": [],
+      "expect_reads": [
+        "references/layer_examples.md"
       ]
     },
     {
@@ -62,7 +81,10 @@
         "Surface that this is a refactor and offer to do it (or ask user).",
         "The response does NOT: Continue adding steps to the `skrub.X` / `skrub.y` skeleton silently.",
         "The response does NOT: Auto-rewrite without surfacing the source-bound alternative to the user."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 5,
@@ -77,7 +99,10 @@
         "Mention `python-api` consultation to confirm `sklearn.preprocessing.TargetEncoder` (or equivalent) signature.",
         "The response does NOT: Accept `apply_func(target_encode)` as written.",
         "The response does NOT: Propose the function with a \"compute mean on training only via manual filtering\" workaround."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -92,22 +117,28 @@
         "The response does NOT: Recommend Option 3 (branch the module) for an appendable step.",
         "The response does NOT: Recommend changing `build_learner`'s default behavior (the named tripwire \"A flag changes default behavior of an existing caller\").",
         "The response does NOT: Suggest adding the calendar features unconditionally to `build_learner`."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 7,
       "title": "`split_kwargs` group structure",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- skrub installed at 0.9.0.\n- IID-shaped features (no cross-row history) but rows are grouped\n  by customer.]\n\nTabular regression on (customer_id, claim_amount, ...). Multiple\nrows per customer. Build the pipeline.",
-      "expected_output": "Behavioural response satisfying: - Identify the group structure (multiple rows per `customer_id`). - Wire `mark_as_X(split_kwargs={\"groups\": data[\"customer_id\"]})` at the X marker. - Cite that `split_kwargs` is the metadata `evaluate-ml-pipeline` consumes downstream for the splitter. It must NOT: - Pick the cross-validator itself (e.g. `GroupKFold`) \u2014 that's out of scope for this skill; `evaluate-ml-pipeline` owns it. - Leave `split_kwargs` empty without surfacing the group question.",
+      "expected_output": "Behavioural response satisfying: - Identify the group structure (multiple rows per `customer_id`). - Wire `mark_as_X(split_kwargs={\"groups\": data[\"customer_id\"]})` at the X marker. - Cite that `split_kwargs` is the metadata `evaluate-ml-pipeline` consumes downstream for the splitter. It must NOT: - Pick the cross-validator in pipeline code (`splitter=GroupKFold(...)`, `cv=GroupKFold`, `skore.evaluate(..., splitter=...)`). Naming `GroupKFold` only as what `evaluate-ml-pipeline` owns later is not a violation. - Leave `split_kwargs` empty without surfacing the group question.",
       "files": [],
       "expectations": [
         "Identify the group structure (multiple rows per `customer_id`).",
         "Wire `mark_as_X(split_kwargs={\"groups\": data[\"customer_id\"]})` at the X marker.",
         "Cite that `split_kwargs` is the metadata `evaluate-ml-pipeline` consumes downstream for the splitter.",
         "Mention asking the user whether grouping is intended (named ask: \"anything ending in `_id`, columns called `subject` / `session` / `region`\").",
-        "The response does NOT: Pick the cross-validator itself (e.g. `GroupKFold`) \u2014 that's out of scope for this skill; `evaluate-ml-pipeline` owns it.",
+        "The response does NOT: Pick the cross-validator in pipeline code (`splitter=GroupKFold(...)`, `cv=GroupKFold`, `skore.evaluate(..., splitter=...)`). Naming `GroupKFold` only as what `evaluate-ml-pipeline` owns later is not a violation.",
         "The response does NOT: Leave `split_kwargs` empty without surfacing the group question."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

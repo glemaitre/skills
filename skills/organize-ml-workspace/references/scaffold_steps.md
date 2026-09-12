@@ -19,13 +19,18 @@ proceeding.
 
 ## Step 2 — G-PKG-NAME ask
 
-Two sub-cases:
+Three sub-cases:
 
-- **A manifest already exists** with `[project].name = <name>`:
+- **Complete existing layout** (`[project].name = <name>` and a
+  matching live `src/<pkg>/`): **reuse** `<name>`. Do not fire
+  keep/rename. Glue is not a rename.
+
+- **A manifest already exists** with `[project].name = <name>`
+  **but no matching `src/<pkg>/`**, or the user asked to rename:
   fire `AskUserQuestion` — *"Keep package name `<name>` for
   `src/<pkg>/`?"* — with options `keep` / `rename to <other>`.
-  Reading the manifest alone is **not** sufficient; the
-  confirmation is the gate pass.
+  Reading the manifest alone is **not** sufficient on this
+  incomplete / rename path; the confirmation is the gate pass.
 
 - **No manifest yet**: fire `AskUserQuestion` with the
   project-root folder name (snake_case) as the proposed default.

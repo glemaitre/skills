@@ -5,78 +5,138 @@
       "id": 1,
       "title": "Shape 1, direct signature lookup, cache miss",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/` exists but `scratch/api/skore/` is empty.\n- `skore` is installed at version `0.18.0`.]\n\nI'm about to call `skore.evaluate(...)` in `experiments/01_baseline.py`.\nWhat's its signature?",
-      "expected_output": "Behavioural response satisfying: - Reference resolving the installed version (mention `pixi run python -c \"import skore; print(skore.__version__)\"` or equivalent). - Reference listing `scratch/api/skore/0.18.0/` for a cache hit before any fresh probe. - Propose writing a probe script under `scratch/<ts>_*.py` (not an inline `python -c`). It must NOT: - Output a literal signature like `def evaluate(estimator, X=None, y=None, ...)` lifted from memory without first running the probe. - Use `__doc__` to capture documentation. - Recommend an inline `pixi run python -c \"...\"` that spans more than 2 lines.",
+      "expected_output": "Behavioural response satisfying: - Resolve the installed version via a scratch file (not inline `python -c`). - List `scratch/api/skore/` (cache **miss** is correct \u2014 empty or missing `0.18.0/` until the probe writes it). Then run a probe. - Write and run a probe script under `scratch/<ts>_*.py` (not an inline `python -c`). It must NOT: - Output a literal signature like `def evaluate(estimator, X=None, y=None, ...)` lifted from memory without first running the probe. - Use `__doc__` to capture documentation. - Recommend an inline `pixi run python -c \"...\"` that spans more than 2 lines.",
       "files": [],
       "expectations": [
-        "Reference resolving the installed version (mention `pixi run python -c \"import skore; print(skore.__version__)\"` or equivalent).",
-        "Reference listing `scratch/api/skore/0.18.0/` for a cache hit before any fresh probe.",
-        "Propose writing a probe script under `scratch/<ts>_*.py` (not an inline `python -c`).",
-        "Name `pydoc.render_doc` (not `__doc__`) for capturing the help text.",
-        "Name the cache file destination as `scratch/api/skore/0.18.0/evaluate.md`.",
-        "Reference the four-section file contract (Source / Signature / help() / Usage) at least implicitly \u2014 i.e. mention writing Signature + help() sections + a Usage block to fill in.",
+        "Resolve the installed version via a scratch file (not inline `python -c`).",
+        "List `scratch/api/skore/` (cache **miss** is correct \u2014 empty or missing `0.18.0/` until the probe writes it). Then run a probe.",
+        "Write and run a probe script under `scratch/<ts>_*.py` (not an inline `python -c`).",
+        "Use `pydoc.render_doc` (not `__doc__`) for capturing the help text.",
+        "Write the cache file at `scratch/api/skore/0.18.0/evaluate.md`.",
+        "Mention Signature + help() and a Usage block (four-section contract at least implicitly).",
         "The response does NOT: Output a literal signature like `def evaluate(estimator, X=None, y=None, ...)` lifted from memory without first running the probe.",
         "The response does NOT: Use `__doc__` to capture documentation.",
         "The response does NOT: Recommend an inline `pixi run python -c \"...\"` that spans more than 2 lines.",
         "The response does NOT: Skip the cache-list step and jump straight to the probe."
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch/api"
+        },
+        {
+          "kind": "dir",
+          "path": "scratch/api/skore"
+        }
+      ],
+      "expect_files": [
+        "scratch/api/skore/0.18.0/evaluate.md"
       ]
     },
     {
       "id": 2,
       "title": "Shape 0, cache hit",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/skore/0.18.0/evaluate.md` already exists on disk (written\n  yesterday).\n- `skore` is installed at version `0.18.0`.]\n\nSame question as before \u2014 I'm calling `skore.evaluate(...)` in the\nbaseline. What's its signature?",
-      "expected_output": "Behavioural response satisfying: - Recognise the cache hit and propose `Read scratch/api/skore/0.18.0/evaluate.md` as the next action. - Mark the pre-flight `Cache file lands on disk` row as `n/a \u2014 cache hit, file already on disk` (or equivalent phrasing). It must NOT: - Re-run a Shape 1 probe / re-fetch / re-WebSearch despite the cache hit. - Write a fresh cache file at the same path (would overwrite the existing synthesis).",
+      "expected_output": "Behavioural response satisfying: - Recognise the cache hit. Using `read_file` on `scratch/api/skore/0.18.0/evaluate.md` counts; naming `Read` in the message also counts. - Mark the pre-flight `Cache file lands on disk` row as `n/a \u2014 cache hit, file already on disk` (or equivalent: the file was already on disk and was read, not rewritten). It must NOT: - Re-run a Shape 1 probe / re-fetch / re-WebSearch despite the cache hit. - Write a fresh cache file at the same path (would overwrite the existing synthesis).",
       "files": [],
       "expectations": [
-        "Recognise the cache hit and propose `Read scratch/api/skore/0.18.0/evaluate.md` as the next action.",
-        "Mark the pre-flight `Cache file lands on disk` row as `n/a \u2014 cache hit, file already on disk` (or equivalent phrasing).",
+        "Recognise the cache hit. Using `read_file` on `scratch/api/skore/0.18.0/evaluate.md` counts; naming `Read` in the message also counts.",
+        "Mark the pre-flight `Cache file lands on disk` row as `n/a \u2014 cache hit, file already on disk` (or equivalent: the file was already on disk and was read, not rewritten).",
         "The response does NOT: Re-run a Shape 1 probe / re-fetch / re-WebSearch despite the cache hit.",
         "The response does NOT: Write a fresh cache file at the same path (would overwrite the existing synthesis)."
-      ]
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch/api/skore/0.18.0"
+        },
+        {
+          "kind": "file",
+          "path": "scratch/api/skore/0.18.0/evaluate.md",
+          "content": "# evaluate\n\nSource: inspect: skore.evaluate @ 0.18.0\nFetched: 2026-09-11\n\n## Signature\nevaluate(estimator, data=None, *, X=None, y=None, splitter=None, ...)\n\n## help()\nskore.evaluate \u2014 cached extract for Shape 0 hit tests.\n\n## Usage\nCall: skore.evaluate(learner, data={...}, splitter=...)\nDon't call: positional X, y on a SkrubLearner\nTrap: none\nReturns: a report object (see cached help)\n"
+        }
+      ],
+      "expect_files": []
     },
     {
       "id": 3,
       "title": "Stack orientation routes to the right submodule",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/skrub/` is empty.\n- `skrub` is installed at version `0.9.0`.]\n\nI have a mixed-type tabular DataFrame (numeric + categorical + text\ncolumns). I want a one-call default-everything featuriser/learner from\nskrub. Which entry point should I reach for, and where does it live?",
-      "expected_output": "Behavioural response satisfying: - Name `tabular_pipeline` (top-level skrub) as the entry point \u2014 i.e. `skrub.tabular_pipeline`. (Acceptable alternative: name `TableVectorizer` as the featuriser-only sibling.) - After naming the symbol, propose a Shape 1 probe to confirm the signature against the installed version before writing the call. - Mention the cache write at `scratch/api/skrub/0.9.0/tabular_pipeline.md`. It must NOT: - Recommend `tabular_learner`, `auto_tabular`, or `TabularLearner` as the entry point (naming them only as a renamed trap is fine). - Recommend writing code with the symbol before proposing the Shape 1 probe.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/skrub/` is empty.\n- `skrub` is installed at version `0.9.0`.]\n\nI have a mixed-type tabular DataFrame (numeric + categorical + text\ncolumns). I want a one-call default-everything featuriser/learner from\nskrub. Which entry point should I reach for, and where does it live?\nConfirm the **installed** signature (parameters and return value \u2014\nincluding whether the call fits in one shot or returns an unfitted\nestimator you then `.fit`). Then show a usage snippet that matches\nthat lookup, not training-data memory.",
+      "expected_output": "Behavioural response satisfying: - Name `tabular_pipeline` (top-level skrub) as the entry point \u2014 i.e. `skrub.tabular_pipeline`. (Acceptable alternative: name `TableVectorizer` as the featuriser-only sibling.) - Run a Shape 1 probe (`scratch/<ts>_*.py` + `pydoc.render_doc`) against the installed skrub and write `scratch/api/skrub/0.9.0/tabular_pipeline.md`. - Report the installed signature (args / return) **from that lookup**. It must NOT: - Recommend `tabular_learner`, `auto_tabular`, or `TabularLearner` as the entry point (naming them only as a renamed trap is fine). - Write a usage / import / `.fit` fence before the Shape 1 probe has run. - Invent parameters the probe did not show (e.g. a `target_column=` argument that is not in the installed signature).",
       "files": [],
       "expectations": [
         "Name `tabular_pipeline` (top-level skrub) as the entry point \u2014 i.e. `skrub.tabular_pipeline`. (Acceptable alternative: name `TableVectorizer` as the featuriser-only sibling.)",
-        "After naming the symbol, propose a Shape 1 probe to confirm the signature against the installed version before writing the call.",
-        "Mention the cache write at `scratch/api/skrub/0.9.0/tabular_pipeline.md`.",
+        "Run a Shape 1 probe (`scratch/<ts>_*.py` + `pydoc.render_doc`) against the installed skrub and write `scratch/api/skrub/0.9.0/tabular_pipeline.md`.",
+        "Report the installed signature (args / return) **from that lookup**.",
+        "Any usage fence comes **after** the probe/cache write and matches the looked-up signature.",
         "The response does NOT: Recommend `tabular_learner`, `auto_tabular`, or `TabularLearner` as the entry point (naming them only as a renamed trap is fine).",
-        "The response does NOT: Recommend writing code with the symbol before proposing the Shape 1 probe."
+        "The response does NOT: Write a usage / import / `.fit` fence before the Shape 1 probe has run.",
+        "The response does NOT: Invent parameters the probe did not show (e.g. a `target_column=` argument that is not in the installed signature)."
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch/api/skrub"
+        }
+      ],
+      "expect_files": [
+        "scratch/api/skrub/0.9.0/tabular_pipeline.md"
       ]
     },
     {
       "id": 4,
       "title": "Shape 3 narrative, versioned docs URL",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/skore/0.18.0/` exists but contains only `project.md`\n  (no `evaluate.md` yet).\n- `skore` is installed at version `0.18.0`.]\n\nWhat does `skore.evaluate` return when I pass a `KFold` splitter? Is it\nthe same return type as the train/test-split case?",
-      "expected_output": "Behavioural response satisfying: - Identify this as a Shape 3 / narrative question (signatures alone do not answer \"is the return type the same\") OR explicitly check the cache first then escalate to WebSearch on miss. - Propose a WebSearch query that includes the version, like `skore 0.18 docs evaluate splitter` (the major.minor pattern). - State that the WebFetch target must be a version-pinned docs URL \u2014 a path carrying `/0.18/` or `/0.18.0/` \u2014 and that `/latest/` or `/stable/` is rejected. It must NOT: - Answer the return-type question from memory (state which type is returned for `KFold` vs holdout). A refusal that withholds the type is allowed even if a class name appears only as an example of what is omitted. - Use a URL containing `/latest/` or `/stable/` as the cached source. - Paraphrase the docs into the cache file (the cache should hold a verbatim extract).",
+      "expected_output": "Behavioural response satisfying: - Identify this as a Shape 3 / narrative question (signatures alone do not answer \"is the return type the same\") OR explicitly check the cache first then escalate to WebSearch on miss. - Propose a WebSearch query that includes the version, like `skore 0.18 docs evaluate splitter` (the major.minor pattern). - State that the WebFetch target must be a version-pinned docs URL \u2014 a path carrying `/0.18/` or `/0.18.0/` \u2014 and that `/latest/` or `/stable/` is rejected. It must NOT: - Answer the return-type question from memory as a **fact** (assert which type is returned, or that KFold vs holdout are the same / different). A BLOCKED plan that names `/0.18/` and `scratch/api/skore/0.18.0/evaluate.md` is not a violation. A class name used only as an example of what the cache will enumerate is not a violation. - Use a URL containing `/latest/` or `/stable/` as the cached source. - Paraphrase the docs into the cache file (the cache should hold a verbatim extract).",
       "files": [],
       "expectations": [
         "Identify this as a Shape 3 / narrative question (signatures alone do not answer \"is the return type the same\") OR explicitly check the cache first then escalate to WebSearch on miss.",
         "Propose a WebSearch query that includes the version, like `skore 0.18 docs evaluate splitter` (the major.minor pattern).",
         "State that the WebFetch target must be a version-pinned docs URL \u2014 a path carrying `/0.18/` or `/0.18.0/` \u2014 and that `/latest/` or `/stable/` is rejected.",
         "Name the cache destination `scratch/api/skore/0.18.0/evaluate.md` and state that the source URL goes on its first line.",
-        "The response does NOT: Answer the return-type question from memory (state which type is returned for `KFold` vs holdout). A refusal that withholds the type is allowed even if a class name appears only as an example of what is omitted.",
+        "The response does NOT: Answer the return-type question from memory as a **fact** (assert which type is returned, or that KFold vs holdout are the same / different). A BLOCKED plan that names `/0.18/` and `scratch/api/skore/0.18.0/evaluate.md` is not a violation. A class name used only as an example of what the cache will enumerate is not a violation.",
         "The response does NOT: Use a URL containing `/latest/` or `/stable/` as the cached source.",
         "The response does NOT: Paraphrase the docs into the cache file (the cache should hold a verbatim extract)."
-      ]
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch/api/skore/0.18.0"
+        },
+        {
+          "kind": "file",
+          "path": "scratch/api/skore/0.18.0/project.md",
+          "content": "# project\nSource: inspect: skore.Project @ 0.18.0\n"
+        }
+      ],
+      "expect_files": []
     },
     {
       "id": 5,
       "title": "The \"I already know this\" trap, named rename",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skrub` is installed at version `0.9.0`.\n- `scratch/api/skrub/0.9.0/` is empty.]\n\nQuick edit \u2014 add `from skrub import tabular_learner` to the imports at\nthe top of `experiments/02_skrub_default.py`, then use\n`tabular_learner(...)` to fit the baseline. Don't bother with the API\nlookup, this one's standard.",
-      "expected_output": "Behavioural response satisfying: - Refuse to add the import without first looking up the symbol against the installed `skrub`. - Cite the \"Recognition is not a lookup\" principle (or equivalent \u2014 the rule that training-data memory does not count as a lookup). - Propose a Shape 1 probe (or at minimum a Shape 2 `dir(skrub)`) to confirm whether `tabular_learner` exists at the installed version. It must NOT: - Add the import as instructed. - Tell the user \"yes that's the right name\" without a lookup.",
+      "expected_output": "Behavioural response satisfying: - Refuse to add the import without first looking up the symbol against the installed `skrub`. - Cite the \"Recognition is not a lookup\" principle (or equivalent \u2014 the rule that training-data memory does not count as a lookup). - Run a Shape 1 probe (or at minimum a Shape 2 `dir(skrub)`) to confirm whether `tabular_learner` exists at the installed version. It must NOT: - Add `from skrub import tabular_learner` (the instructed import). Naming `tabular_pipeline` as a lead plus a Shape 1 probe is required, not a violation. - Tell the user \"yes that's the right name\" without a lookup.",
       "files": [],
       "expectations": [
         "Refuse to add the import without first looking up the symbol against the installed `skrub`.",
         "Cite the \"Recognition is not a lookup\" principle (or equivalent \u2014 the rule that training-data memory does not count as a lookup).",
-        "Propose a Shape 1 probe (or at minimum a Shape 2 `dir(skrub)`) to confirm whether `tabular_learner` exists at the installed version.",
+        "Run a Shape 1 probe (or at minimum a Shape 2 `dir(skrub)`) to confirm whether `tabular_learner` exists at the installed version.",
         "Surface the named-trap context: top-level skrub uses `tabular_pipeline` (per the skill's stack-orientation section).",
-        "The response does NOT: Add the import as instructed.",
+        "The response does NOT: Add `from skrub import tabular_learner` (the instructed import). Naming `tabular_pipeline` as a lead plus a Shape 1 probe is required, not a violation.",
         "The response does NOT: Tell the user \"yes that's the right name\" without a lookup."
-      ]
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch/api/skrub/0.9.0"
+        }
+      ],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -91,54 +151,87 @@
         "The response does NOT: Recommend re-running `experiments/01_baseline.py`.",
         "The response does NOT: Recommend calling `skore.evaluate(...) + project.put(...)` from a scratch probe to \"regenerate\" the report.",
         "The response does NOT: Treat the `KeyError` as evidence the report is missing."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 7,
       "title": "Multi-symbol consolidation, no inline-python-c spam",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/skore/0.18.0/` is empty.\n- `skore` installed at version `0.18.0`.]\n\nI need the signatures of `skore.Project.put`, `skore.Project.get`, and\n`skore.Project.summarize` so I can wire up the experiment-record step.\nCan you grab them?",
-      "expected_output": "Behavioural response satisfying: - Propose **one** probe script under `scratch/<ts>_*.py` that iterates over the three dotted paths and consolidates their Signature + help() sections. - Name **one** cache file destination at `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) covering all three symbols under one topic. - Mention the multi-symbol-consolidation rule (one topic file per topic, not per symbol). It must NOT: - Recommend three separate inline `pixi run python -c \"...\"` calls. - Recommend ANY inline `python -c` (rule is unconditional now \u2014 see Stop conditions, no length carve-out). - Write three separate cache files (`put.md`, `get.md`, `summarize.md`).",
+      "expected_output": "Behavioural response satisfying: - Write **one** probe script under `scratch/<ts>_*.py` that iterates over the three dotted paths and consolidates their Signature + help() sections. - Write **one** cache file at `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) covering all three symbols under one topic. - Mention the multi-symbol-consolidation rule (one topic file per topic, not per symbol). It must NOT: - Recommend three separate inline `pixi run python -c \"...\"` calls. - Recommend ANY inline `python -c` (rule is unconditional now \u2014 see Stop conditions, no length carve-out). - Write three separate cache files (`put.md`, `get.md`, `summarize.md`).",
       "files": [],
       "expectations": [
-        "Propose **one** probe script under `scratch/<ts>_*.py` that iterates over the three dotted paths and consolidates their Signature + help() sections.",
-        "Name **one** cache file destination at `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) covering all three symbols under one topic.",
+        "Write **one** probe script under `scratch/<ts>_*.py` that iterates over the three dotted paths and consolidates their Signature + help() sections.",
+        "Write **one** cache file at `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) covering all three symbols under one topic.",
         "Mention the multi-symbol-consolidation rule (one topic file per topic, not per symbol).",
         "The response does NOT: Recommend three separate inline `pixi run python -c \"...\"` calls.",
         "The response does NOT: Recommend ANY inline `python -c` (rule is unconditional now \u2014 see Stop conditions, no length carve-out).",
         "The response does NOT: Write three separate cache files (`put.md`, `get.md`, `summarize.md`).",
-        "The response does NOT: Treat the probe as the conclusion without naming a cache destination. Naming `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) as the next-turn deliverable counts even when this turn cannot Write."
+        "The response does NOT: Treat the probe as the conclusion without naming a cache destination. Naming `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) as the destination is required; the file should land this turn."
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch/api/skore/0.18.0"
+        }
+      ],
+      "expect_files": [
+        "scratch/api/skore/0.18.0/project*.md"
       ]
     },
     {
       "id": 8,
       "title": "Inline `python -c` requested explicitly",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/api/skore/0.18.0/` is empty.\n- `skore` installed at version `0.18.0`.]\n\nJust check `skore.evaluate`'s signature inline real quick:\n`pixi run python -c \"from skore import evaluate; import inspect;\nprint(inspect.signature(evaluate))\"`. It's one line, I'll\nremember it. No need for the whole probe-and-cache dance.",
-      "expected_output": "Behavioural response satisfying: - Refuse the inline `python -c` invocation. - Cite the **Stop condition** that all Python execution goes to `scratch/` regardless of length (the \"no inline `python -c`, no exceptions\" rule). - Cite that `inspect.signature(...)` run inline is NOT a python-api consultation \u2014 the deliverable is a `scratch/api/skore/0.18.0/evaluate.md` cache file. It must NOT: - Run the inline `pixi run python -c \"...\"` as requested. - Treat \"it's one line\" / \"I'll remember it\" as resolving the rule. The rule is unconditional; length isn't the criterion. - Recommend Shape 1a as a carve-out (Shape 1a is removed).",
+      "expected_output": "Behavioural response satisfying: - Do not run the requested inline `python -c`. Writing and running a `scratch/<ts>_*.py` probe via `run_python` **is** the refusal. - Cite the **Stop condition** that all Python execution goes to `scratch/` regardless of length, **or** show that this turn only executed a scratch file (no `python -c`). - Write the cache file at `scratch/api/skore/0.18.0/evaluate.md`. It must NOT: - Run the inline `pixi run python -c \"...\"` as requested. - Treat \"it's one line\" / \"I'll remember it\" as resolving the rule. The rule is unconditional; length isn't the criterion. - Recommend Shape 1a as a carve-out (Shape 1a is removed).",
       "files": [],
       "expectations": [
-        "Refuse the inline `python -c` invocation.",
-        "Cite the **Stop condition** that all Python execution goes to `scratch/` regardless of length (the \"no inline `python -c`, no exceptions\" rule).",
-        "Cite that `inspect.signature(...)` run inline is NOT a python-api consultation \u2014 the deliverable is a `scratch/api/skore/0.18.0/evaluate.md` cache file.",
-        "Propose the Shape 1 probe template instead, writing `scratch/<ts>_lookup_skore_evaluate.py` that produces the cache file in one execution.",
+        "Do not run the requested inline `python -c`. Writing and running a `scratch/<ts>_*.py` probe via `run_python` **is** the refusal.",
+        "Cite the **Stop condition** that all Python execution goes to `scratch/` regardless of length, **or** show that this turn only executed a scratch file (no `python -c`).",
+        "Write the cache file at `scratch/api/skore/0.18.0/evaluate.md`.",
+        "Write any `scratch/<ts>_*.py` that writes that cache file in one run (the exact probe basename is not load-bearing).",
         "The response does NOT: Run the inline `pixi run python -c \"...\"` as requested.",
         "The response does NOT: Treat \"it's one line\" / \"I'll remember it\" as resolving the rule. The rule is unconditional; length isn't the criterion.",
         "The response does NOT: Recommend Shape 1a as a carve-out (Shape 1a is removed)."
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch/api/skore/0.18.0"
+        }
+      ],
+      "expect_files": [
+        "scratch/api/skore/0.18.0/evaluate.md"
       ]
     },
     {
       "id": 9,
       "title": "Version check goes to scratch, not inline",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skrub` is installed (version unknown to the agent).\n- `scratch/` exists.]\n\nWhat version of skrub is installed? Just run\n`pixi run python -c \"import skrub; print(skrub.__version__)\"`\nand tell me.",
-      "expected_output": "Behavioural response satisfying: - Refuse the inline `python -c`. - Cite the \"all Python execution goes to scratch\" Stop condition \u2014 version checks are explicitly enumerated in the rule. - Propose writing `scratch/<ts>_version_skrub.py` with `import skrub; print(skrub.__version__)` and running it via `pixi run python scratch/<ts>_version_skrub.py`. It must NOT: - Run the inline `pixi run python -c \"...\"` as requested. - Treat the version check as \"trivial enough to inline\". - Skip the file entirely and answer the version from memory.",
+      "expected_output": "Behavioural response satisfying: - Do not run the requested inline `python -c`. A scratch file plus `run_python` **is** the refusal. - Cite the \"all Python execution goes to scratch\" Stop condition (version checks included), **or** show that this turn only ran a scratch file. - Write a scratch file under `scratch/` that prints `skrub.__version__` (name may be `scratch/<ts>_version_skrub.py` or similar) and run it via `run_python` (not `python -c`). It must NOT: - Run the inline `pixi run python -c \"...\"` as requested. - Treat the version check as \"trivial enough to inline\". - Skip the file entirely and answer the version from memory.",
       "files": [],
       "expectations": [
-        "Refuse the inline `python -c`.",
-        "Cite the \"all Python execution goes to scratch\" Stop condition \u2014 version checks are explicitly enumerated in the rule.",
-        "Propose writing `scratch/<ts>_version_skrub.py` with `import skrub; print(skrub.__version__)` and running it via `pixi run python scratch/<ts>_version_skrub.py`.",
-        "Confirm: even a one-line version check produces a scratch file.",
+        "Do not run the requested inline `python -c`. A scratch file plus `run_python` **is** the refusal.",
+        "Cite the \"all Python execution goes to scratch\" Stop condition (version checks included), **or** show that this turn only ran a scratch file.",
+        "Write a scratch file under `scratch/` that prints `skrub.__version__` (name may be `scratch/<ts>_version_skrub.py` or similar) and run it via `run_python` (not `python -c`).",
+        "Confirm: even a one-line version check produces a scratch file. Report the version printed by that script.",
         "The response does NOT: Run the inline `pixi run python -c \"...\"` as requested.",
         "The response does NOT: Treat the version check as \"trivial enough to inline\".",
         "The response does NOT: Skip the file entirely and answer the version from memory."
+      ],
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch"
+        }
+      ],
+      "expect_files": [
+        "scratch/*version*skrub*.py"
       ]
     }
   ]

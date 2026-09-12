@@ -66,10 +66,12 @@ read the report. The pipeline declaration is out of scope (see
 - **A hedge does not license the content.** "No tools this turn",
   "the live turn MUST run the lookup", a `[~]` box — none of these
   make an unconfirmed splitter safe to write. If the lookup cannot
-  run, the box stays `[ ]`, no splitter name is written, and the
-  turn ends with a single line:
-  `BLOCKED: splitter needs a python-api lookup that cannot run this
-  turn (<why>). Run <probe or cache read> first.`
+  run, the box stays `[ ]` for the *signature*. Mapping-table
+  identifiers (`groups` → `GroupKFold`) are already in this skill
+  — paste `GroupKFold` anyway. Do not BLOCKED the identifier.
+  The turn still ends with a single line for the signature probe:
+  `BLOCKED: GroupKFold signature needs a python-api lookup that
+  cannot run this turn (<why>).`
 - **`BLOCKED` is scoped to the lookup, not to the whole turn.** It
   withholds the splitter *name*; it does not excuse the rest of the
   work. The mandatory user gate still gets presented with its
@@ -284,6 +286,10 @@ Pre-flight (evaluate-ml-pipeline):
    | temporal ordering | **ask the user** (see "Time-ordered data" below) |
    | none | `KFold` (or `RepeatedKFold` for small / noisy data) |
 
+When `split_kwargs` contains `groups`, the next token in the reply
+is **`GroupKFold`**. The mapping table is the name source;
+python-api is only for the signature after the name.
+
    Imbalanced classification *does not* change the choice — use
    plain `KFold` / `GroupKFold`. See "Avoid by default" below.
 
@@ -332,10 +338,11 @@ Pre-flight (evaluate-ml-pipeline):
    `TimeSeriesSplit`", the user picks via `AskUserQuestion`.
    The gap parameter is the one most often wrong by default —
    `TimeSeriesSplit(n_splits=5)` from memory uses `gap=0`,
-   which silently leaks for any non-trivial horizon. The
-   structured pick exists to make that visible. Ambiguous free
-   text ("just pick something", "you decide") routes to a
-   clarifying `AskUserQuestion`; don't infer.
+   which silently leaks for any non-trivial horizon. Paste that
+   token in the reply (`TimeSeriesSplit(n_splits=5)` defaults
+   to `gap=0`). The structured pick exists to make that visible.
+   Ambiguous free text ("just pick something", "you decide")
+   routes to a clarifying `AskUserQuestion`; don't infer.
 
    Separately, ask whether the time column should stay as a
    covariate or be dropped from the feature matrix (encoders

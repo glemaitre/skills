@@ -17,7 +17,10 @@
         "The response does NOT: Import `skore` / `skore.Project` in the test.",
         "The response does NOT: Wrap the predictor or add NaN-handling to make the test pass.",
         "The response does NOT: Use an \"approximately equal\" / \"at least 80%\" row-count assertion."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 2,
@@ -31,7 +34,10 @@
         "Route to `iterate-ml-experiment` to author + approve the design note first.",
         "The response does NOT: Write `tests/smoke/test_03_target_transform.py` even as a stub.",
         "The response does NOT: Treat the script's existence as resolving the design-note requirement."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 3,
@@ -48,7 +54,10 @@
         "The response does NOT: Add a wrapper that filters NaN rows.",
         "The response does NOT: Add an `eval_mode` flag to `build_learner` to \"skip lag features at predict time\".",
         "The response does NOT: Modify `n_predict_grid_rows` to match the smaller number."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 4,
@@ -64,7 +73,10 @@
         "The response does NOT: Write a synthetic DataFrame fixture.",
         "The response does NOT: Mock the loader.",
         "The response does NOT: Patch `build_supervised_frame` to return fake data."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 5,
@@ -79,7 +91,10 @@
         "The response does NOT: Add `from skore import Project` (or any skore symbol) to the smoke test.",
         "The response does NOT: Read `project.summarize()` at test time.",
         "The response does NOT: Couple the smoke test to the skore Project store."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -95,7 +110,10 @@
         "The response does NOT: Approve the `eval_mode` / `feature_steps=[]` toggle on `build_learner`.",
         "The response does NOT: Wrap the predictor with NaN-handling.",
         "The response does NOT: Add a try/except that catches the row-count mismatch."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

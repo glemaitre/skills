@@ -8,13 +8,11 @@ by reading each transcript against the **Must / Must NOT** bullets per case.
 For each case the model is given:
 - `skills/iterate-ml-experiment/SKILL.md` as the system prompt.
 - The case's `User prompt` (verbatim) as the user message, prefixed with
-  the `Assumed workspace state` block:
+  the `Assumed workspace state` block.
 
-  ```
-  [Workspace state — read but do not narrate back: <state>]
-
-  <user prompt>
-  ```
+Cases 2, 3, and 6 set `**Tools:** yes` and seed `journal/JOURNAL.md`
+so the target can `read_file` History / Backlog instead of inventing
+rows. Other cases stay single-turn.
 
 Each `Must do` / `Must NOT do` bullet is a substring / behavioural check
 on the transcript. Pass criterion per case: every `Must do` ticked, zero
@@ -61,25 +59,53 @@ violation in any transcript** (hard rule).
 > What's next?
 
 **Assumed workspace state:**
-- `journal/JOURNAL.md` exists with 2 done rows in History:
-  `01_baseline` (RMSE 0.094, done) and `02_text_encoder`
-  (RMSE 0.087, done).
-- Backlog has 3 rows (B1, B2, B3) from prior `iterate-from-skore`
-  runs.
+- Existing scaffold: `src/claim_predictor/`, `experiments/`,
+  `tests/smoke/`, `reports/`.
+- `journal/JOURNAL.md` is on disk with 2 done History rows
+  (`01_baseline` RMSE 0.094, `02_text_encoder` RMSE 0.087) and
+  Backlog B1–B3. Open it with `read_file` before quoting History
+  or Backlog.
+
+**Tools:** yes
+
+**Sandbox:**
+- copy: `eval/iterate-ml-experiment/fixtures/journal_two_done.md` as `journal/JOURNAL.md`
+- dir: `src/claim_predictor`
+- dir: `experiments`
+- dir: `tests/smoke`
+- dir: `reports`
+- file: `experiments/01_baseline.py`
+  ```python
+  # %%
+  """01_baseline — already run."""
+  ```
+- file: `experiments/02_text_encoder.py`
+  ```python
+  # %%
+  """02_text_encoder — already run."""
+  ```
+
+**Expect reads:**
+- `journal/JOURNAL.md`
 
 **Must do:**
 - Read `journal/JOURNAL.md` first (mention it explicitly).
 - Surface the **sourcing menu verbatim** with the four options
   (`skore` / `user` / `my-pick` / `B<N>`).
-- Surface the Backlog table alongside the menu.
-- Use `AskUserQuestion` (or its narrative equivalent — explicitly
-  say "I'll ask you to pick") rather than silently picking one option.
+- Surface the Backlog alongside the menu, copying B1–B3 item text
+  from `journal/JOURNAL.md` (do not invent backlog wording).
+- Use `AskUserQuestion` or a narrative equivalent that asks the
+  user to pick (`Your pick?` / "I'll ask you to pick") rather than
+  silently picking one option.
 
 **Must NOT do:**
 - Silently default to one sourcing strategy.
 - Skip the sourcing menu and immediately draft a design note.
 - Default to `skore` just because a fresh report sits on disk (the
   rule "never silently default" is in Stop conditions).
+- Stop after the § 1 resume / record outcome / propose next ask —
+  "What's next?" already resolved iterate-propose; the sourcing
+  menu is this turn.
 
 ---
 
@@ -91,8 +117,9 @@ violation in any transcript** (hard rule).
 > end of the target range looks a lot tighter than in 02.
 
 **Assumed workspace state:**
-- `journal/JOURNAL.md` has 03_target_transform in History with
-  status `approved`.
+- `journal/JOURNAL.md` is on disk. Open it with `read_file` before
+  rewriting History. It already has `03_target_transform` in History
+  with status `approved` (empty headline) plus done 01/02 rows.
 - `journal/03_target_transform.md` exists with planned/approved
   status block (no Headline result yet).
 - The skore Project at `reports/` is accessible and contains the
@@ -103,12 +130,58 @@ violation in any transcript** (hard rule).
   0.081 ± 0.005 in its `## Metrics summary`.
 - All `tests/smoke/test_NN_*.py` pass.
 
+**Tools:** yes
+
+**Sandbox:**
+- copy: `eval/iterate-ml-experiment/fixtures/journal_case03.md` as `journal/JOURNAL.md`
+- dir: `src/claim_predictor`
+- dir: `experiments`
+- dir: `tests/smoke`
+- dir: `reports`
+- dir: `audit`
+- file: `experiments/01_baseline.py`
+  ```python
+  # %%
+  """01_baseline — already run."""
+  ```
+- file: `experiments/02_text_encoder.py`
+  ```python
+  # %%
+  """02_text_encoder — already run."""
+  ```
+- file: `experiments/03_target_transform.py`
+  ```python
+  # %%
+  """03_target_transform — frozen post-run."""
+  ```
+- file: `scratch/audit/03_target_transform/audit.md`
+  ```markdown
+  ## Metrics summary
+
+  | metric | value |
+  |--------|-------|
+  | RMSE   | 0.081 ± 0.005 |
+  ```
+- file: `journal/03_target_transform.md`
+  ```markdown
+  Status block:
+    State:          approved
+    Headline result:
+    Implication:
+  ```
+
+**Expect reads:**
+- `journal/JOURNAL.md`
+
 **Must do:**
 - Give the `journal/03_target_transform.md` Status block as it will
   read: `State` flipped to `done`, `Headline result` carrying the
   RMSE, and `Implication for next iteration` filled in — not left
   as a placeholder or deferred to another skill.
 - Give the `JOURNAL.md` History row with the headline result.
+  If reprinting History, copy 01/02 headlines from the file
+  (`RMSE 0.094` / `RMSE 0.087`); 03 uses the user's
+  `0.081 ± 0.005`.
 - Mention checking that **all** `tests/smoke/` pass (smoke-test gate
   before `done`), not just the new one.
 - Mention the **backlog hygiene** step (scan Backlog for items the
@@ -119,13 +192,16 @@ violation in any transcript** (hard rule).
   needed.
 
 **Must NOT do:**
-- Write the next design note or experiment body in this turn.
-  Listing the cadence `AskUserQuestion` options ("draft it now" /
-  "not yet") is required and is not an auto-propose.
+- Draft a **new** design note (`journal/04_*.md`) or a new
+  experiment body in this turn. Updating `journal/03_target_transform.md`
+  Status and the `JOURNAL.md` History row for 03 is the § 4
+  deliverable, not a violation.
 - Edit `experiments/03_target_transform.py` to fix anything (the
   experiment script is frozen post-run).
-- Fabricate metric content if the user gave it — paraphrase only,
-  use the user's number verbatim.
+- Invent a **different RMSE** or extra numeric metrics the user
+  did not give. Copying 01/02 headlines from `JOURNAL.md` (`0.094` /
+  `0.087`) and the user's `0.081 ± 0.005` is not fabrication. A
+  derived gap between those copied numbers is not an invented RMSE.
 
 ---
 
@@ -197,11 +273,47 @@ violation in any transcript** (hard rule).
 > one stack up?
 
 **Assumed workspace state:**
-- `journal/JOURNAL.md` has both rows in History with Headline
-  results.
-- `journal/01_baseline.md` (done, RMSE 0.094) and
-  `journal/02_text_encoder.md` (done, RMSE 0.087) both exist.
+- `journal/JOURNAL.md` is on disk with both History rows and
+  Headline results (`01_baseline` RMSE 0.094, `02_text_encoder`
+  RMSE 0.087). Open it with `read_file` before quoting those
+  numbers.
+- `journal/01_baseline.md` (done) and `journal/02_text_encoder.md`
+  (done) both exist.
 - Both reports in the skore Project under their stems.
+
+**Tools:** yes
+
+**Sandbox:**
+- copy: `eval/iterate-ml-experiment/fixtures/journal_two_done.md` as `journal/JOURNAL.md`
+- dir: `src/claim_predictor`
+- dir: `experiments`
+- dir: `tests/smoke`
+- dir: `reports`
+- file: `experiments/01_baseline.py`
+  ```python
+  # %%
+  """01_baseline — already run."""
+  ```
+- file: `experiments/02_text_encoder.py`
+  ```python
+  # %%
+  """02_text_encoder — already run."""
+  ```
+- file: `journal/01_baseline.md`
+  ```markdown
+  Status block:
+    State: done
+    Headline result: RMSE 0.094
+  ```
+- file: `journal/02_text_encoder.md`
+  ```markdown
+  Status block:
+    State: done
+    Headline result: RMSE 0.087
+  ```
+
+**Expect reads:**
+- `journal/JOURNAL.md`
 
 **Must do:**
 - Pull the Headline results for both stems side-by-side from
@@ -236,13 +348,17 @@ violation in any transcript** (hard rule).
   handed over pre-resolved so its inner `AskUserQuestion` doesn't
   fire. The sibling fetches the issue — don't ask the user to paste
   the issue body or a summary instead.
-- Name the design-note destination `journal/NN_<short_name>.md`,
-  with the correct `NN`, and state that the draft lands only after
+- Name the design-note destination `journal/NN_<short_name>.md`
+  (`NN` = next History index; `03_*.md` is correct when two
+  done rows exist) and state that the draft lands only after
   `iterate-from-user` returns a Proposal.
 
 **Must NOT do:**
 - Re-present the sourcing menu in full (the URL already resolved
   the pick).
-- Treat the URL as a free-text idea (`user → free-text` branch);
-  the issue-link branch is the correct one.
+- Ask the user to paste the issue body or a summary instead of
+  handing the URL to `iterate-from-user` pre-resolved. Dispatch
+  to `iterate-from-user` (resource-link / GitHub issue) is the
+  correct route — do not fail that as a free-text vs issue-link
+  fight.
 - Draft `experiments/NN_*.py` before the design note is approved.

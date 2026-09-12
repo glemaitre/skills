@@ -37,8 +37,10 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 - Run `pixi init` / `uv init` / `poetry init` on the user's behalf
   before G-ENV-MGR + G-PKG-NAME have passed.
 - Pick a package name silently from the folder name.
-- Create `experiments/01_baseline.py` with content (the experiment
-  script body lands later via `iterate-ml-experiment`).
+- Write a runnable `experiments/01_baseline.py` whose body actually
+  calls `build_learner` / `skore.evaluate` / `project.put`
+  (uncommented). Enumerating the empty templated shell (imports,
+  `# %%`, commented stubs, `<<PKG>>` placeholders) is allowed.
 - Default to pandas silently because "skore pulls it in".
 
 ---
@@ -64,15 +66,13 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 - Glue to existing folders / names — no renames, no relocates.
 - Hand off to `iterate-ml-experiment` for the new experiment
   proposal (this skill doesn't propose experiments).
-- Confirm the package name via `AskUserQuestion` ("keep
-  `claim_predictor`?") rather than silently reusing.
+- Keep `claim_predictor` as the package / import name (do not
+  rename `src/` or the import).
 
 **Must NOT do:**
 - Recreate / overwrite any existing folder.
 - Auto-write `experiments/02_*.py` before the design note is
   approved.
-- Skip the G-PKG-NAME re-confirmation (continuity from a prior
-  session is NOT continuity from a user decision).
 
 ---
 
@@ -177,19 +177,21 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 
 **Must do:**
 - Refuse the scratch re-evaluate / re-put.
-- Cite the Stop condition: "**Scratch is read-only against the
-  skore Project**".
+- Cite the Stop condition that scratch is read-only against the
+  skore Project (verbatim title not required — "scratch read-only
+  contract" / no `evaluate`/`put` from a probe counts).
 - Recognise the **lookup-shape trap** — `project.get` is by **id**,
   not by `key`. Propose `project.summarize()` to enumerate
   `(key, id)` pairs then `project.get(id)`.
-- Mention the failure mode the rule blocks: a duplicate row under
-  the same `key` polluting `project.summarize()`.
+- Mention the failure mode the rule blocks: a same-key `put`
+  overwrites or duplicates the report / pollutes `summarize()`.
 
 **Must NOT do:**
-- Approve the re-evaluate / re-put plan.
-- Treat the `KeyError` as evidence the report is missing.
-- Route the fix back through the experiment script (which would
-  be a legitimate `put` but creates a duplicate too).
+- Approve the scratch re-evaluate / re-put **this turn**.
+- Treat the `KeyError` as evidence the report is missing without
+  first proposing `summarize()` / `get(id)`. Mentioning a later,
+  gated recovery via `experiments/02_text_encoder.py` (new-vs-edit
+  ask) if `summarize()` is empty is allowed.
 
 ---
 

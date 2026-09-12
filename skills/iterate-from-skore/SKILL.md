@@ -147,7 +147,9 @@ record — see § Stop conditions.
   invent mitigations from training-data memory of skore.
 - **Don't pick a single "winning" finding for the user.** Emit one
   row per actionable check. The user picks via the parent's
-  sourcing menu (`B<N>`).
+  sourcing menu (`B<N>`). Stop after the candidate list. Forbidden
+  closers: "highest-leverage," "run X next," "combined into one
+  experiment." Close with the parent `B<N>` pick only.
 - **Dedup against existing Backlog rows by `Source` citation.**
   Read `JOURNAL.md` Backlog before emitting; skip any candidate
   whose `Source` matches an existing row.

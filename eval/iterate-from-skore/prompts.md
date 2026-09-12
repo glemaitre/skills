@@ -54,10 +54,10 @@ never calls `report.*` accessors.
 - Emit one Backlog candidate per `issue` / `tip` row (SKD003, SKD007,
   SKD012, SKD019) and none for the `passed` row.
 - Cite each row's `Source` as `audit:02_target_transform:checks.<code>`.
-- Name each row's `documentation_url` as the source of its `Item`
-  text — the mitigation comes from the check page. If the page can't
-  be fetched this turn, say so and mark the `Item` provisional
-  rather than passing off the `description` column as the mitigation.
+- If `documentation_url` pages cannot be fetched this turn, mark
+  each `Item` **provisional** **or** say the page was not fetched.
+  Do not require naming every URL as the Item source when the page
+  is unreachable. `Source` as `audit:<stem>:checks.<code>` is enough.
 - Return Backlog-candidate rows as **conversation text** in the
   `Backlog candidates (from: audit digest on 02_target_transform):`
   block format, NOT write to `JOURNAL.md`.

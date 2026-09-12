@@ -15,7 +15,10 @@
         "The response does NOT: Run `pip install skrub` in a pixi project (wrong-manager install).",
         "The response does NOT: Run `uv add skrub` / `poetry add skrub`.",
         "The response does NOT: Silently dump skrub into the default env without confirming scope."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 2,
@@ -32,7 +35,10 @@
         "The response does NOT: Run `pip install pandas` to \"just get started\".",
         "The response does NOT: Pick a manager based on PATH alone.",
         "The response does NOT: Run the bootstrap installer (`curl | sh`) itself."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 3,
@@ -48,7 +54,10 @@
         "The response does NOT: Run `pip install scikit-learn`.",
         "The response does NOT: Add a `requirements.txt` to the project.",
         "The response does NOT: Bypass the manifest with `--user` / `--break-system-packages`."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 4,
@@ -63,7 +72,10 @@
         "The response does NOT: Silently `pixi add optuna` into `default` or into any feature.",
         "The response does NOT: Treat the recorded `env scope: default` from `Workspace decisions` as resolving this per-install scope question.",
         "The response does NOT: Treat \"you pick\" as free-text resolution of the gate."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 5,
@@ -79,7 +91,10 @@
         "The response does NOT: Pick pixi silently because `pixi.toml` exists.",
         "The response does NOT: Pick conda silently because the conda env is active.",
         "The response does NOT: Treat one as \"obviously right\" without flagging the conflict."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -94,7 +109,10 @@
         "The response does NOT: Run `pip install -e .` (wrong manager in a pixi project).",
         "The response does NOT: Skip the editable install (then the scaffold's `PROJECT_ROOT` resolution would break).",
         "The response does NOT: Modify `pyproject.toml`'s `[project]` block ad-hoc to make the package \"findable\" by inference."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

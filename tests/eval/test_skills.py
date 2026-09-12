@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 from deepeval.metrics import GEval
@@ -15,6 +17,7 @@ from tests.eval.harness import (
     call_with_retries,
     compose_user_prompt,
     format_eval_failure,
+    generate_agent_response,
     generate_response,
     litellm_model_name,
     record_eval_result,
@@ -23,6 +26,7 @@ from tests.eval.harness import (
     visible_text,
     write_transcript,
 )
+from tests.eval.sandbox import TOOLS_NOTE, Sandbox, missing_reads
 from tests.eval.tiers import skill_tier
 
 
@@ -151,7 +155,7 @@ def test_skill_case(
     else:
         system = ""
 
-    user = compose_user_prompt(eval_case.prompt)
+    user = compose_user_prompt(eval_case.prompt, tools=eval_case.tools)
     path = transcript_path(
         eval_case, run_id=eval_run_id, mode=skill_mode, model=target_model
     )
@@ -165,19 +169,49 @@ def test_skill_case(
         "judge_model": skill_judge_model,
         "pass_ratio": skill_pass_ratio,
         "prompt": eval_case.prompt,
-        "harness_note": NO_TOOLS_NOTE,
+        "tools": eval_case.tools,
+        "harness_note": TOOLS_NOTE if eval_case.tools else NO_TOOLS_NOTE,
         "user": user,
         "expectations": list(eval_case.expectations),
         "must_do": list(eval_case.must_do),
         "must_not": list(eval_case.must_not),
     }
 
-    result = generate_response(
-        model=target_model,
-        system=system,
-        user=user,
-    )
+    missing_files: list[str] = []
+    missing_reads_list: list[str] = []
+    if eval_case.tools:
+        with TemporaryDirectory(prefix="skill-eval-") as tmp:
+            box = Sandbox(Path(tmp))
+            box.seed(list(eval_case.sandbox))
+            result = generate_agent_response(
+                model=target_model,
+                system=system,
+                user=user,
+                sandbox=box,
+            )
+            missing_files = box.expect_ok(list(eval_case.expect_files))
+            missing_reads_list = missing_reads(
+                result.tool_trace, list(eval_case.expect_reads)
+            )
+            payload["sandbox_tree"] = box.list_tree()
+    else:
+        result = generate_response(
+            model=target_model,
+            system=system,
+            user=user,
+        )
     actual, source = visible_text(result)
+    if eval_case.tools and result.tool_trace:
+        used = "\n".join(
+            f"- {item.get('name')} {item.get('arguments')}"
+            for item in result.tool_trace
+        )
+        tree = payload.get("sandbox_tree") or []
+        tree_s = "\n".join(f"- {name}" for name in tree)
+        actual = (
+            f"{actual}\n\n## Harness: tools used\n{used}\n\n"
+            f"## Harness: sandbox files\n{tree_s}"
+        )
     payload.update(
         {
             "content": result.content,
@@ -185,6 +219,9 @@ def test_skill_case(
             "finish_reason": result.finish_reason,
             "usage": result.usage,
             "judged_from": source,
+            "tool_trace": result.tool_trace,
+            "missing_files": missing_files,
+            "missing_reads": missing_reads_list,
         }
     )
     write_transcript(path, payload)
@@ -205,10 +242,34 @@ def test_skill_case(
         )
 
     if not eval_case.expectations:
-        record_eval_result(mode=skill_mode, case=eval_case, passed=True)
-        payload["passed"] = True
+        passed = not missing_files and not missing_reads_list
+        record_eval_result(mode=skill_mode, case=eval_case, passed=passed)
+        payload["passed"] = passed
         payload["metrics"] = []
         write_transcript(path, payload)
+        if not passed:
+            extra_bits = []
+            if missing_files:
+                extra_bits.append(
+                    "Missing expected sandbox files: " + ", ".join(missing_files)
+                )
+            if missing_reads_list:
+                extra_bits.append(
+                    "Missing expected read_file paths: "
+                    + ", ".join(missing_reads_list)
+                )
+            pytest.fail(
+                format_eval_failure(
+                    case=eval_case,
+                    target_model=target_model,
+                    skill_mode=skill_mode,
+                    actual=actual,
+                    outcomes=(),
+                    transcript=path,
+                    extra=" ".join(extra_bits),
+                ),
+                pytrace=False,
+            )
         return
 
     test_case = LLMTestCase(input=eval_case.prompt, actual_output=actual)
@@ -229,10 +290,25 @@ def test_skill_case(
         )
 
     payload["metrics"] = _outcomes_payload(outcomes)
-    passed = all(item.passed for item in outcomes)
+    passed = (
+        all(item.passed for item in outcomes)
+        and not missing_files
+        and not missing_reads_list
+    )
     judge_error = any(item.reason.startswith("judge error:") for item in outcomes)
     payload["passed"] = passed
     write_transcript(path, payload)
+
+    extra_bits = []
+    if missing_files:
+        extra_bits.append(
+            "Missing expected sandbox files: " + ", ".join(missing_files)
+        )
+    if missing_reads_list:
+        extra_bits.append(
+            "Missing expected read_file paths: " + ", ".join(missing_reads_list)
+        )
+    extra = " ".join(extra_bits)
 
     if passed:
         record_eval_result(mode=skill_mode, case=eval_case, passed=True)
@@ -249,6 +325,7 @@ def test_skill_case(
             actual=actual,
             outcomes=outcomes,
             transcript=path,
+            extra=extra,
         ),
         pytrace=False,
     )

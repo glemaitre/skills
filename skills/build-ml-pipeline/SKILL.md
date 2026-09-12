@@ -198,7 +198,20 @@ equivalent) then `mark_as_X` on the result:
    Layer 3 features take X + history as references.
 
 Do not end on a generic three-layer sketch that terminates in an
-estimator and omits `history_source` / `predict_grid`.
+estimator and omits `history_source` / `predict_grid`. The 24-hour
+(or `H`) horizon belongs to **Layer 2**, not Layer 1 and not as a
+Layer-3 estimator trick.
+
+```
+STOP — no wrapper estimator. Do not invent `_ShiftTargetHorizon`,
+`ShiftedTarget`, `*Target*`, or any estimator whose `transform`
+shifts / `dropna`s / `is_not_null`-filters. That is the
+wrapper-that-filters-NaNs anti-pattern. Paste this pattern instead:
+
+Layer 1: history_source + predict_grid (raw load only; no shift).
+Layer 2: align into {X, y} and mark_as_X / mark_as_y (horizon lives here).
+Layer 3: features take X + history as references.
+```
 
 ### S6. Layer 1 doesn't know the question
 
@@ -208,12 +221,15 @@ estimator and omits `history_source` / `predict_grid`.
   to Layer 2 or downstream, never Layer 1.
 - **Symptom:** the loader's body contains a `target.shift(-HORIZON)`,
   a `drop_nulls("y")`, or any task-specific filter.
-- **Recovery:** push the task-specific operation past the marker
-  into Layer 2 (target derivation via a stateful estimator) or
-  Layer 3 (history-dependent feature). The smoke test passes
-  trivially when the bug is fused into Layer 1 — CV looks fine,
-  and the structural debt only surfaces when the *next*
-  experiment composes against the raw source.
+- **Recovery:** push the task-specific operation past Layer 1.
+  The horizon / shift belongs to **Layer 2** (align
+  `history_source` + `predict_grid` into `{X, y}` and mark). Do
+  **not** implement the shift as a stateful `*Target*` estimator
+  that filters NaN rows. Layer 3 is features that take X +
+  history as references. The smoke test passes trivially when
+  the bug is fused into Layer 1 — CV looks fine, and the
+  structural debt only surfaces when the *next* experiment
+  composes against the raw source.
 - **Constructive test:** *would an external consumer — a SQL
   view, a feature store, a second model — derive this same
   output without knowing your task?* No → push it past the
@@ -315,6 +331,12 @@ more `skrub.var(...)` calls — **not** as a bare
 are not acceptable roots (see S4). Look up the underlying
 signatures via `python-api`.
 
+**If the user asks for `sklearn.Pipeline` / `build_pipeline()`:**
+do not `from sklearn.pipeline import Pipeline`. Redirect to
+`skrub.var(...)` and a `build_learner` that returns
+`predictions.skb.make_learner()`. Do not illustrate the refusal
+with a `Pipeline([...])` constructor in a docstring.
+
 Reference: https://skrub-data.org/stable/data_ops.html
 
 → next: Rule 2 (where the marker goes).
@@ -411,6 +433,21 @@ pull a splitter import into pipeline code (forbidden by S3). Wire
 only `split_kwargs`; `evaluate-ml-pipeline` selects the splitter and
 passes `splitter=`, which overrides any DataOp `cv` anyway.
 
+**Stop after wiring `split_kwargs`.** Do not write
+`splitter=GroupKFold(...)` or `skore.evaluate(..., splitter=...)`
+in this skill. Do not name `GroupKFold` / `KFold` /
+`TimeSeriesSplit` as the likely default — that is picking the
+splitter. Say only: `evaluate-ml-pipeline` consumes `split_kwargs`
+and owns the splitter.
+
+Even when `customer_id` is already wired, still paste this ask
+verbatim (the named-heuristic tokens are load-bearing):
+
+```
+AskUserQuestion: grouping intended? anything ending in `_id`,
+columns called `subject` / `session` / `region`?
+```
+
 **When editing an existing pipeline that uses `skrub.X` /
 `skrub.y` or binds materialized data:** do not auto-rewrite.
 Surface the source-bound alternative and ask whether to refactor.
@@ -491,6 +528,15 @@ Classic traps by name:
 **Litmus test:** would this output change if I called it on the
 training subset alone vs the whole frame? If yes → stateful →
 `.skb.apply` with an estimator, never `.skb.apply_func`.
+
+```
+STOP — target encoding / apply_func. When the user asks for
+`def target_encode` + `.skb.apply_func`: refuse. Do not paste
+the leaky function body "as requested" and then the fix. Cite
+statelessness + leakage. Propose sklearn TargetEncoder (or
+BaseEstimator + TransformerMixin) via `.skb.apply`. Mention
+python-api for the TargetEncoder signature.
+```
 
 → next: Decision flow.
 

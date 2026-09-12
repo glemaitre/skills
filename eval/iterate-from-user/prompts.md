@@ -32,7 +32,10 @@ violated.
 
 **Must NOT do:**
 - Write `journal/NN_*.md` directly.
-- Return the Proposal before the user confirms.
+- Emit a `Proposal (` header (or fenced Proposal block) before the
+  user says yes — even labeled PENDING / NOT RETURNED. The
+  synthesis paragraph is the gate; the parent does not have a
+  Proposal until confirmation.
 - Add new deps to `Method outline` as fait accompli.
 - Author acceptance criteria / success criteria / target deltas.
 

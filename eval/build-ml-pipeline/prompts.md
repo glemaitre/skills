@@ -9,6 +9,10 @@ For each case the model is given:
 - The case's `User prompt` (verbatim), prefixed with the
   `Assumed workspace state` block.
 
+Case 3 sets `**Tools:** yes` and seeds `references/layer_examples.md`
+so the target can `read_file` the history-dependent JOIN example
+(the same file `SKILL.md` points at). Other cases stay single-turn.
+
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
 violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
 
@@ -37,8 +41,11 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
   `predictions.skb.make_learner()` (not a `Pipeline` object).
 
 **Must NOT do:**
-- Write `from sklearn.pipeline import Pipeline` as the top-level.
-- Build a `Pipeline([("scaler", StandardScaler()), ...])` structure.
+- Write `from sklearn.pipeline import Pipeline` as a live import
+  in `pipeline.py`.
+- Return a `Pipeline([("scaler", StandardScaler()), ...])` object
+  from `build_learner` / `build_pipeline`. A docstring that only
+  names the forbidden equivalent is not a violation.
 - Use `skrub.X(...)` / `skrub.y(...)` as graph roots.
 
 ---
@@ -82,6 +89,17 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
 **Assumed workspace state:**
 - skrub installed at 0.9.0.
 - The user is in early baseline construction.
+- The skill's `references/` tree is on disk at the project root
+  (`references/layer_examples.md`). Open that file with `read_file`
+  before proposing Layer 2.
+
+**Tools:** yes
+
+**Sandbox:**
+- copy: `skills/build-ml-pipeline/references/layer_examples.md` as `references/layer_examples.md`
+
+**Expect reads:**
+- `references/layer_examples.md`
 
 **Must do:**
 - Refuse the proposed loader-baked target shift.
@@ -91,6 +109,9 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
 - Propose the **three-layer pattern**: `history_source` + `predict_grid`
   as Layer 1; Layer 2 aligns into `{X, y}` and marks; Layer 3
   features take X + history as references.
+- Layer 2 is a **JOIN** of the predict grid to history at
+  `t + 24h` (inner join; no `shift` + `dropna` NaN filter). A small
+  `align_xy` estimator is fine if it joins.
 
 **Must NOT do:**
 - Accept the loader-baked shift as written.
@@ -218,6 +239,8 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
   `session` / `region`").
 
 **Must NOT do:**
-- Pick the cross-validator itself (e.g. `GroupKFold`) — that's
-  out of scope for this skill; `evaluate-ml-pipeline` owns it.
+- Pick the cross-validator in pipeline code (`splitter=GroupKFold(...)`,
+  `cv=GroupKFold`, `skore.evaluate(..., splitter=...)`). Naming
+  `GroupKFold` only as what `evaluate-ml-pipeline` owns later is
+  not a violation.
 - Leave `split_kwargs` empty without surfacing the group question.

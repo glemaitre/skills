@@ -97,14 +97,14 @@ do ticked, zero Must NOT violated.
   table.
 - Surface that `regression-test-ml-pipeline` is **future / not
   implemented in v1**.
-- Offer alternatives (e.g. propose a `tests/smoke/` assertion that
-  catches the drift indirectly, or note the gap to be filled when
-  the regression subskill ships).
+- Optional one sentence: the gap waits until the subskill ships,
+  or a smoke assertion could be added later. Flag the category
+  mismatch in the same breath as any smoke mention.
 
 **Must NOT do:**
 - Silently dispatch to `regression-test-ml-pipeline` as if it exists.
-- Default to `smoke-test-ml-pipeline` without flagging the category
-  mismatch.
+- Write any test-file body (`def test_`, assertion code, smoke or
+  regression).
 - Author the regression test body inline (this skill is the router,
   not the body owner).
 

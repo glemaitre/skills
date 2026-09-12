@@ -167,10 +167,9 @@ opt-in and added when the workspace's needs warrant them.
      implemented in v1)* (`regression-test-ml-pipeline`,
      `distribution-test-ml-pipeline`, …): **STOP**. Do not create
      `tests/<category>/`. Do not dispatch as if the subskill
-     exists. Tell the user the category is recognised but
-     unimplemented. Offer a `tests/smoke/` assertion that catches
-     the issue indirectly, or note the gap until the subskill
-     ships.
+     exists. Do not write `def test_`, an assertion snippet, or a
+     smoke-test body. One sentence: the category is recognised but
+     unimplemented; optional "gap until the subskill ships."
 3. Place the empty test file at
    `tests/<category>/test_NN_<short_name>.py` with the pytest
    scaffolding (one `def test_*():` function, empty body, a

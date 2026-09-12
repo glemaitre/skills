@@ -79,15 +79,52 @@ or signature as a step of the live turn. Do not illustrate the
 omission with a class name — say "no return type until the cache
 file exists" and stop.
 
+**Shape 3 BLOCKED — copy this, then end the message.** After naming
+WebSearch `skore 0.18 docs evaluate KFold`, WebFetch path `/0.18/`
+or `/0.18.0/`, cache `scratch/api/skore/0.18.0/evaluate.md` with
+source URL on the first line:
+
+```
+BLOCKED: no return type until scratch/api/skore/0.18.0/evaluate.md exists.
+```
+
+Do not add a "What the lookup will answer" section. Do not name
+`EvaluationReport` / `CrossValidationReport`. Do not say whether
+KFold vs holdout types are the same or different.
+
 **Stack orientation may name the entry point**
-(`skrub.tabular_pipeline`). Do not write `from skrub import …`
-or a call until a Shape 1 probe is proposed. Do not tabulate trap
-names (`tabular_learner`, `TabularLearner`) as candidates.
+(`skrub.tabular_pipeline`). Do not tabulate trap names
+(`tabular_learner`, `TabularLearner`) as candidates.
+
+**The first code fence in the reply is the probe, never a call.**
+Naming the symbol in prose is allowed; `from skrub import …`,
+`tabular_pipeline(...)`, `.fit(...)` / `.predict(...)` are not,
+until the Shape 1 probe has been proposed. Emit in this order:
+
+```
+1. Entry point (prose only): skrub.tabular_pipeline
+2. Pre-flight checklist
+3. Shape 1 probe: scratch/<ts>_skrub_tabular_pipeline.py
+4. Cache destination: scratch/api/skrub/0.9.0/tabular_pipeline.md
+5. (optional) Usage sketch — labeled "not executed, pending probe"
+```
+
+Opening the answer with an import + `fit` / `predict` block is the
+failure this rule exists to stop, even when the symbol name is
+right.
 
 **Named traps are leads, not lookups.** `tabular_learner` →
 `tabular_pipeline` in this skill does not confirm the install.
 Still propose a Shape 1 probe (or Shape 2 `dir(skrub)`) before
-treating the replacement as confirmed.
+treating the replacement as confirmed. Do not assert `ImportError`
+from the trap table alone.
+
+**Shape 3 (copy this).** Cache miss on `evaluate.md`: WebSearch
+`<lib> <MAJOR.MINOR> docs <topic>` (e.g. `skore 0.18 docs evaluate
+KFold`). WebFetch URL path must contain `/0.18/` or `/0.18.0/`.
+Reject `/latest/` and `/stable/`. Cache
+`scratch/api/skore/0.18.0/evaluate.md` with the **source URL on
+the first line**. Do not answer the return type from memory.
 
 **Version-check refusal (copy this).** When the user asks for
 `python -c "… __version__"`: refuse the inline command; cite
@@ -153,7 +190,9 @@ Status `Workspace decisions` is the precondition; see
   - skrub: `mark_as_y(target_column)` → signature dropped the
     positional arg in 0.9+; use `.skb.select("...")` before mark.
   - skore: `Project.get(...)` is by **id**, not user-facing `key`;
-    enumerate via `project.summarize()` first.
+    enumerate via `project.summarize()` first. Then stop. Do not
+    mention `experiments/NN_*.py` as a recovery path, even
+    hypothetically.
 - **Never fabricate a probe result.** If the probe hasn't executed,
   the `Signature` / `help()` sections must remain blank or marked
   `<pending probe execution>`. Same rule for Shape 3: do not
@@ -335,7 +374,9 @@ Probe template: → `references/probe_templates.md` § Shape 1.
 (e.g. `Project.put` / `Project.get` / `Project.summarize` under
 `project_local`) → iterate over a tuple of dotted paths inside the
 probe and concatenate sections into one `<topic>.md`. **One topic
-file per *topic*, not per symbol.**
+file per *topic*, not per symbol.** Those three Project methods
+land in **one** file `scratch/api/skore/<ver>/project_local.md`
+(or `project.md`). Never `put.md` / `get.md` / `summarize.md`.
 
 **No inline carve-out for single-signature checks.** Even when a
 cache exists and you want to re-confirm one arg, run a fresh probe
@@ -419,9 +460,12 @@ return when `<arg>` is `<value>`?". Procedure:
 2. **WebFetch** the most relevant result whose URL contains the
    installed version (`/0.18/`, `/0.18.0/`). **Reject** any URL
    with `/latest/` or `/stable/` — those drift on republish.
-3. **Cache verbatim** to `scratch/api/<lib>/<version>/<topic>.md`:
+3. **Cache verbatim** to `scratch/api/<lib>/<version>/<topic>.md`.
+   **First line of the file is the source URL.** Then:
 
    ```markdown
+   <full URL>
+
    # <topic>
 
    Source: <full URL>
@@ -529,7 +573,9 @@ Tier-1 named entry points. Consult **before** a Shape 2 surface
 dump for "where does X live" — the named entry is often the right
 answer. This section names *where* symbols live. It is not a
 licence to write the import/call, or to answer a Shape 3 return-type
-question from this list.
+question from this list. Name the symbol in prose, then go to the
+probe — no `from <lib> import …` / `fit` / `predict` fence before
+the Shape 1 probe is proposed.
 
 ### scikit-learn
 

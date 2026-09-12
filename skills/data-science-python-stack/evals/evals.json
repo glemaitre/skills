@@ -5,16 +5,19 @@
       "id": 1,
       "title": "Tier 1 mandatory libs at project start",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder.]\n\nStarting a fresh ML project. What's the mandatory stack?",
-      "expected_output": "Behavioural response satisfying: - Name the Tier 1 mandatory libraries (sklearn, skrub, skore, ruff, pytest at minimum \u2014 read the skill for the full list). - Mention these are installed at project start, no exceptions. - Mention `python-env-manager` for the actual install mechanism. It must NOT: - Skip the tabular library (that's Tier 2 \u2014 competing library). - Recommend `mlflow` for tracking (skore is canonical; mlflow is reserved for serving / registry). - Recommend `black` / `isort` / `flake8` (ruff is canonical).",
+      "expected_output": "Behavioural response satisfying: - Name the Tier 1 mandatory libraries (sklearn, skrub, skore, ruff, pytest at minimum \u2014 read the skill for the full list). - Mention these are installed at project start, no exceptions. - Mention `python-env-manager` for the actual install mechanism. It must NOT: - Skip the tabular library (that's Tier 2 \u2014 competing library). - Recommend raw `mlflow.log_*` / `mlflow.start_run` as the tracking API. Listing G-SKORE-MODE `mlflow` (the `skore[mlflow]` extra, still `project.put`) is allowed. - Recommend `black` / `isort` / `flake8` (ruff is canonical).",
       "files": [],
       "expectations": [
         "Name the Tier 1 mandatory libraries (sklearn, skrub, skore, ruff, pytest at minimum \u2014 read the skill for the full list).",
         "Mention these are installed at project start, no exceptions.",
         "Mention `python-env-manager` for the actual install mechanism.",
         "The response does NOT: Skip the tabular library (that's Tier 2 \u2014 competing library).",
-        "The response does NOT: Recommend `mlflow` for tracking (skore is canonical; mlflow is reserved for serving / registry).",
+        "The response does NOT: Recommend raw `mlflow.log_*` / `mlflow.start_run` as the tracking API. Listing G-SKORE-MODE `mlflow` (the `skore[mlflow]` extra, still `project.put`) is allowed.",
         "The response does NOT: Recommend `black` / `isort` / `flake8` (ruff is canonical)."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 2,
@@ -29,7 +32,10 @@
         "The response does NOT: Silently default to pandas because \"skore pulls it in transitively\".",
         "The response does NOT: Treat \"tabular regression\" as resolving the pick.",
         "The response does NOT: Recommend both libraries simultaneously."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 3,
@@ -45,7 +51,10 @@
         "The response does NOT: Pick pandas (or any tabular lib) silently.",
         "The response does NOT: Pick a deep-learning framework silently.",
         "The response does NOT: Treat folder structure as a preference signal."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 4,
@@ -60,22 +69,28 @@
         "The response does NOT: Rewrite the code as `sklearn.Pipeline` / `make_pipeline`.",
         "The response does NOT: Drop skrub from the design.",
         "The response does NOT: Treat the import failure as \"skrub isn't right for this stack\"."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 5,
       "title": "Refuse mlflow for tracking, redirect to skore",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- skore is installed.]\n\nLet's use `mlflow.log_metric` for tracking the experiment's\nmetrics, since it's the industry standard.",
-      "expected_output": "Behavioural response satisfying: - Refuse the mlflow-for-tracking substitution. - Cite that **skore** is canonical for evaluation / reporting / tracking in this stack. - Mention mlflow's role is reserved for model serving / registry, not tracking. It must NOT: - Add `import mlflow` to the workspace. - Add `mlflow.log_metric(...)` to the experiment script. - Treat \"industry standard\" as overriding the stack pick.",
+      "expected_output": "Behavioural response satisfying: - Refuse `mlflow.log_metric` as the tracking API. - Cite that **skore** (Project API) is canonical for tracking in this stack. - Allow noting that G-SKORE-MODE `mlflow` stores skore artifacts on an MLflow server; still never call `mlflow.log_*`. It must NOT: - Add `import mlflow` to the workspace. - Add `mlflow.log_metric(...)` to the experiment script. - Treat \"industry standard\" as overriding the stack pick.",
       "files": [],
       "expectations": [
-        "Refuse the mlflow-for-tracking substitution.",
-        "Cite that **skore** is canonical for evaluation / reporting / tracking in this stack.",
-        "Mention mlflow's role is reserved for model serving / registry, not tracking.",
+        "Refuse `mlflow.log_metric` as the tracking API.",
+        "Cite that **skore** (Project API) is canonical for tracking in this stack.",
+        "Allow noting that G-SKORE-MODE `mlflow` stores skore artifacts on an MLflow server; still never call `mlflow.log_*`.",
         "The response does NOT: Add `import mlflow` to the workspace.",
         "The response does NOT: Add `mlflow.log_metric(...)` to the experiment script.",
         "The response does NOT: Treat \"industry standard\" as overriding the stack pick."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -90,7 +105,10 @@
         "The response does NOT: Run `pixi add xgboost` silently.",
         "The response does NOT: Substitute the predictor without surfacing the stack mismatch.",
         "The response does NOT: Treat \"usually beats sklearn\" as resolving a library choice."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

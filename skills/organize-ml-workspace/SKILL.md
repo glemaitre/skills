@@ -91,19 +91,24 @@ Sibling skills (just-in-time):
 - **A gate is never `[n/a]`.** `n/a` is for actions the turn does
   not need. G-PKG-NAME, G-ENV-MGR, G-TABULAR and G-SKORE-MODE are
   resolved (answer recorded this session), outstanding, or blocked —
-  there is no fourth state. "n/a this turn", "already the live
-  import name", "not re-litigated", "settled by prior-session
-  continuity" are all the same move: retiring a gate the user never
-  answered. On an existing workspace G-PKG-NAME re-confirms; reading
-  the name out of `pyproject.toml` is what it re-confirms *against*,
-  not a substitute for asking.
-- **Blocking does not settle the gates it skipped.** A blocked turn
-  still owes the gate list as *unresolved*. Writing "G-PKG-NAME does
-  not fire, the name carries over from `pyproject.toml`" while
-  reporting BLOCKED resolves the gate by assertion — and that
-  carry-over is a Forbidden shortcut in its own right (see the
-  re-confirm row below). Name which gates are outstanding; do not
-  retire them on the way past.
+  there is no fourth state. "n/a this turn", "not re-litigated",
+  "settled by prior-session continuity" are all the same move:
+  retiring a gate the user never answered. **Exception —
+  G-PKG-NAME on a complete layout:** when `[project] name` already
+  matches a live `src/<pkg>/`, glue **reuses** that import name
+  (resolved from disk, not `n/a`). Re-confirm with
+  `AskUserQuestion` only on first scaffold, incomplete package
+  layout (manifest without matching `src/<pkg>/`), or an explicit
+  rename. On those turns, reading the name out of `pyproject.toml`
+  is what the ask re-confirms *against*, not a substitute for
+  asking.
+- **Blocking does not settle the gates it skipped.** A blocked
+  turn still owes the gate list as *unresolved*. Writing
+  "G-PKG-NAME does not fire" while reporting BLOCKED on a
+  **scaffold / incomplete / rename** turn resolves the gate by
+  assertion. Name which gates are outstanding; do not retire them
+  on the way past. Glue that already reused a live `src/<pkg>/`
+  name is not this shortcut.
 - **Missing dependency.** If `import skore` raises, STOP. Invoke
   `python-env-manager` for the install command. Do not drop
   `skore.Project` in favor of `mlflow` / pickles / "print metrics"
@@ -140,9 +145,13 @@ Sibling skills (just-in-time):
   default. **Manifest creation before G-PKG-NAME passes is
   forbidden** — running `init` first creates a `[project] name`
   entry, and reading "name is in the manifest" back is circular.
-  If a manifest exists, confirm via `AskUserQuestion` —
-  continuity from a prior session is not continuity from a user
-  decision.
+  If a manifest exists **without** a matching live `src/<pkg>/`,
+  or the user asked to rename, confirm via `AskUserQuestion`
+  ("keep `claim_predictor`?"). Glue on a **complete** layout
+  (`[project] name` + matching `src/<pkg>/`) reuses that name
+  without a keep/rename ask — that is resolved, not `BLOCKED`.
+  Continuity from a prior session with **no** matching `src/`
+  package is not a skip.
 - **Skore Project mode is asked, not assumed (G-SKORE-MODE).**
   Before any template instantiation containing
   `skore.Project(...)`, fire an `AskUserQuestion` for `local` |
@@ -187,7 +196,7 @@ Sibling skills (just-in-time):
 | Scaffold every skeleton in one turn, incl. `experiments/01_baseline.py` body | Scaffold drops the *empty templated shell* (Decision flow step 5) and stops at the empty `journal/` placeholder. The experiment **body** lands after design-note approval (`iterate-ml-experiment` § 3) |
 | Scaffold drops `audit/01_baseline.py` at workspace creation | Audit files placed by `audit-ml-pipeline` at § 4 record-outcome. Empty `audit/` at scaffold is correct |
 | Forget `audit/` in the scaffold layout | Four-way stem pairing breaks |
-| `pyproject.toml` exists with `name = <x>` → reuse without confirming | Always re-confirm via G-PKG-NAME |
+| `pyproject.toml` exists with `name = <x>` → reuse without confirming, **on scaffold / first `pyproject.toml` write / rename** | G-PKG-NAME must fire before creating or changing the package. Glue + "add a new experiment" may reuse the recorded / manifest name without re-firing the gate |
 | Batch G-TABULAR + G-PKG-NAME + G-ENV-MGR + G-SKORE-MODE into prose recommendations | The gates take structured `AskUserQuestion`. Prose followed by "let me know" does NOT resolve them |
 | Skip G-SKORE-MODE because templates use `mode="local"` | Templates carry the `<SKORE_PROJECT_INIT>` marker, not a literal. The gate must fire |
 | Pick `mode="hub"` without checking the workspace exists / user has access | Project init fails at first `put()` with an authorization error. Confirm during G-SKORE-MODE, not at execution time |
@@ -230,8 +239,11 @@ Pre-flight (organize-ml-workspace):
 - [ ] G-PKG-NAME resolved: <name>
       Evidence: AskUserQuestion id=<id>, answer=<name> |
                 JOURNAL.md Status (Workspace decisions) |
-                existing manifest's [project].name **confirmed via AskUserQuestion**
-                (reading the manifest alone is NOT sufficient)
+                existing manifest's [project].name **when this turn is
+                glue, not scaffold** (add-experiment / keep layout) |
+                existing manifest's [project].name **confirmed via
+                AskUserQuestion** when creating or changing the package
+                (reading the manifest alone is NOT sufficient then)
 - [ ] G-SKORE-MODE resolved: local | hub | mlflow
       Evidence: AskUserQuestion id=<id>, answer=<local|hub|mlflow> |
                 JOURNAL.md Status (Workspace decisions) `skore mode:` row

@@ -9,7 +9,10 @@ Mapping:
   User prompt block    → prompt (prefixed with workspace state)
   Workspace state      → inlined into prompt
   Must do bullets      → expectations (verbatim)
-  Must NOT do bullets  → expectations (negated form: "The response does NOT …")
+  Tools: yes            → evals[].tools (default false)
+  Sandbox: dir/file/copy → evals[].sandbox (seeded temp workspace)
+  Expect files          → evals[].expect_files (pytest glob checks)
+  Expect reads          → evals[].expect_reads (tool-trace path checks)
 
 Usage:
     python3 eval/convert_to_evals_json.py                 # all skills with eval/<name>/prompts.md
@@ -28,7 +31,7 @@ REPO = Path(__file__).parent.parent.resolve()
 
 
 def parse_prompts_md(text: str) -> list[dict]:
-    """Return [{id, title, prompt, must_do, must_not}]."""
+    """Return [{id, title, prompt, must_do, must_not, tools, sandbox, expect_files, expect_reads}]."""
     cases = []
     for block in text.split("\n---\n"):
         head = re.search(r"^## CASE_(\d+) — (.+)$", block, re.MULTILINE)
@@ -53,6 +56,16 @@ def parse_prompts_md(text: str) -> list[dict]:
         )
         workspace_state = ws.group(1).strip() if ws else ""
 
+        tools = bool(re.search(r"\*\*Tools:\*\*\s*yes\b", block, re.IGNORECASE))
+        sandbox = _parse_sandbox(block)
+        expect_files = [
+            item.strip("`")
+            for item in _extract_bullets(block, r"\*\*Expect files:\*\*")
+        ]
+        expect_reads = [
+            item.strip("`")
+            for item in _extract_bullets(block, r"\*\*Expect reads:\*\*")
+        ]
         must_do = _extract_bullets(block, r"\*\*Must do:?\*\*")
         must_not = _extract_bullets(block, r"\*\*Must NOT do:?\*\*")
 
@@ -61,10 +74,68 @@ def parse_prompts_md(text: str) -> list[dict]:
             "title": title,
             "workspace_state": workspace_state,
             "user_prompt": user_prompt,
+            "tools": tools,
+            "sandbox": sandbox,
+            "expect_files": expect_files,
+            "expect_reads": expect_reads,
             "must_do": must_do,
             "must_not": must_not,
         })
     return cases
+
+
+def _parse_sandbox(block: str) -> list[dict]:
+    """Parse **Sandbox:** dir/file bullets and optional fenced file bodies."""
+    m = re.search(r"\*\*Sandbox:\*\*\s*\n", block)
+    if not m:
+        return []
+    rest = block[m.end() :]
+    stop = re.search(r"\n\*\*[^*]+\*\*", rest)
+    section = rest[: stop.start()] if stop else rest
+    entries: list[dict] = []
+    lines = section.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        dir_m = re.match(r"- dir:\s*`?([^`]+?)`?\s*$", line)
+        file_m = re.match(r"- file:\s*`?([^`]+?)`?\s*$", line)
+        copy_m = re.match(
+            r"- copy:\s*`?([^`]+?)`?(?:\s+as\s+`?([^`]+?)`?)?\s*$",
+            line,
+        )
+        if dir_m:
+            entries.append({"kind": "dir", "path": dir_m.group(1).strip()})
+            i += 1
+            continue
+        if copy_m:
+            source = copy_m.group(1).strip()
+            dest = (copy_m.group(2) or source).strip()
+            entries.append({"kind": "copy", "source": source, "path": dest})
+            i += 1
+            continue
+        if file_m:
+            path = file_m.group(1).strip()
+            i += 1
+            content = ""
+            if i < len(lines) and lines[i].startswith("```"):
+                fence = lines[i]
+                fence_len = len(fence) - len(fence.lstrip("`"))
+                i += 1
+                body: list[str] = []
+                closer = "`" * fence_len
+                while i < len(lines):
+                    if lines[i].startswith(closer):
+                        i += 1
+                        break
+                    body.append(lines[i])
+                    i += 1
+                content = "\n".join(body)
+                if content and not content.endswith("\n"):
+                    content += "\n"
+            entries.append({"kind": "file", "path": path, "content": content})
+            continue
+        i += 1
+    return entries
 
 
 def _extract_bullets(block: str, header_re: str) -> list[str]:
@@ -114,14 +185,20 @@ def to_evals_json(skill_name: str, cases: list[dict]) -> dict:
             expected_output_lines.extend(f"- {n}" for n in case["must_not"][:3])
         expected_output = " ".join(expected_output_lines)
 
-        evals.append({
+        rec = {
             "id": case["id"],
             "title": case["title"],
             "prompt": prompt,
             "expected_output": expected_output,
             "files": [],
             "expectations": expectations,
-        })
+            "tools": bool(case.get("tools")),
+            "sandbox": case.get("sandbox") or [],
+            "expect_files": case.get("expect_files") or [],
+        }
+        if case.get("expect_reads"):
+            rec["expect_reads"] = case["expect_reads"]
+        evals.append(rec)
     return {"skill_name": skill_name, "evals": evals}
 
 

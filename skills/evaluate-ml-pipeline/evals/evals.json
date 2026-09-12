@@ -16,38 +16,47 @@
         "The response does NOT: Default to `StratifiedKFold` (forbidden \u2014 compresses across-fold variance, even on imbalance).",
         "The response does NOT: Pre-pin metrics (e.g. `scoring=\"neg_mean_squared_error\"`) \u2014 trust skore defaults.",
         "The response does NOT: Reach for `KFold(5)` from memory without python-api confirmation."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 2,
       "title": "Time-ordered data, mandatory AskUserQuestion",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_load_forecast.md` approved.\n- `pipeline.py` X-marker has `split_kwargs={\"times\": ...}` (temporal\n  ordering attached at build time).\n- Forecast horizon is 24h.\n- Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering\n  `KFold` / `GroupKFold` / `TimeSeriesSplit` \u2014 the splitter lookup\n  is already satisfied.]\n\nWire `evaluate.py` for the 24h-ahead load forecast experiment.\nPick the splitter.",
-      "expected_output": "Behavioural response satisfying: - Name **`AskUserQuestion`** as the mandatory gate that must resolve before a splitter is picked (mandatory for temporal data), and spell out the options it carries. - Present the **four canonical options** verbatim: 1. `TimeSeriesSplit(gap=horizon)` \u2014 safe default 2. `TimeSeriesSplit(gap=0)` \u2014 only on explicit user pick; warn about leakage 3. Custom splitter (purged-and-embargoed / blocked calendar / walk-forward) 4. `KFold` ignoring time \u2014 only with explicit user reason - Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to `gap=0` which silently leaks at non-trivial horizons. It must NOT: - Pick `TimeSeriesSplit` silently without the AskUserQuestion. - Default to `KFold` because empty `gap` \"feels safer\". - Treat harness \"no clarifying questions\" hint as waiving the mandatory ask.",
+      "expected_output": "Behavioural response satisfying: - Name **`AskUserQuestion`** as the mandatory gate that must resolve before a splitter is picked (mandatory for temporal data), and spell out the options it carries. - Present the **four canonical options** verbatim: 1. `TimeSeriesSplit(gap=horizon)` \u2014 safe default 2. `TimeSeriesSplit(gap=0)` \u2014 only on explicit user pick; warn about leakage 3. Custom splitter (purged-and-embargoed / blocked calendar / walk-forward) 4. `KFold` ignoring time \u2014 only with explicit user reason - Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to `gap=0` which silently leaks at non-trivial horizons. Any sentence that `gap=0` is the memory default / leaks is enough; do not require the exact constructor spelling if `gap=0` is named. It must NOT: - Pick `TimeSeriesSplit` silently without the AskUserQuestion. - Default to `KFold` because empty `gap` \"feels safer\". - Treat harness \"no clarifying questions\" hint as waiving the mandatory ask.",
       "files": [],
       "expectations": [
         "Name **`AskUserQuestion`** as the mandatory gate that must resolve before a splitter is picked (mandatory for temporal data), and spell out the options it carries.",
         "Present the **four canonical options** verbatim: 1. `TimeSeriesSplit(gap=horizon)` \u2014 safe default 2. `TimeSeriesSplit(gap=0)` \u2014 only on explicit user pick; warn about leakage 3. Custom splitter (purged-and-embargoed / blocked calendar / walk-forward) 4. `KFold` ignoring time \u2014 only with explicit user reason",
-        "Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to `gap=0` which silently leaks at non-trivial horizons.",
+        "Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to `gap=0` which silently leaks at non-trivial horizons. Any sentence that `gap=0` is the memory default / leaks is enough; do not require the exact constructor spelling if `gap=0` is named.",
         "The response does NOT: Pick `TimeSeriesSplit` silently without the AskUserQuestion.",
         "The response does NOT: Default to `KFold` because empty `gap` \"feels safer\".",
         "The response does NOT: Treat harness \"no clarifying questions\" hint as waiving the mandatory ask."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 3,
       "title": "`split_kwargs={\"groups\": ...}` \u2192 GroupKFold",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `pipeline.py` X-marker has\n  `split_kwargs={\"groups\": data[\"customer_id\"]}`.\n- No temporal structure.]\n\nWire `evaluate.py` for a tabular regression where rows are grouped\nby customer.",
-      "expected_output": "Behavioural response satisfying: - Map `groups` \u2192 **`GroupKFold`** per the mapping table. - Mention python-api consultation for `GroupKFold` signature. - Show the `data={...}` env-dict form for a `SkrubLearner`. It must NOT: - Use `StratifiedGroupKFold`. - Use `LeaveOneGroupOut` (forbidden \u2014 per-fold variance too high). - Pick `KFold` ignoring the group structure.",
+      "expected_output": "Behavioural response satisfying: - Paste **`GroupKFold`** from the mapping table (`groups` \u2192 `GroupKFold`). That identifier is the mapping; do not withhold it. - python-api for the *signature* may be named as the next live turn. Do not fail if signature lookup is BLOCKED as long as `GroupKFold` is named. - Show the `data={...}` env-dict form for a `SkrubLearner`. It must NOT: - Use `StratifiedGroupKFold`. - Use `LeaveOneGroupOut` (forbidden \u2014 per-fold variance too high). - Pick `KFold` ignoring the group structure.",
       "files": [],
       "expectations": [
-        "Map `groups` \u2192 **`GroupKFold`** per the mapping table.",
-        "Mention python-api consultation for `GroupKFold` signature.",
+        "Paste **`GroupKFold`** from the mapping table (`groups` \u2192 `GroupKFold`). That identifier is the mapping; do not withhold it.",
+        "python-api for the *signature* may be named as the next live turn. Do not fail if signature lookup is BLOCKED as long as `GroupKFold` is named.",
         "Show the `data={...}` env-dict form for a `SkrubLearner`.",
         "Do NOT use `StratifiedGroupKFold` (forbidden by Stop conditions).",
         "The response does NOT: Use `StratifiedGroupKFold`.",
         "The response does NOT: Use `LeaveOneGroupOut` (forbidden \u2014 per-fold variance too high).",
         "The response does NOT: Pick `KFold` ignoring the group structure."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 4,
@@ -62,7 +71,10 @@
         "The response does NOT: Default to `KFold` and proceed.",
         "The response does NOT: Auto-wire `split_kwargs={\"groups\": data[\"region\"]}` from this skill (that's `build-ml-pipeline`'s job).",
         "The response does NOT: Pick `StratifiedKFold` because \"stratified is safer\"."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 5,
@@ -78,7 +90,10 @@
         "The response does NOT: Write `cross_val_score(...)` in `evaluate.py`.",
         "The response does NOT: Use `print(mean_squared_error(...))` instead of the report object.",
         "The response does NOT: Allow the substitution as a \"just for now\" workaround."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -94,7 +109,10 @@
         "The response does NOT: Edit `journal/02_load_forecast.md` Status to `done`.",
         "The response does NOT: Edit `journal/JOURNAL.md` History row to `done`.",
         "The response does NOT: Treat clean CV as sufficient for a history-dependent pipeline."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 7,
@@ -109,7 +127,10 @@
         "Recommend using `project.summarize()` + `project.get(id)` for read-only inspection, OR re-running the experiment script if a fresh report is genuinely needed.",
         "The response does NOT: Approve the scratch probe with `evaluate` + `put`.",
         "The response does NOT: Treat scratch as a producer of reports."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

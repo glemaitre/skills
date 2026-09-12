@@ -64,10 +64,12 @@ declaring the turn done.
   conflict ("conda `myenv` is active, but `pixi.toml` is at the
   root") and then picking for the user is not asking. When two
   managers are visible, the pick is the user's: fire the question
-  through `AskUserQuestion`. If that tool is unavailable, report
-  `BLOCKED: manager ambiguity needs a user decision (<why the tool
-  did not run>)` and stop — declaring one side "context, not a
-  pick" closes the question by fiat.
+through `AskUserQuestion`. If that tool is unavailable **and two
+managers are already detected**, report
+`BLOCKED: manager ambiguity needs a user decision (<why the tool
+did not run>)` and stop — declaring one side "context, not a
+pick" closes the question by fiat. An empty folder with **no**
+manager yet is not that case: still list the G-ENV-MGR options.
 - **`BLOCKED` is for missing input, not for work you can already
   do.** Block on a tool you cannot reach or a fact you do not have.
   When the turn already carries what you need — the manager
@@ -188,7 +190,10 @@ fresh; OR detection returned a single manager but no
 
 **AskUserQuestion**: single pick — the manager. Options from the
 detection table. Default *recommendation* on nothing-detected:
-`pixi`. Free-text resolves only when it names a listed manager.
+`pixi`. Always list: pixi (default) + uv / poetry / hatch / conda /
+pip+venv. If the AskUserQuestion UI is missing, still enumerate
+those options and wait — do not `BLOCKED` "no manager yet."
+Free-text resolves only when it names a listed manager.
 
 **Persists**: `env manager: <pick> — recorded: <date>` in
 `journal/JOURNAL.md` Status `Workspace decisions`.
@@ -400,6 +405,17 @@ alternative.
 Editable workspace install (`src/<pkg>/`) per manager:
 → `references/editable_workspace.md`.
 
+**Pixi (copy this):**
+
+```
+pixi add --pypi "<pkg> @ ."
+# pixi.toml:
+<pkg> = { path = ".", editable = true }
+pixi install
+```
+
+Then `from <pkg>.pipeline import build_learner` works from any CWD.
+
 ## Agent feature install
 
 The agent feature = project-scoped install of `ipython` + `pyright`
@@ -511,12 +527,18 @@ If detection found nothing AND the user picked `pixi` via G-ENV-MGR:
    "skore[hub]"`, or `pixi add "skore[mlflow]" "mlflow>=3"`; **no
    `[jupyter]` extra** on pixi).
 5. Add tabular lib (per G-TABULAR: `pandas pyarrow` or `polars`).
-6. Wire editable workspace package
-   (`pixi add --pypi "<pkg> @ ."` then edit to
-   `<pkg> = { path = ".", editable = true }`; then `pixi install`).
-   The point: `from <pkg>.pipeline import build_learner` then
-   resolves from any CWD, with no `PYTHONPATH=src` hack and no
-   re-install after each source edit.
+6. Wire editable workspace package — copy this:
+
+   ```
+   pixi add --pypi "<pkg> @ ."
+   # then in pixi.toml:
+   <pkg> = { path = ".", editable = true }
+   pixi install
+   ```
+
+   Then `from <pkg>.pipeline import build_learner` works from any
+   CWD, with no `PYTHONPATH=src` hack and no re-install after each
+   source edit.
 7. Drop `pyrightconfig.json` via `sed`-substitution of
    `<PYTHON_PATH>` for `.pixi/envs/lsp/bin/python`.
 8. Sync all 4 envs: `pixi install` then `pixi install -e dev` /

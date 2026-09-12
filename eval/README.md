@@ -1,14 +1,27 @@
 # Skill evaluations
 
-Single-turn behavioural evals for each skill: the **target** model sees
-`SKILL.md` as its system prompt (or an empty system, for the baseline)
-and answers a golden prompt. A **judge** model scores the Must / Must NOT
+Behavioural evals for each skill: the **target** model sees `SKILL.md`
+as its system prompt (or an empty system, for the baseline) and answers
+a golden prompt. A **judge** model scores the Must / Must NOT
 expectations via DeepEval `GEval`.
 
-This is an instruction-following check, not a real agent loop. The
-target has no tools and does not `Read` `references/`; workspace state
-is inlined in the prompt. Every user message ends with a harness note
-telling the model to answer in one turn and not emit tool calls.
+**Default is still single-turn, no tools.** Workspace state is inlined
+and the harness note forbids tool calls. Opt-in cases set
+`**Tools:** yes`: those runs get a temp project directory seeded
+from `**Sandbox:**` (`dir:` / `file:` / `copy:` from the repo),
+LiteLLM tools (`list_dir`, `read_file`, `write_file`, `run_python`
+on `scratch/` only), and pytest checks `**Expect files:**` globs
+and `**Expect reads:**` tool-trace paths after the loop. Lookup-gated
+`python-api` cases use this, as does `build-ml-pipeline` case 3
+(seeded `references/layer_examples.md`). The eval environment pins
+skrub / scikit-learn / skore so Shape 1 probes can import them.
+`python-api` case 4 (Shape 3 / WebFetch) has tools for cache files
+but no WebSearch/WebFetch tool yet.
+
+A `copy:` sandbox line copies a repo file into the temp root without
+inlining its body in `prompts.md` (`copy: <repo-rel> as <sandbox-rel>`).
+When a case needs a bundled skill reference, seed it this way rather
+than pasting the file into `SKILL.md`.
 
 ## Scoring
 
@@ -30,7 +43,10 @@ Markdown transcripts.
 ## Authoring cases
 
 1. Edit `eval/<skill>/prompts.md` (`CASE_NN`, user prompt, workspace
-   state, Must do / Must NOT).
+   state, Must do / Must NOT). Optional: `**Tools:** yes`,
+   `**Sandbox:**` (`dir:` / `file:` plus a fenced body, or `copy:`),
+   `**Expect files:**` (globs relative to the temp root),
+   `**Expect reads:**` (`read_file` paths the target must open).
 2. Regenerate the skill-creator schema file:
 
 ```bash

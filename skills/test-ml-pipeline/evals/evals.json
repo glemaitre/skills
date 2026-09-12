@@ -16,7 +16,10 @@
         "The response does NOT: Write assertion bodies in this skill (subskill owns that).",
         "The response does NOT: Overwrite an existing test file (the rule is 1:1 pairing).",
         "The response does NOT: Create a `test_NN_<short_name>_v2.py` variant (stem rule is hard)."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 2,
@@ -30,7 +33,10 @@
         "Hand off back to `iterate-ml-experiment` to author + approve the design note first.",
         "The response does NOT: Create `tests/smoke/test_03_target_transform.py` even as a stub.",
         "The response does NOT: Treat the existence of the script as resolving the design-note requirement."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 3,
@@ -45,22 +51,28 @@
         "The response does NOT: Create the `_v2.py` file as written.",
         "The response does NOT: Create `test_02_text_encoder_2.py` (same anti-pattern by different syntax).",
         "The response does NOT: Auto-edit the existing file without surfacing the choice."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 4,
       "title": "Dispatch table: future categories not implemented",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/03_target_transform.md` exists, approved, done with metrics.\n- `tests/smoke/` exists with prior smoke tests.]\n\nThe metrics drifted between 02 and 03. Can we lock that in with a\nregression test?",
-      "expected_output": "Behavioural response satisfying: - Recognise this as a **regression test** category per the dispatch table. - Surface that `regression-test-ml-pipeline` is **future / not implemented in v1**. - Offer alternatives (e.g. propose a `tests/smoke/` assertion that catches the drift indirectly, or note the gap to be filled when the regression subskill ships). It must NOT: - Silently dispatch to `regression-test-ml-pipeline` as if it exists. - Default to `smoke-test-ml-pipeline` without flagging the category mismatch. - Author the regression test body inline (this skill is the router, not the body owner).",
+      "expected_output": "Behavioural response satisfying: - Recognise this as a **regression test** category per the dispatch table. - Surface that `regression-test-ml-pipeline` is **future / not implemented in v1**. - Optional one sentence: the gap waits until the subskill ships, or a smoke assertion could be added later. Flag the category mismatch in the same breath as any smoke mention. It must NOT: - Silently dispatch to `regression-test-ml-pipeline` as if it exists. - Write any test-file body (`def test_`, assertion code, smoke or regression). - Author the regression test body inline (this skill is the router, not the body owner).",
       "files": [],
       "expectations": [
         "Recognise this as a **regression test** category per the dispatch table.",
         "Surface that `regression-test-ml-pipeline` is **future / not implemented in v1**.",
-        "Offer alternatives (e.g. propose a `tests/smoke/` assertion that catches the drift indirectly, or note the gap to be filled when the regression subskill ships).",
+        "Optional one sentence: the gap waits until the subskill ships, or a smoke assertion could be added later. Flag the category mismatch in the same breath as any smoke mention.",
         "The response does NOT: Silently dispatch to `regression-test-ml-pipeline` as if it exists.",
-        "The response does NOT: Default to `smoke-test-ml-pipeline` without flagging the category mismatch.",
+        "The response does NOT: Write any test-file body (`def test_`, assertion code, smoke or regression).",
         "The response does NOT: Author the regression test body inline (this skill is the router, not the body owner)."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 5,
@@ -75,7 +87,10 @@
         "Route to `tests/smoke/test_02_text_encoder.py` (pytest scaffolding) via `smoke-test-ml-pipeline`.",
         "The response does NOT: Create `experiments/02_text_encoder_smoke.py`.",
         "The response does NOT: Mix the two conventions."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -91,7 +106,10 @@
         "The response does NOT: Treat \"just a quick baseline\" as waiving the smoke-test requirement.",
         "The response does NOT: Skip the test entirely.",
         "The response does NOT: Pick regression / distribution by default."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

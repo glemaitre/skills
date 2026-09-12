@@ -21,8 +21,9 @@ violated.
 
 **Must NOT do:**
 - Skip the tabular library (that's Tier 2 — competing library).
-- Recommend `mlflow` for tracking (skore is canonical;
-  mlflow is reserved for serving / registry).
+- Recommend raw `mlflow.log_*` / `mlflow.start_run` as the
+  tracking API. Listing G-SKORE-MODE `mlflow` (the `skore[mlflow]`
+  extra, still `project.put`) is allowed.
 - Recommend `black` / `isort` / `flake8` (ruff is canonical).
 
 ---
@@ -112,11 +113,11 @@ violated.
 - skore is installed.
 
 **Must do:**
-- Refuse the mlflow-for-tracking substitution.
-- Cite that **skore** is canonical for evaluation / reporting /
-  tracking in this stack.
-- Mention mlflow's role is reserved for model serving / registry,
-  not tracking.
+- Refuse `mlflow.log_metric` as the tracking API.
+- Cite that **skore** (Project API) is canonical for tracking in
+  this stack.
+- Allow noting that G-SKORE-MODE `mlflow` stores skore artifacts
+  on an MLflow server; still never call `mlflow.log_*`.
 
 **Must NOT do:**
 - Add `import mlflow` to the workspace.

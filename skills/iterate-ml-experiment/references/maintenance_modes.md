@@ -54,11 +54,12 @@ do not stretch it.
   `evaluate-ml-pipeline` **once per stem, separately** — that skill
   is single-learner by scope. The user does the cross-experiment
   synthesis from the two narratives; the skill does not.
-- **Don't write to `journal/`** during a compare request. If the
-  side-by-side reading surfaces a finding the user wants to act on,
-  re-enter § 1 with the sourcing menu — typically `skore` (mine one
-  or both reports into Backlog) or `user` (the user has a concrete
-  idea drawn from the comparison).
+- **Don't write to `journal/`** during a compare request.
+- **This turn is the table only.** Do not add a "Suggested next
+  step", do not dispatch `audit-ml-pipeline` / `iterate-from-skore`
+  / `iterate-from-user`, do not auto-propose a next experiment.
+  If the user wants to act, they say so in a **later** turn; then
+  re-enter § 2 with the sourcing menu.
 
 ### v2 gap, flagged
 

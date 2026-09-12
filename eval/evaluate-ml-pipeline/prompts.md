@@ -67,7 +67,10 @@ violated.
      walk-forward)
   4. `KFold` ignoring time — only with explicit user reason
 - Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to
-  `gap=0` which silently leaks at non-trivial horizons.
+  `gap=0` which silently leaks at non-trivial horizons. Any
+  sentence that `gap=0` is the memory default / leaks is enough;
+  do not require the exact constructor spelling if `gap=0` is
+  named.
 
 **Must NOT do:**
 - Pick `TimeSeriesSplit` silently without the AskUserQuestion.
@@ -89,8 +92,11 @@ violated.
 - No temporal structure.
 
 **Must do:**
-- Map `groups` → **`GroupKFold`** per the mapping table.
-- Mention python-api consultation for `GroupKFold` signature.
+- Paste **`GroupKFold`** from the mapping table (`groups` →
+  `GroupKFold`). That identifier is the mapping; do not withhold it.
+- python-api for the *signature* may be named as the next live
+  turn. Do not fail if signature lookup is BLOCKED as long as
+  `GroupKFold` is named.
 - Show the `data={...}` env-dict form for a `SkrubLearner`.
 - Do NOT use `StratifiedGroupKFold` (forbidden by Stop conditions).
 

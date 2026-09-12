@@ -5,19 +5,22 @@
       "id": 1,
       "title": "Standard checks walk",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skore` installed at 0.18.0.\n- `journal/JOURNAL.md` has 02_target_transform in History with status\n  `done`, headline RMSE 0.081.\n- The digest above is on disk at\n  `scratch/audit/02_target_transform/audit.md`.\n- `JOURNAL.md` Backlog has 2 existing rows: B1 (Source:\n  `audit:01_baseline:checks.SKD003` from prior mining of 01_baseline),\n  B2 (Source: `user`).]\n\nMine the 02_target_transform audit digest \u2014 fill the Backlog with\nwhatever actionable findings come out of it. Here's\n`scratch/audit/02_target_transform/audit.md`:\n\n```\n## Checks summary\n\n| code   | severity | description                                             | documentation_url                        |\n|--------|----------|---------------------------------------------------------|------------------------------------------|\n| SKD001 | passed   | No constant features detected                             | https://docs.skore.probabl.ai/c/SKD001   |\n| SKD003 | issue    | Systematic residual bias in the top target bin            | https://docs.skore.probabl.ai/c/SKD003   |\n| SKD007 | issue    | Predicted-interval coverage below nominal in bin 4        | https://docs.skore.probabl.ai/c/SKD007   |\n| SKD012 | tip      | One fold's error is far from the cross-fold mean          | https://docs.skore.probabl.ai/c/SKD012   |\n| SKD019 | tip      | A single feature dominates permutation importance         | https://docs.skore.probabl.ai/c/SKD019   |\n\n## Metrics summary\n\n| metric | value |\n|--------|-------|\n| RMSE   | 0.081 |\n| R2     | 0.912 |\n```",
-      "expected_output": "Behavioural response satisfying: - Emit one Backlog candidate per `issue` / `tip` row (SKD003, SKD007, SKD012, SKD019) and none for the `passed` row. - Cite each row's `Source` as `audit:02_target_transform:checks.<code>`. - Name each row's `documentation_url` as the source of its `Item` text \u2014 the mitigation comes from the check page. If the page can't be fetched this turn, say so and mark the `Item` provisional rather than passing off the `description` column as the mitigation. It must NOT: - Write `journal/JOURNAL.md` directly. - Pick a single \"winning\" finding (the user picks via `B<N>`). - Emit a Backlog row for the `passed` check (SKD001).",
+      "expected_output": "Behavioural response satisfying: - Emit one Backlog candidate per `issue` / `tip` row (SKD003, SKD007, SKD012, SKD019) and none for the `passed` row. - Cite each row's `Source` as `audit:02_target_transform:checks.<code>`. - If `documentation_url` pages cannot be fetched this turn, mark each `Item` **provisional** **or** say the page was not fetched. Do not require naming every URL as the Item source when the page is unreachable. `Source` as `audit:<stem>:checks.<code>` is enough. It must NOT: - Write `journal/JOURNAL.md` directly. - Pick a single \"winning\" finding (the user picks via `B<N>`). - Emit a Backlog row for the `passed` check (SKD001).",
       "files": [],
       "expectations": [
         "Emit one Backlog candidate per `issue` / `tip` row (SKD003, SKD007, SKD012, SKD019) and none for the `passed` row.",
         "Cite each row's `Source` as `audit:02_target_transform:checks.<code>`.",
-        "Name each row's `documentation_url` as the source of its `Item` text \u2014 the mitigation comes from the check page. If the page can't be fetched this turn, say so and mark the `Item` provisional rather than passing off the `description` column as the mitigation.",
+        "If `documentation_url` pages cannot be fetched this turn, mark each `Item` **provisional** **or** say the page was not fetched. Do not require naming every URL as the Item source when the page is unreachable. `Source` as `audit:<stem>:checks.<code>` is enough.",
         "Return Backlog-candidate rows as **conversation text** in the `Backlog candidates (from: audit digest on 02_target_transform):` block format, NOT write to `JOURNAL.md`.",
         "Include the one-paragraph summary, dense, with top 2-3 by payoff.",
         "The response does NOT: Write `journal/JOURNAL.md` directly.",
         "The response does NOT: Pick a single \"winning\" finding (the user picks via `B<N>`).",
         "The response does NOT: Emit a Backlog row for the `passed` check (SKD001).",
         "The response does NOT: Re-open the skore Project or call `report.checks.summarize()` here \u2014 the audit already did that."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 2,
@@ -34,7 +37,10 @@
         "The response does NOT: Mine a digest that isn't on disk.",
         "The response does NOT: Write anything to `journal/`, or instruct the parent to record a `JOURNAL.md` Status line.",
         "The response does NOT: Auto-re-run the experiment or the audit to recreate the digest."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 3,
@@ -49,7 +55,10 @@
         "The response does NOT: Manufacture findings to \"have something to say\".",
         "The response does NOT: Author Backlog rows from the `## Metrics summary` alone (metrics ground the summary paragraph; they don't drive rows).",
         "The response does NOT: Write to `journal/`."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 4,
@@ -65,7 +74,10 @@
         "The response does NOT: Emit only one Backlog row when the digest surfaced multiple actionable rows.",
         "The response does NOT: Write \"I recommend running X next\" as a single-pick conclusion.",
         "The response does NOT: Author the design note for the picked candidate (out of scope \u2014 parent does that after the user picks `B<N>`)."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 5,
@@ -80,7 +92,10 @@
         "The response does NOT: Emit all 4 candidates (would duplicate Backlog).",
         "The response does NOT: Dedup by `Item` text instead of `Source` (Source is the stable citation; Item is just human-readable).",
         "The response does NOT: Re-mine without reading the current Backlog state first."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     },
     {
       "id": 6,
@@ -95,7 +110,10 @@
         "The response does NOT: Write or Edit `journal/JOURNAL.md` in this turn.",
         "The response does NOT: Bypass the hand-off to `iterate-ml-experiment`.",
         "The response does NOT: Treat \"skip the hand-off, just do it\" as resolving the boundary rule."
-      ]
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

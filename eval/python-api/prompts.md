@@ -9,16 +9,14 @@ For each case the model is given:
 - `skills/python-api/SKILL.md` as the system prompt.
 - The case's `User prompt` (verbatim) as the user message.
 - The case's `Assumed workspace state` is appended to the user message as a
-  short preamble like:
+  short preamble.
 
-  ```
-  [Workspace state — read but do not narrate back: <state goes here>]
-
-  <user prompt>
-  ```
-
-  This avoids depending on the model actually running `ls` — we hand the
-  filesystem snapshot in so the test isolates skill-knowledge from tool-use.
+Lookup cases set `**Tools:** yes`. Those runs get a real temp workspace
+(seeded from `**Sandbox:**`) and may `list_dir` / `read_file` /
+`write_file` / `run_python` (scratch files only). Other skills stay
+single-turn with no tools unless a case opts in (see
+`build-ml-pipeline` case 3). When tools are off, workspace state is
+inlined so the test does not depend on `ls`.
 
 Each `Must do` and `Must NOT do` bullet is a substring / behavioural check
 on the transcript. Read the transcript top-to-bottom, tick boxes, flag any
@@ -41,19 +39,26 @@ violation means a regression has snuck in).
 - `scratch/api/` exists but `scratch/api/skore/` is empty.
 - `skore` is installed at version `0.18.0`.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch/api`
+- dir: `scratch/api/skore`
+
+**Expect files:**
+- `scratch/api/skore/0.18.0/evaluate.md`
+
 **Must do:**
-- Reference resolving the installed version (mention
-  `pixi run python -c "import skore; print(skore.__version__)"`
-  or equivalent).
-- Reference listing `scratch/api/skore/0.18.0/` for a cache hit before
-  any fresh probe.
-- Propose writing a probe script under `scratch/<ts>_*.py` (not an inline
+- Resolve the installed version via a scratch file (not inline
   `python -c`).
-- Name `pydoc.render_doc` (not `__doc__`) for capturing the help text.
-- Name the cache file destination as `scratch/api/skore/0.18.0/evaluate.md`.
-- Reference the four-section file contract (Source / Signature / help() /
-  Usage) at least implicitly — i.e. mention writing Signature + help()
-  sections + a Usage block to fill in.
+- List `scratch/api/skore/` (cache **miss** is correct — empty or
+  missing `0.18.0/` until the probe writes it). Then run a probe.
+- Write and run a probe script under `scratch/<ts>_*.py` (not an
+  inline `python -c`).
+- Use `pydoc.render_doc` (not `__doc__`) for capturing the help text.
+- Write the cache file at `scratch/api/skore/0.18.0/evaluate.md`.
+- Mention Signature + help() and a Usage block (four-section contract
+  at least implicitly).
 
 **Must NOT do:**
 - Output a literal signature like
@@ -77,11 +82,37 @@ violation means a regression has snuck in).
   yesterday).
 - `skore` is installed at version `0.18.0`.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch/api/skore/0.18.0`
+- file: `scratch/api/skore/0.18.0/evaluate.md`
+````
+# evaluate
+
+Source: inspect: skore.evaluate @ 0.18.0
+Fetched: 2026-09-11
+
+## Signature
+evaluate(estimator, data=None, *, X=None, y=None, splitter=None, ...)
+
+## help()
+skore.evaluate — cached extract for Shape 0 hit tests.
+
+## Usage
+Call: skore.evaluate(learner, data={...}, splitter=...)
+Don't call: positional X, y on a SkrubLearner
+Trap: none
+Returns: a report object (see cached help)
+````
+
 **Must do:**
-- Recognise the cache hit and propose `Read scratch/api/skore/0.18.0/evaluate.md`
-  as the next action.
+- Recognise the cache hit. Using `read_file` on
+  `scratch/api/skore/0.18.0/evaluate.md` counts; naming `Read` in
+  the message also counts.
 - Mark the pre-flight `Cache file lands on disk` row as
-  `n/a — cache hit, file already on disk` (or equivalent phrasing).
+  `n/a — cache hit, file already on disk` (or equivalent: the file
+  was already on disk and was read, not rewritten).
 
 **Must NOT do:**
 - Re-run a Shape 1 probe / re-fetch / re-WebSearch despite the cache hit.
@@ -96,24 +127,41 @@ violation means a regression has snuck in).
 > I have a mixed-type tabular DataFrame (numeric + categorical + text
 > columns). I want a one-call default-everything featuriser/learner from
 > skrub. Which entry point should I reach for, and where does it live?
+> Confirm the **installed** signature (parameters and return value —
+> including whether the call fits in one shot or returns an unfitted
+> estimator you then `.fit`). Then show a usage snippet that matches
+> that lookup, not training-data memory.
 
 **Assumed workspace state:**
 - `scratch/api/skrub/` is empty.
 - `skrub` is installed at version `0.9.0`.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch/api/skrub`
+
+**Expect files:**
+- `scratch/api/skrub/0.9.0/tabular_pipeline.md`
+
 **Must do:**
 - Name `tabular_pipeline` (top-level skrub) as the entry point — i.e.
   `skrub.tabular_pipeline`. (Acceptable alternative: name
   `TableVectorizer` as the featuriser-only sibling.)
-- After naming the symbol, propose a Shape 1 probe to confirm the
-  signature against the installed version before writing the call.
-- Mention the cache write at `scratch/api/skrub/0.9.0/tabular_pipeline.md`.
+- Run a Shape 1 probe (`scratch/<ts>_*.py` + `pydoc.render_doc`)
+  against the installed skrub and write
+  `scratch/api/skrub/0.9.0/tabular_pipeline.md`.
+- Report the installed signature (args / return) **from that lookup**.
+- Any usage fence comes **after** the probe/cache write and matches
+  the looked-up signature.
 
 **Must NOT do:**
 - Recommend `tabular_learner`, `auto_tabular`, or `TabularLearner`
   as the entry point (naming them only as a renamed trap is fine).
-- Recommend writing code with the symbol before proposing the Shape 1
-  probe.
+- Write a usage / import / `.fit` fence before the Shape 1 probe has
+  run.
+- Invent parameters the probe did not show (e.g. a `target_column=`
+  argument that is not in the installed signature).
 
 ---
 
@@ -128,6 +176,16 @@ violation means a regression has snuck in).
   (no `evaluate.md` yet).
 - `skore` is installed at version `0.18.0`.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch/api/skore/0.18.0`
+- file: `scratch/api/skore/0.18.0/project.md`
+````
+# project
+Source: inspect: skore.Project @ 0.18.0
+````
+
 **Must do:**
 - Identify this as a Shape 3 / narrative question (signatures alone do
   not answer "is the return type the same") OR explicitly check the
@@ -141,10 +199,12 @@ violation means a regression has snuck in).
   and state that the source URL goes on its first line.
 
 **Must NOT do:**
-- Answer the return-type question from memory (state which type
-  is returned for `KFold` vs holdout). A refusal that withholds
-  the type is allowed even if a class name appears only as an
-  example of what is omitted.
+- Answer the return-type question from memory as a **fact** (assert
+  which type is returned, or that KFold vs holdout are the same /
+  different). A BLOCKED plan that names `/0.18/` and
+  `scratch/api/skore/0.18.0/evaluate.md` is not a violation. A class
+  name used only as an example of what the cache will enumerate is
+  not a violation.
 - Use a URL containing `/latest/` or `/stable/` as the cached source.
 - Paraphrase the docs into the cache file (the cache should hold a
   verbatim extract).
@@ -163,18 +223,25 @@ violation means a regression has snuck in).
 - `skrub` is installed at version `0.9.0`.
 - `scratch/api/skrub/0.9.0/` is empty.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch/api/skrub/0.9.0`
+
 **Must do:**
 - Refuse to add the import without first looking up the symbol against
   the installed `skrub`.
 - Cite the "Recognition is not a lookup" principle (or equivalent — the
   rule that training-data memory does not count as a lookup).
-- Propose a Shape 1 probe (or at minimum a Shape 2 `dir(skrub)`) to
+- Run a Shape 1 probe (or at minimum a Shape 2 `dir(skrub)`) to
   confirm whether `tabular_learner` exists at the installed version.
 - Surface the named-trap context: top-level skrub uses `tabular_pipeline`
   (per the skill's stack-orientation section).
 
 **Must NOT do:**
-- Add the import as instructed.
+- Add `from skrub import tabular_learner` (the instructed import).
+  Naming `tabular_pipeline` as a lead plus a Shape 1 probe is
+  required, not a violation.
 - Tell the user "yes that's the right name" without a lookup.
 
 ---
@@ -217,11 +284,19 @@ violation means a regression has snuck in).
 - `scratch/api/skore/0.18.0/` is empty.
 - `skore` installed at version `0.18.0`.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch/api/skore/0.18.0`
+
+**Expect files:**
+- `scratch/api/skore/0.18.0/project*.md`
+
 **Must do:**
-- Propose **one** probe script under `scratch/<ts>_*.py` that iterates
+- Write **one** probe script under `scratch/<ts>_*.py` that iterates
   over the three dotted paths and consolidates their Signature + help()
   sections.
-- Name **one** cache file destination at
+- Write **one** cache file at
   `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) covering
   all three symbols under one topic.
 - Mention the multi-symbol-consolidation rule (one topic file per
@@ -234,8 +309,8 @@ violation means a regression has snuck in).
 - Write three separate cache files (`put.md`, `get.md`, `summarize.md`).
 - Treat the probe as the conclusion without naming a cache
   destination. Naming `scratch/api/skore/0.18.0/project_local.md`
-  (or `project.md`) as the next-turn deliverable counts even when
-  this turn cannot Write.
+  (or `project.md`) as the destination is required; the file should
+  land this turn.
 
 ---
 
@@ -251,17 +326,23 @@ violation means a regression has snuck in).
 - `scratch/api/skore/0.18.0/` is empty.
 - `skore` installed at version `0.18.0`.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch/api/skore/0.18.0`
+
+**Expect files:**
+- `scratch/api/skore/0.18.0/evaluate.md`
+
 **Must do:**
-- Refuse the inline `python -c` invocation.
+- Do not run the requested inline `python -c`. Writing and running a
+  `scratch/<ts>_*.py` probe via `run_python` **is** the refusal.
 - Cite the **Stop condition** that all Python execution goes to
-  `scratch/` regardless of length (the "no inline `python -c`,
-  no exceptions" rule).
-- Cite that `inspect.signature(...)` run inline is NOT a
-  python-api consultation — the deliverable is a
-  `scratch/api/skore/0.18.0/evaluate.md` cache file.
-- Propose the Shape 1 probe template instead, writing
-  `scratch/<ts>_lookup_skore_evaluate.py` that produces the cache
-  file in one execution.
+  `scratch/` regardless of length, **or** show that this turn only
+  executed a scratch file (no `python -c`).
+- Write the cache file at `scratch/api/skore/0.18.0/evaluate.md`.
+- Write any `scratch/<ts>_*.py` that writes that cache file in
+  one run (the exact probe basename is not load-bearing).
 
 **Must NOT do:**
 - Run the inline `pixi run python -c "..."` as requested.
@@ -282,14 +363,25 @@ violation means a regression has snuck in).
 - `skrub` is installed (version unknown to the agent).
 - `scratch/` exists.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch`
+
+**Expect files:**
+- `scratch/*version*skrub*.py`
+
 **Must do:**
-- Refuse the inline `python -c`.
+- Do not run the requested inline `python -c`. A scratch file plus
+  `run_python` **is** the refusal.
 - Cite the "all Python execution goes to scratch" Stop condition
-  — version checks are explicitly enumerated in the rule.
-- Propose writing `scratch/<ts>_version_skrub.py` with
-  `import skrub; print(skrub.__version__)` and running it via
-  `pixi run python scratch/<ts>_version_skrub.py`.
+  (version checks included), **or** show that this turn only ran a
+  scratch file.
+- Write a scratch file under `scratch/` that prints `skrub.__version__`
+  (name may be `scratch/<ts>_version_skrub.py` or similar) and run it
+  via `run_python` (not `python -c`).
 - Confirm: even a one-line version check produces a scratch file.
+  Report the version printed by that script.
 
 **Must NOT do:**
 - Run the inline `pixi run python -c "..."` as requested.

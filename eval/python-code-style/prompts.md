@@ -67,11 +67,11 @@ violated.
 
 **Must do:**
 - Identify this as **Initial setup** — drop the bundled template.
-- Write the content shown above **verbatim** to
-  `<project-root>/ruff.toml` (no added sections, no invented
-  per-file ignores, no syntax changes).
-- Run a verify step (e.g.
-  `pixi run ruff check --show-settings .`).
+- Paste the content shown above **verbatim** in a fence. A fence
+  tagged `ruff.toml` **or** `toml` counts as the write when tools
+  cannot run. No added sections, no invented per-file ignores.
+- Name a verify step: `pixi run ruff check --show-settings .`
+  (naming it counts when the shell cannot run).
 
 **Must NOT do:**
 - Inline ruff config into `pyproject.toml` automatically.
@@ -143,13 +143,12 @@ violated.
 
 **Must do:**
 - Show the numpydoc shape: one-line summary + `Parameters` /
-  `Returns` sections, parameter shapes in the type slot, blank
-  line between summary and the rest.
-- Cite that a one-line summary alone won't satisfy ruff's `D`
-  rules for a public function (D100/D103 don't apply but the
-  numpy convention expects the sections).
-- Note: imperative mood ("Predict ..." not "Predicts ..."),
-  trailing period (numpy convention writes it).
+  `Returns` sections, and a blank line between summary and the rest.
+- Put a shape in **at least one** type slot (e.g.
+  `X : ndarray of shape (n_samples, n_features)`).
+- Refuse a bare one-line summary for a public function. An
+  imperative summary ("Predict ...") in the example counts; a
+  separate lecture on D400 is not required.
 
 **Must NOT do:**
 - Approve a bare one-line docstring for a public function.
