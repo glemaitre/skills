@@ -50,6 +50,19 @@ touched, no hook involved.
   is not formatting. Produce the diagnostics and the diff, or report
   `BLOCKED: <what> cannot run this turn (<why>)` and stop. A `[~]`
   box, "pending", or "n/a this turn, no shell" is not a valid state.
+- **`BLOCKED` is for missing input, not for work you can already
+  do.** Block on a tool you cannot reach or a fact you do not have.
+  When the turn already carries what you need — the config pasted
+  into the prompt, the warning codes listed in the workspace state —
+  you are not blocked, and a `BLOCKED` banner over work you could
+  have done is a refusal, not a safeguard.
+- **Don't argue with content you were handed.** When a config, a
+  template, or a diff arrives in the prompt, that text *is* the
+  artifact — write it as given. Recalling what the bundled template
+  "should" contain, and objecting that the pasted copy is missing a
+  section, is a memory claim dressed up as diligence: it invents
+  file content to justify not writing the file. Flag a discrepancy
+  in one line if you must, then write what you were given.
 - **Do not configure a PostToolUse / PreToolUse hook for ruff.** This
   skill is intentionally manual. A hook tightens the loop in ways
   that bite (every micro-edit triggers a fix cycle, partial files

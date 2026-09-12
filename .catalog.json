@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "793c47892c42f47c838f0ae005144932cbac857c33cd07e997885edf9caffdd3",
+  "catalog_hash": "be3b28337f976d6db628f5a3728b7570caa98fca86e6f18f44f9afee83596202",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "33b2788ccdcdf4f01f33227d17f111635260ed3f2d0ac779e5f955c4cb127f38"
+      "hash": "bbe46681c31e5575fa09d3eee5a96cff7b27e19a03db2eea1fd48eff1870a332"
     },
     {
       "id": "test-ml-pipeline",
@@ -66,7 +66,7 @@
       "summary": "Design, keep track of experiments and iterate on them.",
       "category": "orchestration",
       "subcategory": "dispatchers",
-      "hash": "cd473e7b6137ec3eaf50074285c715ced3fc244984b3a10eacdce4683fe25956"
+      "hash": "b514fad2df0db02568277875b639a9897ca749626594d8858456ee1cb030d354"
     },
     {
       "id": "iterate-from-skore",
@@ -93,7 +93,7 @@
       "summary": "An organized workspace to keep track of your experiments.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "da0584ea50ccd77ba6cfda86c776bf67d6c3002aa859157af59690e394859cc4"
+      "hash": "f8ac784e44a4040ff40a1eb13d83442baeeb6643e7966246c3d037eae2dfb7e0"
     },
     {
       "id": "python-code-style",
@@ -102,7 +102,7 @@
       "summary": "Enforce good practices out-of-the-box for the Python ecosystem for your code.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "d02bf626f014a4c26f2b9d075f6db5cc6e6f011790b6d0a8277b414c0f035a12"
+      "hash": "81590f1e9a86534faec01ddf9ecdd8c3f616a4251b6f7551d30caf4bd105b290"
     },
     {
       "id": "python-env-manager",
@@ -111,7 +111,7 @@
       "summary": "Bootstrapping the experiment setup based on your favorite Python environment manager.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "2e4c2dce0ea8307a2601729e48b3db93bcb71159d6fb0f3e6d9693a25cdbfb06"
+      "hash": "04c91afed20430abc6d026182f1adccc4bf6093fc8d3df4099225aad1810492a"
     },
     {
       "id": "data-science-python-stack",
@@ -129,7 +129,7 @@
       "summary": "Discover the public API of any installed Python package to make agent find their way without bothering your workspace.",
       "category": "reference",
       "subcategory": null,
-      "hash": "529cdda6803911394cf0fde0ff236036cd2a961bc8885aa62fd947a8f251e673"
+      "hash": "6df8dfc01dca86da992c2e077513f1199c9c1c37a1adc2c605b5d9705993ecd9"
     }
   ],
   "workflows": [

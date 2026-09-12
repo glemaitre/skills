@@ -66,7 +66,6 @@ violation in any transcript** (hard rule).
   (RMSE 0.087, done).
 - Backlog has 3 rows (B1, B2, B3) from prior `iterate-from-skore`
   runs.
-- `overview/summary.md` exists.
 
 **Must do:**
 - Read `journal/JOURNAL.md` first (mention it explicitly).
@@ -98,22 +97,26 @@ violation in any transcript** (hard rule).
   status block (no Headline result yet).
 - The skore Project at `reports/` is accessible and contains the
   report under key `"03_target_transform"`.
+- The § 4 audit dispatch already ran: `audit/03_target_transform.py`
+  is placed and its digest is on disk at
+  `scratch/audit/03_target_transform/audit.md`, carrying RMSE
+  0.081 ± 0.005 in its `## Metrics summary`.
 - All `tests/smoke/test_NN_*.py` pass.
 
 **Must do:**
-- Update `journal/03_target_transform.md` Status block: flip `State`
-  to `done`, fill `Headline result` (the RMSE), fill `Implication
-  for next iteration`.
-- Update `JOURNAL.md` History row with the headline result.
+- Give the `journal/03_target_transform.md` Status block as it will
+  read: `State` flipped to `done`, `Headline result` carrying the
+  RMSE, and `Implication for next iteration` filled in — not left
+  as a placeholder or deferred to another skill.
+- Give the `JOURNAL.md` History row with the headline result.
 - Mention checking that **all** `tests/smoke/` pass (smoke-test gate
   before `done`), not just the new one.
 - Mention the **backlog hygiene** step (scan Backlog for items the
   new run answered / killed).
-- Mention **refreshing `overview/summary.md`** (curated narrative
-  digest) as part of the outcome flow.
-- After recording, **ask via `AskUserQuestion`** (or narrative
-  equivalent) whether to "draft the next experiment now" or
-  "not yet" — do not auto-propose.
+- Close by naming the `AskUserQuestion` (or narrative equivalent)
+  that offers "draft the next experiment now" vs "not yet" — do not
+  auto-propose, and do not simply declare that a fresh turn is
+  needed.
 
 **Must NOT do:**
 - Auto-propose the next experiment in the same turn (the rule

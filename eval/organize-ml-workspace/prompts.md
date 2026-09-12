@@ -23,13 +23,14 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 
 **Must do:**
 - Identify as a **fresh** layout (no detection signals matched).
-- Fire **G-PKG-NAME** — ask the user for the `src/<pkg>/` import
-  name via `AskUserQuestion` (with the folder name as default).
-- Fire **G-TABULAR** — pandas / polars pick via the
+- Name **G-PKG-NAME** as the next gate — the `src/<pkg>/` import
+  name goes to the user via `AskUserQuestion`, with the folder name
+  as the default, and is not picked here.
+- Name **G-TABULAR** — pandas / polars pick via the
   data-science-python-stack ask.
 - Mention **G-ENV-MGR** as routed via `python-env-manager`.
 - Mention scaffolding the default layout: `src/<pkg>/`,
-  `journal/`, `experiments/`, `tests/smoke/`, `overview/`,
+  `journal/`, `experiments/`, `audit/`, `tests/smoke/`,
   `scratch/`, `reports/`.
 
 **Must NOT do:**

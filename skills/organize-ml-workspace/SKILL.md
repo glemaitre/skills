@@ -80,6 +80,30 @@ Sibling skills (just-in-time):
   `AskUserQuestion`, a prose question or a markdown table is not a
   substitute. If the tool is unavailable, that is BLOCKED, not an
   excuse to improvise the question inline.
+- **`BLOCKED` is for missing input, not for work you can already
+  do.** Block on a tool you cannot reach or a fact you do not have.
+  When the turn already carries what you need — the gates resolved
+  and recorded, content pasted into the prompt, state given in the
+  workspace description — you are not blocked. A `BLOCKED` banner
+  over work you could have done is a refusal, not a safeguard, and
+  an *action* row that simply does not apply is `[n/a] — <why>`,
+  not an unchecked box escalated into a block.
+- **A gate is never `[n/a]`.** `n/a` is for actions the turn does
+  not need. G-PKG-NAME, G-ENV-MGR, G-TABULAR and G-SKORE-MODE are
+  resolved (answer recorded this session), outstanding, or blocked —
+  there is no fourth state. "n/a this turn", "already the live
+  import name", "not re-litigated", "settled by prior-session
+  continuity" are all the same move: retiring a gate the user never
+  answered. On an existing workspace G-PKG-NAME re-confirms; reading
+  the name out of `pyproject.toml` is what it re-confirms *against*,
+  not a substitute for asking.
+- **Blocking does not settle the gates it skipped.** A blocked turn
+  still owes the gate list as *unresolved*. Writing "G-PKG-NAME does
+  not fire, the name carries over from `pyproject.toml`" while
+  reporting BLOCKED resolves the gate by assertion — and that
+  carry-over is a Forbidden shortcut in its own right (see the
+  re-confirm row below). Name which gates are outstanding; do not
+  retire them on the way past.
 - **Missing dependency.** If `import skore` raises, STOP. Invoke
   `python-env-manager` for the install command. Do not drop
   `skore.Project` in favor of `mlflow` / pickles / "print metrics"

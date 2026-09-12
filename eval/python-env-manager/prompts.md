@@ -84,29 +84,33 @@ violated.
 
 ---
 
-## CASE_04 — `G-ENV-SCOPE` per install (feature vs default)
+## CASE_04 — `G-ENV-SCOPE` on an ambiguous extra
 
 **User prompt:**
-> Add jupyterlab to the project.
+> Add optuna to the project — I want to tune the learner's
+> hyperparameters. You pick where it goes.
 
 **Assumed workspace state:**
 - pixi project, `Workspace decisions` records `env manager: pixi`,
   `env scope: default`.
-- `pixi.toml` has features: `default`, `dev`, `notebooks`.
+- `pixi.toml` has the enforced 3-feature layout: `default`, `dev`,
+  `agent`.
+- `optuna` is not in the auto-routing table.
 
 **Must do:**
-- Fire **`G-ENV-SCOPE`** for this specific install.
-- Enumerate the existing features (default / dev / notebooks) and
-  "create a new feature".
-- Propose `notebooks` as a likely target (jupyterlab is a dev tool
-  often siloed) but require user confirmation.
+- Identify `optuna` as an **ambiguous extra** — it misses the
+  auto-routing table, so `G-ENV-SCOPE` is the gate for this install.
+- Name `AskUserQuestion` as the gate and give its **two** options:
+  `default` (fold into runtime deps) vs a new named feature, with
+  `tuning` proposed as the name from the user's wording.
+- State that "you pick" does not resolve `G-ENV-SCOPE` — only an
+  explicit `default` or a feature name does.
 
 **Must NOT do:**
-- Silently `pixi add jupyterlab` into `default`.
+- Silently `pixi add optuna` into `default` or into any feature.
 - Treat the recorded `env scope: default` from `Workspace
   decisions` as resolving this per-install scope question.
-- Assume jupyterlab "belongs" in any specific feature without
-  asking.
+- Treat "you pick" as free-text resolution of the gate.
 
 ---
 

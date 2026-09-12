@@ -21,11 +21,11 @@
     {
       "id": 2,
       "title": "Time-ordered data, mandatory AskUserQuestion",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_load_forecast.md` approved.\n- `pipeline.py` X-marker has `split_kwargs={\"times\": ...}` (temporal\n  ordering attached at build time).\n- Forecast horizon is 24h.]\n\nWire `evaluate.py` for the 24h-ahead load forecast experiment.\nPick the splitter.",
-      "expected_output": "Behavioural response satisfying: - Fire **`AskUserQuestion`** before picking a splitter (mandatory for temporal data). - Present the **four canonical options** verbatim: 1. `TimeSeriesSplit(gap=horizon)` \u2014 safe default 2. `TimeSeriesSplit(gap=0)` \u2014 only on explicit user pick; warn about leakage 3. Custom splitter (purged-and-embargoed / blocked calendar / walk-forward) 4. `KFold` ignoring time \u2014 only with explicit user reason - Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to `gap=0` which silently leaks at non-trivial horizons. It must NOT: - Pick `TimeSeriesSplit` silently without the AskUserQuestion. - Default to `KFold` because empty `gap` \"feels safer\". - Treat harness \"no clarifying questions\" hint as waiving the mandatory ask.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_load_forecast.md` approved.\n- `pipeline.py` X-marker has `split_kwargs={\"times\": ...}` (temporal\n  ordering attached at build time).\n- Forecast horizon is 24h.\n- Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering\n  `KFold` / `GroupKFold` / `TimeSeriesSplit` \u2014 the splitter lookup\n  is already satisfied.]\n\nWire `evaluate.py` for the 24h-ahead load forecast experiment.\nPick the splitter.",
+      "expected_output": "Behavioural response satisfying: - Name **`AskUserQuestion`** as the mandatory gate that must resolve before a splitter is picked (mandatory for temporal data), and spell out the options it carries. - Present the **four canonical options** verbatim: 1. `TimeSeriesSplit(gap=horizon)` \u2014 safe default 2. `TimeSeriesSplit(gap=0)` \u2014 only on explicit user pick; warn about leakage 3. Custom splitter (purged-and-embargoed / blocked calendar / walk-forward) 4. `KFold` ignoring time \u2014 only with explicit user reason - Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to `gap=0` which silently leaks at non-trivial horizons. It must NOT: - Pick `TimeSeriesSplit` silently without the AskUserQuestion. - Default to `KFold` because empty `gap` \"feels safer\". - Treat harness \"no clarifying questions\" hint as waiving the mandatory ask.",
       "files": [],
       "expectations": [
-        "Fire **`AskUserQuestion`** before picking a splitter (mandatory for temporal data).",
+        "Name **`AskUserQuestion`** as the mandatory gate that must resolve before a splitter is picked (mandatory for temporal data), and spell out the options it carries.",
         "Present the **four canonical options** verbatim: 1. `TimeSeriesSplit(gap=horizon)` \u2014 safe default 2. `TimeSeriesSplit(gap=0)` \u2014 only on explicit user pick; warn about leakage 3. Custom splitter (purged-and-embargoed / blocked calendar / walk-forward) 4. `KFold` ignoring time \u2014 only with explicit user reason",
         "Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to `gap=0` which silently leaks at non-trivial horizons.",
         "The response does NOT: Pick `TimeSeriesSplit` silently without the AskUserQuestion.",
@@ -100,12 +100,12 @@
       "id": 7,
       "title": "`skore.evaluate` / `project.put` only in experiment script",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `experiments/02_text_encoder.py` already produced a report.\n- The user wants a \"refreshed\" version.]\n\nAdd a scratch probe that re-runs `skore.evaluate(learner, ...)` to\nsee the updated metrics, then `project.put(\"02_text_encoder\",\nreport)` to refresh the cache.",
-      "expected_output": "Behavioural response satisfying: - Refuse the scratch re-run. - Cite the Stop condition: \"`skore.evaluate(...)` and `project.put(...)` live only in `experiments/NN_*.py`.\" - Cite that re-running from scratch lands a duplicate row under the same `key` in `project.summarize()`, polluting `overview/summary.md`. It must NOT: - Approve the scratch probe with `evaluate` + `put`. - Treat scratch as a producer of reports.",
+      "expected_output": "Behavioural response satisfying: - Refuse the scratch re-run. - Cite the Stop condition: \"`skore.evaluate(...)` and `project.put(...)` live only in `experiments/NN_*.py`.\" - Cite that re-running from scratch lands a duplicate row under the same `key` in `project.summarize()`, polluting the Project's report index. It must NOT: - Approve the scratch probe with `evaluate` + `put`. - Treat scratch as a producer of reports.",
       "files": [],
       "expectations": [
         "Refuse the scratch re-run.",
         "Cite the Stop condition: \"`skore.evaluate(...)` and `project.put(...)` live only in `experiments/NN_*.py`.\"",
-        "Cite that re-running from scratch lands a duplicate row under the same `key` in `project.summarize()`, polluting `overview/summary.md`.",
+        "Cite that re-running from scratch lands a duplicate row under the same `key` in `project.summarize()`, polluting the Project's report index.",
         "Recommend using `project.summarize()` + `project.get(id)` for read-only inspection, OR re-running the experiment script if a fresh report is genuinely needed.",
         "The response does NOT: Approve the scratch probe with `evaluate` + `put`.",
         "The response does NOT: Treat scratch as a producer of reports."

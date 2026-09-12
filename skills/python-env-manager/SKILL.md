@@ -68,6 +68,13 @@ declaring the turn done.
   `BLOCKED: manager ambiguity needs a user decision (<why the tool
   did not run>)` and stop — declaring one side "context, not a
   pick" closes the question by fiat.
+- **`BLOCKED` is for missing input, not for work you can already
+  do.** Block on a tool you cannot reach or a fact you do not have.
+  When the turn already carries what you need — the manager
+  recorded, the feature layout given in the workspace state — you
+  are not blocked, and a `BLOCKED` banner over work you could have
+  done is a refusal, not a safeguard. A row that does not apply is
+  `[n/a] — <why>`, not an unchecked box escalated into a block.
 - **Wrong-manager install is forbidden.** If the project uses pixi,
   do not `pip install`. If it uses poetry, do not `uv add`. Mixing
   managers creates state the manifest doesn't track, and the next

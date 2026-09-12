@@ -70,6 +70,14 @@ read the report. The pipeline declaration is out of scope (see
   turn ends with a single line:
   `BLOCKED: splitter needs a python-api lookup that cannot run this
   turn (<why>). Run <probe or cache read> first.`
+- **`BLOCKED` is scoped to the lookup, not to the whole turn.** It
+  withholds the splitter *name*; it does not excuse the rest of the
+  work. The mandatory user gate still gets presented with its
+  options spelled out, the leakage reasoning still gets written, and
+  the replacement call shape still gets proposed. Blocking on one
+  unresolvable fact and then declining everything else is a refusal
+  wearing the banner of a safeguard. A cache hit for the symbol is a
+  satisfied lookup, not a block.
 - **Splitter choice is data-driven, not default-driven
   (`G-CV-SPLITTER`).** This is the **G-CV-SPLITTER** gate — owned by
   this skill, fired during `iterate-ml-experiment` § 3 (the build →

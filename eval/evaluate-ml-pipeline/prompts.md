@@ -51,10 +51,14 @@ violated.
 - `pipeline.py` X-marker has `split_kwargs={"times": ...}` (temporal
   ordering attached at build time).
 - Forecast horizon is 24h.
+- Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering
+  `KFold` / `GroupKFold` / `TimeSeriesSplit` — the splitter lookup
+  is already satisfied.
 
 **Must do:**
-- Fire **`AskUserQuestion`** before picking a splitter (mandatory
-  for temporal data).
+- Name **`AskUserQuestion`** as the mandatory gate that must resolve
+  before a splitter is picked (mandatory for temporal data), and
+  spell out the options it carries.
 - Present the **four canonical options** verbatim:
   1. `TimeSeriesSplit(gap=horizon)` — safe default
   2. `TimeSeriesSplit(gap=0)` — only on explicit user pick; warn
@@ -196,8 +200,8 @@ violated.
 - Cite the Stop condition: "`skore.evaluate(...)` and
   `project.put(...)` live only in `experiments/NN_*.py`."
 - Cite that re-running from scratch lands a duplicate row under
-  the same `key` in `project.summarize()`, polluting
-  `overview/summary.md`.
+  the same `key` in `project.summarize()`, polluting the Project's
+  report index.
 - Recommend using `project.summarize()` + `project.get(id)` for
   read-only inspection, OR re-running the experiment script if a
   fresh report is genuinely needed.

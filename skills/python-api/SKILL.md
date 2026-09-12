@@ -188,6 +188,21 @@ live turn" are not valid box states. Emit no signature, no arg
 list, no return type, not even a hedged one — an unrunnable lookup
 is a reason to stop, never a licence to answer from another source.
 
+**`n/a` is a valid box state; `BLOCKED` is not a synonym for it.** A
+row that does not apply this turn gets `[n/a] — <why>`. The commonest
+case is a cache hit: the topic file is already on disk, so there is
+no probe to run and no fetch to make, and the row is `n/a`, not
+unchecked. Do not redefine an inapplicable row into a failed one
+("cache file is *read* this turn" → unchecked → BLOCKED) so the turn
+can be reported as blocked. A cache hit is a satisfied lookup.
+
+**Block on missing input, not on work you can already do.** `BLOCKED`
+is for a tool you cannot reach or a fact you do not have. When the
+turn already carries what you need — a cache hit, content pasted into
+the prompt, state given in the workspace description — you are not
+blocked, and a `BLOCKED` banner over an answer you could have written
+is a refusal, not a safeguard.
+
 ## Forbidden shortcuts
 
 | Shortcut | Why it's wrong |
