@@ -261,6 +261,7 @@ def _format_transcript_md(payload: dict) -> str:
         f"# {heading}",
         "",
         f"- mode: {payload.get('mode')}",
+        f"- tier: {payload.get('tier')}",
         f"- target: {payload.get('target_model')}",
         f"- judge: {payload.get('judge_model')}",
         f"- finish_reason: {payload.get('finish_reason')}",

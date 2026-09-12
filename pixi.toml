@@ -35,13 +35,15 @@ python-dotenv = ">=1.0"
 # (see `.env.example`). Names are LiteLLM ids; `openrouter/<vendor>/<model>`
 # routes through OpenRouter and needs only `OPENROUTER_API_KEY`.
 #
-# SKILL_EVAL_MODELS       comma-separated target models (models under test,
-#                         one pytest node per model x case x mode)
-# SKILL_EVAL_JUDGE_MODEL  single judge model for DeepEval GEval. Same class
-#                         of model as the targets — cheap, and good enough
-#                         for these rubrics. Self-grades when DeepSeek is
-#                         also a target; override with --skill-judge-model
-#                         for an independent read.
+# SKILL_EVAL_TIER_SMALL / MEDIUM / BIG
+#                         named target models for the three skill tiers
+# SKILL_EVAL_TIER         assigned  each skill on its own tier model
+#                         all       every skill x all three models
+#                         small|medium|big
+#                                   only skills assigned to that tier
+# SKILL_EVAL_MODELS       optional comma-separated override; when set,
+#                         ignores the tier table (same as --skill-model)
+# SKILL_EVAL_JUDGE_MODEL  single judge for DeepEval GEval (not tiered)
 # SKILL_EVAL_MODE         with     SKILL.md as the system prompt
 #                         without  empty system prompt (baseline)
 #                         both     run each case twice and report the
@@ -50,11 +52,13 @@ python-dotenv = ">=1.0"
 #                         credit). Must-NOT stays all-or-nothing.
 #
 # Overridable per run with `--skill-model` (repeatable),
-# `--skill-judge-model`, `--skill-mode`, and `--skill-pass-ratio`.
+# `--skill-tier`, `--skill-judge-model`, `--skill-mode`, and
+# `--skill-pass-ratio`.
 [feature.eval.activation.env]
-# Small, cheap models: the skills must stay legible to these.
-# Full sweep: "openrouter/deepseek/deepseek-v4.1-flash,openrouter/z-ai/glm-5.3-flash,openrouter/qwen/qwen3.8-27b"
-SKILL_EVAL_MODELS = "openrouter/deepseek/deepseek-v4.1-flash"
+SKILL_EVAL_TIER_SMALL = "openrouter/qwen/qwen3.7-flash"
+SKILL_EVAL_TIER_MEDIUM = "openrouter/deepseek/deepseek-v4.1-flash"
+SKILL_EVAL_TIER_BIG = "openrouter/minimax/minimax-m2.7"
+SKILL_EVAL_TIER = "assigned"
 SKILL_EVAL_JUDGE_MODEL = "openrouter/deepseek/deepseek-v4.1-flash"
 SKILL_EVAL_MODE = "with"
 SKILL_EVAL_PASS_RATIO = "0.7"

@@ -23,6 +23,7 @@ from tests.eval.harness import (
     visible_text,
     write_transcript,
 )
+from tests.eval.tiers import skill_tier
 
 
 def _judge_model(skill_judge_model: str) -> LiteLLMModel:
@@ -160,6 +161,7 @@ def test_skill_case(
         "case_id": eval_case.case_id,
         "title": eval_case.title,
         "mode": skill_mode,
+        "tier": skill_tier(eval_case.skill_name),
         "target_model": target_model,
         "judge_model": skill_judge_model,
         "pass_ratio": skill_pass_ratio,

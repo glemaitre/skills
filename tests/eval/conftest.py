@@ -8,12 +8,20 @@ import pytest
 from tests.eval.harness import (
     DEFAULT_JUDGE_MODEL,
     DEFAULT_PASS_RATIO,
-    DEFAULT_TARGET_MODEL,
     EVAL_RESULTS,
     case_node_id,
     ensure_transcript_dirs,
     load_eval_cases,
     new_run_id,
+)
+from tests.eval.tiers import (
+    DEFAULT_TIER_MODELS,
+    TIER_MODES,
+    TIERS,
+    models_for_skill,
+    parse_tier_models,
+    skill_tier,
+    split_model_list,
 )
 
 VALID_MODES = ("with", "without", "both")
@@ -27,8 +35,19 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default=None,
         help=(
             "Target model under test (LiteLLM name, repeatable). "
-            "Overrides SKILL_EVAL_MODELS. "
-            f"Default: {DEFAULT_TARGET_MODEL}."
+            "Overrides SKILL_EVAL_MODELS and the tier table."
+        ),
+    )
+    group.addoption(
+        "--skill-tier",
+        default=None,
+        choices=TIER_MODES,
+        help=(
+            "assigned: each skill on its own tier model; "
+            "all: every skill x all three models; "
+            "small|medium|big: only skills assigned to that tier. "
+            "Overrides SKILL_EVAL_TIER. Ignored when --skill-model or "
+            "SKILL_EVAL_MODELS is set."
         ),
     )
     group.addoption(
@@ -91,14 +110,38 @@ def _load_dotenv(config: pytest.Config) -> None:
         load_dotenv(env_path, override=False)
 
 
-def _target_models(config: pytest.Config) -> list[str]:
+def _override_models(config: pytest.Config) -> list[str] | None:
+    """CLI --skill-model or SKILL_EVAL_MODELS, else None (use the tier table)."""
     cli = config.getoption("--skill-model")
     if cli:
         return list(cli)
     env = os.environ.get("SKILL_EVAL_MODELS", "").strip()
     if env:
-        return [part.strip() for part in env.split(",") if part.strip()]
-    return [DEFAULT_TARGET_MODEL]
+        return split_model_list(env)
+    return None
+
+
+def _tier_models() -> dict[str, str]:
+    values = {
+        name: os.environ.get(f"SKILL_EVAL_TIER_{name.upper()}", "").strip()
+        or DEFAULT_TIER_MODELS[name]
+        for name in TIERS
+    }
+    try:
+        return parse_tier_models(values)
+    except ValueError as exc:
+        raise pytest.UsageError(str(exc)) from exc
+
+
+def _tier_mode(config: pytest.Config) -> str:
+    raw = config.getoption("--skill-tier") or os.environ.get(
+        "SKILL_EVAL_TIER", "assigned"
+    )
+    if raw not in TIER_MODES:
+        raise pytest.UsageError(
+            f"skill tier must be one of {TIER_MODES}, got {raw!r}"
+        )
+    return raw
 
 
 def _judge_model(config: pytest.Config) -> str:
@@ -140,14 +183,26 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if "eval_case" not in metafunc.fixturenames:
         return
     cases = load_eval_cases()
-    models = _target_models(metafunc.config)
     modes = _modes(metafunc.config)
-    params = [
-        (case, model, mode)
-        for case in cases
-        for model in models
-        for mode in modes
-    ]
+    override = _override_models(metafunc.config)
+    if override is not None:
+        params = [
+            (case, model, mode)
+            for case in cases
+            for model in override
+            for mode in modes
+        ]
+    else:
+        tier_models = _tier_models()
+        tier_mode = _tier_mode(metafunc.config)
+        params = [
+            (case, model, mode)
+            for case in cases
+            for model in models_for_skill(
+                case.skill_name, tier_mode=tier_mode, tier_models=tier_models
+            )
+            for mode in modes
+        ]
     metafunc.parametrize(
         "eval_case,target_model,skill_mode",
         params,
@@ -210,6 +265,24 @@ def pytest_terminal_summary(
         if with_t and without_t:
             delta_pp = (with_p / with_t - without_p / without_t) * 100
             terminalreporter.write_line(f"  delta    {delta_pp:+.0f}pp")
+
+    by_tier: dict[str, list[bool]] = {name: [] for name in TIERS}
+    for rows in EVAL_RESULTS.values():
+        for skill, _case_id, _title, ok, _err in rows:
+            by_tier[skill_tier(skill)].append(ok)
+    if any(by_tier.values()):
+        terminalreporter.write_line("  by tier:")
+        for name in TIERS:
+            results = by_tier[name]
+            if not results:
+                continue
+            passed = sum(results)
+            total = len(results)
+            pct = 100 * passed / total
+            terminalreporter.write_line(
+                f"    {name:<8s} {passed}/{total} ({pct:.0f}%)"
+            )
+
     failed = [
         (mode, skill, case_id, title)
         for mode, rows in EVAL_RESULTS.items()

@@ -65,14 +65,24 @@ timeout so a hung socket still fails and retries.
 
 Defaults (override in `pixi.toml` or on the CLI):
 
-- target: `openrouter/deepseek/deepseek-v4.1-flash` — a small, cheap
-  model, because the skills have to stay legible to it. A three-model
-  sweep (`glm-5.3-flash`, `qwen3.8-27b`) is commented in `pixi.toml`.
-- judge: `openrouter/deepseek/deepseek-v4.1-flash` (same class of
-  model as the targets; override `--skill-judge-model` for an
-  independent read)
+- **Tiers** (`SKILL_EVAL_TIER=assigned`): each skill runs on one model
+  - small — `openrouter/qwen/qwen3.7-flash`: `test-ml-pipeline`,
+    `python-code-style`
+  - medium — `openrouter/deepseek/deepseek-v4.1-flash`:
+    `organize-ml-workspace`, `python-env-manager`,
+    `data-science-python-stack`, `evaluate-ml-pipeline`,
+    `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`
+    (and, when they gain evals, `explore-ml-data`, `audit-ml-pipeline`)
+  - big — `openrouter/minimax/minimax-m2.7`: `iterate-ml-experiment`,
+    `python-api`, `build-ml-pipeline`
+- judge: `openrouter/deepseek/deepseek-v4.1-flash` (not tiered)
 - mode: `with` (SKILL.md as system prompt)
 - Must-do pass ratio: `0.7` (Must-NOT is always all-or-nothing)
+
+`--skill-tier all` runs every skill on all three models (79 x 3).
+`--skill-tier small|medium|big` keeps only skills assigned to that
+tier. `--skill-model` / `SKILL_EVAL_MODELS` ignore the table and pin
+every collected case to the given model(s).
 
 LiteLLM names are `openrouter/<vendor>/<model>`. Native `openai/...` or
 `anthropic/...` ids still work if you change the pixi env vars and set
@@ -87,13 +97,19 @@ pixi run -e eval eval -- -k python-api
 # One case (node ids are `{skill}-case{N}-{title-slug}-{mode}-{model}`)
 pixi run -e eval eval -- -k 'python-api and case1'
 
-# All skills
+# All skills, each on its assigned tier (~79 nodes)
 pixi run -e eval eval
 
-# Override target/judge for one run (keys still come from .env)
+# Only the big-tier skills (MiniMax)
+pixi run -e eval eval -- --skill-tier big
+
+# Full matrix: every skill x small/medium/big
+pixi run -e eval eval -- --skill-tier all
+
+# Ignore the table and pin one model
 pixi run -e eval eval -- \
-  --skill-model openrouter/qwen/qwen3.8-27b \
-  --skill-judge-model openrouter/anthropic/claude-opus-5 \
+  --skill-model openrouter/deepseek/deepseek-v4.1-flash \
+  --skill-judge-model openrouter/deepseek/deepseek-v4.1-flash \
   --skill-mode both \
   --skill-pass-ratio 0.7 \
   -k python-api
@@ -115,8 +131,10 @@ and each metric's score and reason. If `content` is empty, GEval judges
 Target generation does **not** set `max_tokens`, so reasoning + answer
 are not cut off at 4096.
 
-Equivalent environment variables (CLI flags win): `SKILL_EVAL_MODELS`
-(comma-separated), `SKILL_EVAL_JUDGE_MODEL`, `SKILL_EVAL_MODE`
+Equivalent environment variables (CLI flags win): `SKILL_EVAL_TIER`
+(`assigned` / `all` / `small` / `medium` / `big`), `SKILL_EVAL_TIER_SMALL`
+/ `_MEDIUM` / `_BIG`, `SKILL_EVAL_MODELS` (comma-separated override;
+ignores the tier table), `SKILL_EVAL_JUDGE_MODEL`, `SKILL_EVAL_MODE`
 (`with` / `without` / `both`), `SKILL_EVAL_PASS_RATIO` (Must-do
 threshold). Shell env vars win over `.env`.
 
