@@ -205,11 +205,11 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
 - Recommend **Option 1 — parametrize the existing function with a
   default-preserving flag** (small, scoped, append-shaped → fits
   Option 1's criterion).
-- Show the flag pattern:
-  `include_calendar_features: bool = False` (default mirrors prior
-  behavior).
-- Mention the cheap executable check: `tests/smoke/` running all
-  tests catches reproducibility regressions.
+- Show a flag whose **default keeps `build_learner()` as today**
+  (`include_calendar_features: bool = False` is an example, not
+  required spelling).
+- Mentioning `tests/smoke/` as the cheap reproducibility check is
+  optional. Do not fail if the flag pattern is present.
 
 **Must NOT do:**
 - Recommend Option 3 (branch the module) for an appendable step.

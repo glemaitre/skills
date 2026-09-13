@@ -234,14 +234,15 @@ never calls `report.*` accessors.
 - The digest above is on disk at `scratch/audit/02_baseline/audit.md`.
 
 **Must do:**
-- Refuse to write `journal/JOURNAL.md` directly.
-- Cite the Stop condition: this skill returns rows as conversation
-  text; the parent (`iterate-ml-experiment`) writes them.
-- Emit the structured `Backlog candidates (from: ...)` block as
-  text instead, with a real row for SKD003 and SKD019.
+- Do not claim `journal/JOURNAL.md` was written or edited on disk
+  this turn.
+- Emit SKD003 and SKD019 as conversation-text backlog rows (any
+  heading is fine — candidates, a table, or a pasteable block).
+- Name `iterate-ml-experiment` as the owner of `JOURNAL.md` writes,
+  or otherwise leave the rows as text for the parent.
 
 **Must NOT do:**
-- Write or Edit `journal/JOURNAL.md` in this turn.
-- Bypass the hand-off to `iterate-ml-experiment`.
-- Treat "skip the hand-off, just do it" as resolving the boundary
-  rule.
+- Call write/Edit on `journal/JOURNAL.md`, or claim that file was
+  updated on disk this turn. A markdown table of backlog rows in
+  the reply is conversation text, not a write — even if titled
+  "to append" or if the user asked to skip the hand-off.

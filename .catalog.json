@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "9f544236059b30217f644d59442d1f3eb86062c9d702693281864e5f9d5a48b2",
+  "catalog_hash": "a0e2b52498916384e17e09206e2d55574fded46736e4e657e5befc54db20a016",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "450f038b48cb09959d58eb41c3dabadf3eb66f7f8c0f0cf6f8bfae61e84d5d9a"
+      "hash": "553b63a73671686aedd41eb6ebe8f3090171859406369c8bfc9d84c7665574c2"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -66,7 +66,7 @@
       "summary": "Design, keep track of experiments and iterate on them.",
       "category": "orchestration",
       "subcategory": "dispatchers",
-      "hash": "6814b442e6599ca97bb30e7200ba09121cc598c0f2c885a05d93982f6632ac9e"
+      "hash": "c6a076718f6e2ab86b9d9d6254ed1a546778dfe47826946fed34cbb0356e0e21"
     },
     {
       "id": "iterate-from-skore",
@@ -75,7 +75,7 @@
       "summary": "Use skore to run diagnostics and checks that can be reported and addressed in the next experiment.",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "532a311db511592c78db2f2716917a495b69929d9dae73d7eec50ef56d12a54d"
+      "hash": "dcaa59c6d1a3133efed4dbe2f0bc1f0827a3117347f41c1430db76352e030606"
     },
     {
       "id": "iterate-from-user",
@@ -129,7 +129,7 @@
       "summary": "Discover the public API of any installed Python package to make agent find their way without bothering your workspace.",
       "category": "reference",
       "subcategory": null,
-      "hash": "adb8db09bcf0ad969bcf32f496aed5d29bb97f4a3d1f9c18dfe0e5632ee54e2a"
+      "hash": "b0dea32ada9fa3fefae6140f4bfd006f2f7c2c169b84fb28cd8a3b92d2234675"
     }
   ],
   "workflows": [

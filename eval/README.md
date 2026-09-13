@@ -29,23 +29,35 @@ than pasting the file into `SKILL.md`.
 ## Scoring
 
 Expectations from `prompts.md` are split on the prefix
-`The response does NOT`:
+`The response does NOT`. Pytest **fails the node** only on
+dramatic misses:
 
-- **Must-do** is a non-strict GEval with partial credit. The default
-  pass threshold is `0.7` (`SKILL_EVAL_PASS_RATIO`): a minor miss no
-  longer fails the case. Most cases carry 3-4 Must-do expectations,
-  so `0.7` buys exactly one item of tolerance; at `0.8` the ceiling
-  rounds that away and the metric is all-or-nothing again.
-- **Must-NOT** stays all-or-nothing (`threshold=1.0`, `strict_mode`).
-  Any prohibition violated fails the case.
-- If the visible answer **dies mid-turn** (truncated checklist row,
-  last line is "now writing…", unclosed fence), pytest **skips**
-  the case instead of failing. The transcript records
-  `skipped` / `skip_reason`. Empty replies still fail.
+- **Must-NOT** is all-or-nothing (`threshold=1.0`, `strict_mode`).
+  A violated prohibition fails the case.
+- Missing `**Expect files:**` / `**Expect reads:**` fails.
+- An **empty** visible answer (not a skip) fails.
 
-A failing node prints both scores, each judge reason, the grouped
-expectations, the full target response, and paths to the JSON and
-Markdown transcripts.
+**Must-do** still runs. It is a non-strict GEval with partial
+credit; the default threshold is `0.7` (`SKILL_EVAL_PASS_RATIO`).
+The score and judge reason land on the transcript and the session
+summary (`must-do-weak`). **Must-do-weak is not a pytest fail and
+is not a skill-patch trigger.** Treat it as a diagnostic: the
+model may have skipped a slogan or added extra help the judge
+disliked.
+
+A Must-NOT red is a skill change **only if it reproduces**. Do not
+patch `SKILL.md` from a single noisy judge hit.
+
+If the visible answer **dies mid-turn** (truncated checklist row,
+last line is "now writing…", unclosed fence), pytest **skips**
+the case instead of failing. The transcript records
+`skipped` / `skip_reason`. Empty replies still fail.
+
+There is no 2-of-3 retry in pytest (cost). A failing node prints
+both scores, each judge reason, the grouped expectations, the
+full target response, and paths to the JSON and Markdown
+transcripts. The session summary lists `failed` (Must-NOT /
+files / empty) separately from `must-do-weak`.
 
 ## Authoring cases
 
@@ -100,7 +112,8 @@ Defaults (override in `pixi.toml` or on the CLI):
     `python-api`, `build-ml-pipeline`
 - judge: `openrouter/deepseek/deepseek-v4.1-flash` (not tiered)
 - mode: `with` (SKILL.md as system prompt)
-- Must-do pass ratio: `0.7` (Must-NOT is always all-or-nothing)
+- Must-do pass ratio: `0.7` (diagnostic metric only; Must-NOT is
+  always all-or-nothing and is what fails the node)
 
 `--skill-tier all` runs every skill on all three models (79 x 3).
 `--skill-tier small|medium|big` keeps only skills assigned to that
@@ -141,7 +154,8 @@ pixi run -e eval eval -- \
 A failing node prints per-group GEval scores (Must-do / Must-NOT), each
 judge reason, the grouped expectations, the full target response, and
 paths to JSON and Markdown transcripts. LiteLLM errors keep their
-traceback. The session summary lists failed `(skill, case, title)` rows.
+traceback. The session summary lists `failed` (Must-NOT / missing
+files / empty) and `must-do-weak` (diagnostic, not a fail).
 
 Transcripts are written even when the visible reply is empty (reasoning
 models sometimes fill `reasoning_content` only). They land under
@@ -159,7 +173,8 @@ Equivalent environment variables (CLI flags win): `SKILL_EVAL_TIER`
 / `_MEDIUM` / `_BIG`, `SKILL_EVAL_MODELS` (comma-separated override;
 ignores the tier table), `SKILL_EVAL_JUDGE_MODEL`, `SKILL_EVAL_MODE`
 (`with` / `without` / `both`), `SKILL_EVAL_PASS_RATIO` (Must-do
-threshold). Shell env vars win over `.env`.
+diagnostic threshold; does not fail the node). Shell env vars
+win over `.env`.
 
 `--skill-mode both` prints a pass-rate delta (with minus without) in the
 pytest summary.

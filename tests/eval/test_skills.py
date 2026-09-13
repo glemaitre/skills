@@ -15,6 +15,7 @@ from tests.eval.harness import (
     MetricOutcome,
     NO_TOOLS_NOTE,
     call_with_retries,
+    case_hard_pass,
     compose_user_prompt,
     died_mid_deliverable,
     format_eval_failure,
@@ -300,13 +301,13 @@ def test_skill_case(
         )
 
     payload["metrics"] = _outcomes_payload(outcomes)
-    passed = (
-        all(item.passed for item in outcomes)
-        and not missing_files
-        and not missing_reads_list
+    hard_pass, must_do_weak, must_not_judge_error = case_hard_pass(
+        outcomes=outcomes,
+        missing_files=missing_files,
+        missing_reads=missing_reads_list,
     )
-    judge_error = any(item.reason.startswith("judge error:") for item in outcomes)
-    payload["passed"] = passed
+    payload["passed"] = hard_pass
+    payload["must_do_weak"] = must_do_weak
     write_transcript(path, payload)
 
     extra_bits = []
@@ -320,12 +321,20 @@ def test_skill_case(
         )
     extra = " ".join(extra_bits)
 
-    if passed:
-        record_eval_result(mode=skill_mode, case=eval_case, passed=True)
+    if hard_pass:
+        record_eval_result(
+            mode=skill_mode,
+            case=eval_case,
+            passed=True,
+            must_do_weak=must_do_weak,
+        )
         return
 
     record_eval_result(
-        mode=skill_mode, case=eval_case, passed=False, judge_error=judge_error
+        mode=skill_mode,
+        case=eval_case,
+        passed=False,
+        judge_error=must_not_judge_error,
     )
     pytest.fail(
         format_eval_failure(

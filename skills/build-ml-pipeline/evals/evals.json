@@ -108,12 +108,12 @@
       "id": 6,
       "title": "Reproducibility: add a feature without breaking prior",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `src/<pkg>/pipeline.py` has `build_learner(data_dir_preview=None)`.\n- `experiments/01_baseline.py` uses `build_learner()` (no kwargs).\n- Calendar features = a stateless step appending a few columns.]\n\nFor experiment 02, I want to add calendar features (day-of-week,\nhour-of-day). `build_learner` is shared with 01_baseline. How\nshould I extend `pipeline.py` so that 01 still runs the same?",
-      "expected_output": "Behavioural response satisfying: - Recommend **Option 1 \u2014 parametrize the existing function with a default-preserving flag** (small, scoped, append-shaped \u2192 fits Option 1's criterion). - Show the flag pattern: `include_calendar_features: bool = False` (default mirrors prior behavior). - Mention the cheap executable check: `tests/smoke/` running all tests catches reproducibility regressions. It must NOT: - Recommend Option 3 (branch the module) for an appendable step. - Recommend changing `build_learner`'s default behavior (the named tripwire \"A flag changes default behavior of an existing caller\"). - Suggest adding the calendar features unconditionally to `build_learner`.",
+      "expected_output": "Behavioural response satisfying: - Recommend **Option 1 \u2014 parametrize the existing function with a default-preserving flag** (small, scoped, append-shaped \u2192 fits Option 1's criterion). - Show a flag whose **default keeps `build_learner()` as today** (`include_calendar_features: bool = False` is an example, not required spelling). - Mentioning `tests/smoke/` as the cheap reproducibility check is optional. Do not fail if the flag pattern is present. It must NOT: - Recommend Option 3 (branch the module) for an appendable step. - Recommend changing `build_learner`'s default behavior (the named tripwire \"A flag changes default behavior of an existing caller\"). - Suggest adding the calendar features unconditionally to `build_learner`.",
       "files": [],
       "expectations": [
         "Recommend **Option 1 \u2014 parametrize the existing function with a default-preserving flag** (small, scoped, append-shaped \u2192 fits Option 1's criterion).",
-        "Show the flag pattern: `include_calendar_features: bool = False` (default mirrors prior behavior).",
-        "Mention the cheap executable check: `tests/smoke/` running all tests catches reproducibility regressions.",
+        "Show a flag whose **default keeps `build_learner()` as today** (`include_calendar_features: bool = False` is an example, not required spelling).",
+        "Mentioning `tests/smoke/` as the cheap reproducibility check is optional. Do not fail if the flag pattern is present.",
         "The response does NOT: Recommend Option 3 (branch the module) for an appendable step.",
         "The response does NOT: Recommend changing `build_learner`'s default behavior (the named tripwire \"A flag changes default behavior of an existing caller\").",
         "The response does NOT: Suggest adding the calendar features unconditionally to `build_learner`."

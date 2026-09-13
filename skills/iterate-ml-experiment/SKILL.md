@@ -111,11 +111,6 @@ then jump.
 If two modes seem to match ("compare X and Y, then propose"), pick
 the **read** mode first, stop. Re-entering § 1 is a separate turn.
 
-**Compare mode — copy this turn.** Side-by-side Headline cells
-from `JOURNAL.md` History. Then STOP. Do not write "Suggested
-next step", "next iteration should", "next lever", or dispatch
-`iterate-from-skore` / `audit-ml-pipeline` / `iterate-from-user`.
-
 ## Stop conditions — read before anything else
 
 - **No design note, no script.** Never create or edit

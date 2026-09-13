@@ -72,7 +72,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         "--skill-pass-ratio",
         default=None,
         help=(
-            "Must-do GEval threshold in [0, 1]. Must-NOT stays all-or-nothing. "
+            "Must-do GEval threshold in [0, 1] (diagnostic only; does not "
+            "fail the node). Must-NOT stays all-or-nothing. "
             "Overrides SKILL_EVAL_PASS_RATIO. "
             f"Default: {DEFAULT_PASS_RATIO}."
         ),
@@ -248,31 +249,42 @@ def pytest_terminal_summary(
     if not EVAL_RESULTS:
         return
     terminalreporter.write_sep("=", "skill-eval summary")
-    counts: dict[str, tuple[int, int, int, int]] = {}
+    counts: dict[str, tuple[int, int, int, int, int]] = {}
     for mode, rows in EVAL_RESULTS.items():
-        passed = sum(1 for *_, ok, _err, skip in rows if ok and not skip)
-        skipped = sum(1 for *_, _ok, _err, skip in rows if skip)
-        errored = sum(1 for *_, _ok, err, skip in rows if err and not skip)
+        passed = sum(
+            1 for *_, ok, _err, skip, _weak in rows if ok and not skip
+        )
+        skipped = sum(1 for *_, _ok, _err, skip, _weak in rows if skip)
+        weak = sum(
+            1
+            for *_, ok, _err, skip, must_do_weak in rows
+            if ok and not skip and must_do_weak
+        )
+        errored = sum(
+            1 for *_, _ok, err, skip, _weak in rows if err and not skip
+        )
         total = len(rows)
         scored = total - skipped
-        counts[mode] = (passed, scored, errored, skipped)
+        counts[mode] = (passed, scored, errored, skipped, weak)
         pct = (100 * passed / scored) if scored else 0
         line = f"  {mode:<8s} {passed}/{scored} ({pct:.0f}%)"
         if skipped:
             line += f"  {skipped} skipped"
+        if weak:
+            line += f"  {weak} must-do-weak"
         if errored:
             line += f"  {errored} judge-error"
         terminalreporter.write_line(line)
     if "with" in counts and "without" in counts:
-        with_p, with_t, _, _ = counts["with"]
-        without_p, without_t, _, _ = counts["without"]
+        with_p, with_t, _, _, _ = counts["with"]
+        without_p, without_t, _, _, _ = counts["without"]
         if with_t and without_t:
             delta_pp = (with_p / with_t - without_p / without_t) * 100
             terminalreporter.write_line(f"  delta    {delta_pp:+.0f}pp")
 
     by_tier: dict[str, list[bool]] = {name: [] for name in TIERS}
     for rows in EVAL_RESULTS.values():
-        for skill, _case_id, _title, ok, _err, skip in rows:
+        for skill, _case_id, _title, ok, _err, skip, _weak in rows:
             if skip:
                 continue
             by_tier[skill_tier(skill)].append(ok)
@@ -292,12 +304,26 @@ def pytest_terminal_summary(
     failed = [
         (mode, skill, case_id, title)
         for mode, rows in EVAL_RESULTS.items()
-        for skill, case_id, title, ok, _err, skip in rows
+        for skill, case_id, title, ok, _err, skip, _weak in rows
         if not ok and not skip
     ]
     if failed:
         terminalreporter.write_line("  failed:")
         for mode, skill, case_id, title in failed:
+            suffix = f" — {title}" if title else ""
+            terminalreporter.write_line(
+                f"    [{mode}] {skill} case {case_id}{suffix}"
+            )
+
+    weak_rows = [
+        (mode, skill, case_id, title)
+        for mode, rows in EVAL_RESULTS.items()
+        for skill, case_id, title, ok, _err, skip, must_do_weak in rows
+        if ok and not skip and must_do_weak
+    ]
+    if weak_rows:
+        terminalreporter.write_line("  must-do-weak (not a fail):")
+        for mode, skill, case_id, title in weak_rows:
             suffix = f" — {title}" if title else ""
             terminalreporter.write_line(
                 f"    [{mode}] {skill} case {case_id}{suffix}"

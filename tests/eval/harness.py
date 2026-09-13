@@ -142,7 +142,9 @@ def load_eval_cases() -> list[EvalCase]:
     return cases
 
 
-EVAL_RESULTS: dict[str, list[tuple[str, object, str, bool, bool, bool]]] = defaultdict(list)
+EVAL_RESULTS: dict[
+    str, list[tuple[str, object, str, bool, bool, bool, bool]]
+] = defaultdict(list)
 
 
 def record_eval_result(
@@ -152,9 +154,18 @@ def record_eval_result(
     passed: bool,
     judge_error: bool = False,
     skipped: bool = False,
+    must_do_weak: bool = False,
 ) -> None:
     EVAL_RESULTS[mode].append(
-        (case.skill_name, case.case_id, case.title, passed, judge_error, skipped)
+        (
+            case.skill_name,
+            case.case_id,
+            case.title,
+            passed,
+            judge_error,
+            skipped,
+            must_do_weak,
+        )
     )
 
 
@@ -187,6 +198,31 @@ class MetricOutcome:
     reason: str
     passed: bool
     evaluation_cost: float | None = None
+
+
+def case_hard_pass(
+    *,
+    outcomes: Sequence[MetricOutcome],
+    missing_files: Sequence[str] = (),
+    missing_reads: Sequence[str] = (),
+) -> tuple[bool, bool, bool]:
+    """Return ``(hard_pass, must_do_weak, must_not_judge_error)``.
+
+    Pytest fails only when ``hard_pass`` is false (Must-NOT miss,
+    missing sandbox files/reads, or a Must-NOT judge error).
+    Must-do below threshold is ``must_do_weak`` and does not fail.
+    """
+    if missing_files or missing_reads:
+        return False, False, False
+    by_name = {item.name: item for item in outcomes}
+    must_not = by_name.get("must_not")
+    must_do = by_name.get("must_do")
+    if must_not is not None and must_not.reason.startswith("judge error:"):
+        return False, False, True
+    if must_not is not None and not must_not.passed:
+        return False, False, False
+    weak = must_do is not None and not must_do.passed
+    return True, weak, False
 
 
 def format_eval_failure(

@@ -75,86 +75,26 @@ and (Shape 3) the versioned WebSearch query. `BLOCKED` means: do
 import, call). It does **not** mean skip naming those paths.
 
 **Do not preview the memory answer.** Do not write a return type
-or signature as a step of the live turn. Do not illustrate the
-omission with a class name — say "no return type until the cache
-file exists" and stop.
+or signature from training-data memory. Quote those only after
+the probe or cache file exists. After a probe, usage in the
+reply must match the looked-up signature.
 
-**Shape 3 BLOCKED — copy this, then end the message.** After naming
-WebSearch `skore 0.18 docs evaluate KFold`, WebFetch path `/0.18/`
-or `/0.18.0/`, cache `scratch/api/skore/0.18.0/evaluate.md` with
-source URL on the first line:
+**All Python goes through scratch files.** Inline `python -c`
+is forbidden, including one-line `__version__` checks. Refuse
+the `-c` form; propose `scratch/<ts>_version_<pkg>.py` (or the
+Shape 1 probe). That refusal is not `BLOCKED`.
 
-```
-BLOCKED: no return type until scratch/api/skore/0.18.0/evaluate.md exists.
-```
+**When `write_file` / `run_python` exist, run the probe this
+turn.** Do not stop at a fenced `pixi run python scratch/…`
+recipe. Write the scratch file, run it, then quote the lookup.
+`BLOCKED` / plan-only applies only when those tools are missing.
 
-Do not add a "What the lookup will answer" section. Do not name
-`EvaluationReport` / `CrossValidationReport`. Do not say whether
-KFold vs holdout types are the same or different. **This holds
-even if Shape 1 already ran this turn.** `pydoc` / `inspect` may
-print a return union; they do not close the narrative dispatch.
-Do not tabulate splitter → report class from that output.
-
-**Stack orientation may name the entry point**
-(`skrub.tabular_pipeline`). Do not tabulate trap names
-(`tabular_learner`, `TabularLearner`) as candidates.
-
-**The first code fence in the reply is the probe, never a call.**
-Naming the symbol in prose is allowed; `from skrub import …`,
-`tabular_pipeline(...)`, `.fit(...)` / `.predict(...)` are not,
-until the Shape 1 probe has been proposed. Emit in this order:
-
-```
-1. Entry point (prose only): skrub.tabular_pipeline
-2. Pre-flight checklist
-3. Shape 1 probe: scratch/<ts>_skrub_tabular_pipeline.py
-4. Cache destination: scratch/api/skrub/0.9.0/tabular_pipeline.md
-5. (optional) Usage sketch — labeled "not executed, pending probe"
-```
-
-Opening the answer with an import + `fit` / `predict` block is the
-failure this rule exists to stop, even when the symbol name is
-right.
-
-**Named traps are leads, not lookups.** `tabular_learner` →
-`tabular_pipeline` in this skill does not confirm the install.
-Still propose a Shape 1 probe (or Shape 2 `dir(skrub)`) before
-treating the replacement as confirmed. Do not assert `ImportError`
-from the trap table alone.
-
-**Shape 3 (copy this).** Cache miss on `evaluate.md`: WebSearch
-`<lib> <MAJOR.MINOR> docs <topic>` (e.g. `skore 0.18 docs evaluate
-KFold`). WebFetch URL path must contain `/0.18/` or `/0.18.0/`.
-Reject `/latest/` and `/stable/`. Cache
-`scratch/api/skore/0.18.0/evaluate.md` with the **source URL on
-the first line**. Do not answer the return type from memory.
-
-**Version-check refusal (copy this).** When the user asks for
-`python -c "… __version__"`: refuse the inline command; cite
-**all Python execution goes to scratch** (version checks are
-enumerated in that Stop condition); propose
-`scratch/<ts>_version_<pkg>.py`; say even a one-line version
-check produces a scratch file. Do not `BLOCKED` the policy
-refusal.
-
-**Inline `python -c` when tools exist (copy this).** The user
-asks to run `python -c` / `pixi run python -c` for a signature
-or version. Refuse the inline command. Then **this turn**,
-do not stop at a fenced recipe:
-
-```
-1. write_file the probe at scratch/<ts>_*.py
-   (Shape 1: writes scratch/api/<lib>/<version>/<topic>.md;
-    version: scratch/<ts>_version_<pkg>.py)
-2. run_python that same file (not pixi run python scratch/…)
-3. Confirm the cache / print landed
-4. Then quote the lookup
-```
-
-A pasted probe plus `Run: pixi run python scratch/….py` is
-**not** the refusal. `write_file` + `run_python` **is**.
-`BLOCKED` / plan-only applies only when those tools are
-missing.
+**Named traps are leads, not lookups.** A rename in this skill
+(`tabular_learner` → `tabular_pipeline`) does not confirm the
+install. Still propose Shape 1 (or Shape 2 `dir`) before treating
+the replacement as confirmed. Do not assert `ImportError` from
+the trap table alone. Stack orientation may name the entry point
+in prose; do not emit a call until the probe is proposed.
 
 ## Next-step pointers
 

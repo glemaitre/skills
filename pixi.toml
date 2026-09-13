@@ -55,7 +55,9 @@ joblib = "<1.5"
 #                         both     run each case twice and report the
 #                                  pass-rate delta in the pytest summary
 # SKILL_EVAL_PASS_RATIO   Must-do GEval threshold in [0, 1] (partial
-#                         credit). Must-NOT stays all-or-nothing.
+#                         credit). Diagnostic only — does not fail
+#                         the pytest node. Must-NOT stays
+#                         all-or-nothing and is the hard gate.
 #
 # Overridable per run with `--skill-model` (repeatable),
 # `--skill-tier`, `--skill-judge-model`, `--skill-mode`, and
