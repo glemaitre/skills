@@ -104,6 +104,31 @@ def check_workspace(fmt: str) -> None:
         raise SystemExit(code)
 
 
+@cli.command("style")
+@click.argument(
+    "paths",
+    nargs=-1,
+    type=click.Path(path_type=Path),
+)
+def style_cmd(paths: tuple[Path, ...]) -> None:
+    """Run ruff check --fix then format on defaults or PATHS.
+
+    Default globs: ``src/``, ``experiments/``, ``audit/``, ``data/eda.py``,
+    top-level ``*.py``. Does not write ``ruff.toml``.
+    """
+    from skore_skills.style import run_style
+
+    def warn(message: str) -> None:
+        click.echo(message, err=True)
+
+    try:
+        code = run_style(Path.cwd(), paths, warn=warn)
+    except FileNotFoundError as exc:
+        raise click.ClickException(str(exc)) from exc
+    if code:
+        raise SystemExit(code)
+
+
 def main() -> None:
     """Run the CLI (``python -m skore_skills`` / console script)."""
     cli()
