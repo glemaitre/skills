@@ -8,6 +8,8 @@ import click
 
 from skore_skills import __version__
 from skore_skills.api import get_symbol, package_version
+from skore_skills.check import render_workspace_check
+from skore_skills.status import render_status
 
 
 @click.group()
@@ -66,6 +68,40 @@ def api_version(package: str) -> None:
         click.echo(package_version(package))
     except ImportError as exc:
         raise click.ClickException(str(exc)) from exc
+
+
+@cli.command("status")
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["json", "text"], case_sensitive=False),
+    default="json",
+    show_default=True,
+)
+def status_cmd(fmt: str) -> None:
+    """Print a read-only JSON snapshot of the current workspace."""
+    click.echo(render_status(Path.cwd(), fmt.lower()), nl=False)
+
+
+@cli.group("check")
+def check_group() -> None:
+    """Yes/no checks over workspace facts."""
+
+
+@check_group.command("workspace")
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["json", "text"], case_sensitive=False),
+    default="json",
+    show_default=True,
+)
+def check_workspace(fmt: str) -> None:
+    """Exit 1 if the tree is not scaffolded (no ``src/`` and no ``journal/``)."""
+    text, code = render_workspace_check(Path.cwd(), fmt.lower())
+    click.echo(text, nl=False)
+    if code:
+        raise SystemExit(code)
 
 
 def main() -> None:
