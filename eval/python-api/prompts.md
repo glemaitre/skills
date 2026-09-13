@@ -1,31 +1,12 @@
 # python-api eval — golden prompts
 
-Behavioural prompts for the `python-api` skill, scored manually by reading
-each transcript against the **Must / Must NOT** bullets per case.
+Behavioural prompts for the `python-api` skill.
 
-## How a case is scored
-
-For each case the model is given:
-- `skills/python-api/SKILL.md` as the system prompt.
-- The case's `User prompt` (verbatim) as the user message.
-- The case's `Assumed workspace state` is appended to the user message as a
-  short preamble.
-
-Lookup cases set `**Tools:** yes`. Those runs get a real temp workspace
-(seeded from `**Sandbox:**`) and may `list_dir` / `read_file` /
-`write_file` / `run_python` (scratch files only). Other skills stay
-single-turn with no tools unless a case opts in (see
-`build-ml-pipeline` case 3). When tools are off, workspace state is
-inlined so the test does not depend on `ls`.
-
-Each `Must do` and `Must NOT do` bullet is a substring / behavioural check
-on the transcript. Read the transcript top-to-bottom, tick boxes, flag any
-miss.
-
-Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. Pass criterion overall: ≥ 6 / 7 cases pass and no `Must NOT do`
-violation appears in any transcript (the latter is the hard rule — a
-violation means a regression has snuck in).
+Lookup cases set `**Tools:** yes`. Those runs get a temp workspace
+and may `list_dir` / `read_file` / `write_file` / `run_python` /
+`run_skore_skills`. Shape 1 happy path is
+`run_skore_skills` with `python -m skore_skills api get|version`.
+Do not treat `run_python` + `scratch/<ts>_*.py` as the lookup.
 
 ---
 
@@ -46,28 +27,25 @@ violation means a regression has snuck in).
 - dir: `scratch/api/skore`
 
 **Expect files:**
-- `scratch/api/skore/0.18.0/evaluate.md`
+- `scratch/api/skore/0.18.0/skore_evaluate.md`
+
+**Expect cli:**
+- `api get skore.evaluate`
 
 **Must do:**
-- Resolve the installed version via a scratch file (not inline
-  `python -c`).
-- List `scratch/api/skore/` (cache **miss** is correct — empty or
-  missing `0.18.0/` until the probe writes it). Then run a probe.
-- Write and run a probe script under `scratch/<ts>_*.py` (not an
-  inline `python -c`).
-- Use `pydoc.render_doc` (not `__doc__`) for capturing the help text.
-- Write the cache file at `scratch/api/skore/0.18.0/evaluate.md`.
-- Mention Signature + help() and a Usage block (four-section contract
-  at least implicitly).
+- Run `python -m skore_skills api get skore.evaluate` via
+  `run_skore_skills` (optional `api version skore` first).
+- List or acknowledge `scratch/api/skore/` as a cache miss before
+  or while fetching.
+- Land the cache file the CLI writes
+  (`scratch/api/skore/0.18.0/skore_evaluate.md`).
+- Quote the signature from that lookup, not from memory.
 
 **Must NOT do:**
-- Output a literal signature like
-  `def evaluate(estimator, X=None, y=None, ...)` lifted from memory
-  without first running the probe.
-- Use `__doc__` to capture documentation.
-- Recommend an inline `pixi run python -c "..."` that spans more than 2
-  lines.
-- Skip the cache-list step and jump straight to the probe.
+- Output a literal signature lifted from memory without first
+  running `api get`.
+- Write or run a `scratch/<ts>_*.py` probe.
+- Run inline `python -c`.
 
 ---
 
@@ -78,48 +56,35 @@ violation means a regression has snuck in).
 > baseline. What's its signature?
 
 **Assumed workspace state:**
-- `scratch/api/skore/0.18.0/evaluate.md` already exists on disk (written
-  yesterday).
+- `scratch/api/skore/0.18.0/skore_evaluate.md` already exists on disk.
 - `skore` is installed at version `0.18.0`.
 
 **Tools:** yes
 
 **Sandbox:**
 - dir: `scratch/api/skore/0.18.0`
-- file: `scratch/api/skore/0.18.0/evaluate.md`
+- file: `scratch/api/skore/0.18.0/skore_evaluate.md`
 ````
-# evaluate
+# `skore.evaluate`
 
-Source: inspect: skore.evaluate @ 0.18.0
-Fetched: 2026-09-11
+- package version: `0.18.0`
+- signature: `(estimator, data=None, *, X=None, y=None, splitter=None, ...)`
 
-## Signature
-evaluate(estimator, data=None, *, X=None, y=None, splitter=None, ...)
-
-## help()
-skore.evaluate — cached extract for Shape 0 hit tests.
-
-## Usage
-Call: skore.evaluate(learner, data={...}, splitter=...)
-Don't call: positional X, y on a SkrubLearner
-Trap: none
-Returns: a report object (see cached help)
+## Doc
+cached extract for Shape 0 hit tests.
 ````
+
+**Expect reads:**
+- `scratch/api/skore/0.18.0/skore_evaluate.md`
 
 **Must do:**
 - Recognise the cache hit. Using `read_file` on
-  `scratch/api/skore/0.18.0/evaluate.md` counts; naming `Read` in
-  the message also counts.
+  `scratch/api/skore/0.18.0/skore_evaluate.md` counts.
 - Treat the cache file as already on disk (read, not rewritten).
-  The pre-flight `n/a — cache hit, file already on disk` phrasing
-  is sufficient. So is a cache-hit answer that `read_file`s that
-  path and does not `write_file` it — do not require the exact
-  pre-flight sentence.
 
 **Must NOT do:**
-- Re-run a Shape 1 probe / re-fetch / re-WebSearch despite the cache hit.
-- Write a fresh cache file at the same path (would overwrite the
-  existing synthesis).
+- Re-run `api get` / a Shape 1 probe / WebSearch despite the cache hit.
+- Write a fresh cache file at the same path.
 
 ---
 
@@ -144,26 +109,26 @@ Returns: a report object (see cached help)
 - dir: `scratch/api/skrub`
 
 **Expect files:**
-- `scratch/api/skrub/0.9.0/tabular_pipeline.md`
+- `scratch/api/skrub/0.9.0/skrub_tabular_pipeline.md`
+
+**Expect cli:**
+- `api get skrub.tabular_pipeline`
 
 **Must do:**
-- Name `tabular_pipeline` (top-level skrub) as the entry point — i.e.
-  `skrub.tabular_pipeline`. (Acceptable alternative: name
-  `TableVectorizer` as the featuriser-only sibling.)
-- Run a Shape 1 probe (`scratch/<ts>_*.py` + `pydoc.render_doc`)
-  against the installed skrub and write
-  `scratch/api/skrub/0.9.0/tabular_pipeline.md`.
-- Report the installed signature (args / return) **from that lookup**.
-- Any usage fence comes **after** the probe/cache write and matches
-  the looked-up signature.
+- Name `tabular_pipeline` (top-level skrub) as the entry point —
+  `skrub.tabular_pipeline`. (Acceptable alternative: `TableVectorizer`
+  as the featuriser-only sibling, with a matching `api get`.)
+- Run `python -m skore_skills api get skrub.tabular_pipeline` and
+  write `scratch/api/skrub/0.9.0/skrub_tabular_pipeline.md`.
+- Report the installed signature from that lookup.
+- Any usage fence comes **after** the CLI/cache write.
 
 **Must NOT do:**
 - Recommend `tabular_learner`, `auto_tabular`, or `TabularLearner`
   as the entry point (naming them only as a renamed trap is fine).
-- Write a usage / import / `.fit` fence before the Shape 1 probe has
-  run.
-- Invent parameters the probe did not show (e.g. a `target_column=`
-  argument that is not in the installed signature).
+- Write a usage / import / `.fit` fence before `api get` has run.
+- Invent parameters the lookup did not show.
+- Write a `scratch/<ts>_*.py` probe.
 
 ---
 
@@ -175,7 +140,7 @@ Returns: a report object (see cached help)
 
 **Assumed workspace state:**
 - `scratch/api/skore/0.18.0/` exists but contains only `project.md`
-  (no `evaluate.md` yet).
+  (no evaluate cache yet).
 - `skore` is installed at version `0.18.0`.
 
 **Tools:** yes
@@ -189,25 +154,18 @@ Source: inspect: skore.Project @ 0.18.0
 ````
 
 **Must do:**
-- Identify this as a Shape 3 / narrative question (signatures alone do
-  not answer "is the return type the same") OR check the cache then
-  escalate to WebSearch on miss.
+- Identify this as a Shape 3 / narrative question OR check the cache
+  then escalate to WebSearch on miss.
 - Look the dispatch up this turn before treating it as installed
-  truth. Any of these count: a Shape 1 `pydoc` / `inspect` probe on
-  the installed `skore.evaluate`, a written `evaluate.md` cache,
-  WebSearch / docs next, or a BLOCKED plan. Do not require a
-  versioned query string, a `/0.18/` vs `/latest/` lecture, or
-  withholding the KFold-vs-holdout answer after a successful probe.
+  truth. Any of these count: `api get skore.evaluate`, a written
+  evaluate cache, WebSearch / docs next, or a BLOCKED plan.
 
 **Must NOT do:**
 - Answer the return-type question from **training-data memory** as
-  installed truth — no probe, no cache file, no BLOCKED / "docs
-  next." Answering from `pydoc` / `inspect` (or a cache written
-  this turn) is a lookup, not a miss. A labeled guess next to
-  BLOCKED or "WebSearch is next" is extra help, not a miss.
+  installed truth — no CLI, no cache file, no BLOCKED / "docs next."
 - Use a URL containing `/latest/` or `/stable/` as the **cached**
-  source if a cache write happens. Mentioning `/latest/` only to
-  reject it is not a violation.
+  source if a cache write happens.
+- Write a `scratch/<ts>_*.py` probe as the happy path.
 
 ---
 
@@ -228,24 +186,21 @@ Source: inspect: skore.Project @ 0.18.0
 **Sandbox:**
 - dir: `scratch/api/skrub/0.9.0`
 
+**Expect cli:**
+- `api get skrub.tabular_pipeline`
+
 **Must do:**
 - Refuse to add the import without first looking up the symbol against
   the installed `skrub`.
-- Run a Shape 1 probe this turn. Probing `tabular_pipeline` (the
-  live name) counts; do not require a second probe of
-  `tabular_learner` / `dir(skrub)` for the dead name.
-- Surface the named-trap context: top-level skrub uses
-  `tabular_pipeline`. A Shape 1 probe plus naming
-  `tabular_pipeline` **is** the "recognition is not a lookup"
-  equivalent. The slogan is optional.
+- Run `api get` this turn on `skrub.tabular_pipeline` (the live name).
+- Surface that top-level skrub uses `tabular_pipeline`.
 
 **Must NOT do:**
 - Write `from skrub import tabular_learner` into
-  `experiments/02_skrub_default.py` (or any other project file) as
-  the live import. Quoting that string in prose as the refused
-  trap / user request is not a miss. A `tabular_pipeline` import
-  plus a Shape 1 probe is the expected deliverable.
+  `experiments/02_skrub_default.py` as the live import. Quoting that
+  string as the refused trap is not a miss.
 - Tell the user "yes that's the right name" without a lookup.
+- Write a `scratch/<ts>_*.py` probe.
 
 ---
 
@@ -265,14 +220,11 @@ Source: inspect: skore.Project @ 0.18.0
   by **id**, not by `key`.
 - Propose `project.summarize()` to enumerate `(key, id)` pairs, then
   `project.get(<id>)` with the resolved id.
-- Cite the "Never substitute by re-creating the artifact" rule (or
-  equivalent — re-running and `put`-ing would write a duplicate row).
+- Cite that re-running and `put`-ing would write a duplicate row.
 
 **Must NOT do:**
 - Recommend re-running `experiments/01_baseline.py` **this turn** as
-  the first recovery (before `summarize()`). Mentioning a later
-  re-run **if** `summarize()` has no `"01_baseline"` row is
-  allowed.
+  the first recovery (before `summarize()`).
 - Recommend calling `skore.evaluate(...) + project.put(...)` from a
   scratch probe this turn to "regenerate" the report.
 - Treat the `KeyError` as evidence the report is missing without
@@ -280,7 +232,7 @@ Source: inspect: skore.Project @ 0.18.0
 
 ---
 
-## CASE_07 — Multi-symbol consolidation, no inline-python-c spam
+## CASE_07 — Multi-symbol lookup via the CLI
 
 **User prompt:**
 > I need the signatures of `skore.Project.put`, `skore.Project.get`, and
@@ -297,27 +249,22 @@ Source: inspect: skore.Project @ 0.18.0
 - dir: `scratch/api/skore/0.18.0`
 
 **Expect files:**
-- `scratch/api/skore/0.18.0/project*.md`
+- `scratch/api/skore/0.18.0/skore_Project*.md`
+
+**Expect cli:**
+- `api get skore.Project`
 
 **Must do:**
-- Write **one** probe script under `scratch/<ts>_*.py` that iterates
-  over the three dotted paths and consolidates their Signature + help()
-  sections.
-- Write **one** cache file at
-  `scratch/api/skore/0.18.0/project_local.md` (or `project.md`) covering
-  all three symbols under one topic.
-- Mention the multi-symbol-consolidation rule (one topic file per
-  topic, not per symbol).
+- Look up via `python -m skore_skills api get` (Project and/or the
+  three methods). Naming `api get skore.Project` counts if the card
+  covers the methods; separate gets also count.
+- Land cache files under `scratch/api/skore/0.18.0/`.
+- Quote signatures from the CLI output / cache, not memory.
 
 **Must NOT do:**
-- Recommend three separate inline `pixi run python -c "..."` calls.
-- Recommend ANY inline `python -c` (rule is unconditional now —
-  see Stop conditions, no length carve-out).
-- Write three separate cache files (`put.md`, `get.md`, `summarize.md`).
-- Treat the probe as the conclusion without naming a cache
-  destination. Naming `scratch/api/skore/0.18.0/project_local.md`
-  (or `project.md`) as the destination is required; the file should
-  land this turn.
+- Recommend inline `python -c`.
+- Write `scratch/<ts>_*.py` probes.
+- Treat the lookup as done without naming a cache destination.
 
 ---
 
@@ -339,27 +286,24 @@ Source: inspect: skore.Project @ 0.18.0
 - dir: `scratch/api/skore/0.18.0`
 
 **Expect files:**
-- `scratch/api/skore/0.18.0/evaluate.md`
+- `scratch/api/skore/0.18.0/skore_evaluate.md`
+
+**Expect cli:**
+- `api get skore.evaluate`
 
 **Must do:**
-- Do not run the requested inline `python -c`. Writing and running a
-  `scratch/<ts>_*.py` probe via `run_python` **is** the refusal.
-- Cite the **Stop condition** that all Python execution goes to
-  `scratch/` regardless of length, **or** show that this turn only
-  executed a scratch file (no `python -c`).
-- Write the cache file at `scratch/api/skore/0.18.0/evaluate.md`.
-- Write any `scratch/<ts>_*.py` that writes that cache file in
-  one run (the exact probe basename is not load-bearing).
+- Do not run the requested inline `python -c`. Running
+  `python -m skore_skills api get skore.evaluate` **is** the refusal.
+- Write the cache file at `scratch/api/skore/0.18.0/skore_evaluate.md`.
 
 **Must NOT do:**
 - Run the inline `pixi run python -c "..."` as requested.
-- Treat "it's one line" / "I'll remember it" as resolving the
-  rule. The rule is unconditional; length isn't the criterion.
-- Recommend Shape 1a as a carve-out (Shape 1a is removed).
+- Treat "it's one line" as resolving the rule.
+- Write a `scratch/<ts>_*.py` probe instead of the CLI.
 
 ---
 
-## CASE_09 — Version check goes to scratch, not inline
+## CASE_09 — Version check via `api version`, not inline
 
 **User prompt:**
 > What version of skrub is installed? Just run
@@ -375,22 +319,15 @@ Source: inspect: skore.Project @ 0.18.0
 **Sandbox:**
 - dir: `scratch`
 
-**Expect files:**
-- `scratch/*.py`
+**Expect cli:**
+- `api version skrub`
 
 **Must do:**
-- Do not run the requested inline `python -c`. A scratch file plus
-  `run_python` **is** the refusal.
-- Cite the "all Python execution goes to scratch" Stop condition
-  (version checks included), **or** show that this turn only ran a
-  scratch file.
-- Write a scratch file under `scratch/` that prints `skrub.__version__`
-  (any `scratch/*.py` name is fine) and run it via `run_python`
-  (not `python -c`).
-- Confirm: even a one-line version check produces a scratch file.
-  Report the version printed by that script.
+- Do not run the requested inline `python -c`.
+  `python -m skore_skills api version skrub` **is** the refusal.
+- Report the version printed by that command.
 
 **Must NOT do:**
 - Run the inline `pixi run python -c "..."` as requested.
-- Treat the version check as "trivial enough to inline".
-- Skip the file entirely and answer the version from memory.
+- Skip the CLI and answer the version from memory.
+- Write a `scratch/<ts>_*.py` version probe.
