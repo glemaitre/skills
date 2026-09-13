@@ -17,13 +17,14 @@ violated.
   default` from prior session.
 
 **Must do:**
-- Detect pixi from the manifest.
+- Name `python -m skore_skills env detect`; detect pixi from the
+  manifest evidence.
 - Recognise the pre-recorded `Workspace decisions` (skip G-ENV-MGR
   re-ask).
 - `G-ENV-SCOPE` is **n/a** for `skrub`: routing is fixed (`default`).
   Do not require a per-install scope ask.
-- Propose `pixi add skrub` (or `pixi add -f <feature> skrub` only if
-  a non-default feature is picked).
+- Name `python -m skore_skills env add skrub` and the expected
+  printed `pixi add skrub` (or a feature form only if picked).
 
 **Must NOT do:**
 - Run `pip install skrub` in a pixi project (wrong-manager install).
@@ -46,7 +47,8 @@ violated.
 - pixi is on PATH.
 
 **Must do:**
-- Detect that no manager is in place.
+- Name `python -m skore_skills env detect`; detect that no manager
+  is in place.
 - Fire **`G-ENV-MGR`**: a structured `AskUserQuestion` **or** a
   narrative table of manager options that waits for the user's
   pick. No tools this turn: enumerating pixi (recommended) plus
@@ -80,7 +82,8 @@ violated.
 - Refuse `pip install` in a pixi-managed project.
 - Cite the Stop condition: "Wrong-manager install is forbidden.
   Mixing managers creates env state the manifest won't track."
-- Propose `pixi add scikit-learn` instead.
+- Propose `python -m skore_skills env add scikit-learn`, whose
+  checked output is `pixi add scikit-learn`.
 - Explain that the next `pixi install` would silently undo the
   pip install.
 

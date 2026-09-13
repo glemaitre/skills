@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "a648ae8f96f3b1be9df1502fed70cbb1ea8c4428628fd1d6d8bd2a7a460521ef",
+  "catalog_hash": "ecfdcf333e29235c6ca6ee48a48eb8fae2389b08627dddc7fe691e48ee67566d",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -111,7 +111,7 @@
       "summary": "Bootstrapping the experiment setup based on your favorite Python environment manager.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "b1d35827e371408e7fb72b851fcfbeec1b030a0454446fb9fe3ee92f0a7ae579"
+      "hash": "2cb7aacd94861518847f5ded46e2b213f23f3ee32da3a495ab618953bb64497d"
     },
     {
       "id": "data-science-python-stack",
