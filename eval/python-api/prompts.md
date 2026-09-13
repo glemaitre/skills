@@ -192,19 +192,19 @@ Source: inspect: skore.Project @ 0.18.0
 - Identify this as a Shape 3 / narrative question (signatures alone do
   not answer "is the return type the same") OR check the cache then
   escalate to WebSearch on miss.
-- Withhold the KFold-vs-holdout answer until docs are fetched.
-  Saying WebSearch / docs lookup is next, or emitting a BLOCKED
-  plan, both count. Do not require a versioned query string, a
-  `/0.18/` vs `/latest/` lecture, or naming
-  `scratch/api/skore/0.18.0/evaluate.md` this turn.
+- Look the dispatch up this turn before treating it as installed
+  truth. Any of these count: a Shape 1 `pydoc` / `inspect` probe on
+  the installed `skore.evaluate`, a written `evaluate.md` cache,
+  WebSearch / docs next, or a BLOCKED plan. Do not require a
+  versioned query string, a `/0.18/` vs `/latest/` lecture, or
+  withholding the KFold-vs-holdout answer after a successful probe.
 
 **Must NOT do:**
-- Answer the return-type question from memory as the **lookup
-  result** — asserted installed truth with no BLOCKED / no "docs
-  next." A labeled guess or example dispatch (`KFold → one report
-  type, holdout → another`) **next to** BLOCKED or "WebSearch is
-  next" is extra help, not a miss. A class name used only as an
-  example of what the cache will enumerate is not a violation.
+- Answer the return-type question from **training-data memory** as
+  installed truth — no probe, no cache file, no BLOCKED / "docs
+  next." Answering from `pydoc` / `inspect` (or a cache written
+  this turn) is a lookup, not a miss. A labeled guess next to
+  BLOCKED or "WebSearch is next" is extra help, not a miss.
 - Use a URL containing `/latest/` or `/stable/` as the **cached**
   source if a cache write happens. Mentioning `/latest/` only to
   reject it is not a violation.
