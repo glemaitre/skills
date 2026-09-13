@@ -14,3 +14,9 @@ eval/*-workspace/
 __pycache__/
 .pytest_cache/
 .deepeval/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
