@@ -10,15 +10,21 @@ and the harness note forbids tool calls. Opt-in cases set
 `**Tools:** yes`: those runs get a temp project directory seeded
 from `**Sandbox:**` (`dir:` / `file:` / `copy:` from the repo),
 LiteLLM tools (`list_dir`, `read_file`, `write_file`, `run_python`
-on `scratch/` only). The loop cap is 12 tool steps; leftover
+on `scratch/` only, and `run_skore_skills` for
+`python -m skore_skills <args>` with cwd = the temp root).
+`run_python` still rejects `python -c` and files outside `scratch/`.
+The loop cap is 12 tool steps; leftover
 MiniMax-style XML tool calls are not scored — the harness strips them,
 keeps the last prose, and if needed nudges once for a final assistant
 message.
-Pytest checks `**Expect files:**` globs and `**Expect reads:**`
-tool-trace paths after the loop. Lookup-gated `python-api` cases
-use this, as does `build-ml-pipeline` case 3 (seeded
-`references/layer_examples.md`). The eval environment pins
-skrub / scikit-learn / skore so Shape 1 probes can import them.
+Pytest checks `**Expect files:**` globs, `**Expect reads:**`
+tool-trace paths, and `**Expect cli:**` argv substrings on
+`run_skore_skills` after the loop. Lookup-gated `python-api` cases
+still use `run_python` probes until C09 rewrites them to
+`run_skore_skills`. `build-ml-pipeline` case 3 seeds
+`references/layer_examples.md`. The eval environment includes
+editable `skore-skills` plus skrub / scikit-learn / skore so both
+the CLI and leftover probes can import them.
 `python-api` case 4 (Shape 3 / WebFetch) has tools for cache files
 but no WebSearch/WebFetch tool yet.
 
@@ -35,7 +41,7 @@ dramatic misses:
 
 - **Must-NOT** is all-or-nothing (`threshold=1.0`, `strict_mode`).
   A violated prohibition fails the case.
-- Missing `**Expect files:**` / `**Expect reads:**` fails.
+- Missing `**Expect files:**` / `**Expect reads:**` / `**Expect cli:**` fails.
 - An **empty** visible answer (not a skip) fails.
 
 **Must-do** still runs. It is a non-strict GEval with partial
@@ -66,7 +72,11 @@ files / empty) separately from `must-do-weak`.
    state, Must do / Must NOT). Optional: `**Tools:** yes`,
    `**Sandbox:**` (`dir:` / `file:` plus a fenced body, or `copy:`),
    `**Expect files:**` (globs relative to the temp root),
-   `**Expect reads:**` (`read_file` paths the target must open).
+   `**Expect reads:**` (`read_file` paths the target must open),
+   `**Expect cli:**` (argv substring of a `run_skore_skills` call,
+   e.g. `api get sklearn.model_selection.KFold`). Document
+   `python -m skore_skills` until `skore skills run` ships; do not
+   require the forwarder in evals yet.
 2. Regenerate the skill-creator schema file:
 
 ```bash
@@ -109,7 +119,7 @@ Defaults (override in `pixi.toml` or on the CLI):
     `data-science-python-stack`, `evaluate-ml-pipeline`,
     `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`
     (and, when they gain evals, `explore-ml-data`, `audit-ml-pipeline`)
-  - big — `openrouter/moonshotai/kimi-k3`: `iterate-ml-experiment`,
+  - big — `openrouter/deepseek/deepseek-v4.1-flash`: `iterate-ml-experiment`,
     `python-api`, `build-ml-pipeline`
 - judge: `openrouter/deepseek/deepseek-v4.1-flash` (not tiered)
 - mode: `with` (SKILL.md as system prompt)

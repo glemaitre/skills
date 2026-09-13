@@ -15,7 +15,7 @@ DEFAULT_TIER = "medium"
 DEFAULT_TIER_MODELS = {
     "small": "openrouter/qwen/qwen3.7-flash",
     "medium": "openrouter/deepseek/deepseek-v4.1-flash",
-    "big": "openrouter/moonshotai/kimi-k3",
+    "big": "openrouter/deepseek/deepseek-v4.1-flash",
 }
 
 # Skills with no evals.json yet are listed so a later converter run
