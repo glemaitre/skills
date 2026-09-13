@@ -17,10 +17,8 @@ violated.
 - `pixi run ruff --version` succeeds (ruff is installed).
 
 **Must do:**
-- List the three ruff commands in order:
-  1. `pixi run ruff format src/claim_predictor/pipeline.py`
-  2. `pixi run ruff check --fix src/claim_predictor/pipeline.py`
-  3. `pixi run ruff check src/claim_predictor/pipeline.py`
+- Name `python -m skore_skills style
+  src/claim_predictor/pipeline.py`.
 - Cite the one-fix-per-file rule (max 2 passes per warning).
 - Mention the touched-file scope only (not the whole `src/`).
 
@@ -174,9 +172,8 @@ violated.
   `get_splitter`, `D415` on `get_splitter`.
 
 **Must do:**
-- Name `pipeline.py` as this turn's in-scope file and list the ruff
-  trio for it (`ruff format`, `ruff check --fix`, `ruff check`).
-  Naming the commands counts when the shell cannot run.
+- Name `pipeline.py` as this turn's in-scope file and name
+  `python -m skore_skills style pipeline.py`.
 - **Surface** the `evaluate.py` warnings — list the 7 codes — and
   **ask** (yes/no) whether to address them as a separate task. Do
   not schedule them alongside `pipeline.py`.
