@@ -57,6 +57,19 @@ Then run the following command:
 skore skills install
 ```
 
+Install a smaller workflow pack by id when you do not need the full
+companion:
+
+```bash
+skore skills install setup  # workspace, environment, stack, style
+skore skills install eda    # data exploration
+skore skills install model  # build, evaluate, test, smoke
+skore skills install loop   # iterate, source, audit
+```
+
+`skore skills install ml-experimentation` remains the complete pack,
+and the default `install` / `install all` behavior is unchanged.
+
 You can use `uvx` or `pixi exec` to install the `skore` CLI and directly run the
 command in an isolated environment:
 

@@ -134,6 +134,47 @@
   ],
   "workflows": [
     {
+      "id": "setup",
+      "title": "Set Up an ML Workspace",
+      "summary": "Scaffold an ML workspace, choose its Python stack, and configure its environment and code style.",
+      "includes": [
+        "organize-ml-workspace",
+        "python-env-manager",
+        "data-science-python-stack",
+        "python-code-style"
+      ]
+    },
+    {
+      "id": "eda",
+      "title": "Explore ML Data",
+      "summary": "Install the data exploration workflow.",
+      "includes": [
+        "explore-ml-data"
+      ]
+    },
+    {
+      "id": "model",
+      "title": "Model an ML Pipeline",
+      "summary": "Build, evaluate, and test an ML pipeline.",
+      "includes": [
+        "build-ml-pipeline",
+        "evaluate-ml-pipeline",
+        "test-ml-pipeline",
+        "smoke-test-ml-pipeline"
+      ]
+    },
+    {
+      "id": "loop",
+      "title": "Iterate on ML Experiments",
+      "summary": "Design, audit, and source successive experiments.",
+      "includes": [
+        "iterate-ml-experiment",
+        "iterate-from-skore",
+        "iterate-from-user",
+        "audit-ml-pipeline"
+      ]
+    },
+    {
       "id": "ml-experimentation",
       "title": "ML Experimentation Companion",
       "summary": "A machine learning experiment companion. Focus on the science, the companion organizes the rest with organized workspaces and reporting, auditable results where you are still the owner.",
