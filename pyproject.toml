@@ -46,13 +46,16 @@ source = ["skore_skills"]
 parallel = true
 
 [tool.coverage.report]
-omit = ["tests/*"]
+omit = ["tests/*", "*/skore_skills/templates/*"]
 show_missing = true
 exclude_also = [
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+
+[tool.ruff]
+exclude = ["src/skore_skills/templates"]
 
 [tool.ruff.lint]
 select = [
@@ -82,7 +85,7 @@ convention = "numpy"
 [tool.mypy]
 mypy_path = "src"
 explicit_package_bases = true
-exclude = ["tests/"]
+exclude = ["tests/", "templates/"]
 warn_unused_configs = true
 warn_redundant_casts = true
 

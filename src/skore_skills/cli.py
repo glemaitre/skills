@@ -104,6 +104,27 @@ def check_workspace(fmt: str) -> None:
         raise SystemExit(code)
 
 
+@cli.command("scaffold")
+@click.option(
+    "--package", "package_name", required=True, help="Snake-case import name."
+)
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Overwrite an existing src/ / experiments / pyproject layout.",
+)
+def scaffold_cmd(package_name: str, force: bool) -> None:
+    """Copy the organize-ml-workspace templates into the current directory."""
+    from skore_skills.scaffold import scaffold
+
+    try:
+        written = scaffold(Path.cwd(), package_name, force=force)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    for path in written:
+        click.echo(str(path))
+
+
 @cli.command("style")
 @click.argument(
     "paths",
