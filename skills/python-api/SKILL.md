@@ -54,6 +54,48 @@ Three durable rules:
 3. **Bundled `references/` ≠ workspace cache.** Bundled refs are
    durable workflow patterns; cache files are per-version extracts.
 
+## This-turn contract (including no-tools evals)
+
+Checklist boxes are only `[x]`, `[ ]`, or `[n/a]`. Never `[~]`,
+"pending", or "deferred".
+
+**A cache hit is never `BLOCKED`.** If workspace state already
+lists `scratch/api/<lib>/<version>/<topic>.md` on disk, mark
+`Cache file lands on disk` as
+`[n/a] — cache hit, file already on disk` even if `Read` cannot
+run this turn. Next action: name
+`Read scratch/api/<lib>/<version>/<topic>.md`. Do not emit
+`BLOCKED`. A version given in workspace state counts as resolved.
+
+**When tools are missing, still write the plan.** Name the Shape,
+the probe path (`scratch/<ts>_….py` — version checks use
+`scratch/<ts>_version_<pkg>.py` exactly), the cache destination,
+and (Shape 3) the versioned WebSearch query. `BLOCKED` means: do
+**not** emit the looked-up fact (signature, arg list, return type,
+import, call). It does **not** mean skip naming those paths.
+
+**Do not preview the memory answer.** Do not write a return type
+or signature from training-data memory. Quote those only after
+the probe or cache file exists. After a probe, usage in the
+reply must match the looked-up signature.
+
+**All Python goes through scratch files.** Inline `python -c`
+is forbidden, including one-line `__version__` checks. Refuse
+the `-c` form; propose `scratch/<ts>_version_<pkg>.py` (or the
+Shape 1 probe). That refusal is not `BLOCKED`.
+
+**When `write_file` / `run_python` exist, run the probe this
+turn.** Do not stop at a fenced `pixi run python scratch/…`
+recipe. Write the scratch file, run it, then quote the lookup.
+`BLOCKED` / plan-only applies only when those tools are missing.
+
+**Named traps are leads, not lookups.** A rename in this skill
+(`tabular_learner` → `tabular_pipeline`) does not confirm the
+install. Still propose Shape 1 (or Shape 2 `dir`) before treating
+the replacement as confirmed. Do not assert `ImportError` from
+the trap table alone. Stack orientation may name the entry point
+in prose; do not emit a call until the probe is proposed.
+
 ## Next-step pointers
 
 | Came here for… | After lookup, next is… |
@@ -85,6 +127,15 @@ shape produces a wrong-looking cache file and burns a turn.
 section but typically does not enumerate dispatch behaviour under
 each argument value — that lives in narrative docs.
 
+**Shape 1 does not close Shape 3.** A probe this turn may record
+the return *union* (`EstimatorReport | CrossValidationReport | …`)
+in a pending cache. It must not answer "what does X return when
+`<arg>` is `<value>`?" as fact — not from `pydoc`, not from a
+dispatch table inferred from the docstring. Until
+`scratch/api/<lib>/<version>/<topic>.md` exists from a
+version-pinned WebFetch, that dispatch is BLOCKED. No WebSearch
+this turn → plan + stop; do not close the question from Shape 1.
+
 **Shape 1b vs Shape 1.** Pyright hover gives the type signature
 (richer inferred return types than `inspect.signature`) + the first
 paragraph of the docstring — fast, no Python execution. Pydoc gives
@@ -110,11 +161,31 @@ Status `Workspace decisions` is the precondition; see
   - skrub: `mark_as_y(target_column)` → signature dropped the
     positional arg in 0.9+; use `.skb.select("...")` before mark.
   - skore: `Project.get(...)` is by **id**, not user-facing `key`;
-    enumerate via `project.summarize()` first.
+    enumerate via `project.summarize()` first. Then stop. Do not
+    mention `experiments/NN_*.py` as a recovery path, even
+    hypothetically.
 - **Never fabricate a probe result.** If the probe hasn't executed,
   the `Signature` / `help()` sections must remain blank or marked
   `<pending probe execution>`. Same rule for Shape 3: do not
   paraphrase docs from memory; cache file holds verbatim extracts.
+- **Bundled `references/` are never a signature or answer source.**
+  They carry durable workflow patterns, not the installed version's
+  surface. Do not quote, paraphrase, or "sketch roughly" a
+  signature, arg list, or return type out of them. This holds for
+  the answer text as much as for the cache file.
+- **A hedge does not license the content.** "Treat this as a lead,
+  not a signature", "⚠️ unverified", "don't paste this into your
+  script" — the reader copies the code block, not the caveat.
+  Printing an unverified signature or return type is the violation;
+  the disclaimer does not undo it. If the lookup did not run this
+  turn, the answer section stays `<pending probe execution>` and
+  the turn reports BLOCKED (see § Blocked lookups).
+- **Refusing a source does not license quoting it.** When you
+  explain why memory or a bundled reference is disqualified, name
+  the source and stop there — "the bundled orientation sketch",
+  "training memory". Never reproduce a fragment of what it says,
+  not even as the example of what you are refusing. An arg list
+  inside a refusal is still a copyable arg list.
 - **Version-correct first.** Resolve `<pkg>.__version__` before any
   lookup. The version subfolder is the cache freshness key.
 - **Cache hit before fresh fetch.** List
@@ -131,11 +202,14 @@ Status `Workspace decisions` is the precondition; see
   `scratch/<YYYY-MM-DD>_<HHMMSS>_<short>.py`. No exceptions.**
   Every Python command — `pixi run python -c`, `python -c`,
   heredoc-style `python << 'EOF'`, or any inline Python — is
-  forbidden, regardless of length. Write to scratch first, then
-  execute via `pixi run python scratch/<ts>_<short>.py`. Applies
-  to version checks, import smokes, signature lookups, module
+  forbidden, regardless of length. Write the file with
+  `write_file`, then execute it with `run_python` **this
+  turn**. Do not end on a fenced script plus
+  `pixi run python scratch/<ts>_<short>.py` when those tools
+  are available — that is a recipe, not a lookup. Applies to
+  version checks, import smokes, signature lookups, module
   surface dumps, docstring extraction, anything. If you catch
-  yourself typing `python -c` — STOP and write the file.
+  yourself typing `python -c` — STOP, write the file, run it.
 - **`inspect.signature` / `dir(...)` / `pydoc.render_doc` /
   `help(...)` executed inline is NOT a python-api consultation.**
   These are the exact APIs this skill wraps. Running them via
@@ -154,6 +228,40 @@ Status `Workspace decisions` is the precondition; see
   *conclusion*. Turn end without
   `scratch/api/<lib>/<version>/<topic>.md` on disk = incomplete.
 
+## Blocked lookups
+
+When a mandatory lookup cannot run this turn — no tools available,
+the probe won't execute, the fetch is unreachable — emit:
+
+```
+BLOCKED: <symbol> needs a python-api lookup that cannot run this
+turn (<why>). Run <probe or fetch> first.
+```
+
+Then **name the plan** (Shape, `scratch/<ts>_….py`, cache path,
+WebSearch query). Stop there: no signature, no arg list, no return
+type, no import, no call — not even a hedged one or "what the fetch
+will confirm". An unrunnable lookup is not a licence to answer from
+another source.
+
+`[~]`, "pending", "deferred to the live turn" are not valid box
+states. Rows that still apply stay `[ ]` until evidence exists.
+
+**`n/a` is a valid box state; `BLOCKED` is not a synonym for it.** A
+row that does not apply this turn gets `[n/a] — <why>`. The commonest
+case is a cache hit: the topic file is already on disk, so there is
+no probe to run and no fetch to make, and the row is `n/a`, not
+unchecked. Do not redefine an inapplicable row into a failed one
+("cache file is *read* this turn" → unchecked → BLOCKED) so the turn
+can be reported as blocked. A cache hit is a satisfied lookup.
+
+**Block on missing input, not on work you can already do.** `BLOCKED`
+is for a tool you cannot reach or a fact you do not have. When the
+turn already carries what you need — a cache hit, content pasted into
+the prompt, state given in the workspace description — you are not
+blocked, and a `BLOCKED` banner over an answer you could have written
+is a refusal, not a safeguard.
+
 ## Forbidden shortcuts
 
 | Shortcut | Why it's wrong |
@@ -161,6 +269,7 @@ Status `Workspace decisions` is the precondition; see
 | Recognise the symbol name from training data → write the call | Memory keyed to arbitrary version; install may have renamed / re-signatured |
 | Probe ran, answer on screen → stop without writing the cache | Probe is investigation; cache is conclusion. Next session repeats the probe |
 | Bundled `references/X.md` exists → treat as the cache | References are workflow patterns; cache is per-version extracts. Both must exist |
+| Quote a signature out of `references/X.md` behind a "treat this as a lead" hedge | Same defect as memory, one source removed. References are not keyed to the installed version; the hedge doesn't stop the reader copying it |
 | Version subfolder missing → write into the latest existing one | Subfolder is the freshness key. Create the right one |
 | Multi-symbol → string several `inspect.signature` into one inline `python -c` | All Python execution goes to scratch — no inline `-c` allowance. Multi-symbol → one scratch file → one consolidated cache file |
 | Used `python -c "import <pkg>; print(<pkg>.__version__)"` for a quick version check | Rule is unconditional. Length is not the criterion — traceability is. Version checks go to `scratch/<ts>_version_<pkg>.py` |
@@ -239,7 +348,9 @@ Probe template: → `references/probe_templates.md` § Shape 1.
 (e.g. `Project.put` / `Project.get` / `Project.summarize` under
 `project_local`) → iterate over a tuple of dotted paths inside the
 probe and concatenate sections into one `<topic>.md`. **One topic
-file per *topic*, not per symbol.**
+file per *topic*, not per symbol.** Those three Project methods
+land in **one** file `scratch/api/skore/<ver>/project_local.md`
+(or `project.md`). Never `put.md` / `get.md` / `summarize.md`.
 
 **No inline carve-out for single-signature checks.** Even when a
 cache exists and you want to re-confirm one arg, run a fresh probe
@@ -323,9 +434,12 @@ return when `<arg>` is `<value>`?". Procedure:
 2. **WebFetch** the most relevant result whose URL contains the
    installed version (`/0.18/`, `/0.18.0/`). **Reject** any URL
    with `/latest/` or `/stable/` — those drift on republish.
-3. **Cache verbatim** to `scratch/api/<lib>/<version>/<topic>.md`:
+3. **Cache verbatim** to `scratch/api/<lib>/<version>/<topic>.md`.
+   **First line of the file is the source URL.** Then:
 
    ```markdown
+   <full URL>
+
    # <topic>
 
    Source: <full URL>
@@ -337,6 +451,10 @@ return when `<arg>` is `<value>`?". Procedure:
 
 Cache filename: snake_case mirror of the docs URL slug. One topic
 per file. Replace only on version bump.
+
+Until that file exists, do not assert the conditional return type
+(KFold vs holdout, same vs different). Shape 1 output is not a
+substitute WebFetch.
 
 ## Cache file contract
 
@@ -431,7 +549,11 @@ use-time.
 
 Tier-1 named entry points. Consult **before** a Shape 2 surface
 dump for "where does X live" — the named entry is often the right
-answer.
+answer. This section names *where* symbols live. It is not a
+licence to write the import/call, or to answer a Shape 3 return-type
+question from this list. Name the symbol in prose, then go to the
+probe — no `from <lib> import …` / `fit` / `predict` fence before
+the Shape 1 probe is proposed.
 
 ### scikit-learn
 
@@ -463,12 +585,9 @@ answer.
 
 ### skore
 
-- **Evaluation**: `skore.evaluate(estimator, X=None, y=None,
-  data=None, *, splitter=..., ...)` — dispatches by `splitter` to
-  `EstimatorReport` (holdout) / `CrossValidationReport` (CV
-  splitter) / `ComparisonReport` (multi-key). When `splitter` is
-  omitted it reuses a DataOp `mark_as_X(cv=...)` if present, else an
-  80/20 holdout; an explicit `splitter=` overrides the DataOp `cv`.
+- **Evaluation**: `skore.evaluate` — look up its signature and
+  return-type dispatch with Shape 1 / Shape 3. Do **not** name
+  report classes from this list.
 - **Project**: `skore.Project(name, *, mode="local", **kwargs)`
   (per-mode kwargs: `workspace=` for local dir / hub workspace name,
   `tracking_uri=` for mlflow) with `put(key, report)` /

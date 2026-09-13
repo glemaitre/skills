@@ -163,11 +163,19 @@ opt-in and added when the workspace's needs warrant them.
    - **Yes** → continue.
 2. Identify the test category from the user's signal (Dispatch
    table). Default: `smoke`.
+   - If the dispatch table marks the subskill *(future — not
+     implemented in v1)* (`regression-test-ml-pipeline`,
+     `distribution-test-ml-pipeline`, …): **STOP**. Do not create
+     `tests/<category>/`. Do not dispatch as if the subskill
+     exists. Do not write `def test_`, an assertion snippet, or a
+     smoke-test body. One sentence: the category is recognised but
+     unimplemented; optional "gap until the subskill ships."
 3. Place the empty test file at
    `tests/<category>/test_NN_<short_name>.py` with the pytest
    scaffolding (one `def test_*():` function, empty body, a
    `# TODO: filled in by <subskill>` marker). If the file already
-   exists, do **not** overwrite.
+   exists, do **not** overwrite. Skip this step when step 2
+   stopped on a future category.
 4. Hand off to the subskill (`smoke-test-ml-pipeline` etc.). The
    subskill writes the assertions, fixture construction, and any
    helpers it needs.

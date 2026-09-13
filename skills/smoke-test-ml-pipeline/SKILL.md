@@ -47,6 +47,14 @@ description: >
 The minimal pytest that catches the "load → featurize → split"
 anti-pattern at iteration time, before it reaches production.
 
+**Deliverable first.** After the pre-flight checklist, the first
+user-visible content is the complete test file in a fenced block
+(`assert len(predictions) == n_predict_grid_rows`, predict env
+with no pre-history buffer, real `data/` source, soft assertion
+with the CV-mean hardcoded as a literal, no `skore` import).
+Do not stop at a plan or leave the file only in a thinking
+channel.
+
 ## Stop conditions — read before anything else
 
 - **No smoke test without an approved design note + script.** The pairing
@@ -65,6 +73,18 @@ anti-pattern at iteration time, before it reaches production.
   of expected rows". A row-count mismatch *is* the failure mode the
   smoke test exists to catch. Loosening the assertion silently
   reintroduces the bug.
+- **Don't shrink the expected count either.** The assertion is a
+  pair — the `==` *and* the number on its right. Redefining
+  `n_predict_grid_rows` down to whatever the pipeline emitted
+  ("predict grid minus embargo", "minus the cold-start window") is
+  the same defect with the equality left intact. If you believe the
+  gap is intended, that is an X-marker question for
+  `build-ml-pipeline`: say so and stop. Do not propose a number.
+- **A hedge does not license the content.** A conditional offer is
+  an offer: "if the 24 rows turn out to be a documented embargo,
+  then the right change is …" proposes the forbidden edit. Refusals
+  end at the refusal plus the route-back; they do not carry a
+  caveat that lands in the same place.
 - **Don't synthesize the fixture.** The smoke test reads the real
   `data/` source. Synthetic fixtures look fine but skip the
   loaders that actually break in production.

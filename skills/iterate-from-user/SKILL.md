@@ -73,8 +73,9 @@ have nothing in hand, the parent's menu re-presents itself.
   Don't reconstruct from a title or a one-line description.
 - **Confirm before returning.** The Proposal goes back to the
   parent *only after* the user has explicitly said "yes, that's
-  what I want." Free-text "hmm" / "maybe" / "interesting" is not
-  confirmation. See § Confirm before returning.
+  what I want." Emit the synthesis question **before** any
+  `Proposal (...)` block. Free-text "hmm" / "maybe" / "interesting"
+  is not confirmation. See § Confirm before returning.
 - **Check `gh` auth before fetching anything from GitHub.** Before
   any `gh issue view` / `gh api` call, run `gh auth status`
   (cheap, cached). If unauthenticated, ask the user to run
@@ -98,7 +99,9 @@ have nothing in hand, the parent's menu re-presents itself.
   silently include it in `Method outline` as a fait accompli. Flag
   it as an open gap (`"this approach needs <library>; OK to add,
   or should we adapt to the existing stack?"`) and defer the
-  resolution to `data-science-python-stack` + the user.
+  resolution to `data-science-python-stack` + the user. Until the
+  user answers, the library name lives **only** under `Open gaps`
+  — never in `Method outline`.
 - **Domain-specific assertions need user confirmation.** If the
   source asserts something the article / issue / spec alone can't
   establish for *our* dataset — e.g. "feature X is monotone in the
@@ -187,6 +190,12 @@ prompt, or implicit in the parent message).
    confirmation]` in `Open gaps`.
 6. **Confirm before returning** — see § Confirm before returning.
 
+**If fetch cannot run this turn** (no tools, unreachable URL):
+still emit the three shaping questions (placeholders are fine),
+put domain claims under `Open gaps` with `[needs user
+confirmation]`, and show the § Confirm before returning
+restatement. Do not wait on the fetched body to skip those boxes.
+
 ### Branch B — resource-link
 
 The user picks `resource-link` and points at:
@@ -227,6 +236,12 @@ In all three resource sub-shapes:
    shaping questions, list it under `Open gaps`.
 4. **Confirm before returning** — see below.
 
+**If fetch cannot run this turn** (no `gh`, no `Read`): still
+name `gh auth status` then `gh issue view <N> …` (or `Read` the
+named file), emit the three shaping questions, list unanswered
+items under `Open gaps`, and show the confirmation restatement.
+Do not wait on the issue body to skip those boxes.
+
 ### Branch C — free-text
 
 The user picks `free-text` and types their idea directly.
@@ -251,10 +266,15 @@ synthesis to the user and waits for explicit approval:
 > **<method-outline-summary>**. Open gaps: **<bullets>**. Does
 > this capture what you want before I hand it to the planner?"
 
+Until the user says yes, the message is **only** that quoted
+paragraph. Do not emit a `Proposal (` header, even labeled
+PENDING / NOT RETURNED.
+
 The user's answer determines what happens next:
 
 - **"Yes / confirm / go" → return the Proposal.** The parent
-  skill drafts `journal/NN_*.md` from it.
+  skill drafts `journal/NN_*.md` from it. Do not emit the
+  `Proposal (...)` block before this yes.
 - **"No / not quite / adjust X" → revise and re-confirm.** Iterate
   the synthesis until the user is happy. Do not return a Proposal
   the user hasn't signed off on.
@@ -262,7 +282,8 @@ The user's answer determines what happens next:
 This gate is non-optional. It is the user-side analogue of the
 parent's design-note approval gate — it catches misunderstandings
 *before* a design note is drafted, when the cost of revision is
-cheapest.
+cheapest. Show the restatement even when the source body was not
+fetched this turn.
 
 ## What is returned
 

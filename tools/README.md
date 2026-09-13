@@ -20,6 +20,14 @@ pixi run check          # composite: hash-check + validate + check-versions (the
 `pixi run check` is what CI invokes via `prefix-dev/setup-pixi` — see
 `.github/workflows/validate-catalog.yml`.
 
+Optional LLM skill evals live in a separate pixi environment and are
+**not** part of catalog CI. See [`eval/README.md`](../eval/README.md):
+
+```bash
+pixi install -e eval
+pixi run -e eval eval -- -k python-api
+```
+
 ## hash_skills.py
 
 Computes a SHA-256 digest of every skill listed in `.catalog.json`

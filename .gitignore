@@ -1,4 +1,16 @@
 .DS_Store
+scratch/
+eval/*-workspace/
+
+# Eval transcripts (local only): .transcripts/<run-id>/<skill>/
+.transcripts/
+
+# Local secrets (API keys, etc.) — committed template is .env.example
+.env
+.env.local
+.env.*.local
+
 .pixi/
 __pycache__/
 .pytest_cache/
+.deepeval/

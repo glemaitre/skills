@@ -130,3 +130,92 @@ expresses the alignment most clearly for the data.
 
 Look up the underlying skrub DataOp / `mark_as_X` / `mark_as_y`
 signatures via `python-api` against the installed skrub version.
+
+### Inside the aligner — JOIN, not SHIFT+DROP
+
+The most common Layer-2 mistake is to write the aligner as a
+`shift(-HORIZON) → drop_nulls("y")` two-step. That's the forbidden
+wrapper-NaN-filter anti-pattern dressed in a Layer-2 disguise: it
+silently drops the cold-start rows the smoke test exists to
+catch. **Renaming the class doesn't change the shape.**
+
+The right shape is a **JOIN**: target-time `t + HORIZON` lookup
+against the history table. The inner-join keeps only rows where the
+target time exists in history, so there are *no NaN rows to drop*.
+At predict time `y` is `None` (you're predicting it); the X side
+is just the predict grid passed through.
+
+**The pattern is library-agnostic.** The example below uses polars
+for concreteness, but the same shape translates directly to pandas
+(`grid.merge(target, on=[...], how="inner")`) or any dataframe
+library with an inner-join. The point is the JOIN; the syntax is
+illustration.
+
+```python
+from sklearn.base import BaseEstimator, TransformerMixin
+import polars as pl
+
+class AlignByHorizon(TransformerMixin, BaseEstimator):
+    """Align (predict_grid, history) → {X, y} via a target-time JOIN.
+
+    `transform` does NOT call `.drop_nulls()` / `.dropna()` /
+    `.filter()`. The inner-join shape produces only rows where
+    the target time exists in history — there is nothing to drop.
+    If you find yourself adding row-filtering inside `transform`,
+    you have built the forbidden wrapper-NaN-filter pattern
+    (see `SKILL.md` § "Anti-pattern symptoms"). Fix the join
+    instead.
+    """
+
+    def __init__(self, horizon_hours: int = 24):
+        self.horizon_hours = horizon_hours
+
+    def fit(self, env, y=None):
+        # Stateless join; no learned parameters to fit.
+        return self
+
+    def fit_transform(self, env, y=None):
+        grid = env["predict_grid"]          # rows we want predictions for
+        history = env["history"]            # raw load by (timestamp, region)
+
+        # Build a target-time view of history: for each historical
+        # observation at time `t`, expose its load value under the key
+        # `target_time = t - HORIZON`. The join below then picks that
+        # value as `y` for grid rows at `t - HORIZON`.
+        target = history.with_columns(
+            target_time=pl.col("timestamp")
+            - pl.duration(hours=self.horizon_hours)
+        ).select(
+            pl.col("target_time").alias("timestamp"),
+            pl.col("region"),
+            pl.col("load").alias("y"),
+        )
+
+        # Inner JOIN: only rows where the target time exists in history.
+        # No NaN rows produced → no `drop_nulls` needed.
+        aligned = grid.join(target, on=["timestamp", "region"], how="inner")
+        return {"X": aligned.drop("y"), "y": aligned["y"]}
+
+    def transform(self, env):
+        # Predict time: y is unknown; the X side is just the grid.
+        # NO row filtering, NO drop_nulls — the grid is exactly what
+        # the caller wants predictions for.
+        return {"X": env["predict_grid"], "y": None}
+```
+
+The litmus test for any Layer-2 aligner you write:
+
+- Does `transform` call `.drop_nulls()` / `.dropna()` / `.filter()`
+  on data the pipeline itself produced? → **forbidden** (the
+  wrapper-NaN-filter pattern; see `SKILL.md` § "Anti-pattern
+  symptoms"). Rewrite as a JOIN.
+- Does the inner-join shape mean no row-filtering is needed? →
+  correct.
+- Does `transform` return `{"X": <grid>, "y": None}` at predict
+  time, with no shift/drop logic? → correct.
+
+The smoke test in `tests/smoke/` catches the wrong shape via the
+row-count assertion: a correct aligner returns
+`len(predictions) == len(predict_grid)` on a fresh predict env
+that carries no pre-history buffer; the wrong shape silently drops
+rows and the count mismatches.

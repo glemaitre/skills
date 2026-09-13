@@ -4,6 +4,11 @@ Per-library surface map. Stable across versions; per-version detail
 goes in `scratch/api/<lib>/<version>/`. Load this when the inline
 orientation in `SKILL.md` doesn't name what you need.
 
+**Nothing in this file may be quoted as a verified signature, arg
+list, or return type** — not even hedged as "a lead". It orients you
+toward the right symbol; the lookup against the installed version is
+what you answer from. See `SKILL.md` § Stop conditions.
+
 ## scikit-learn
 
 - `sklearn.metrics` — scoring functions, both functional

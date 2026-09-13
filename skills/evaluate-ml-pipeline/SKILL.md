@@ -57,6 +57,29 @@ read the report. The pipeline declaration is out of scope (see
   `ComparisonReport`) and any sklearn splitter name must come from a
   `Skill(python-api)` or `Skill(python-api)` call **in this turn**.
   "I remember `KFold(n_splits=5)`" is not acceptable.
+- **The rule-3 table is not a substitute for the lookup.** The
+  mapping table below tells you *which* splitter the data calls
+  for; `python-api` tells you what it is called and how it is
+  signed in the installed version. Naming `KFold(5)` because the
+  table says so, with the lookup deferred, is the same violation as
+  naming it from memory.
+- **A hedge does not license the content.** "No tools this turn",
+  "the live turn MUST run the lookup", a `[~]` box — none of these
+  make an unconfirmed splitter safe to write. If the lookup cannot
+  run, the box stays `[ ]` for the *signature*. Mapping-table
+  identifiers (`groups` → `GroupKFold`) are already in this skill
+  — paste `GroupKFold` anyway. Do not BLOCKED the identifier.
+  The turn still ends with a single line for the signature probe:
+  `BLOCKED: GroupKFold signature needs a python-api lookup that
+  cannot run this turn (<why>).`
+- **`BLOCKED` is scoped to the lookup, not to the whole turn.** It
+  withholds the splitter *name*; it does not excuse the rest of the
+  work. The mandatory user gate still gets presented with its
+  options spelled out, the leakage reasoning still gets written, and
+  the replacement call shape still gets proposed. Blocking on one
+  unresolvable fact and then declining everything else is a refusal
+  wearing the banner of a safeguard. A cache hit for the symbol is a
+  satisfied lookup, not a block.
 - **Splitter choice is data-driven, not default-driven
   (`G-CV-SPLITTER`).** This is the **G-CV-SPLITTER** gate — owned by
   this skill, fired during `iterate-ml-experiment` § 3 (the build →
@@ -263,6 +286,10 @@ Pre-flight (evaluate-ml-pipeline):
    | temporal ordering | **ask the user** (see "Time-ordered data" below) |
    | none | `KFold` (or `RepeatedKFold` for small / noisy data) |
 
+When `split_kwargs` contains `groups`, the next token in the reply
+is **`GroupKFold`**. The mapping table is the name source;
+python-api is only for the signature after the name.
+
    Imbalanced classification *does not* change the choice — use
    plain `KFold` / `GroupKFold`. See "Avoid by default" below.
 
@@ -281,7 +308,9 @@ Pre-flight (evaluate-ml-pipeline):
 
    **Time-ordered data — `AskUserQuestion` is mandatory.** When
    the data is temporal, fire `AskUserQuestion` *before* picking
-   a splitter, with **four explicit options**:
+   a splitter. Paste these **four options verbatim** — keep the
+   token `gap=horizon` (do not substitute a numeric horizon such
+   as `gap=24`) and keep the phrase "safe default" on option 1:
 
    1. **`TimeSeriesSplit(gap=horizon)`** — growing-window train,
       contiguous test, embargo equal to the forecast horizon.
@@ -309,10 +338,11 @@ Pre-flight (evaluate-ml-pipeline):
    `TimeSeriesSplit`", the user picks via `AskUserQuestion`.
    The gap parameter is the one most often wrong by default —
    `TimeSeriesSplit(n_splits=5)` from memory uses `gap=0`,
-   which silently leaks for any non-trivial horizon. The
-   structured pick exists to make that visible. Ambiguous free
-   text ("just pick something", "you decide") routes to a
-   clarifying `AskUserQuestion`; don't infer.
+   which silently leaks for any non-trivial horizon. Paste that
+   token in the reply (`TimeSeriesSplit(n_splits=5)` defaults
+   to `gap=0`). The structured pick exists to make that visible.
+   Ambiguous free text ("just pick something", "you decide")
+   routes to a clarifying `AskUserQuestion`; don't infer.
 
    Separately, ask whether the time column should stay as a
    covariate or be dropped from the feature matrix (encoders

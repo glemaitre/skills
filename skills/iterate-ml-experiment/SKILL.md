@@ -53,7 +53,7 @@ session open
    │                                          │
    │                                          └─► design note → G-DESIGN → § 3 implement
    │
-   ├── "what's next?" with ≥1 done row ───► § 1 → § 2 (sourcing) → § 3 implement
+   ├── "what's next?" with ≥1 done row ───► § 1 summary → § 2 (sourcing; skip three-way) → § 3 implement
    │
    ├── "run finished" ─────────────────────► § 4 record outcome
    │                                          │
@@ -100,7 +100,7 @@ then jump.
 |---|---|---|
 | `JOURNAL.md` missing / placeholder / 0 History rows | **Bootstrap** | § 0 |
 | `journal/` not scaffolded (no `src/`, no `experiments/`) | **Bootstrap → handoff first** | → `organize-ml-workspace`, then § 0 |
-| "what's next?" / "let's iterate" / "propose next" — with ≥1 done row | **Iterate (propose)** | §§ 1–3 + Dispatch table |
+| "what's next?" / "let's iterate" / "propose next" — with ≥1 done row | **Iterate (propose)** | § 1 summary → § 2 (+ Dispatch); skip the § 1 three-way |
 | "the run finished" / "log the result" / "we got X = …" | **Iterate (record)** | § 4 |
 | "where are we?" / "status?" / "what have we tried?" | **Project overview** | `references/maintenance_modes.md` § "Project overview" |
 | "compare X and Y" / "X vs Y" | **Compare (read-only)** | `references/maintenance_modes.md` § "Compare past experiments" |
@@ -116,6 +116,21 @@ the **read** mode first, stop. Re-entering § 1 is a separate turn.
 - **No design note, no script.** Never create or edit
   `experiments/NN_*.py` until `journal/NN_*.md` exists, is filled,
   and the user has explicitly approved it.
+- **A dispatch is a handoff, not an offer.** When a sourcing branch
+  routes to a sibling skill, the sibling does its own fetching.
+  Don't ask the user to paste the issue body, the article text, or
+  "a short summary" so you can skip the hop — that is doing the
+  sibling's job through the user, and it discards the branch's
+  shaping questions and confirmation gate. If the dispatch can't
+  run this turn, say which hop is blocked and stop; don't substitute
+  a user prompt for it.
+
+  ```
+  GitHub issue URL this turn: name iterate-from-user (resource-link,
+  pre-resolved) and journal/NN_<short_name>.md. Then STOP.
+  BLOCKED: sibling fetch. Do not offer "paste 2–3 paragraphs".
+  Do not offer "confirm fetch". Do not run the three-branch ask.
+  ```
 - **`JOURNAL.md` is read at session start, not improvised.** Don't
   reconstruct history from `experiments/` filenames or `git log` —
   those don't carry the *why*.
@@ -143,9 +158,14 @@ the **read** mode first, stop. Re-entering § 1 is a separate turn.
      is the most common shortcut.**
   3. `test-ml-pipeline` → `smoke-test-ml-pipeline` → smoke test.
 
-  Only then assemble `experiments/NN_*.py`.
+  Only then assemble `experiments/NN_*.py`. A request to write
+  `evaluate.py` first, with `pipeline.py` / `features.py` /
+  `data.py` still missing, still starts at hop 1:
+  `build-ml-pipeline`. Do not dispatch `evaluate-ml-pipeline`
+  next.
 - **Harness "no clarifying questions" hints do NOT waive gates.**
-  G-DESIGN, G-RUN, the §1 mode pick, the §2 sourcing menu, the §0
+  G-DESIGN, G-RUN, the §1 mode pick (unless the opening message
+  already resolved iterate-propose), the §2 sourcing menu, the §0
   config gates are operating-contract gates.
 - **Post-hoc audit — required before ending the turn.** Walk every
   pre-flight row; surface unfilled Evidence cells explicitly.
@@ -154,9 +174,10 @@ the **read** mode first, stop. Re-entering § 1 is a separate turn.
 
 | Shortcut | Why it's wrong |
 |---|---|
-| User said "quick baseline" → skip G-DESIGN | G-DESIGN is non-negotiable; "quick" never waives it. The design note is the postmortem's frozen Method |
+| User said "quick baseline" → skip G-DESIGN | G-DESIGN is non-negotiable; "quick" / "standard" / "skip the design note" / "skip questions" never waives it. This turn: refuse, cite this row, draft `journal/01_baseline.md` only. No `experiments/01_baseline.py` |
+| User said "skip the questions" / "standard tabular" → G-EDA = skip | G-EDA is a structured run/skip owned by `explore-ml-data`. "Skip questions", "standard tabular", and "quick baseline" do not set skip. Dispatch the run/skip ask. Only an explicit "skip EDA" (or the sibling's skip answer) records `Status: skipped`. |
 | Scaffold + implement in one turn before G-DESIGN | Inverts the contract. Code that lands before approval has no Motivation/Risks the user signed off on |
-| Skipped `evaluate-ml-pipeline` because `KFold(5)` "feels right" | Even empty `split_kwargs` is a justified pick the skill exists to surface. Bypass = user never got the choice |
+| Skipped `evaluate-ml-pipeline` because `KFold(5)` "feels right" | Even empty `split_kwargs` is a justified pick the skill exists to surface. Bypass = user never got the choice. Refuse the write. If `src/<pkg>/{pipeline,features,data}.py` are missing, dispatch `build-ml-pipeline` this turn — not `evaluate-ml-pipeline` next. |
 | Bootstrap mode → skip ALL questions, not just the sourcing menu | Bootstrap forbids the sourcing menu only. G-PKG-NAME / G-ENV-MGR / G-TABULAR / G-SKORE-MODE / G-EDA / G-DESIGN / G-CV-SPLITTER / G-RUN still fire |
 | Ambiguous "hmm interesting" / "I guess" read as approval | Approval is explicit. Ambiguity → re-ask, never silent yes |
 | Auto-detect run finished via `reports/` mtime | § 4 is user-triggered (v1). The skill never auto-records |
@@ -194,6 +215,8 @@ Pre-flight (iterate-ml-experiment):
       Evidence: explore-ml-data dispatched; answer=<run|skip>;
                 JOURNAL.md `## Data understanding (EDA)` section present
                 | "n/a — iterate mode"
+      "skip the questions" / "standard tabular" / "quick baseline"
+      is NOT G-EDA = skip.
 - [ ] Design note drafted (or Backlog enriched, for `skore`)
       Evidence: Write journal/<NN>_<name>.md (this turn) | "Backlog
                 rows B<x>..B<y> appended" | "n/a — read-only mode"
@@ -201,9 +224,10 @@ Pre-flight (iterate-ml-experiment):
       Evidence: AskUserQuestion id=<id>, answer=approved | user quote |
                 "n/a"
 - [ ] (§ 3 only) Three-skill chain ran in order:
-      build → evaluate → test
+      `build-ml-pipeline` → `evaluate-ml-pipeline` → `test-ml-pipeline`
       Evidence: each owning skill produced its file this turn
                 | "n/a outside § 3"
+                | "BLOCKED — start at build-ml-pipeline (src files missing)"
 - [ ] (§ 3 only) G-CV-SPLITTER resolved during the evaluate step
       Evidence: evaluate-ml-pipeline fired the splitter AskUserQuestion
                 (or mapped split_kwargs) before `evaluate.py` write
@@ -227,6 +251,9 @@ placeholder, or has 0 History rows.
 
 **Procedure (compact — full version in `references/bootstrap.md`):**
 
+**First action:** Read `data/README.md` to seed the goal default
+before asking the user.
+
 1. **Scaffold first if needed.** No `src/` / `experiments/` /
    `journal/` → hand off to `organize-ml-workspace`, return when
    the placeholder `JOURNAL.md` exists.
@@ -243,7 +270,10 @@ placeholder, or has 0 History rows.
    step. The run path needs the agent feature (`ipython`) and may
    trigger `G-AGENT-FEATURE` here, before the baseline; if the user
    declines it, EDA falls back to **skip**. On skip, the JOURNAL
-   section records `Status: skipped`.
+   section records `Status: skipped`. Do **not** set skip from
+   "skip the questions", "standard tabular", or "quick baseline" —
+   those refuse G-DESIGN, they do not answer G-EDA. Fire the
+   run/skip ask.
 5. **Auto-draft `journal/01_baseline.md`** via the consultation
    chain, **informed by the EDA findings**: learner default
    (`build-ml-pipeline`) and metric default (`python-api` on
@@ -275,8 +305,11 @@ placeholder, or has 0 History rows.
 | `G-CV-SPLITTER` | CV family for `skore.evaluate` | `evaluate-ml-pipeline` | **inside the § 3 chain, AFTER G-DESIGN** — at the evaluate step, before `evaluate.py` write; mandatory even with empty `split_kwargs` |
 | `G-RUN` | "run now" vs "leave for later" | this skill | before executing the experiment script |
 
-Free-text "quick baseline" / "you pick" do NOT resolve any of
-these — fall through to structured `AskUserQuestion`.
+Free-text "quick baseline" / "standard tabular" / "skip the
+questions" / "you pick" do NOT resolve any of these — including
+G-EDA. Fall through to structured `AskUserQuestion`. Only an
+explicit "skip EDA" or the `explore-ml-data` skip answer records
+G-EDA = skip.
 
 → next: G-DESIGN, then § 3 implementation chain.
 
@@ -285,7 +318,15 @@ these — fall through to structured `AskUserQuestion`.
 - Read `JOURNAL.md`.
 - Summarize to the user in 2–3 lines: dataset, goal, last
   experiment + status, what's ripe in Backlog.
-- **Ask via `AskUserQuestion`** — three options, no silent default:
+
+**Skip the three-way ask when the opening message already is
+iterate-propose.** Signals: "what's next?", "propose next",
+"let's iterate", with ≥1 done History row. The Mode picker
+already resolved the path — go to § 2 (sourcing menu) this
+turn. Do not stop at resume | record outcome | propose next.
+
+Otherwise **Ask via `AskUserQuestion`** — three options, no silent
+default:
   - **resume** — last experiment still planned/approved/unfinished.
   - **record outcome** — last one ran; enter § 4.
   - **propose next** — last one is `done` or `abandoned`; → § 2.
@@ -298,6 +339,14 @@ these — fall through to structured `AskUserQuestion`.
 
 Every time § 2 runs in iterate mode, surface this menu with the
 JOURNAL.md Backlog table. **Never silently default.**
+
+**A resolved pick skips the menu entirely.** When the user's opening
+message already names the strategy — a URL, a `B<N>`, an explicit
+"my-pick" — § 2 is satisfied and the menu does not run. Reproducing
+it anyway "for the record", "for transparency", "so you can see what
+I skipped", or inside a collapsed block is *presenting* it: the
+reader sees four options and a prompt. Name the branch the input
+resolved to and move on.
 
 ```
 How would you like me to source the next experiment?
@@ -315,8 +364,10 @@ Backlog (pick by index):
 <paste JOURNAL.md Backlog table here>
 ```
 
-Use `AskUserQuestion` for the pick. Plain-text enumeration only if
-unavailable.
+Use `AskUserQuestion` for the pick, or end with "I'll ask you to
+pick" / `Your pick?`. Plain-text enumeration only if the structured
+UI is unavailable. Always show the Backlog indexes (B1, B2, …)
+next to the four options even when row bodies were not pasted.
 
 ### Free-text handling — first match wins
 
@@ -325,7 +376,7 @@ unavailable.
 | Exact label (`skore` / `user` / `my-pick` / `B<N>`) | that pick |
 | `B2` / "let's do B2" | `B<N>` pick |
 | Scientific article URL pasted | `user` → article-link branch |
-| GitHub issue URL / `org/repo#N` / spec path | `user` → resource-link branch |
+| GitHub issue URL / `org/repo#N` / spec path | `user` → resource-link branch. Dispatch `iterate-from-user` **pre-resolved**. Do not ask for a summary. Do not re-present the sourcing menu. Design note path: `journal/NN_<short_name>.md`. |
 | "give me ideas" / "you decide" | `my-pick` |
 | "let me try X" / "use Y instead" | `user` → free-text branch |
 | Ambiguous / off-menu | fire `AskUserQuestion`, don't guess |
@@ -382,6 +433,13 @@ After G-DESIGN passes, dispatch in order:
 Only then assemble `experiments/NN_*.py`. Confirm signatures via
 `python-api`, not memory.
 
+If the user asks only for `evaluate.py` (even with a splitter
+already named) and `pipeline.py` / `features.py` / `data.py` are
+missing: refuse the write, name the chain
+`build-ml-pipeline` → `evaluate-ml-pipeline` → `test-ml-pipeline`,
+and invoke **`build-ml-pipeline` first**. Hop 2 is after hop 1
+returns; do not say "dispatch `evaluate-ml-pipeline` next".
+
 ### G-RUN — post-smoke run gate
 
 Once `tests/smoke/` passes (the new test AND every prior one):
@@ -420,8 +478,10 @@ or polling for runs the user kicked off themselves.**
 3. **Fill all four Status-block fields** in `journal/NN_*.md`:
    - **State**: `done` (or `abandoned` with one-line reason).
    - **Approved by user on**: unchanged from approval.
-   - **Headline result**: metric + uncertainty (e.g.
-     `RMSE 0.083 ± 0.004 (5-fold CV)`).
+   - **Headline result**: copy the metric the user (or audit)
+     gave **verbatim**. Do not invent extra numbers, fold counts,
+     or residual claims they did not state. If they already said
+     `0.081 ± 0.005 on 5-fold CV`, that phrase is allowed.
    - **Implication for next iteration**: 1–2 sentences.
 4. **Smoke-test gate before `done`** — **all** `tests/smoke/`
    must pass. Prior failures = reproducibility regression → route
@@ -439,13 +499,16 @@ or polling for runs the user kicked off themselves.**
    `gh issue comment <N>` with the headline. Never auto-post.
 
 **Stop here. Do NOT auto-propose the next experiment in the same
-turn.** Surface the implication, ask via `AskUserQuestion`:
+turn.** Close with these two options **verbatim** via
+`AskUserQuestion`:
 
 - **draft it now** — re-enter § 1 with the implication as seed.
 - **not yet** — record the implication in Backlog, stop.
 
-The user controls cadence; this skill records, it doesn't
-propose-and-record in one breath.
+Listing those two options is **not** proposing the next
+experiment. Auto-propose means writing the next design note or
+experiment body in this turn. The user controls cadence; this
+skill records, it doesn't propose-and-record in one breath.
 
 ## Dispatch table — which iterate-from-* skill
 
@@ -454,7 +517,7 @@ propose-and-record in one breath.
 | **No prior experiment** (bootstrap) | § 0 forces auto-drafted baseline. No strategy skill |
 | User names a Backlog row (`B2`, "let's do B5") | Promote directly; no strategy skill |
 | "mine the report" / "what does skore see?" | `iterate-from-skore` — enriches Backlog, re-shows menu. *No design note this turn.* |
-| "I want to try X" / article URL / GitHub issue | `iterate-from-user` — three-branch ask. If free-text already resolved, pass pre-resolved branch |
+| "I want to try X" / article URL / GitHub issue | `iterate-from-user`. GitHub issue URL / `org/repo#N`: pass **pre-resolved** (resource-link). Do **not** fire the three-branch ask. Do **not** ask the user to paste the issue body. Destination `journal/NN_<short_name>.md` (`NN` = next History index). Draft only after a Proposal returns. |
 | "give me ideas" / "you decide" | `my-pick` — handled inline. Synthesize 2–4 candidates, AskUserQuestion |
 | Open-ended "what's next?" with ≥1 recorded experiment | Present sourcing menu verbatim + Backlog. No silent default |
 
@@ -475,7 +538,11 @@ Each is read-only or rare. Full procedures in
 - **Project overview** — read-only summary from JOURNAL + Backlog.
   Don't generate a separate document.
 - **Compare past experiments** — read-only. v1 is pairwise
-  side-by-side. Don't draft a design note. Don't add JOURNAL rows.
+  side-by-side from `JOURNAL.md` History. Don't draft a design
+  note. Don't add JOURNAL rows. **This turn: the comparison table
+  only.** No "Suggested next step", no dispatch to
+  `audit-ml-pipeline` / `iterate-from-skore`. Next experiment is a
+  later user turn.
 - **Goal pivots** — update Status with date + reason, insert a
   horizontal divider in History, flag incomparability in the next
   experiment's Risks.

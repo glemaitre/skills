@@ -117,11 +117,20 @@ zero rows and a summary that explains the access failure. The
 parent surfaces the gap to the user; recovery is owned by
 `audit-ml-pipeline` (re-run the audit runner, fix the auth, …).
 
+State the access failure in the Summary and stop there. Do not
+draft the parent's `JOURNAL.md` Status line or tell it what to
+record — see § Stop conditions.
+
 ## Stop conditions
 
-- **Don't write `journal/` files.** That includes `JOURNAL.md`.
-  This skill returns rows as conversation text; the parent writes
-  them.
+- **Don't write `journal/` files, and don't tell anyone else to.**
+  That includes `JOURNAL.md`. This skill returns rows as
+  conversation text; the parent writes them. No "record the gap in
+  `JOURNAL.md` Status", no drafted Status lines, no instructions
+  addressed to the parent about what to append. Anything the parent
+  needs to know goes in the Summary paragraph as an observation —
+  the parent decides what lands on disk. Routing a write through
+  someone else is still the write.
 - **Don't re-open the skore Project from this skill.** The audit
   already did. Reading the digest as text is the contract — see
   § "Why read the digest". If the digest is missing, re-execute
@@ -138,7 +147,9 @@ parent surfaces the gap to the user; recovery is owned by
   invent mitigations from training-data memory of skore.
 - **Don't pick a single "winning" finding for the user.** Emit one
   row per actionable check. The user picks via the parent's
-  sourcing menu (`B<N>`).
+  sourcing menu (`B<N>`). Stop after the candidate list. Forbidden
+  closers: "highest-leverage," "run X next," "combined into one
+  experiment." Close with the parent `B<N>` pick only.
 - **Dedup against existing Backlog rows by `Source` citation.**
   Read `JOURNAL.md` Backlog before emitting; skip any candidate
   whose `Source` matches an existing row.

@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "eval: LLM-backed skill evaluations (opt-in; requires provider API keys)",
+]

@@ -45,15 +45,63 @@ touched, no hook involved.
 
 ## Stop conditions — read before anything else
 
+- **Untouched-file ask (copy this shape).** When the user asks to
+  also fix warnings on a file that was **not** edited this turn
+  (e.g. `evaluate.py` while `pipeline.py` was touched):
+
+  ```
+  In-scope this turn: pipeline.py
+  pixi run ruff format pipeline.py
+  pixi run ruff check --fix pipeline.py
+  pixi run ruff check pipeline.py
+
+  Out of scope: evaluate.py — D100, D103, D103, D205, D400, D401, D415
+  AskUserQuestion: address evaluate.py as a separate task? yes | no
+
+  Rule: don't widen scope on touched files.
+  ```
+
+  Do **not** list a ruff trio for the untouched file. Do **not**
+  write a remediation table or docstring drafts for it. The
+  deliverable is the ask, not the fix. This overrides "describing
+  the work is not doing it" for out-of-scope files.
+
+- **Describing the work is not doing it.** "In my response, list the
+  7 D warnings" is not listing them; "run `ruff format` next turn"
+  is not formatting. Produce the diagnostics and the diff, or report
+  `BLOCKED: <what> cannot run this turn (<why>)` and stop. A `[~]`
+  box, "pending", or "n/a this turn, no shell" is not a valid state.
+- **`BLOCKED` is for missing input, not for work you can already
+  do.** Block on a tool you cannot reach or a fact you do not have.
+  When the turn already carries what you need — the config pasted
+  into the prompt, the warning codes listed in the workspace state —
+  you are not blocked, and a `BLOCKED` banner over work you could
+  have done is a refusal, not a safeguard.
+- **Don't argue with content you were handed.** When a config, a
+  template, or a diff arrives in the prompt, that text *is* the
+  artifact — write it as given. Recalling what the bundled template
+  "should" contain, and objecting that the pasted copy is missing a
+  section, is a memory claim dressed up as diligence: it invents
+  file content to justify not writing the file. Flag a discrepancy
+  in one line if you must, then write what you were given.
 - **Do not configure a PostToolUse / PreToolUse hook for ruff.** This
   skill is intentionally manual. A hook tightens the loop in ways
   that bite (every micro-edit triggers a fix cycle, partial files
   fail D-rule checks mid-write, retries can stall the turn). If the
   user explicitly asks for an automated hook later, redirect to
   `update-config` — but the default is "Claude runs ruff itself."
+
+  ```
+  STOP — hook request. Refuse. Do not emit a JSON payload for
+  `.claude/settings.local.json` / PostToolUse / PreToolUse, even
+  as an example. Cite this Stop. Redirect to update-config; default
+  remains no hook.
+  ```
 - **Do not substitute ruff with `black` / `isort` / `flake8` /
   `pydocstyle` / `pylint`.** Ruff is the canonical linter in this
-  stack (`data-science-python-stack` Tier 1). If `import ruff` /
+  stack (`data-science-python-stack` Tier 1). Ruff covers
+  **formatting (black-equivalent)**, **import sorting
+  (isort-equivalent)**, and the **lint rules**. If `import ruff` /
   `pixi run ruff --version` fails, route through `python-env-manager`
   to install — don't silently fall back.
 - **One fix attempt per file, then surface.** If `ruff check`
@@ -78,6 +126,11 @@ touched, no hook involved.
   data memory drops half the contract silently. If you catch
   yourself typing `[lint]` / `[format]` / `select = [...]` without
   having read the template this turn, STOP and `Read` it first.
+  When the template is already pasted in the prompt: this is
+  **Initial setup**. Echo that toml verbatim in a fence (prefer
+  language `ruff.toml`). Do not summarize. Do not add
+  `[lint.per-file-ignores]`. Name
+  `pixi run ruff check --show-settings .` as the verify step.
 - **Don't call `warnings.filterwarnings(...)` unless the user
   explicitly asks for it.** Same for `warnings.simplefilter`,
   `@pytest.mark.filterwarnings`, and `filterwarnings = [...]` in
@@ -228,14 +281,12 @@ Public functions and classes carry numpydoc-format docstrings; ruff's
 `D` rules with `pydocstyle.convention = "numpy"` enforce the shape.
 
 **A bare one-line summary is NOT sufficient for public functions.**
-The `Parameters` / `Returns` (and `Raises` when applicable) sections
-are mandatory — even when the function is small, even when the user
-says "just the summary is fine". Approving a one-line docstring on
-a public function silently fails the contract this skill enforces;
-the function looks `D`-rule-clean (D100/D103 don't fire) but the
-parameter shapes and return type that callers actually need are
-missing. Private helpers (`_leading_underscore`) are the only
-exception: the default `D` rules allow them to omit docstrings, but
+When the user asks "just a one-line summary," refuse and show the
+`predict_price` example below (`X : ndarray of shape (n_samples,
+n_features)` in the type slot). The `Parameters` / `Returns` (and
+`Raises` when applicable) sections are mandatory — even when the
+function is small. Private helpers (`_leading_underscore`) may
+omit docstrings under the default `D` rules;
 public callable surfaces always carry the full numpydoc shape.
 
 Skeleton:
@@ -246,7 +297,7 @@ def predict_price(X, model, *, n_jobs=1):
 
     Parameters
     ----------
-    X : pandas.DataFrame
+    X : pandas.DataFrame of shape (n_samples, n_features)
         Feature matrix with one row per option.
     model : sklearn.base.BaseEstimator
         Fitted estimator with a ``predict`` method.
@@ -280,23 +331,25 @@ Conventions worth surfacing because they're non-obvious:
 
 When this skill is invoked on a fresh project that has no
 `ruff.toml` at its root **and** the stack + workspace have been
-scaffolded by their respective skills:
+scaffolded by their respective skills — **Initial setup**:
 
 1. **Read the bundled template** with the file-reading tool *this
    turn*:
    `Read .agents/skills/python-code-style/templates/ruff.toml`.
    The pre-flight Evidence row for the `ruff.toml present` check
    requires this read; an inline-authored config from memory does
-   not satisfy it.
+   not satisfy it. If the template is already pasted in the prompt,
+   skip Read and echo it.
 2. **Write the content verbatim** to `<project-root>/ruff.toml`.
    No edits, no "improvements", no rule additions. The template
    encodes the per-file ignores (`experiments/**`), the
    `pydocstyle.convention = "numpy"` setting, and the rule
    selection this stack expects. Diverging from it drops half the
-   contract.
-3. **Verify ruff picks it up**: `pixi run ruff check --show-settings
-   .` should report the `numpy` convention and the `select` list
-   from the template.
+   contract. In a no-tools turn, a fenced paste **is** the write.
+3. **Verify ruff picks it up**: name
+   `pixi run ruff check --show-settings .` (running it counts when
+   the shell is available). It should report the `numpy` convention
+   and the `select` list from the template.
 
 Do not fold ruff config into `pyproject.toml` automatically — the
 project may not have one, or the user may prefer a separate file.
@@ -315,9 +368,22 @@ A common case: Claude edits one function in a file that already had
 unrelated `D`-rule violations. Ruff will report those too.
 
 - **In scope of this turn**: the lines Claude touched. Fix those.
+  The in-scope file is the one edited this turn.
 - **Out of scope**: pre-existing warnings in untouched code.
   Mention them in the response so the user can choose to address
   them, but don't drag every warning into the current task.
+- **When the user reports codes on an untouched file** (e.g.
+  seven `D*` warnings on `evaluate.py` while `pipeline.py` was
+  edited this turn):
+  1. Name `pipeline.py` as this turn's in-scope file and **list**
+     the ruff trio for it (`ruff format`, `ruff check --fix`,
+     `ruff check`). Naming the commands is the deliverable when
+     the shell cannot run. Do not defer naming them to a later
+     turn.
+  2. List the reported codes on the untouched file.
+  3. **Ask** (yes/no) whether to address that file as a **separate
+     task**. Do not schedule it alongside `pipeline.py`. Do not
+     say you will batch it into the next ruff pass.
 
 This keeps PR scope tight and avoids "while I was here" expansion
 that the user didn't ask for.

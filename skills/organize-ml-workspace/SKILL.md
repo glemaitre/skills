@@ -72,6 +72,43 @@ Sibling skills (just-in-time):
 
 ## Stop conditions — read before anything else
 
+- **Describing the work is not doing it.** A plan for next turn does
+  not tick a pre-flight box. Scaffold the layout, or report
+  `BLOCKED: <what> cannot run this turn (<why>)` and stop — a `[~]`
+  box, "pending", or "deferred to the live turn" is not a valid
+  state. The same holds for the mechanism: when a gate calls for
+  `AskUserQuestion`, a prose question or a markdown table is not a
+  substitute. If the tool is unavailable, that is BLOCKED, not an
+  excuse to improvise the question inline.
+- **`BLOCKED` is for missing input, not for work you can already
+  do.** Block on a tool you cannot reach or a fact you do not have.
+  When the turn already carries what you need — the gates resolved
+  and recorded, content pasted into the prompt, state given in the
+  workspace description — you are not blocked. A `BLOCKED` banner
+  over work you could have done is a refusal, not a safeguard, and
+  an *action* row that simply does not apply is `[n/a] — <why>`,
+  not an unchecked box escalated into a block.
+- **A gate is never `[n/a]`.** `n/a` is for actions the turn does
+  not need. G-PKG-NAME, G-ENV-MGR, G-TABULAR and G-SKORE-MODE are
+  resolved (answer recorded this session), outstanding, or blocked —
+  there is no fourth state. "n/a this turn", "not re-litigated",
+  "settled by prior-session continuity" are all the same move:
+  retiring a gate the user never answered. **Exception —
+  G-PKG-NAME on a complete layout:** when `[project] name` already
+  matches a live `src/<pkg>/`, glue **reuses** that import name
+  (resolved from disk, not `n/a`). Re-confirm with
+  `AskUserQuestion` only on first scaffold, incomplete package
+  layout (manifest without matching `src/<pkg>/`), or an explicit
+  rename. On those turns, reading the name out of `pyproject.toml`
+  is what the ask re-confirms *against*, not a substitute for
+  asking.
+- **Blocking does not settle the gates it skipped.** A blocked
+  turn still owes the gate list as *unresolved*. Writing
+  "G-PKG-NAME does not fire" while reporting BLOCKED on a
+  **scaffold / incomplete / rename** turn resolves the gate by
+  assertion. Name which gates are outstanding; do not retire them
+  on the way past. Glue that already reused a live `src/<pkg>/`
+  name is not this shortcut.
 - **Missing dependency.** If `import skore` raises, STOP. Invoke
   `python-env-manager` for the install command. Do not drop
   `skore.Project` in favor of `mlflow` / pickles / "print metrics"
@@ -92,7 +129,10 @@ Sibling skills (just-in-time):
   `project.get(key)` raises `KeyError`, the fix is the lookup
   shape: `get` is by **id**, not by `key`. Use `summarize()` →
   `(key, id)` → `get(id)`. Never substitute by re-running
-  `evaluate` + `put`.
+  `evaluate` + `put`. This scratch-fix turn never routes recovery
+  through the experiment script (`experiments/NN_*.py`). Stop at
+  the lookup-shape. Even if `summarize()` has no matching row, do
+  not send the user to re-run the experiment from this turn.
 - **Tabular library is asked, not assumed (G-TABULAR).** Pandas
   being importable via skore is not a pick. Invoke
   `data-science-python-stack` for the structured ask. Free-text
@@ -105,9 +145,13 @@ Sibling skills (just-in-time):
   default. **Manifest creation before G-PKG-NAME passes is
   forbidden** — running `init` first creates a `[project] name`
   entry, and reading "name is in the manifest" back is circular.
-  If a manifest exists, confirm via `AskUserQuestion` —
-  continuity from a prior session is not continuity from a user
-  decision.
+  If a manifest exists **without** a matching live `src/<pkg>/`,
+  or the user asked to rename, confirm via `AskUserQuestion`
+  ("keep `claim_predictor`?"). Glue on a **complete** layout
+  (`[project] name` + matching `src/<pkg>/`) reuses that name
+  without a keep/rename ask — that is resolved, not `BLOCKED`.
+  Continuity from a prior session with **no** matching `src/`
+  package is not a skip.
 - **Skore Project mode is asked, not assumed (G-SKORE-MODE).**
   Before any template instantiation containing
   `skore.Project(...)`, fire an `AskUserQuestion` for `local` |
@@ -149,10 +193,10 @@ Sibling skills (just-in-time):
 | `pixi` on PATH → run `pixi init` to get a manifest, then read the name back | Violates G-ENV-MGR (silent manager pick) AND G-PKG-NAME (name from folder via init side-effect). Circular: the agent created the manifest it now claims to read |
 | Folder name = good name → skip the ask | Default *value* is fine; silent *pick* is not. G-PKG-NAME requires the structured ask even with folder as default |
 | `pandas` already importable via skore → write `import pandas` in `data.py` | Transitive presence is not a pick. Violates G-TABULAR |
-| Scaffold every skeleton in one turn, incl. `experiments/01_baseline.py` body | Scaffold stops at empty `journal/` placeholder. Experiment script content lands after design-note approval (`iterate-ml-experiment` § 3) |
+| Scaffold every skeleton in one turn, incl. `experiments/01_baseline.py` body | Scaffold drops the *empty templated shell* (Decision flow step 5) and stops at the empty `journal/` placeholder. The experiment **body** lands after design-note approval (`iterate-ml-experiment` § 3) |
 | Scaffold drops `audit/01_baseline.py` at workspace creation | Audit files placed by `audit-ml-pipeline` at § 4 record-outcome. Empty `audit/` at scaffold is correct |
 | Forget `audit/` in the scaffold layout | Four-way stem pairing breaks |
-| `pyproject.toml` exists with `name = <x>` → reuse without confirming | Always re-confirm via G-PKG-NAME |
+| `pyproject.toml` exists with `name = <x>` → reuse without confirming, **on scaffold / first `pyproject.toml` write / rename** | G-PKG-NAME must fire before creating or changing the package. Glue + "add a new experiment" may reuse the recorded / manifest name without re-firing the gate |
 | Batch G-TABULAR + G-PKG-NAME + G-ENV-MGR + G-SKORE-MODE into prose recommendations | The gates take structured `AskUserQuestion`. Prose followed by "let me know" does NOT resolve them |
 | Skip G-SKORE-MODE because templates use `mode="local"` | Templates carry the `<SKORE_PROJECT_INIT>` marker, not a literal. The gate must fire |
 | Pick `mode="hub"` without checking the workspace exists / user has access | Project init fails at first `put()` with an authorization error. Confirm during G-SKORE-MODE, not at execution time |
@@ -167,6 +211,7 @@ Sibling skills (just-in-time):
 | Substituting `<SKORE_PROJECT_INIT>` in `audit/<stem>.py` independently of `experiments/<stem>.py` | Audit must open the same Project. Byte-identical copy from the experiment file is the rule |
 | Hub workspace name contains `/` (e.g. `acme/datasci`) | `workspace=` is a single Hub workspace identifier, not a path or a `<workspace>/<project>` join; a `/` is invalid. Reject at G-SKORE-MODE follow-up |
 | `project.get(key)` raised `KeyError` → re-run `evaluate` + `put` to "recover" | Lookup shape wrong (`get` is by id). Use `summarize()` → `get(id)` |
+| `summarize()` has no row → re-run `experiments/NN_*.py` from a scratch-fix turn | Still not this turn's job. Stop at the lookup-shape; do not route recovery through the experiment script |
 
 ## Pre-flight — emit before any code
 
@@ -194,8 +239,11 @@ Pre-flight (organize-ml-workspace):
 - [ ] G-PKG-NAME resolved: <name>
       Evidence: AskUserQuestion id=<id>, answer=<name> |
                 JOURNAL.md Status (Workspace decisions) |
-                existing manifest's [project].name **confirmed via AskUserQuestion**
-                (reading the manifest alone is NOT sufficient)
+                existing manifest's [project].name **when this turn is
+                glue, not scaffold** (add-experiment / keep layout) |
+                existing manifest's [project].name **confirmed via
+                AskUserQuestion** when creating or changing the package
+                (reading the manifest alone is NOT sufficient then)
 - [ ] G-SKORE-MODE resolved: local | hub | mlflow
       Evidence: AskUserQuestion id=<id>, answer=<local|hub|mlflow> |
                 JOURNAL.md Status (Workspace decisions) `skore mode:` row
@@ -332,7 +380,7 @@ revisiting the matching smoke test
 | 2a | **G-SKORE-MODE** ask: local | hub | mlflow (+ hub workspace name if hub; + MLflow tracking URI if mlflow). Determines `<SKORE_PROJECT_INIT>` form + skore install variant. → `references/g_skore_mode.md` | this skill |
 | 3 | Drop `pyproject.toml` from `templates/pyproject.toml` (substitute `<pkg>`). Hand off to `python-env-manager` for editable install | this skill → env-manager |
 | 4 | Create `src/<pkg>/` with skeletons from `templates/src_*.py` | this skill |
-| 5 | Create `experiments/01_baseline.py` from `templates/experiment.py` (substitute `<pkg>`, `<SKORE_PROJECT_INIT>` per G-SKORE-MODE, `<project-name>`) | this skill |
+| 5 | Create `experiments/01_baseline.py` as an **empty templated shell** from `templates/experiment.py` (substitute `<pkg>`, `<SKORE_PROJECT_INIT>` per G-SKORE-MODE, `<project-name>`). Imports and `# %%` cell markers only — the experiment body lands later, after design-note approval (`iterate-ml-experiment` § 3) | this skill |
 | 6 | Create empty `tests/smoke/`. Verify pytest on manifest | this skill |
 | 6a | Create empty `audit/` | this skill |
 | 7 | Create `journal/JOURNAL.md` one-line placeholder; `iterate-ml-experiment` rewrites it | this skill |
@@ -341,6 +389,13 @@ revisiting the matching smoke test
 | 10 | Touch `.gitignore` — drop template if none; else suggest patch (always ask about `reports/`). **Never ignore the whole `data/`** (EDA deliverables live there); to keep raw inputs out of git, ignore specific input paths only and ask | this skill |
 | 11 | **Hand off to `python-code-style`** § Initial setup for `ruff.toml` + first pass — invoking the skill teaches NumPyDoc and (once files carry real content) contextualizes their comments to the problem | this skill → python-code-style |
 | 12 | Hand back to the relevant sibling (`iterate-ml-experiment` for design note, etc.) | this skill → next caller |
+
+When files cannot be written this turn, still **enumerate** this
+layout (directories + files). Include step 5's empty
+`experiments/01_baseline.py` shell with `<pkg>` substituted from
+G-PKG-NAME (e.g. `churnlab`). Do not emit `BLOCKED` instead of
+the file list; refusing the experiment *body* is not refusing the
+scaffold.
 
 → next: `iterate-ml-experiment` § 0 (bootstrap) for the first
 design note.
