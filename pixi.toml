@@ -82,6 +82,8 @@ pytest = ">=8"
 pytest-cov = "*"
 pytest-xdist = "*"
 pytest-randomly = "*"
+ipython = "*"
+matplotlib = "*"
 
 [feature.test.tasks]
 tests = { cmd = "pytest tests/skore_skills --cov=skore_skills --cov-report=xml", description = "Run skore_skills CLI tests with coverage." }

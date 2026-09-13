@@ -90,4 +90,8 @@ ignore_missing_imports = true
 module = [
     "click",
     "click.*",
+    "matplotlib",
+    "pandas",
+    "IPython",
+    "IPython.*",
 ]
