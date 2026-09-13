@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import compileall
 from pathlib import Path
 
@@ -55,6 +56,13 @@ def test_scaffold_tree_and_no_placeholders(
     )
     assert "from demo_pkg import PROJECT_ROOT" in experiment
     assert "<pkg>" not in experiment
+    tree = ast.parse(experiment)
+    assert not any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr in {"evaluate", "put"}
+        for node in ast.walk(tree)
+    )
     for path in tmp_path.rglob("*"):
         if path.is_file() and path.suffix in {".py", ".toml", ".md"}:
             text = path.read_text(encoding="utf-8")

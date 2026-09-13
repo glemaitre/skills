@@ -29,6 +29,8 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 - Name **G-TABULAR** — pandas / polars pick via the
   data-science-python-stack ask.
 - Mention **G-ENV-MGR** as routed via `python-env-manager`.
+- Name `python -m skore_skills scaffold --package <pkg>` as the
+  action after the gates resolve.
 - Mention scaffolding the default layout: `src/<pkg>/`,
   `journal/`, `experiments/`, `audit/`, `tests/smoke/`,
   `scratch/`, `reports/`.
@@ -118,11 +120,23 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
   `churnlab`, G-ENV-MGR = pixi, G-TABULAR = pandas, G-SKORE-MODE =
   local. Nothing is left to ask before the layout goes down.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch`
+
+**Expect files:**
+- `src/churnlab/pipeline.py`
+- `experiments/01_baseline.py`
+- `journal/JOURNAL.md`
+- `pyproject.toml`
+
+**Expect cli:**
+- `scaffold --package churnlab`
+
 **Must do:**
-- Lay out the scaffold (name the directories and files the
-  Decision flow creates). Recording already-resolved gates into
-  `journal/JOURNAL.md` Status / `Workspace decisions` is allowed;
-  the placeholder does **not** have to stay empty.
+- Run `python -m skore_skills scaffold --package churnlab` via
+  `run_skore_skills`; the resulting template tree is the scaffold.
 - Refuse to write `experiments/01_baseline.py` with a **runnable
   body** during the scaffold turn.
 - Cite the rule: "design note first, then code" /

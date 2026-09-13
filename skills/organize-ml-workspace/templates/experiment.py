@@ -6,12 +6,13 @@
 # **Result:** filled in after the run.
 
 # %%
-import skore
-
-from <pkg> import PROJECT_ROOT
-from <pkg>.data import load_dataset
-from <pkg>.evaluate import splitter
-from <pkg>.pipeline import build_learner
+# Uncomment only after journal/01_baseline.md is approved.
+# import skore
+#
+# from <pkg> import PROJECT_ROOT
+# from <pkg>.data import load_dataset
+# from <pkg>.evaluate import splitter
+# from <pkg>.pipeline import build_learner
 
 # %% [markdown]
 # ## Paths
@@ -25,7 +26,7 @@ from <pkg>.pipeline import build_learner
 # binding.
 
 # %%
-DATA_DIR = PROJECT_ROOT / "data"
+# DATA_DIR = PROJECT_ROOT / "data"
 
 # %% [markdown]
 # ## Project
@@ -36,11 +37,11 @@ DATA_DIR = PROJECT_ROOT / "data"
 
 # %%
 # <SKORE_PROJECT_INIT>
-project = skore.Project(
-    name="<project-name>",
-    mode="local",
-    workspace=str(PROJECT_ROOT / "reports"),
-)
+# project = skore.Project(
+#     name="<project-name>",
+#     mode="local",
+#     workspace=str(PROJECT_ROOT / "reports"),
+# )
 
 # %% [markdown]
 # ## Data and learner
@@ -50,8 +51,8 @@ project = skore.Project(
 # from `data=` below).
 
 # %%
-X, y = load_dataset()
-learner = build_learner(data_dir_preview=DATA_DIR)
+# X, y = load_dataset()
+# learner = build_learner(data_dir_preview=DATA_DIR)
 
 # %% [markdown]
 # ## Evaluate
@@ -65,8 +66,10 @@ learner = build_learner(data_dir_preview=DATA_DIR)
 # materialized bindings.
 
 # %%
-report = skore.evaluate(learner, data={"data_dir": str(DATA_DIR)}, splitter=splitter)
-report
+# report = skore.evaluate(
+#     learner, data={"data_dir": str(DATA_DIR)}, splitter=splitter
+# )
+# report
 
 # %% [markdown]
 # ## Persist
@@ -75,4 +78,4 @@ report
 # stored report — fork into a new experiment file if you want both.
 
 # %%
-project.put("<experiment-key>", report)
+# project.put("<experiment-key>", report)

@@ -12,6 +12,7 @@
         "Name **G-PKG-NAME** as the next gate \u2014 the `src/<pkg>/` import name goes to the user via `AskUserQuestion`, with the folder name as the default, and is not picked here.",
         "Name **G-TABULAR** \u2014 pandas / polars pick via the data-science-python-stack ask.",
         "Mention **G-ENV-MGR** as routed via `python-env-manager`.",
+        "Name `python -m skore_skills scaffold --package <pkg>` as the action after the gates resolve.",
         "Mention scaffolding the default layout: `src/<pkg>/`, `journal/`, `experiments/`, `audit/`, `tests/smoke/`, `scratch/`, `reports/`.",
         "The response does NOT: Run `pixi init` / `uv init` / `poetry init` on the user's behalf before G-ENV-MGR + G-PKG-NAME have passed.",
         "The response does NOT: Pick a package name silently from the folder name.",
@@ -63,19 +64,32 @@
       "id": 4,
       "title": "Pre-emptive experiment file creation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder, fresh scaffold.\n- The config gates are already resolved and recorded: G-PKG-NAME =\n  `churnlab`, G-ENV-MGR = pixi, G-TABULAR = pandas, G-SKORE-MODE =\n  local. Nothing is left to ask before the layout goes down.]\n\nScaffold the workspace and write the baseline experiment\n`experiments/01_baseline.py` so we can run it right away.",
-      "expected_output": "Behavioural response satisfying: - Lay out the scaffold (name the directories and files the Decision flow creates). Recording already-resolved gates into `journal/JOURNAL.md` Status / `Workspace decisions` is allowed; the placeholder does **not** have to stay empty. - Refuse to write `experiments/01_baseline.py` with a **runnable body** during the scaffold turn. - Cite the rule: \"design note first, then code\" / `iterate-ml-experiment` \u00a7 3 owns experiment-script content. It must NOT: - Write a runnable `experiments/01_baseline.py` with a real build_learner call, `skore.evaluate`, and `project.put` in this turn. - Treat \"so we can run it right away\" as overriding the design-note-first rule.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills scaffold --package churnlab` via `run_skore_skills`; the resulting template tree is the scaffold. - Refuse to write `experiments/01_baseline.py` with a **runnable body** during the scaffold turn. - Cite the rule: \"design note first, then code\" / `iterate-ml-experiment` \u00a7 3 owns experiment-script content. It must NOT: - Write a runnable `experiments/01_baseline.py` with a real build_learner call, `skore.evaluate`, and `project.put` in this turn. - Treat \"so we can run it right away\" as overriding the design-note-first rule.",
       "files": [],
       "expectations": [
-        "Lay out the scaffold (name the directories and files the Decision flow creates). Recording already-resolved gates into `journal/JOURNAL.md` Status / `Workspace decisions` is allowed; the placeholder does **not** have to stay empty.",
+        "Run `python -m skore_skills scaffold --package churnlab` via `run_skore_skills`; the resulting template tree is the scaffold.",
         "Refuse to write `experiments/01_baseline.py` with a **runnable body** during the scaffold turn.",
         "Cite the rule: \"design note first, then code\" / `iterate-ml-experiment` \u00a7 3 owns experiment-script content.",
         "An empty or templated `experiments/01_baseline.py` shell (imports / `# %%` / commented stubs / `<pkg>` placeholders) counts as the Decision-flow drop. Do not require the words \"step 5\" or `<<PKG>>`. The real body lands only after design-note approval.",
         "The response does NOT: Write a runnable `experiments/01_baseline.py` with a real build_learner call, `skore.evaluate`, and `project.put` in this turn.",
         "The response does NOT: Treat \"so we can run it right away\" as overriding the design-note-first rule."
       ],
-      "tools": false,
-      "sandbox": [],
-      "expect_files": []
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch"
+        }
+      ],
+      "expect_files": [
+        "src/churnlab/pipeline.py",
+        "experiments/01_baseline.py",
+        "journal/JOURNAL.md",
+        "pyproject.toml"
+      ],
+      "expect_cli": [
+        "scaffold --package churnlab"
+      ]
     },
     {
       "id": 5,
