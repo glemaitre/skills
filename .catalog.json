@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "51c72aefca713dcf4858e0e972a300575fc49ad85fcacff871386ce2fd89ab2c",
+  "catalog_hash": "d419d501d4f30e02c572d9c6be740c122eb2777115d3452620381ccdc124a4c8",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -66,7 +66,7 @@
       "summary": "Design, keep track of experiments and iterate on them.",
       "category": "orchestration",
       "subcategory": "dispatchers",
-      "hash": "c6a076718f6e2ab86b9d9d6254ed1a546778dfe47826946fed34cbb0356e0e21"
+      "hash": "bc5e548c77243d2fe1c7317a2b46909ef6243f81cea9653df82338268322f655"
     },
     {
       "id": "iterate-from-skore",

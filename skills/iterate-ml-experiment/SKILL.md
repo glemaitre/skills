@@ -465,9 +465,15 @@ or polling for runs the user kicked off themselves.**
 ### Procedure
 
 1. **Audit-first**: dispatch to `audit-ml-pipeline` to place +
-   execute `audit/NN_<short_name>.py`. The audit reads the report
-   read-only via the bundled runner and streams a markdown digest
-   that carries the headline metrics. **The audit replaces scratch
+   execute `audit/NN_<short_name>.py` with:
+
+   ```bash
+   python -m skore_skills cells run \
+     audit/NN_<short_name>.py scratch/audit/NN_<short_name>/audit.md
+   ```
+
+   The audit reads the report read-only and streams a markdown
+   digest that carries the headline metrics. **The audit replaces scratch
    probes** — don't write `scratch/<ts>_inspect_*.py` to extract
    metrics from the report when the audit is the canonical path.
    - Agent feature must be installed; if not, audit-ml-pipeline
