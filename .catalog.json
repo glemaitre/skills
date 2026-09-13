@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "523a502d3ded8cd44d28f95622a548f6c24d844aa217adb627d905036b673f76",
+  "catalog_hash": "da52ce6d780b4429e66f37c92d1e2f7f3bb24c1c9bcfc93035f7e705416c61bd",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "6437acaf028f208a0ebd20bc7cfebd070f1238fe4612fcbb653d254ddf0e6da8"
+      "hash": "450f038b48cb09959d58eb41c3dabadf3eb66f7f8c0f0cf6f8bfae61e84d5d9a"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -66,7 +66,7 @@
       "summary": "Design, keep track of experiments and iterate on them.",
       "category": "orchestration",
       "subcategory": "dispatchers",
-      "hash": "ca2a0bfd6909d8b1cab81df3e3d0712cfc8a927a093bbe0c5da2bd98fdbb7f18"
+      "hash": "6814b442e6599ca97bb30e7200ba09121cc598c0f2c885a05d93982f6632ac9e"
     },
     {
       "id": "iterate-from-skore",
@@ -84,7 +84,7 @@
       "summary": "As a user be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo).",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "9752cbb18034573df06a5e36848636e704fbaf5cb6c1b3d5d1dcb4e50f3a8901"
+      "hash": "1fd22a95bda2d95d098f7aa5f6e1375a0a697591475771cacaa3e6b5ec73b817"
     },
     {
       "id": "organize-ml-workspace",
@@ -129,7 +129,7 @@
       "summary": "Discover the public API of any installed Python package to make agent find their way without bothering your workspace.",
       "category": "reference",
       "subcategory": null,
-      "hash": "175bc93f18aa080c16797d4969d9328dc17c8e2e6b6b53b10c6fd28a79eff319"
+      "hash": "d0adab75dcb636aa18dd262eb585ee8daae008a09386e5a959ff17a0916729a4"
     }
   ],
   "workflows": [

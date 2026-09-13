@@ -142,9 +142,12 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
 - Refuse `skrub.X(...)` / `skrub.y(...)` as graph roots.
 - Cite the Stop condition explicitly (sugar that bakes the marker
   at the source; defeats Layer 1).
-- Propose the source-bound alternative:
-  `skrub.var("<source>", preview).skb.apply_func(load_*)` followed
-  by `.skb.mark_as_X()` on the loaded frame.
+- Propose the source-bound alternative: `skrub.var("<source>",
+  preview)` then `.skb.mark_as_X()` on that frame. When the source
+  is a path/dir, that includes `.skb.apply_func(load_*)` before
+  the marker. When the workspace already has a loaded DataFrame,
+  `skrub.var(..., value=preview)` + `.skb.mark_as_X()` counts —
+  do not require a loader call.
 - Surface that this is a refactor and offer to do it (or ask user).
 
 **Must NOT do:**

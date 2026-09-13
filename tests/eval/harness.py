@@ -367,6 +367,20 @@ def _format_transcript_md(payload: dict) -> str:
 
 _FENCE_RE = re.compile(r"```(?:[^\n`]*)\n.*?```", re.DOTALL)
 _REASONING_TAIL_CHARS = 2000
+FINAL_NUDGE = (
+    "No more tools. Put the complete deliverable in the assistant "
+    "message (not only in a thinking channel). Do not emit tool calls."
+)
+CONTENT_NUDGE = (
+    "Put the complete deliverable in the assistant message "
+    "(not only in a thinking channel)."
+)
+
+
+def _is_xml_only(content: str) -> bool:
+    from tests.eval.sandbox import is_tool_xml_only
+
+    return is_tool_xml_only(content)
 
 
 def visible_text(result: GenerationResult) -> tuple[str, str]:
@@ -377,7 +391,7 @@ def visible_text(result: GenerationResult) -> tuple[str, str]:
     Full reasoning stays on the transcript payload.
     """
     content = (result.content or "").strip()
-    if content:
+    if content and not _is_xml_only(content):
         return content, "content"
     reasoning = (result.reasoning or "").strip()
     if not reasoning:
@@ -389,7 +403,7 @@ def visible_text(result: GenerationResult) -> tuple[str, str]:
 def _reasoning_deliverable(reasoning: str) -> str:
     fences = list(_FENCE_RE.finditer(reasoning))
     if not fences:
-        return reasoning
+        return ""
     last = fences[-1]
     extracted = last.group(0)
     tail = reasoning[last.end() :].strip()
@@ -482,11 +496,25 @@ def generate_response(*, model: str, system: str, user: str) -> GenerationResult
     response = call_with_retries(_once)
     choice = response.choices[0]
     message = choice.message
+    content = message.content or ""
+    reasoning = str(getattr(message, "reasoning_content", None) or "")
+    finish = getattr(choice, "finish_reason", None)
+    usage = _usage_dict(response)
+    if not (content or "").strip():
+        messages.append(_assistant_message_dict(message))
+        messages.append({"role": "user", "content": CONTENT_NUDGE})
+        response = call_with_retries(_once)
+        usage = _merge_usage(usage, _usage_dict(response))
+        choice = response.choices[0]
+        message = choice.message
+        content = message.content or ""
+        reasoning = str(getattr(message, "reasoning_content", None) or "") or reasoning
+        finish = getattr(choice, "finish_reason", None)
     return GenerationResult(
-        content=message.content or "",
-        reasoning=str(getattr(message, "reasoning_content", None) or ""),
-        finish_reason=getattr(choice, "finish_reason", None),
-        usage=_usage_dict(response),
+        content=content,
+        reasoning=reasoning,
+        finish_reason=finish,
+        usage=usage,
     )
 
 
@@ -503,8 +531,10 @@ def generate_agent_response(
     from tests.eval.sandbox import (
         TOOL_LOOP_CAP,
         TOOL_SCHEMAS,
+        is_tool_xml_only,
         parse_tool_arguments,
         parse_xml_tool_calls,
+        strip_tool_xml,
     )
 
     messages: list[dict[str, Any]] = []
@@ -517,11 +547,10 @@ def generate_agent_response(
     last_content = ""
     last_reasoning = ""
     last_finish: str | None = None
+    last_prose = ""
 
-    for step in range(TOOL_LOOP_CAP + 1):
-        use_tools = step < TOOL_LOOP_CAP
-
-        def _once(use_tools: bool = use_tools):
+    def _complete(*, use_tools: bool) -> Any:
+        def _once() -> Any:
             kwargs: dict[str, Any] = {
                 "model": litellm_model_name(model),
                 "messages": messages,
@@ -532,47 +561,97 @@ def generate_agent_response(
                 kwargs["tools"] = TOOL_SCHEMAS
             return completion(**kwargs)
 
-        response = call_with_retries(_once)
+        return call_with_retries(_once)
+
+    def _record(message: Any, finish: str | None) -> None:
+        nonlocal last_content, last_reasoning, last_finish, last_prose
+        last_content = message.content or ""
+        last_reasoning = str(getattr(message, "reasoning_content", None) or "")
+        last_finish = finish
+        prose = strip_tool_xml(last_content)
+        if prose:
+            last_prose = prose
+
+    def _dispatch_native(message: Any) -> None:
+        messages.append(_assistant_message_dict(message))
+        for tc in list(getattr(message, "tool_calls", None) or []):
+            fn = getattr(tc, "function", None)
+            name = getattr(fn, "name", "") or ""
+            args = parse_tool_arguments(getattr(fn, "arguments", "") or "")
+            result = sandbox.dispatch(name, args)
+            tool_trace.append({"name": name, "arguments": args, "result": result[:4000]})
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": getattr(tc, "id", "") or "",
+                    "content": result,
+                }
+            )
+
+    def _dispatch_xml(content: str, xml_calls: list[dict[str, Any]], step: int) -> None:
+        messages.append({"role": "assistant", "content": content})
+        for i, item in enumerate(xml_calls):
+            name = str(item.get("name") or "")
+            args = item.get("arguments") or {}
+            result = sandbox.dispatch(name, args)
+            tool_trace.append({"name": name, "arguments": args, "result": result[:4000]})
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": f"xml-{step}-{i}",
+                    "content": result,
+                }
+            )
+
+    still_calling_tools = True
+    for step in range(TOOL_LOOP_CAP):
+        response = _complete(use_tools=True)
         usage = _merge_usage(usage, _usage_dict(response))
         choice = response.choices[0]
         message = choice.message
-        last_content = message.content or ""
-        last_reasoning = str(getattr(message, "reasoning_content", None) or "")
-        last_finish = getattr(choice, "finish_reason", None)
+        _record(message, getattr(choice, "finish_reason", None))
         tool_calls = list(getattr(message, "tool_calls", None) or [])
         xml_calls = [] if tool_calls else parse_xml_tool_calls(last_content)
         if not tool_calls and not xml_calls:
+            still_calling_tools = False
             break
         if tool_calls:
-            messages.append(_assistant_message_dict(message))
-            for tc in tool_calls:
-                fn = getattr(tc, "function", None)
-                name = getattr(fn, "name", "") or ""
-                args = parse_tool_arguments(getattr(fn, "arguments", "") or "")
-                result = sandbox.dispatch(name, args)
-                tool_trace.append({"name": name, "arguments": args, "result": result[:4000]})
-                messages.append(
-                    {
-                        "role": "tool",
-                        "tool_call_id": getattr(tc, "id", "") or "",
-                        "content": result,
-                    }
-                )
+            _dispatch_native(message)
         else:
-            messages.append({"role": "assistant", "content": last_content})
-            for i, item in enumerate(xml_calls):
-                name = str(item.get("name") or "")
-                args = item.get("arguments") or {}
-                result = sandbox.dispatch(name, args)
-                tool_trace.append({"name": name, "arguments": args, "result": result[:4000]})
-                messages.append(
-                    {
-                        "role": "tool",
-                        "tool_call_id": f"xml-{step}-{i}",
-                        "content": result,
-                    }
-                )
+            _dispatch_xml(last_content, xml_calls, step)
         last_finish = "tool_calls"
+
+    if still_calling_tools or is_tool_xml_only(last_content) or not strip_tool_xml(
+        last_content
+    ):
+        if last_prose and is_tool_xml_only(last_content):
+            last_content = last_prose
+            last_finish = "stop"
+        else:
+            for _nudge in range(2):
+                if _nudge:
+                    messages.append(
+                        {"role": "assistant", "content": last_content or ""}
+                    )
+                    messages.append({"role": "user", "content": FINAL_NUDGE})
+                response = _complete(use_tools=False)
+                usage = _merge_usage(usage, _usage_dict(response))
+                choice = response.choices[0]
+                message = choice.message
+                _record(message, getattr(choice, "finish_reason", None))
+                prose = strip_tool_xml(last_content)
+                if prose:
+                    last_content = prose
+                    last_finish = "stop"
+                    break
+                if last_prose:
+                    last_content = last_prose
+                    last_finish = "stop"
+                    break
+            else:
+                last_content = last_prose or strip_tool_xml(last_content) or last_content
+    else:
+        last_content = strip_tool_xml(last_content) or last_content
 
     return GenerationResult(
         content=last_content,

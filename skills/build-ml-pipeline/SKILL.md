@@ -164,6 +164,20 @@ bottom; any match means STOP.
   (3) silently re-enable the late-`mark_as_X` bug for cross-row
   features.
 
+**S4 copy this into the assistant message, then stop.** Do not
+leave the refuse in a thinking channel. Do not add encoder /
+predictor steps on the `skrub.X` skeleton.
+
+```
+Refuse: skrub.X / skrub.y are not graph roots (S4).
+They bake the marker at the source and defeat Layer 1.
+
+Alternative (refactor — ask before rewriting):
+  data = skrub.var("data_dir", value=preview).skb.apply_func(load_raw)
+  X = data.drop(columns=[TARGET_COL]).skb.mark_as_X()
+  y = data[TARGET_COL].skb.mark_as_y()
+```
+
 ### S5. Late `mark_as_X` is forbidden when any feature step is cross-row
 
 - **Rule:** for any cross-row step (lag, rolling, group-agg,

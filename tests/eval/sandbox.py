@@ -23,7 +23,8 @@ TOOLS_NOTE = (
     "write_file, and run_python. run_python only executes files under "
     "scratch/ — inline python -c is rejected. When you are done, put "
     "the complete deliverable in the assistant message (not only in a "
-    "thinking channel)."
+    "thinking channel). The last message must be that deliverable, "
+    "not another tool call."
 )
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
@@ -242,6 +243,29 @@ class Sandbox:
             out.append(proc.stderr)
         out.append(f"exit_code={proc.returncode}")
         return "\n".join(out).strip()
+
+
+_TOOL_XML_RE = re.compile(
+    r"<minimax:tool_call>.*?</minimax:tool_call>"
+    r"|<invoke\s+name=\"[^\"]+\">.*?</invoke>",
+    re.DOTALL,
+)
+
+
+def strip_tool_xml(content: str) -> str:
+    """Remove MiniMax-style XML tool wrappers; keep leftover prose."""
+    if not content:
+        return ""
+    return _TOOL_XML_RE.sub("", content).strip()
+
+
+def is_tool_xml_only(content: str) -> bool:
+    raw = (content or "").strip()
+    if not raw:
+        return False
+    if strip_tool_xml(raw):
+        return False
+    return "<invoke" in raw or "<minimax:tool_call>" in raw
 
 
 def parse_xml_tool_calls(content: str) -> list[dict[str, Any]]:

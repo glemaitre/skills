@@ -82,13 +82,18 @@ violated.
 **Must do:**
 - Recognise this as `free-text` branch (concrete idea typed inline
   → pre-resolved).
-- Walk the three shaping questions in plain language, quoting the
-  user.
+- Walk the three shaping questions in plain language **or**
+  restate the user's idea with the open gaps that those questions
+  would close. Quoting the user is optional. Do not require a
+  numbered 1/2/3 walk.
 - **Flag the goal shift**: point-estimate → prediction interval is
   a different output shape; this should update `JOURNAL.md`
   Status. Surface as a question before returning the Proposal.
-- Fire confirmation gate before returning.
-- `Source` field = the user quote.
+- Fire confirmation gate before returning. Withholding the
+  Proposal until the user confirms is correct.
+- `Source` field = the user quote **when a Proposal is returned**.
+  If this turn stops at the confirmation gate, omitting `Source`
+  is not a miss.
 
 **Must NOT do:**
 - Silently change the goal in the returned Proposal.

@@ -93,8 +93,9 @@ violation in any transcript** (hard rule).
 
 **Must do:**
 - Read `journal/JOURNAL.md` first (mention it explicitly).
-- Surface the **sourcing menu verbatim** with the four options
-  (`skore` / `user` / `my-pick` / `B<N>`).
+- Surface the **sourcing menu** with the four options
+  (`skore` / `user` / `my-pick` / `B<N>`). Exact copy-paste of
+  the skill block is not required; naming all four is enough.
 - Surface the Backlog alongside the menu, copying B1–B3 item text
   from `journal/JOURNAL.md` (do not invent backlog wording).
 - Use `AskUserQuestion` or a narrative equivalent that asks the
@@ -102,7 +103,9 @@ violation in any transcript** (hard rule).
   silently picking one option.
 
 **Must NOT do:**
-- Silently default to one sourcing strategy.
+- Silently default to one sourcing strategy — skip the menu and
+  draft as if the pick were already made. Naming a likely pick
+  (e.g. B2) **next to** the four options is not silently defaulting.
 - Skip the sourcing menu and immediately draft a design note.
 - Default to `skore` just because a fresh report sits on disk (the
   rule "never silently default" is in Stop conditions).
@@ -191,8 +194,8 @@ violation in any transcript** (hard rule).
   new run answered / killed).
 - Close by naming the `AskUserQuestion` (or narrative equivalent)
   that offers "draft the next experiment now" vs "not yet" — do not
-  auto-propose, and do not simply declare that a fresh turn is
-  needed.
+  simply declare that a fresh turn is needed. Naming a likely
+  Backlog follow-up in that ask is extra help, not auto-propose.
 
 **Must NOT do:**
 - Draft a **new** design note (`journal/04_*.md`) or a new
@@ -325,12 +328,16 @@ violation in any transcript** (hard rule).
 - Surface the comparison without writing anything to `journal/`.
 
 **Must NOT do:**
-- Draft a new design note.
-- Add a row to `JOURNAL.md` History.
-- Auto-propose a next experiment in the same turn (separate user
-  turn if they want one).
+- Draft a new design note (`journal/04_*.md` or similar).
+- Add a row to `JOURNAL.md` History or otherwise write under
+  `journal/`.
 - Invoke a `ComparisonReport` / multi-key entry point — v1 scope
   is pairwise side-by-side only.
+
+Listing Backlog items as facts, or saying a likely next lever is
+`B2` / `B3` after the table, is extra help — not a miss. Fail
+auto-propose only if this turn **writes** a new design note or
+experiment.
 
 ---
 

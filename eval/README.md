@@ -10,10 +10,13 @@ and the harness note forbids tool calls. Opt-in cases set
 `**Tools:** yes`: those runs get a temp project directory seeded
 from `**Sandbox:**` (`dir:` / `file:` / `copy:` from the repo),
 LiteLLM tools (`list_dir`, `read_file`, `write_file`, `run_python`
-on `scratch/` only), and pytest checks `**Expect files:**` globs
-and `**Expect reads:**` tool-trace paths after the loop. Lookup-gated
-`python-api` cases use this, as does `build-ml-pipeline` case 3
-(seeded `references/layer_examples.md`). The eval environment pins
+on `scratch/` only). The loop cap is 12 tool steps; leftover MiniMax
+XML tool calls are not scored — the harness strips them, keeps the
+last prose, and if needed nudges once for a final assistant message.
+Pytest checks `**Expect files:**` globs and `**Expect reads:**`
+tool-trace paths after the loop. Lookup-gated `python-api` cases
+use this, as does `build-ml-pipeline` case 3 (seeded
+`references/layer_examples.md`). The eval environment pins
 skrub / scikit-learn / skore so Shape 1 probes can import them.
 `python-api` case 4 (Shape 3 / WebFetch) has tools for cache files
 but no WebSearch/WebFetch tool yet.
