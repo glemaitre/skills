@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "46439fd4c869c1b72aad7a3884f0abb5d12954f27674ad6ca446b044fd300567",
+  "catalog_hash": "312afca3e2ca29b2c6d69e742080de94066c68fce34d57b5ea45e23d433db087",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b1137532708783f36d1f4fb14af0f217d390bd816f676b2030a0b9246d566be1"
+      "hash": "430849648a6e96080861bd0bef2f1ff0dd57c48a0bb8b1629f95ccd495eb1be1"
     },
     {
       "id": "test-ml-pipeline",
@@ -129,7 +129,7 @@
       "summary": "Discover the public API of any installed Python package to make agent find their way without bothering your workspace.",
       "category": "reference",
       "subcategory": null,
-      "hash": "4178448e70de22153bf78e6db07d467f20c722f94277a2297e15d5b3a543cf96"
+      "hash": "65febe8330fee4ec813aa76d46c156cc066aa76e867e346a0b91c3f1542363a4"
     }
   ],
   "workflows": [

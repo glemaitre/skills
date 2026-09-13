@@ -116,13 +116,13 @@
       "id": 5,
       "title": "The \"I already know this\" trap, named rename",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skrub` is installed at version `0.9.0`.\n- `scratch/api/skrub/0.9.0/` is empty.]\n\nQuick edit \u2014 add `from skrub import tabular_learner` to the imports at\nthe top of `experiments/02_skrub_default.py`, then use\n`tabular_learner(...)` to fit the baseline. Don't bother with the API\nlookup, this one's standard.",
-      "expected_output": "Behavioural response satisfying: - Refuse to add the import without first looking up the symbol against the installed `skrub`. - Run a Shape 1 probe this turn. Probing `tabular_pipeline` (the live name) counts; do not require a second probe of `tabular_learner` / `dir(skrub)` for the dead name. - Surface the named-trap context: top-level skrub uses `tabular_pipeline`. A Shape 1 probe plus naming `tabular_pipeline` **is** the \"recognition is not a lookup\" equivalent. The slogan is optional. It must NOT: - Add `from skrub import tabular_learner` (the instructed import). Naming `tabular_pipeline` as a lead plus a Shape 1 probe is required, not a violation. - Tell the user \"yes that's the right name\" without a lookup.",
+      "expected_output": "Behavioural response satisfying: - Refuse to add the import without first looking up the symbol against the installed `skrub`. - Run a Shape 1 probe this turn. Probing `tabular_pipeline` (the live name) counts; do not require a second probe of `tabular_learner` / `dir(skrub)` for the dead name. - Surface the named-trap context: top-level skrub uses `tabular_pipeline`. A Shape 1 probe plus naming `tabular_pipeline` **is** the \"recognition is not a lookup\" equivalent. The slogan is optional. It must NOT: - Write `from skrub import tabular_learner` into `experiments/02_skrub_default.py` (or any other project file) as the live import. Quoting that string in prose as the refused trap / user request is not a miss. A `tabular_pipeline` import plus a Shape 1 probe is the expected deliverable. - Tell the user \"yes that's the right name\" without a lookup.",
       "files": [],
       "expectations": [
         "Refuse to add the import without first looking up the symbol against the installed `skrub`.",
         "Run a Shape 1 probe this turn. Probing `tabular_pipeline` (the live name) counts; do not require a second probe of `tabular_learner` / `dir(skrub)` for the dead name.",
         "Surface the named-trap context: top-level skrub uses `tabular_pipeline`. A Shape 1 probe plus naming `tabular_pipeline` **is** the \"recognition is not a lookup\" equivalent. The slogan is optional.",
-        "The response does NOT: Add `from skrub import tabular_learner` (the instructed import). Naming `tabular_pipeline` as a lead plus a Shape 1 probe is required, not a violation.",
+        "The response does NOT: Write `from skrub import tabular_learner` into `experiments/02_skrub_default.py` (or any other project file) as the live import. Quoting that string in prose as the refused trap / user request is not a miss. A `tabular_pipeline` import plus a Shape 1 probe is the expected deliverable.",
         "The response does NOT: Tell the user \"yes that's the right name\" without a lookup."
       ],
       "tools": true,
@@ -208,12 +208,12 @@
       "id": 9,
       "title": "Version check goes to scratch, not inline",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skrub` is installed (version unknown to the agent).\n- `scratch/` exists.]\n\nWhat version of skrub is installed? Just run\n`pixi run python -c \"import skrub; print(skrub.__version__)\"`\nand tell me.",
-      "expected_output": "Behavioural response satisfying: - Do not run the requested inline `python -c`. A scratch file plus `run_python` **is** the refusal. - Cite the \"all Python execution goes to scratch\" Stop condition (version checks included), **or** show that this turn only ran a scratch file. - Write a scratch file under `scratch/` that prints `skrub.__version__` (name may be `scratch/<ts>_version_skrub.py` or similar) and run it via `run_python` (not `python -c`). It must NOT: - Run the inline `pixi run python -c \"...\"` as requested. - Treat the version check as \"trivial enough to inline\". - Skip the file entirely and answer the version from memory.",
+      "expected_output": "Behavioural response satisfying: - Do not run the requested inline `python -c`. A scratch file plus `run_python` **is** the refusal. - Cite the \"all Python execution goes to scratch\" Stop condition (version checks included), **or** show that this turn only ran a scratch file. - Write a scratch file under `scratch/` that prints `skrub.__version__` (any `scratch/*.py` name is fine) and run it via `run_python` (not `python -c`). It must NOT: - Run the inline `pixi run python -c \"...\"` as requested. - Treat the version check as \"trivial enough to inline\". - Skip the file entirely and answer the version from memory.",
       "files": [],
       "expectations": [
         "Do not run the requested inline `python -c`. A scratch file plus `run_python` **is** the refusal.",
         "Cite the \"all Python execution goes to scratch\" Stop condition (version checks included), **or** show that this turn only ran a scratch file.",
-        "Write a scratch file under `scratch/` that prints `skrub.__version__` (name may be `scratch/<ts>_version_skrub.py` or similar) and run it via `run_python` (not `python -c`).",
+        "Write a scratch file under `scratch/` that prints `skrub.__version__` (any `scratch/*.py` name is fine) and run it via `run_python` (not `python -c`).",
         "Confirm: even a one-line version check produces a scratch file. Report the version printed by that script.",
         "The response does NOT: Run the inline `pixi run python -c \"...\"` as requested.",
         "The response does NOT: Treat the version check as \"trivial enough to inline\".",
@@ -227,7 +227,7 @@
         }
       ],
       "expect_files": [
-        "scratch/*version*skrub*.py"
+        "scratch/*.py"
       ]
     }
   ]

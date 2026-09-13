@@ -36,7 +36,6 @@ violated.
   variance, even on imbalance).
 - Pre-pin metrics (e.g. `scoring="neg_mean_squared_error"`) — trust
   skore defaults.
-- Reach for `KFold(5)` from memory without python-api confirmation.
 
 ---
 

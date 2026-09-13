@@ -240,9 +240,11 @@ Source: inspect: skore.Project @ 0.18.0
   equivalent. The slogan is optional.
 
 **Must NOT do:**
-- Add `from skrub import tabular_learner` (the instructed import).
-  Naming `tabular_pipeline` as a lead plus a Shape 1 probe is
-  required, not a violation.
+- Write `from skrub import tabular_learner` into
+  `experiments/02_skrub_default.py` (or any other project file) as
+  the live import. Quoting that string in prose as the refused
+  trap / user request is not a miss. A `tabular_pipeline` import
+  plus a Shape 1 probe is the expected deliverable.
 - Tell the user "yes that's the right name" without a lookup.
 
 ---
@@ -374,7 +376,7 @@ Source: inspect: skore.Project @ 0.18.0
 - dir: `scratch`
 
 **Expect files:**
-- `scratch/*version*skrub*.py`
+- `scratch/*.py`
 
 **Must do:**
 - Do not run the requested inline `python -c`. A scratch file plus
@@ -383,8 +385,8 @@ Source: inspect: skore.Project @ 0.18.0
   (version checks included), **or** show that this turn only ran a
   scratch file.
 - Write a scratch file under `scratch/` that prints `skrub.__version__`
-  (name may be `scratch/<ts>_version_skrub.py` or similar) and run it
-  via `run_python` (not `python -c`).
+  (any `scratch/*.py` name is fine) and run it via `run_python`
+  (not `python -c`).
 - Confirm: even a one-line version check produces a scratch file.
   Report the version printed by that script.
 

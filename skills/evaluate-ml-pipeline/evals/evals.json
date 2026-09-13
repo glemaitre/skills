@@ -14,8 +14,7 @@
         "Mention `data={...}` (env-dict) for `SkrubLearner`, NOT positional `X, y`.",
         "The response does NOT: Recommend `cross_val_score`, `cross_validate`, `classification_report`, or hand-rolled `print(mean_squared_error(...))`.",
         "The response does NOT: Default to `StratifiedKFold` (forbidden \u2014 compresses across-fold variance, even on imbalance).",
-        "The response does NOT: Pre-pin metrics (e.g. `scoring=\"neg_mean_squared_error\"`) \u2014 trust skore defaults.",
-        "The response does NOT: Reach for `KFold(5)` from memory without python-api confirmation."
+        "The response does NOT: Pre-pin metrics (e.g. `scoring=\"neg_mean_squared_error\"`) \u2014 trust skore defaults."
       ],
       "tools": false,
       "sandbox": [],
