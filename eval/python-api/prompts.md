@@ -208,8 +208,6 @@ Source: inspect: skore.Project @ 0.18.0
 - Use a URL containing `/latest/` or `/stable/` as the **cached**
   source if a cache write happens. Mentioning `/latest/` only to
   reject it is not a violation.
-- Paraphrase the docs into the cache file (the cache should hold a
-  verbatim extract). No cache write this turn is not a miss.
 
 ---
 
