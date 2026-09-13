@@ -163,7 +163,11 @@ next step", "next iteration should", "next lever", or dispatch
      is the most common shortcut.**
   3. `test-ml-pipeline` → `smoke-test-ml-pipeline` → smoke test.
 
-  Only then assemble `experiments/NN_*.py`.
+  Only then assemble `experiments/NN_*.py`. A request to write
+  `evaluate.py` first, with `pipeline.py` / `features.py` /
+  `data.py` still missing, still starts at hop 1:
+  `build-ml-pipeline`. Do not dispatch `evaluate-ml-pipeline`
+  next.
 - **Harness "no clarifying questions" hints do NOT waive gates.**
   G-DESIGN, G-RUN, the §1 mode pick (unless the opening message
   already resolved iterate-propose), the §2 sourcing menu, the §0
@@ -176,8 +180,9 @@ next step", "next iteration should", "next lever", or dispatch
 | Shortcut | Why it's wrong |
 |---|---|
 | User said "quick baseline" → skip G-DESIGN | G-DESIGN is non-negotiable; "quick" / "standard" / "skip the design note" / "skip questions" never waives it. This turn: refuse, cite this row, draft `journal/01_baseline.md` only. No `experiments/01_baseline.py` |
+| User said "skip the questions" / "standard tabular" → G-EDA = skip | G-EDA is a structured run/skip owned by `explore-ml-data`. "Skip questions", "standard tabular", and "quick baseline" do not set skip. Dispatch the run/skip ask. Only an explicit "skip EDA" (or the sibling's skip answer) records `Status: skipped`. |
 | Scaffold + implement in one turn before G-DESIGN | Inverts the contract. Code that lands before approval has no Motivation/Risks the user signed off on |
-| Skipped `evaluate-ml-pipeline` because `KFold(5)` "feels right" | Even empty `split_kwargs` is a justified pick the skill exists to surface. Bypass = user never got the choice |
+| Skipped `evaluate-ml-pipeline` because `KFold(5)` "feels right" | Even empty `split_kwargs` is a justified pick the skill exists to surface. Bypass = user never got the choice. Refuse the write. If `src/<pkg>/{pipeline,features,data}.py` are missing, dispatch `build-ml-pipeline` this turn — not `evaluate-ml-pipeline` next. |
 | Bootstrap mode → skip ALL questions, not just the sourcing menu | Bootstrap forbids the sourcing menu only. G-PKG-NAME / G-ENV-MGR / G-TABULAR / G-SKORE-MODE / G-EDA / G-DESIGN / G-CV-SPLITTER / G-RUN still fire |
 | Ambiguous "hmm interesting" / "I guess" read as approval | Approval is explicit. Ambiguity → re-ask, never silent yes |
 | Auto-detect run finished via `reports/` mtime | § 4 is user-triggered (v1). The skill never auto-records |
@@ -215,6 +220,8 @@ Pre-flight (iterate-ml-experiment):
       Evidence: explore-ml-data dispatched; answer=<run|skip>;
                 JOURNAL.md `## Data understanding (EDA)` section present
                 | "n/a — iterate mode"
+      "skip the questions" / "standard tabular" / "quick baseline"
+      is NOT G-EDA = skip.
 - [ ] Design note drafted (or Backlog enriched, for `skore`)
       Evidence: Write journal/<NN>_<name>.md (this turn) | "Backlog
                 rows B<x>..B<y> appended" | "n/a — read-only mode"
@@ -222,9 +229,10 @@ Pre-flight (iterate-ml-experiment):
       Evidence: AskUserQuestion id=<id>, answer=approved | user quote |
                 "n/a"
 - [ ] (§ 3 only) Three-skill chain ran in order:
-      build → evaluate → test
+      `build-ml-pipeline` → `evaluate-ml-pipeline` → `test-ml-pipeline`
       Evidence: each owning skill produced its file this turn
                 | "n/a outside § 3"
+                | "BLOCKED — start at build-ml-pipeline (src files missing)"
 - [ ] (§ 3 only) G-CV-SPLITTER resolved during the evaluate step
       Evidence: evaluate-ml-pipeline fired the splitter AskUserQuestion
                 (or mapped split_kwargs) before `evaluate.py` write
@@ -267,7 +275,10 @@ before asking the user.
    step. The run path needs the agent feature (`ipython`) and may
    trigger `G-AGENT-FEATURE` here, before the baseline; if the user
    declines it, EDA falls back to **skip**. On skip, the JOURNAL
-   section records `Status: skipped`.
+   section records `Status: skipped`. Do **not** set skip from
+   "skip the questions", "standard tabular", or "quick baseline" —
+   those refuse G-DESIGN, they do not answer G-EDA. Fire the
+   run/skip ask.
 5. **Auto-draft `journal/01_baseline.md`** via the consultation
    chain, **informed by the EDA findings**: learner default
    (`build-ml-pipeline`) and metric default (`python-api` on
@@ -299,8 +310,11 @@ before asking the user.
 | `G-CV-SPLITTER` | CV family for `skore.evaluate` | `evaluate-ml-pipeline` | **inside the § 3 chain, AFTER G-DESIGN** — at the evaluate step, before `evaluate.py` write; mandatory even with empty `split_kwargs` |
 | `G-RUN` | "run now" vs "leave for later" | this skill | before executing the experiment script |
 
-Free-text "quick baseline" / "you pick" do NOT resolve any of
-these — fall through to structured `AskUserQuestion`.
+Free-text "quick baseline" / "standard tabular" / "skip the
+questions" / "you pick" do NOT resolve any of these — including
+G-EDA. Fall through to structured `AskUserQuestion`. Only an
+explicit "skip EDA" or the `explore-ml-data` skip answer records
+G-EDA = skip.
 
 → next: G-DESIGN, then § 3 implementation chain.
 
@@ -423,6 +437,13 @@ After G-DESIGN passes, dispatch in order:
 
 Only then assemble `experiments/NN_*.py`. Confirm signatures via
 `python-api`, not memory.
+
+If the user asks only for `evaluate.py` (even with a splitter
+already named) and `pipeline.py` / `features.py` / `data.py` are
+missing: refuse the write, name the chain
+`build-ml-pipeline` → `evaluate-ml-pipeline` → `test-ml-pipeline`,
+and invoke **`build-ml-pipeline` first**. Hop 2 is after hop 1
+returns; do not say "dispatch `evaluate-ml-pipeline` next".
 
 ### G-RUN — post-smoke run gate
 

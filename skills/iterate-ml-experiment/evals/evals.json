@@ -5,14 +5,14 @@
       "id": 1,
       "title": "Bootstrap detection",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Workspace exists with `src/`, `experiments/`, `journal/` scaffolded\n  by `organize-ml-workspace`.\n- `journal/JOURNAL.md` is the one-line placeholder dropped by\n  `organize-ml-workspace`; History is empty.\n- `data/README.md` exists and describes a tabular regression task\n  (predict `target` from a mixed-type DataFrame).]\n\nLet's start. Build me a quick baseline for this dataset.",
-      "expected_output": "Behavioural response satisfying: - Identify this as **bootstrap mode** (no History rows). - Mention reading `data/README.md` to derive a goal default before asking the user. - Reference the **config gates** that fire in bootstrap (G-PKG-NAME, G-ENV-MGR, G-TABULAR, G-CV-SPLITTER) \u2014 at least name two of them. It must NOT: - Present the sourcing menu (`skore` / `user` / `my-pick` / `B<N>`) \u2014 the menu is skipped in bootstrap. - Treat the \"quick\" framing as permission to skip all gates (the forbidden-shortcut named \"Bootstrap mode \u2192 skip ALL questions\"). - Create `experiments/01_baseline.py` before the design note exists and is approved.",
+      "expected_output": "Behavioural response satisfying: - Identify this as **bootstrap mode** (no History rows). - Mention reading `data/README.md` to derive a goal default before asking the user. - Reference the **config gates** that fire in bootstrap (G-PKG-NAME, G-ENV-MGR, G-TABULAR, G-CV-SPLITTER) \u2014 at least name two of them. It must NOT: - Offer the four sourcing options (`skore` / `user` / `my-pick` / `B<N>`) as a pick \u2014 \"How would you like me to source\u2026\", `AskUserQuestion`, or a numbered menu. A pre-flight row titled \"Sourcing menu presented\" with evidence `n/a \u2014 bootstrap` is not presenting the menu. - Treat the \"quick\" framing as permission to skip all gates (the forbidden-shortcut named \"Bootstrap mode \u2192 skip ALL questions\"). - Create `experiments/01_baseline.py` before the design note exists and is approved.",
       "files": [],
       "expectations": [
         "Identify this as **bootstrap mode** (no History rows).",
         "Mention reading `data/README.md` to derive a goal default before asking the user.",
         "Reference the **config gates** that fire in bootstrap (G-PKG-NAME, G-ENV-MGR, G-TABULAR, G-CV-SPLITTER) \u2014 at least name two of them.",
         "Propose to auto-draft `journal/01_baseline.md`, not jump straight to writing `experiments/01_baseline.py`.",
-        "The response does NOT: Present the sourcing menu (`skore` / `user` / `my-pick` / `B<N>`) \u2014 the menu is skipped in bootstrap.",
+        "The response does NOT: Offer the four sourcing options (`skore` / `user` / `my-pick` / `B<N>`) as a pick \u2014 \"How would you like me to source\u2026\", `AskUserQuestion`, or a numbered menu. A pre-flight row titled \"Sourcing menu presented\" with evidence `n/a \u2014 bootstrap` is not presenting the menu.",
         "The response does NOT: Treat the \"quick\" framing as permission to skip all gates (the forbidden-shortcut named \"Bootstrap mode \u2192 skip ALL questions\").",
         "The response does NOT: Create `experiments/01_baseline.py` before the design note exists and is approved."
       ],

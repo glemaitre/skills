@@ -90,7 +90,10 @@ BLOCKED: no return type until scratch/api/skore/0.18.0/evaluate.md exists.
 
 Do not add a "What the lookup will answer" section. Do not name
 `EvaluationReport` / `CrossValidationReport`. Do not say whether
-KFold vs holdout types are the same or different.
+KFold vs holdout types are the same or different. **This holds
+even if Shape 1 already ran this turn.** `pydoc` / `inspect` may
+print a return union; they do not close the narrative dispatch.
+Do not tabulate splitter → report class from that output.
 
 **Stack orientation may name the entry point**
 (`skrub.tabular_pipeline`). Do not tabulate trap names
@@ -164,6 +167,15 @@ shape produces a wrong-looking cache file and burns a turn.
 *condition* over an argument.** `help()` carries a `Returns`
 section but typically does not enumerate dispatch behaviour under
 each argument value — that lives in narrative docs.
+
+**Shape 1 does not close Shape 3.** A probe this turn may record
+the return *union* (`EstimatorReport | CrossValidationReport | …`)
+in a pending cache. It must not answer "what does X return when
+`<arg>` is `<value>`?" as fact — not from `pydoc`, not from a
+dispatch table inferred from the docstring. Until
+`scratch/api/<lib>/<version>/<topic>.md` exists from a
+version-pinned WebFetch, that dispatch is BLOCKED. No WebSearch
+this turn → plan + stop; do not close the question from Shape 1.
 
 **Shape 1b vs Shape 1.** Pyright hover gives the type signature
 (richer inferred return types than `inspect.signature`) + the first
@@ -477,6 +489,10 @@ return when `<arg>` is `<value>`?". Procedure:
 
 Cache filename: snake_case mirror of the docs URL slug. One topic
 per file. Replace only on version bump.
+
+Until that file exists, do not assert the conditional return type
+(KFold vs holdout, same vs different). Shape 1 output is not a
+substitute WebFetch.
 
 ## Cache file contract
 

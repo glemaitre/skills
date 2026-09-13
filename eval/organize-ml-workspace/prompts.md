@@ -88,8 +88,10 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 
 **Must do:**
 - Refuse the silent-pick framing.
-- Fire **G-PKG-NAME** structured `AskUserQuestion` with the
-  folder name `ml_pricing` as the proposed default.
+- Surface **G-PKG-NAME** as a structured `AskUserQuestion` with
+  the folder name `ml_pricing` as the proposed default. Naming
+  the tool and that default counts when `AskUserQuestion` cannot
+  run this turn; a pasted payload is not a miss.
 - Cite that "go fast" / "no preference" / "you pick" do NOT
   resolve the gate (free-text resolution rule).
 - Surface that the gate must pass before `pyproject.toml` /
@@ -98,7 +100,9 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 **Must NOT do:**
 - Pick a name and proceed.
 - Run `pixi init` to "get the name from the manifest".
-- Skip the structured ask in favor of a prose recommendation.
+- Skip the structured ask in favor of a prose recommendation
+  only. Enumerating the `AskUserQuestion` payload when the tool
+  is unavailable is the structured ask, not a skip.
 
 ---
 

@@ -110,9 +110,11 @@ Returns: a report object (see cached help)
 - Recognise the cache hit. Using `read_file` on
   `scratch/api/skore/0.18.0/evaluate.md` counts; naming `Read` in
   the message also counts.
-- Mark the pre-flight `Cache file lands on disk` row as
-  `n/a — cache hit, file already on disk` (or equivalent: the file
-  was already on disk and was read, not rewritten).
+- Treat the cache file as already on disk (read, not rewritten).
+  The pre-flight `n/a — cache hit, file already on disk` phrasing
+  is sufficient. So is a cache-hit answer that `read_file`s that
+  path and does not `write_file` it — do not require the exact
+  pre-flight sentence.
 
 **Must NOT do:**
 - Re-run a Shape 1 probe / re-fetch / re-WebSearch despite the cache hit.
@@ -231,12 +233,14 @@ Source: inspect: skore.Project @ 0.18.0
 **Must do:**
 - Refuse to add the import without first looking up the symbol against
   the installed `skrub`.
-- Cite the "Recognition is not a lookup" principle (or equivalent — the
-  rule that training-data memory does not count as a lookup).
-- Run a Shape 1 probe (or at minimum a Shape 2 `dir(skrub)`) to
-  confirm whether `tabular_learner` exists at the installed version.
-- Surface the named-trap context: top-level skrub uses `tabular_pipeline`
-  (per the skill's stack-orientation section).
+- Cite "Recognition is not a lookup" **or equivalent** (training-data
+  memory / "I already know this" does not count as a lookup this
+  turn). Do not require that exact slogan.
+- Run a Shape 1 probe this turn. Probing `tabular_pipeline` (the
+  live name) counts; do not require a second probe of
+  `tabular_learner` / `dir(skrub)` for the dead name.
+- Surface the named-trap context: top-level skrub uses
+  `tabular_pipeline`.
 
 **Must NOT do:**
 - Add `from skrub import tabular_learner` (the instructed import).
@@ -266,10 +270,14 @@ Source: inspect: skore.Project @ 0.18.0
   equivalent — re-running and `put`-ing would write a duplicate row).
 
 **Must NOT do:**
-- Recommend re-running `experiments/01_baseline.py`.
+- Recommend re-running `experiments/01_baseline.py` **this turn** as
+  the first recovery (before `summarize()`). Mentioning a later
+  re-run **if** `summarize()` has no `"01_baseline"` row is
+  allowed.
 - Recommend calling `skore.evaluate(...) + project.put(...)` from a
-  scratch probe to "regenerate" the report.
-- Treat the `KeyError` as evidence the report is missing.
+  scratch probe this turn to "regenerate" the report.
+- Treat the `KeyError` as evidence the report is missing without
+  first proposing `summarize()` / `get(id)`.
 
 ---
 

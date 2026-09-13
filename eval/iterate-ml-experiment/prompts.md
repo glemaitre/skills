@@ -44,8 +44,11 @@ violation in any transcript** (hard rule).
   writing `experiments/01_baseline.py`.
 
 **Must NOT do:**
-- Present the sourcing menu (`skore` / `user` / `my-pick` / `B<N>`) —
-  the menu is skipped in bootstrap.
+- Offer the four sourcing options (`skore` / `user` / `my-pick` /
+  `B<N>`) as a pick — "How would you like me to source…",
+  `AskUserQuestion`, or a numbered menu. A pre-flight row titled
+  "Sourcing menu presented" with evidence `n/a — bootstrap` is not
+  presenting the menu.
 - Treat the "quick" framing as permission to skip all gates (the
   forbidden-shortcut named "Bootstrap mode → skip ALL questions").
 - Create `experiments/01_baseline.py` before the design note exists

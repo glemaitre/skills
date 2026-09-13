@@ -155,5 +155,7 @@ row owned by `python-env-manager`.
 
 A user message resolves a config gate **only if it names one of
 the gate's options**. "Quick baseline" / "go fast" / "you pick" /
-"whatever is standard" do NOT resolve any of the gates above;
-they fall through to the structured `AskUserQuestion`.
+"whatever is standard" / "skip the questions" do NOT resolve any
+of the gates above — including G-EDA (that skip is only "skip EDA"
+or the `explore-ml-data` skip answer). They fall through to the
+structured `AskUserQuestion`.

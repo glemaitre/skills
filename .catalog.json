@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "3978dd0b62d05e85550e715eda869e212f9aa2e2335db7c0f06644821374a024",
+  "catalog_hash": "523a502d3ded8cd44d28f95622a548f6c24d844aa217adb627d905036b673f76",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -66,7 +66,7 @@
       "summary": "Design, keep track of experiments and iterate on them.",
       "category": "orchestration",
       "subcategory": "dispatchers",
-      "hash": "6ae49845fa14f7986202f170842835ef1febbd828a6a362dc710869c0dc219dd"
+      "hash": "ca2a0bfd6909d8b1cab81df3e3d0712cfc8a927a093bbe0c5da2bd98fdbb7f18"
     },
     {
       "id": "iterate-from-skore",
@@ -93,7 +93,7 @@
       "summary": "An organized workspace to keep track of your experiments.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "ed06f5d4a2a5e877942c9b08a0c60ead7fd29cd16f8c7767e5a18f10f0e8c559"
+      "hash": "9e0af5db24b95048c4720eb04419d90ac21f20fa5dfc8fc9223c248cfae83301"
     },
     {
       "id": "python-code-style",
@@ -129,7 +129,7 @@
       "summary": "Discover the public API of any installed Python package to make agent find their way without bothering your workspace.",
       "category": "reference",
       "subcategory": null,
-      "hash": "6d46c7d9e485ccf2814fe84e97228ddff5f479ee730e9f30c407109eeb14b472"
+      "hash": "175bc93f18aa080c16797d4969d9328dc17c8e2e6b6b53b10c6fd28a79eff319"
     }
   ],
   "workflows": [

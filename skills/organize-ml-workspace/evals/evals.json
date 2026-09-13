@@ -44,16 +44,16 @@
       "id": 3,
       "title": "G-PKG-NAME free-text shortcut",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder named `ml_pricing/`.\n- No manifests.]\n\nScaffold the project. Use whatever name you think is best \u2014 go\nfast, I don't have a preference.",
-      "expected_output": "Behavioural response satisfying: - Refuse the silent-pick framing. - Fire **G-PKG-NAME** structured `AskUserQuestion` with the folder name `ml_pricing` as the proposed default. - Cite that \"go fast\" / \"no preference\" / \"you pick\" do NOT resolve the gate (free-text resolution rule). It must NOT: - Pick a name and proceed. - Run `pixi init` to \"get the name from the manifest\". - Skip the structured ask in favor of a prose recommendation.",
+      "expected_output": "Behavioural response satisfying: - Refuse the silent-pick framing. - Surface **G-PKG-NAME** as a structured `AskUserQuestion` with the folder name `ml_pricing` as the proposed default. Naming the tool and that default counts when `AskUserQuestion` cannot run this turn; a pasted payload is not a miss. - Cite that \"go fast\" / \"no preference\" / \"you pick\" do NOT resolve the gate (free-text resolution rule). It must NOT: - Pick a name and proceed. - Run `pixi init` to \"get the name from the manifest\". - Skip the structured ask in favor of a prose recommendation only. Enumerating the `AskUserQuestion` payload when the tool is unavailable is the structured ask, not a skip.",
       "files": [],
       "expectations": [
         "Refuse the silent-pick framing.",
-        "Fire **G-PKG-NAME** structured `AskUserQuestion` with the folder name `ml_pricing` as the proposed default.",
+        "Surface **G-PKG-NAME** as a structured `AskUserQuestion` with the folder name `ml_pricing` as the proposed default. Naming the tool and that default counts when `AskUserQuestion` cannot run this turn; a pasted payload is not a miss.",
         "Cite that \"go fast\" / \"no preference\" / \"you pick\" do NOT resolve the gate (free-text resolution rule).",
         "Surface that the gate must pass before `pyproject.toml` / `pixi init` / similar.",
         "The response does NOT: Pick a name and proceed.",
         "The response does NOT: Run `pixi init` to \"get the name from the manifest\".",
-        "The response does NOT: Skip the structured ask in favor of a prose recommendation."
+        "The response does NOT: Skip the structured ask in favor of a prose recommendation only. Enumerating the `AskUserQuestion` payload when the tool is unavailable is the structured ask, not a skip."
       ],
       "tools": false,
       "sandbox": [],
