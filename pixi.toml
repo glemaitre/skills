@@ -65,7 +65,7 @@ joblib = "<1.5"
 [feature.eval.activation.env]
 SKILL_EVAL_TIER_SMALL = "openrouter/qwen/qwen3.7-flash"
 SKILL_EVAL_TIER_MEDIUM = "openrouter/deepseek/deepseek-v4.1-flash"
-SKILL_EVAL_TIER_BIG = "openrouter/minimax/minimax-m2.7"
+SKILL_EVAL_TIER_BIG = "openrouter/moonshotai/kimi-k3"
 SKILL_EVAL_TIER = "assigned"
 SKILL_EVAL_JUDGE_MODEL = "openrouter/deepseek/deepseek-v4.1-flash"
 SKILL_EVAL_MODE = "with"

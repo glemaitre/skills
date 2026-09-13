@@ -69,19 +69,21 @@ violated.
 - Identify this as **Initial setup** — drop the bundled template.
 - Paste the content shown above **verbatim** in a fence. A fence
   tagged `ruff.toml` **or** `toml` counts as the write when tools
-  cannot run. No added sections, no invented per-file ignores.
+  cannot run. Score the fence, not surrounding prose: a verify
+  sentence that names per-file ignores is extra help, not a miss.
 - Name a verify step: `pixi run ruff check --show-settings .`
   (naming it counts when the shell cannot run).
 
 **Must NOT do:**
 - Inline ruff config into `pyproject.toml` automatically.
-- Add sections / rules / per-file ignores that aren't in the
-  template content above (especially: `[build]` is NOT a valid
-  ruff section; `[lint.per-file-ignores]` for `experiments/**`
-  is NOT in this template — the template handles experiment cells
-  via the global `E402` / `B018` ignores).
-- Add `D100` / `D103` per-file ignores not in the template.
-- Author a "richer" ruff.toml from memory ignoring the template.
+- Put extra sections / rules / per-file ignores **inside the
+  fenced `ruff.toml` / `toml` block** that aren't in the template
+  content above (especially: `[build]` is NOT a valid ruff
+  section). A verify sentence that names `experiments/**` /
+  `audit/**` / `data/eda.py` is not a miss if the fence itself
+  matches the template.
+- Author a "richer" ruff.toml **in the fence** from memory,
+  ignoring the template.
 
 ---
 

@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "54384497546911bbb57b817a4584cadce6b9684e75a54871215cf37479056914",
+  "catalog_hash": "fce2b37257bc8e82240b1f7a6ebacae755afb8393d607f434967ce49eaaa3821",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -102,7 +102,7 @@
       "summary": "Enforce good practices out-of-the-box for the Python ecosystem for your code.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "0fa50920af6cea5e89276d43ed5b2a5d959812b5b18a2c0f72a59056e3608bf1"
+      "hash": "2bbd0970fd2d62769a7a013d13ca59035e4e1c9b6b9a256a913f275f5023defa"
     },
     {
       "id": "python-env-manager",

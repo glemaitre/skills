@@ -10,9 +10,10 @@ and the harness note forbids tool calls. Opt-in cases set
 `**Tools:** yes`: those runs get a temp project directory seeded
 from `**Sandbox:**` (`dir:` / `file:` / `copy:` from the repo),
 LiteLLM tools (`list_dir`, `read_file`, `write_file`, `run_python`
-on `scratch/` only). The loop cap is 12 tool steps; leftover MiniMax
-XML tool calls are not scored — the harness strips them, keeps the
-last prose, and if needed nudges once for a final assistant message.
+on `scratch/` only). The loop cap is 12 tool steps; leftover
+MiniMax-style XML tool calls are not scored — the harness strips them,
+keeps the last prose, and if needed nudges once for a final assistant
+message.
 Pytest checks `**Expect files:**` globs and `**Expect reads:**`
 tool-trace paths after the loop. Lookup-gated `python-api` cases
 use this, as does `build-ml-pipeline` case 3 (seeded
@@ -108,7 +109,7 @@ Defaults (override in `pixi.toml` or on the CLI):
     `data-science-python-stack`, `evaluate-ml-pipeline`,
     `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`
     (and, when they gain evals, `explore-ml-data`, `audit-ml-pipeline`)
-  - big — `openrouter/minimax/minimax-m2.7`: `iterate-ml-experiment`,
+  - big — `openrouter/moonshotai/kimi-k3`: `iterate-ml-experiment`,
     `python-api`, `build-ml-pipeline`
 - judge: `openrouter/deepseek/deepseek-v4.1-flash` (not tiered)
 - mode: `with` (SKILL.md as system prompt)
@@ -136,7 +137,7 @@ pixi run -e eval eval -- -k 'python-api and case1'
 # All skills, each on its assigned tier (~79 nodes)
 pixi run -e eval eval
 
-# Only the big-tier skills (MiniMax)
+# Only the big-tier skills (Kimi K3)
 pixi run -e eval eval -- --skill-tier big
 
 # Full matrix: every skill x small/medium/big
