@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "2e8bf91172bb372568fc09f9952e587b5a70ade4db3f27da855a77bf17ef2e52",
+  "catalog_hash": "b3ebb27e51b28c6926ce42ab3d74827d32c25f506d065d9bf312e1d3a1fb76cc",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "60fa149bf056699ec7f7608dd9ee95cce30c2c6689b579a3da58d857fa900064"
+      "hash": "83b4aefdf879397d0176f5c1a070679f892c9b631ebb4562dcc2c93323ca5d1c"
     },
     {
       "id": "build-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "626e0441623aeecec4264ac5b7b6e34fd4545a2ae717ed8b80743a2303366517"
+      "hash": "3b9094c4407a7221218f5739511e611f19cff8ba2994e03881f0880e6aec59c9"
     },
     {
       "id": "iterate-ml-experiment",

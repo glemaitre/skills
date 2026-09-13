@@ -6,15 +6,13 @@ description: >
   `journal/NN_<short_name>.md`, that loads the experiment's skore
   report **read-only** and uses bare-last-expression cells whose
   `__repr__` carries the audit's signal.   The agent executes the audit
-  file via the bundled in-process runner
-  (`audit-ml-pipeline/scripts/run_cells.py` — IPython
-  `InteractiveShell.run_cell`), which streams a markdown digest of
-  each cell's stdout + last-expression repr to stdout (optionally also
-  to a file). The digest fuels narrative work (the `JOURNAL.md`
-  Status + History update, follow-up questions about a past
-  experiment, cross-experiment comparison). Stops at "audit/NN_*.py
-  is placed, executed, and the digest is available." Never calls
-  `skore.evaluate(...)` or `project.put(...)`.
+  file via `python -m skore_skills cells run`, which streams a
+  markdown digest of each cell's stdout + last-expression repr to
+  stdout (optionally also to a file). The digest fuels narrative work
+  (the `JOURNAL.md` Status + History update, follow-up questions
+  about a past experiment, cross-experiment comparison). Stops at
+  "audit/NN_*.py is placed, executed, and the digest is available."
+  Never calls `skore.evaluate(...)` or `project.put(...)`.
 
   TRIGGER — any of:
   - `iterate-ml-experiment` § 4 record-outcome — audit is dispatched
@@ -40,9 +38,9 @@ description: >
   report under that key in the Project), then place
   `audit/NN_<short_name>.py` from `templates/audit.py`, substituting
   the package name + the literal Project init block copied from
-  `experiments/<stem>.py`.   Execute via the bundled runner: `pixi run
-  -e agent python .agents/skills/audit-ml-pipeline/scripts/run_cells.py
-  audit/<stem>.py`. **Read the Stop conditions and emit the Pre-flight
+  `experiments/<stem>.py`. Execute via
+  `python -m skore_skills cells run audit/<stem>.py`.
+  **Read the Stop conditions and emit the Pre-flight
   checklist before any write or shell command.** Always invoke
   `python-api` for skore symbol signatures — never write them from
   memory.
@@ -72,8 +70,8 @@ extraction step.
 | Path | Durability | Who writes it | What it holds |
 |---|---|---|---|
 | `audit/<NN>_<short_name>.py` | **Durable** (in git) | This skill, once per experiment | The bare-expression cells. Source of truth. Can be opened as a notebook in JupyterLab / VS Code for the rich HTML view |
-| `scratch/audit/<stem>/audit.md` | Ephemeral (gitignored), optional | `run_cells.py` when given a 2nd arg | Per-cell markdown digest: source + stdout + last-expression `repr`. Same content as stdout |
-| Stdout from `run_cells.py` | Captured by the bash tool | `run_cells.py` (always) | Streamed digest — the agent reads this directly from the tool output |
+| `scratch/audit/<stem>/audit.md` | Ephemeral (gitignored), optional | `cells run` when given a 2nd arg | Per-cell markdown digest: source + stdout + last-expression `repr`. Same content as stdout |
+| Stdout from `cells run` | Captured by the bash tool | CLI (always) | Streamed digest — the agent reads this directly from the tool output |
 
 **Mnemonic:** `audit/` is *source* (in git); `scratch/audit/` and
 stdout are *output*. Never put the source `.py` under
@@ -213,10 +211,8 @@ Pre-flight (audit-ml-pipeline):
       summarize / get / report.* only — no evaluate, no put
       Evidence: explicit grep / Read confirmation of the drafted file
 - [ ] Execution command shape confirmed:
-        pixi run -e agent python \
-          .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-          audit/<stem>.py [scratch/audit/<stem>/audit.md]
-      (Second arg is optional — the runner always streams to stdout.)
+        python -m skore_skills cells run audit/<stem>.py [scratch/audit/<stem>/audit.md]
+      (In a pixi agent env: `pixi run -e agent python -m skore_skills …`.)
       Evidence: command emitted in the response before running
 - [ ] Pre-flight re-emitted with evidence before final message.
       Evidence: this checklist appears in the end-of-turn summary.
@@ -290,22 +286,15 @@ deeper inspection here.
 ## Execution contract — one command
 
 ```bash
-pixi run -e agent python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  audit/<stem>.py
+python -m skore_skills cells run audit/<stem>.py
 ```
 
-The runner streams the digest to stdout — the agent reads it
-directly from the bash tool's output. Pass a second arg
+The CLI streams the digest to stdout. Pass a second arg
 `scratch/audit/<stem>/audit.md` to also write to a file (parent
-created if missing).
-
-For non-pixi workspaces, swap the activation prefix per
-`python-env-manager` § Agent feature.
-
-What the runner does internally (parsing, IPython shell setup,
-matplotlib backend fix, progress-bar suppression, displayhook
-patch, pandas widening, error capture) → `references/runner_internals.md`.
+created if missing). For a pixi agent environment, prefix with
+`pixi run -e agent`. Stale copies may still call
+`scripts/run_cells.py`; prefer the CLI. Details:
+`python -m skore_skills cells run --help`.
 
 ### Re-execution semantics
 
@@ -395,18 +384,15 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 
 - `templates/audit.py` — per-experiment audit file skeleton. Copy
   + substitute; don't rewrite from memory.
-- `scripts/run_cells.py` — the in-process cell runner (generic;
-  shared with `explore-ml-data`). Source of truth for the execution
-  contract; don't reimplement or fork.
+- `scripts/run_cells.py` — shim for one release; prefer
+  `python -m skore_skills cells run`.
 
 ## References (load on demand)
 
 - `references/cell_anatomy.md` — concrete cell examples (right /
   wrong shapes), full 7-cell sequence, why `.frame()` matters,
   bare-expression rules.
-- `references/runner_internals.md` — what `run_cells.py` does
-  internally: parsing, IPython shell + NoOpDisplayHook, matplotlib
-  Agg backend, progress-bar suppression, pandas widening, per-cell
-  capture, error rendering.
+- `references/runner_internals.md` — leftover runner internals
+  (IPython, Agg). Prefer `--help` / the package docstring.
 - `references/failure_modes.md` — detailed recovery for every
   symptom in § Failure modes.

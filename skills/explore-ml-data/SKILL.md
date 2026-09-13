@@ -2,8 +2,8 @@
 name: explore-ml-data
 description: >
   Owns data understanding BEFORE any model is designed. Places and
-  executes `data/eda.py` (a jupytext `# %%` script) via the shared
-  in-process runner, reads the streamed digest, then writes a
+  in-process runner (`python -m skore_skills cells run`), reads the
+  streamed digest, then writes a
   persisted `data/eda.md` report (plus linked `data/eda_<table>.html`
   skrub `TableReport` pages) and the `## Data understanding (EDA)`
   section of `journal/JOURNAL.md`. The point is to surface the
@@ -12,7 +12,7 @@ description: >
   that JUSTIFY the later learner / splitter / metric decisions, so the
   user understands *why* the modelling choices are made. Uses
   `skrub.TableReport` for dataframe overviews and the shared runner
-  `audit-ml-pipeline/scripts/run_cells.py`. Stops at "EDA executed,
+  `python -m skore_skills cells run`. Stops at "EDA executed,
   `data/eda.md` + HTML written, JOURNAL EDA section updated." Never
   designs the model, never edits `src/<pkg>/`, never modifies the
   user's raw data files.
@@ -40,7 +40,8 @@ description: >
   HOW TO USE: run the Detection step (does `data/eda.md` + the JOURNAL
   EDA section already exist?), emit the Pre-flight checklist as
   visible text, read the Stop conditions, then place `data/eda.py`
-  from `templates/eda.py`, execute it via the shared runner, read the
+  from `templates/eda.py`, execute it via
+  `python -m skore_skills cells run`, read the
   digest, and author `data/eda.md` + the JOURNAL EDA section. Always
   resolve skrub / pandas / polars symbols via `python-api`, never from
   memory.
@@ -96,7 +97,7 @@ may live anywhere) and the **EDA deliverables** (always under
 | `data/eda.py` | **Durable** (committed) | This skill, once per workspace | The jupytext `# %%` EDA cells. Source of truth. Openable as a notebook for the rich view |
 | `data/eda.md` | **Durable** (committed) | This skill (authored from the digest) | The prose narrative: findings + **modelling implications** that the baseline note cites |
 | `data/eda_<table>.html` | **Durable** (committed) | `data/eda.py` via `TableReport.write_html(...)` | The rich, interactive skrub report per table — for the human |
-| `scratch/eda/eda.md` | Ephemeral (gitignored), optional | `run_cells.py` when given a 2nd arg | Per-cell digest the agent reads. Same content as stdout |
+| `scratch/eda/eda.md` | Ephemeral (gitignored), optional | `cells run` when given a 2nd arg | Per-cell digest the agent reads. Same content as stdout |
 | `journal/JOURNAL.md` § Data understanding (EDA) | **Durable** (committed) | This skill | 2–4 line summary + link to `data/eda.md` |
 
 **Mnemonic:** the raw data is *read-only and lives wherever the user
@@ -262,9 +263,8 @@ Pre-flight (explore-ml-data):
         <table> → short slug per table for eda_<table>.html
       Evidence: Read templates/eda.py this turn before Write data/eda.py
 - [ ] Execution command shape confirmed:
-        pixi run -e agent python \
-          .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-          data/eda.py [scratch/eda/eda.md]
+        python -m skore_skills cells run data/eda.py [scratch/eda/eda.md]
+      (In a pixi agent env: `pixi run -e agent python -m skore_skills …`.)
       Evidence: command emitted before running
 - [ ] Deliverables written: data/eda.md (prose + implications),
         data/eda_<table>.html (≥1), JOURNAL §Data understanding
@@ -329,21 +329,14 @@ very large data, load a row sample (see `references/cell_anatomy.md`).
 ## Execution contract — one command
 
 ```bash
-pixi run -e agent python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  data/eda.py
+python -m skore_skills cells run data/eda.py
 ```
 
-The runner (shared with `audit-ml-pipeline`) streams the digest to
-stdout — the agent reads it directly from the bash tool output. Pass
-a second arg `scratch/eda/eda.md` to also write the digest to a file.
-For non-pixi workspaces, swap the activation prefix per
-`python-env-manager` § "Agent feature".
-
-**This skill ships no runner of its own** — there is no
-`explore-ml-data/scripts/`. Always invoke the shared
-`audit-ml-pipeline/scripts/run_cells.py` at the path above; don't
-look for or fork a local copy.
+The CLI streams the digest to stdout. Pass a second arg
+`scratch/eda/eda.md` to also write the digest to a file.
+For a pixi agent environment, prefix with `pixi run -e agent`.
+Stale skill copies may still call
+`audit-ml-pipeline/scripts/run_cells.py`; prefer the CLI.
 
 **Prerequisites for the run path:** the workspace package must be
 importable (`from <pkg> import PROJECT_ROOT` — editable install done
@@ -436,7 +429,7 @@ detail lives in `data/eda.md`. On the **skip** path, only the
 | Skill | Relationship |
 |---|---|
 | `iterate-ml-experiment` | Caller. § 0 fires G-EDA before the baseline note; the EDA findings seed the note's Method / Risks |
-| `audit-ml-pipeline` | Owns the shared cell runner `scripts/run_cells.py` this skill executes; same bare-expression discipline |
+| `audit-ml-pipeline` | Same `cells run` CLI and bare-expression discipline |
 | `organize-ml-workspace` | Workspace layout; `data/` is user-owned — this skill is the one exception that writes `data/eda.*` into it |
 | `python-env-manager` | Agent feature install (G-AGENT-FEATURE). This skill requests; that skill installs |
 | `python-api` | skrub / pandas / polars symbol lookups. Cache hits first |
@@ -449,8 +442,9 @@ detail lives in `data/eda.md`. On the **skip** path, only the
   don't rewrite from memory.
 - `templates/eda.md` — the `data/eda.md` report skeleton.
 
-The cell runner is **not** owned here — it is
-`audit-ml-pipeline/scripts/run_cells.py` (shared). Don't fork it.
+The cell runner is **the CLI** —
+`python -m skore_skills cells run`. A shim
+`audit-ml-pipeline/scripts/run_cells.py` remains for one release.
 
 ## References (load on demand)
 
