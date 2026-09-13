@@ -7,6 +7,7 @@ from pathlib import Path
 import click
 
 from skore_skills import __version__
+from skore_skills.api import get_symbol, package_version
 
 
 @click.group()
@@ -38,6 +39,33 @@ def cells_run(src: Path, dst: Path | None) -> None:
     from skore_skills.cells import run
 
     run(src, dst)
+
+
+@cli.group("api")
+def api_group() -> None:
+    """Look up public symbols in the running interpreter."""
+
+
+@api_group.command("get")
+@click.argument("symbol")
+def api_get(symbol: str) -> None:
+    """Print a signature card and cache it under ``scratch/api/``."""
+    try:
+        click.echo(get_symbol(symbol), nl=False)
+    except ImportError as exc:
+        raise click.ClickException(str(exc)) from exc
+    except LookupError as exc:
+        raise click.ClickException(str(exc)) from exc
+
+
+@api_group.command("version")
+@click.argument("package")
+def api_version(package: str) -> None:
+    """Print the installed version of ``PACKAGE``."""
+    try:
+        click.echo(package_version(package))
+    except ImportError as exc:
+        raise click.ClickException(str(exc)) from exc
 
 
 def main() -> None:
