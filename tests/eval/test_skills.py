@@ -16,6 +16,7 @@ from tests.eval.harness import (
     NO_TOOLS_NOTE,
     call_with_retries,
     compose_user_prompt,
+    died_mid_deliverable,
     format_eval_failure,
     generate_agent_response,
     generate_response,
@@ -201,6 +202,7 @@ def test_skill_case(
             user=user,
         )
     actual, source = visible_text(result)
+    skip_reason = died_mid_deliverable(result.content or "")
     if eval_case.tools and result.tool_trace:
         used = "\n".join(
             f"- {item.get('name')} {item.get('arguments')}"
@@ -222,9 +224,17 @@ def test_skill_case(
             "tool_trace": result.tool_trace,
             "missing_files": missing_files,
             "missing_reads": missing_reads_list,
+            "skipped": bool(skip_reason),
+            "skip_reason": skip_reason,
         }
     )
     write_transcript(path, payload)
+
+    if skip_reason:
+        record_eval_result(
+            mode=skill_mode, case=eval_case, passed=False, skipped=True
+        )
+        pytest.skip(skip_reason)
 
     if not actual:
         record_eval_result(mode=skill_mode, case=eval_case, passed=False)

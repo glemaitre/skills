@@ -78,14 +78,13 @@
       "id": 5,
       "title": "Refuse mlflow for tracking, redirect to skore",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- skore is installed.]\n\nLet's use `mlflow.log_metric` for tracking the experiment's\nmetrics, since it's the industry standard.",
-      "expected_output": "Behavioural response satisfying: - Refuse `mlflow.log_metric` as the tracking API. - Cite that **skore** (Project API) is canonical for tracking in this stack. - Allow noting that G-SKORE-MODE `mlflow` stores skore artifacts on an MLflow server; still never call `mlflow.log_*`. It must NOT: - Add `import mlflow` to the workspace. - Add `mlflow.log_metric(...)` to the experiment script. - Treat \"industry standard\" as overriding the stack pick.",
+      "expected_output": "Behavioural response satisfying: - Refuse `mlflow.log_metric` as the tracking API for this stack (redirect to skore). Showing a labeled override / rejected-option snippet is not choosing it. - Cite that **skore** (Project API) is canonical for tracking in this stack. - Allow noting that G-SKORE-MODE `mlflow` stores skore artifacts on an MLflow server. It must NOT: - Add `import mlflow` / `mlflow.log_metric(...)` as the **chosen** workspace path. A fenced example labeled override / option C / \"what you asked for, not the stack pick\" is not adding MLflow to the workspace. - Treat \"industry standard\" as overriding the stack pick.",
       "files": [],
       "expectations": [
-        "Refuse `mlflow.log_metric` as the tracking API.",
+        "Refuse `mlflow.log_metric` as the tracking API for this stack (redirect to skore). Showing a labeled override / rejected-option snippet is not choosing it.",
         "Cite that **skore** (Project API) is canonical for tracking in this stack.",
-        "Allow noting that G-SKORE-MODE `mlflow` stores skore artifacts on an MLflow server; still never call `mlflow.log_*`.",
-        "The response does NOT: Add `import mlflow` to the workspace.",
-        "The response does NOT: Add `mlflow.log_metric(...)` to the experiment script.",
+        "Allow noting that G-SKORE-MODE `mlflow` stores skore artifacts on an MLflow server.",
+        "The response does NOT: Add `import mlflow` / `mlflow.log_metric(...)` as the **chosen** workspace path. A fenced example labeled override / option C / \"what you asked for, not the stack pick\" is not adding MLflow to the workspace.",
         "The response does NOT: Treat \"industry standard\" as overriding the stack pick."
       ],
       "tools": false,

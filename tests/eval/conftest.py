@@ -248,27 +248,33 @@ def pytest_terminal_summary(
     if not EVAL_RESULTS:
         return
     terminalreporter.write_sep("=", "skill-eval summary")
-    counts: dict[str, tuple[int, int, int]] = {}
+    counts: dict[str, tuple[int, int, int, int]] = {}
     for mode, rows in EVAL_RESULTS.items():
-        passed = sum(1 for *_, ok, _err in rows if ok)
-        errored = sum(1 for *_, _ok, err in rows if err)
+        passed = sum(1 for *_, ok, _err, skip in rows if ok and not skip)
+        skipped = sum(1 for *_, _ok, _err, skip in rows if skip)
+        errored = sum(1 for *_, _ok, err, skip in rows if err and not skip)
         total = len(rows)
-        counts[mode] = (passed, total, errored)
-        pct = (100 * passed / total) if total else 0
-        line = f"  {mode:<8s} {passed}/{total} ({pct:.0f}%)"
+        scored = total - skipped
+        counts[mode] = (passed, scored, errored, skipped)
+        pct = (100 * passed / scored) if scored else 0
+        line = f"  {mode:<8s} {passed}/{scored} ({pct:.0f}%)"
+        if skipped:
+            line += f"  {skipped} skipped"
         if errored:
             line += f"  {errored} judge-error"
         terminalreporter.write_line(line)
     if "with" in counts and "without" in counts:
-        with_p, with_t, _ = counts["with"]
-        without_p, without_t, _ = counts["without"]
+        with_p, with_t, _, _ = counts["with"]
+        without_p, without_t, _, _ = counts["without"]
         if with_t and without_t:
             delta_pp = (with_p / with_t - without_p / without_t) * 100
             terminalreporter.write_line(f"  delta    {delta_pp:+.0f}pp")
 
     by_tier: dict[str, list[bool]] = {name: [] for name in TIERS}
     for rows in EVAL_RESULTS.values():
-        for skill, _case_id, _title, ok, _err in rows:
+        for skill, _case_id, _title, ok, _err, skip in rows:
+            if skip:
+                continue
             by_tier[skill_tier(skill)].append(ok)
     if any(by_tier.values()):
         terminalreporter.write_line("  by tier:")
@@ -286,8 +292,8 @@ def pytest_terminal_summary(
     failed = [
         (mode, skill, case_id, title)
         for mode, rows in EVAL_RESULTS.items()
-        for skill, case_id, title, ok, _err in rows
-        if not ok
+        for skill, case_id, title, ok, _err, skip in rows
+        if not ok and not skip
     ]
     if failed:
         terminalreporter.write_line("  failed:")

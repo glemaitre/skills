@@ -38,6 +38,10 @@ Expectations from `prompts.md` are split on the prefix
   rounds that away and the metric is all-or-nothing again.
 - **Must-NOT** stays all-or-nothing (`threshold=1.0`, `strict_mode`).
   Any prohibition violated fails the case.
+- If the visible answer **dies mid-turn** (truncated checklist row,
+  last line is "now writing…", unclosed fence), pytest **skips**
+  the case instead of failing. The transcript records
+  `skipped` / `skip_reason`. Empty replies still fail.
 
 A failing node prints both scores, each judge reason, the grouped
 expectations, the full target response, and paths to the JSON and

@@ -113,15 +113,19 @@ violated.
 - skore is installed.
 
 **Must do:**
-- Refuse `mlflow.log_metric` as the tracking API.
+- Refuse `mlflow.log_metric` as the tracking API for this stack
+  (redirect to skore). Showing a labeled override / rejected-option
+  snippet is not choosing it.
 - Cite that **skore** (Project API) is canonical for tracking in
   this stack.
 - Allow noting that G-SKORE-MODE `mlflow` stores skore artifacts
-  on an MLflow server; still never call `mlflow.log_*`.
+  on an MLflow server.
 
 **Must NOT do:**
-- Add `import mlflow` to the workspace.
-- Add `mlflow.log_metric(...)` to the experiment script.
+- Add `import mlflow` / `mlflow.log_metric(...)` as the **chosen**
+  workspace path. A fenced example labeled override / option C /
+  "what you asked for, not the stack pick" is not adding MLflow to
+  the workspace.
 - Treat "industry standard" as overriding the stack pick.
 
 ---

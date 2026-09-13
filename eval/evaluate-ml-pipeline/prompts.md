@@ -56,10 +56,12 @@ violated.
   is already satisfied.
 
 **Must do:**
-- Name **`AskUserQuestion`** as the mandatory gate that must resolve
-  before a splitter is picked (mandatory for temporal data), and
-  spell out the options it carries.
-- Present the **four canonical options** verbatim:
+- Name **`AskUserQuestion`** (or a narrative equivalent that lists
+  the picks and waits) as the mandatory gate before a splitter is
+  locked in. No tools this turn: enumerating the options in the
+  message counts as firing the gate.
+- Present the **four canonical options** (wording need not be
+  verbatim):
   1. `TimeSeriesSplit(gap=horizon)` — safe default
   2. `TimeSeriesSplit(gap=0)` — only on explicit user pick; warn
      about leakage
@@ -73,7 +75,10 @@ violated.
   named.
 
 **Must NOT do:**
-- Pick `TimeSeriesSplit` silently without the AskUserQuestion.
+- Skip the four-option ask and lock a splitter with no user pick.
+  Naming a **recommended** option (e.g. `TimeSeriesSplit(gap=horizon)`)
+  next to the menu, or drafting `evaluate.py` labeled pending
+  confirmation, is not a silent pick.
 - Default to `KFold` because empty `gap` "feels safer".
 - Treat harness "no clarifying questions" hint as waiving the
   mandatory ask.

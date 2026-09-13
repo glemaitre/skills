@@ -137,6 +137,25 @@ enumerated in that Stop condition); propose
 check produces a scratch file. Do not `BLOCKED` the policy
 refusal.
 
+**Inline `python -c` when tools exist (copy this).** The user
+asks to run `python -c` / `pixi run python -c` for a signature
+or version. Refuse the inline command. Then **this turn**,
+do not stop at a fenced recipe:
+
+```
+1. write_file the probe at scratch/<ts>_*.py
+   (Shape 1: writes scratch/api/<lib>/<version>/<topic>.md;
+    version: scratch/<ts>_version_<pkg>.py)
+2. run_python that same file (not pixi run python scratch/…)
+3. Confirm the cache / print landed
+4. Then quote the lookup
+```
+
+A pasted probe plus `Run: pixi run python scratch/….py` is
+**not** the refusal. `write_file` + `run_python` **is**.
+`BLOCKED` / plan-only applies only when those tools are
+missing.
+
 ## Next-step pointers
 
 | Came here for… | After lookup, next is… |
@@ -243,11 +262,14 @@ Status `Workspace decisions` is the precondition; see
   `scratch/<YYYY-MM-DD>_<HHMMSS>_<short>.py`. No exceptions.**
   Every Python command — `pixi run python -c`, `python -c`,
   heredoc-style `python << 'EOF'`, or any inline Python — is
-  forbidden, regardless of length. Write to scratch first, then
-  execute via `pixi run python scratch/<ts>_<short>.py`. Applies
-  to version checks, import smokes, signature lookups, module
+  forbidden, regardless of length. Write the file with
+  `write_file`, then execute it with `run_python` **this
+  turn**. Do not end on a fenced script plus
+  `pixi run python scratch/<ts>_<short>.py` when those tools
+  are available — that is a recipe, not a lookup. Applies to
+  version checks, import smokes, signature lookups, module
   surface dumps, docstring extraction, anything. If you catch
-  yourself typing `python -c` — STOP and write the file.
+  yourself typing `python -c` — STOP, write the file, run it.
 - **`inspect.signature` / `dir(...)` / `pydoc.render_doc` /
   `help(...)` executed inline is NOT a python-api consultation.**
   These are the exact APIs this skill wraps. Running them via

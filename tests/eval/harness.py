@@ -142,14 +142,19 @@ def load_eval_cases() -> list[EvalCase]:
     return cases
 
 
-EVAL_RESULTS: dict[str, list[tuple[str, object, str, bool, bool]]] = defaultdict(list)
+EVAL_RESULTS: dict[str, list[tuple[str, object, str, bool, bool, bool]]] = defaultdict(list)
 
 
 def record_eval_result(
-    *, mode: str, case: EvalCase, passed: bool, judge_error: bool = False
+    *,
+    mode: str,
+    case: EvalCase,
+    passed: bool,
+    judge_error: bool = False,
+    skipped: bool = False,
 ) -> None:
     EVAL_RESULTS[mode].append(
-        (case.skill_name, case.case_id, case.title, passed, judge_error)
+        (case.skill_name, case.case_id, case.title, passed, judge_error, skipped)
     )
 
 
@@ -289,6 +294,8 @@ def _format_transcript_md(payload: dict) -> str:
     ]
     if "passed" in payload:
         lines.append(f"- passed: {payload.get('passed')}")
+    if payload.get("skipped"):
+        lines.append(f"- skipped: {payload.get('skip_reason')}")
     lines += ["", "## Prompt", "", str(payload.get("prompt") or "").rstrip(), ""]
     note = payload.get("harness_note")
     if note:
@@ -375,6 +382,36 @@ CONTENT_NUDGE = (
     "Put the complete deliverable in the assistant message "
     "(not only in a thinking channel)."
 )
+
+_DANGLING_CHECKBOX = re.compile(r"- \[[xX ]?(?!\])\s*$")
+_NOW_WRITING = re.compile(
+    r"^(now writing|let me now proceed|now proceeding)\b",
+    re.IGNORECASE,
+)
+
+
+def died_mid_deliverable(content: str) -> str | None:
+    """Return a skip reason if the visible answer clearly truncated.
+
+    Used when the model started a checklist or announced a write and then
+    stopped. A complete last line (including a finished ``- [x] …`` row)
+    is not a skip.
+    """
+    text = (content or "").strip()
+    if not text:
+        return None
+    if _DANGLING_CHECKBOX.search(text):
+        return "visible answer truncated mid-checklist"
+    last = next(
+        (line.strip() for line in reversed(text.splitlines()) if line.strip()),
+        "",
+    )
+    last_bare = last.rstrip(":").strip()
+    if _NOW_WRITING.match(last_bare):
+        return "visible answer stopped before the deliverable"
+    if text.count("```") % 2 == 1:
+        return "visible answer has an unclosed code fence"
+    return None
 
 
 def _is_xml_only(content: str) -> bool:

@@ -102,7 +102,12 @@ do ticked, zero Must NOT violated.
   mismatch in the same breath as any smoke mention.
 
 **Must NOT do:**
-- Silently dispatch to `regression-test-ml-pipeline` as if it exists.
+- Silently dispatch to `regression-test-ml-pipeline` as if it
+  exists — i.e. hand off for that subskill to write a body, or
+  treat the category as live. Naming it on the pre-flight row
+  `Subskill dispatched: regression-test-ml-pipeline` (even `[x]`)
+  is routing, not a live dispatch, when the same message says
+  future / not implemented in v1.
 - Write any test-file body (`def test_`, assertion code, smoke or
   regression).
 - Author the regression test body inline (this skill is the router,

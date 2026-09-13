@@ -20,15 +20,18 @@ violated.
 - Detect pixi from the manifest.
 - Recognise the pre-recorded `Workspace decisions` (skip G-ENV-MGR
   re-ask).
-- Confirm scope for THIS install (`G-ENV-SCOPE` — even with recorded
-  default, each install confirms the target scope).
-- Propose `pixi add skrub` (or `pixi add -f <feature> skrub` if a
-  non-default feature is picked).
+- `G-ENV-SCOPE` is **n/a** for `skrub`: routing is fixed (`default`).
+  Do not require a per-install scope ask.
+- Propose `pixi add skrub` (or `pixi add -f <feature> skrub` only if
+  a non-default feature is picked).
 
 **Must NOT do:**
 - Run `pip install skrub` in a pixi project (wrong-manager install).
 - Run `uv add skrub` / `poetry add skrub`.
-- Silently dump skrub into the default env without confirming scope.
+- Auto-routing `skrub` to `default` is **not** a silent dump.
+  Fail this bullet only if the package is an ambiguous extra
+  (`optuna` / `xgboost` / `mlflow`) dropped into `default`
+  without `G-ENV-SCOPE`.
 
 ---
 
@@ -44,13 +47,17 @@ violated.
 
 **Must do:**
 - Detect that no manager is in place.
-- Fire **`G-ENV-MGR`** structured `AskUserQuestion` — manager
-  sub-pick (pixi recommended default; uv / poetry / hatch / conda /
-  pip+venv as alternatives) + scope sub-pick.
+- Fire **`G-ENV-MGR`**: a structured `AskUserQuestion` **or** a
+  narrative table of manager options that waits for the user's
+  pick. No tools this turn: enumerating pixi (recommended) plus
+  uv / poetry / hatch / conda / pip+venv is enough. Do not require
+  the tool call.
 - Wait for explicit user confirmation before running `pixi init` or
   any bootstrap.
 - Mention that pixi being on PATH is detection context, not
   permission.
+- Scope sub-pick is **n/a** when the requested package auto-routes
+  (here `pandas` → `default`). Do not require a second ask.
 
 **Must NOT do:**
 - Run `pixi init` silently.

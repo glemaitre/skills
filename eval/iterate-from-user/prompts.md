@@ -117,12 +117,17 @@ violated.
 
 **Must do:**
 - Recognise `article-link` branch.
-- Fetch and map to three shaping questions.
+- Map the request to the three shaping questions **or** restate
+  the user claim with the open gaps those questions would close.
+  This case has no tools and the URL is a placeholder: an actual
+  `WebFetch` / `WebSearch` is **n/a**. Mapping from the user's
+  stated claim is enough. Do not require a fetched paper body.
 - **List the "feature X is monotone in the target" claim under
   `Open gaps`** with `[needs user confirmation]` — the paper
   alone can't establish this for *our* dataset.
 - Ask the user to confirm whether the monotonicity assumption
   holds for the workspace's data before returning the Proposal.
+  Withholding the Proposal until that confirmation is correct.
 
 **Must NOT do:**
 - Ship the monotonicity assertion as a `Method outline` fact.

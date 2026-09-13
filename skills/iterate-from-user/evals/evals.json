@@ -70,13 +70,13 @@
       "id": 4,
       "title": "Domain-specific assertion needs confirmation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` shows a regression task on tabular financial\n  data.]\n\nRead this paper: https://example.com/paper-on-target-monotonicity\nThey claim feature X is monotone in the target for option pricing.\nUse that as a constraint in our model.",
-      "expected_output": "Behavioural response satisfying: - Recognise `article-link` branch. - Fetch and map to three shaping questions. - **List the \"feature X is monotone in the target\" claim under `Open gaps`** with `[needs user confirmation]` \u2014 the paper alone can't establish this for *our* dataset. It must NOT: - Ship the monotonicity assertion as a `Method outline` fact. - Treat the paper's framing as evidence for this workspace's data. - Author the constraint silently without flagging.",
+      "expected_output": "Behavioural response satisfying: - Recognise `article-link` branch. - Map the request to the three shaping questions **or** restate the user claim with the open gaps those questions would close. This case has no tools and the URL is a placeholder: an actual `WebFetch` / `WebSearch` is **n/a**. Mapping from the user's stated claim is enough. Do not require a fetched paper body. - **List the \"feature X is monotone in the target\" claim under `Open gaps`** with `[needs user confirmation]` \u2014 the paper alone can't establish this for *our* dataset. It must NOT: - Ship the monotonicity assertion as a `Method outline` fact. - Treat the paper's framing as evidence for this workspace's data. - Author the constraint silently without flagging.",
       "files": [],
       "expectations": [
         "Recognise `article-link` branch.",
-        "Fetch and map to three shaping questions.",
+        "Map the request to the three shaping questions **or** restate the user claim with the open gaps those questions would close. This case has no tools and the URL is a placeholder: an actual `WebFetch` / `WebSearch` is **n/a**. Mapping from the user's stated claim is enough. Do not require a fetched paper body.",
         "**List the \"feature X is monotone in the target\" claim under `Open gaps`** with `[needs user confirmation]` \u2014 the paper alone can't establish this for *our* dataset.",
-        "Ask the user to confirm whether the monotonicity assumption holds for the workspace's data before returning the Proposal.",
+        "Ask the user to confirm whether the monotonicity assumption holds for the workspace's data before returning the Proposal. Withholding the Proposal until that confirmation is correct.",
         "The response does NOT: Ship the monotonicity assertion as a `Method outline` fact.",
         "The response does NOT: Treat the paper's framing as evidence for this workspace's data.",
         "The response does NOT: Author the constraint silently without flagging."

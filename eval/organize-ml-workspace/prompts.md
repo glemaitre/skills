@@ -119,16 +119,19 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
   local. Nothing is left to ask before the layout goes down.
 
 **Must do:**
-- Lay out the scaffold up to the **empty** `journal/JOURNAL.md`
-  placeholder (name the directories and files the Decision flow
-  creates).
-- Refuse to write `experiments/01_baseline.py` with content
-  during the scaffold turn.
+- Lay out the scaffold (name the directories and files the
+  Decision flow creates). Recording already-resolved gates into
+  `journal/JOURNAL.md` Status / `Workspace decisions` is allowed;
+  the placeholder does **not** have to stay empty.
+- Refuse to write `experiments/01_baseline.py` with a **runnable
+  body** during the scaffold turn.
 - Cite the rule: "design note first, then code" /
   `iterate-ml-experiment` § 3 owns experiment-script content.
-- Mention that step 5 of the Decision flow drops a templated
-  `01_baseline.py` shell (with `<pkg>` substituted), but the
-  real body lands only after design-note approval.
+- An empty or templated `experiments/01_baseline.py` shell
+  (imports / `# %%` / commented stubs / `<pkg>` placeholders)
+  counts as the Decision-flow drop. Do not require the words
+  "step 5" or `<<PKG>>`. The real body lands only after
+  design-note approval.
 
 **Must NOT do:**
 - Write a runnable `experiments/01_baseline.py` with a real

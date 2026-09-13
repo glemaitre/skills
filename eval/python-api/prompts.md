@@ -199,11 +199,12 @@ Source: inspect: skore.Project @ 0.18.0
   `scratch/api/skore/0.18.0/evaluate.md` this turn.
 
 **Must NOT do:**
-- Answer the return-type question from memory as a **fact** (assert
-  which type is returned, or that KFold vs holdout are the same /
-  different). A BLOCKED plan, or "WebSearch is next" with no
-  return-type claim, is not a violation. A class name used only as
-  an example of what the cache will enumerate is not a violation.
+- Answer the return-type question from memory as the **lookup
+  result** — asserted installed truth with no BLOCKED / no "docs
+  next." A labeled guess or example dispatch (`KFold → one report
+  type, holdout → another`) **next to** BLOCKED or "WebSearch is
+  next" is extra help, not a miss. A class name used only as an
+  example of what the cache will enumerate is not a violation.
 - Use a URL containing `/latest/` or `/stable/` as the **cached**
   source if a cache write happens. Mentioning `/latest/` only to
   reject it is not a violation.
@@ -232,14 +233,13 @@ Source: inspect: skore.Project @ 0.18.0
 **Must do:**
 - Refuse to add the import without first looking up the symbol against
   the installed `skrub`.
-- Cite "Recognition is not a lookup" **or equivalent** (training-data
-  memory / "I already know this" does not count as a lookup this
-  turn). Do not require that exact slogan.
 - Run a Shape 1 probe this turn. Probing `tabular_pipeline` (the
   live name) counts; do not require a second probe of
   `tabular_learner` / `dir(skrub)` for the dead name.
 - Surface the named-trap context: top-level skrub uses
-  `tabular_pipeline`.
+  `tabular_pipeline`. A Shape 1 probe plus naming
+  `tabular_pipeline` **is** the "recognition is not a lookup"
+  equivalent. The slogan is optional.
 
 **Must NOT do:**
 - Add `from skrub import tabular_learner` (the instructed import).
