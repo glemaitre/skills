@@ -37,9 +37,9 @@ description: >
   every structural edit (added/swapped step, changed input columns,
   changed estimator family). Don't re-consult for cosmetic edits.
   **First, read the Stop conditions and emit the Pre-flight
-  checklist as visible text before any code.** Always invoke
-  `python-api` to confirm skrub / sklearn symbol names and
-  signatures before typing — don't guess from memory.
+  checklist as visible text before any code.** Always run
+  `python -m skore_skills api get <dotted>` to confirm skrub /
+  sklearn symbol names and signatures before typing.
 ---
 
 # Build ML Pipeline (Declaration)
@@ -136,13 +136,14 @@ bottom; any match means STOP.
 
 ### S2. Symbol from memory is forbidden
 
-- **Rule:** every skrub / scikit-learn / skore name must come from
-  a `python-api` lookup *this turn*.
+- **Rule:** every new skrub / scikit-learn / skore name must come
+  from `python -m skore_skills api get <dotted>` or an existing
+  matching cache read *this turn*.
 - **Symptom:** you type `tabular_learner` (renamed in 0.7+),
   `mark_as_y(col)` (signature dropped the positional in 0.9+), or
   any name "you remember".
-- **Recovery:** invoke `python-api`. Recognition is not a lookup;
-  names drift between releases.
+- **Recovery:** run `api get`. Recognition is not a lookup; names
+  drift between releases.
 
 ### S3. Splitter selection is out of scope
 
@@ -293,11 +294,13 @@ Pre-flight (build-ml-pipeline):
 - [ ] Tabular library identified: pandas | polars
       Evidence: JOURNAL.md Status (Workspace decisions) | user quote
                 | "n/a — pandas already in loader signature"
-- [ ] python-api consulted for skrub symbols this turn
-      Evidence: Read scratch/api/skrub/<v>/<topic>.md (this turn)
+- [ ] API confirmed for skrub symbols this turn
+      Evidence: python -m skore_skills api get <dotted>
+                | Read scratch/api/skrub/<v>/<topic>.md (this turn)
                 | "n/a — no new skrub symbol this turn"
-- [ ] python-api consulted for sklearn symbols this turn
-      Evidence: Read scratch/api/sklearn/<v>/<topic>.md (this turn)
+- [ ] API confirmed for sklearn symbols this turn
+      Evidence: python -m skore_skills api get <dotted>
+                | Read scratch/api/sklearn/<v>/<topic>.md (this turn)
                 | "n/a — no new sklearn symbol this turn"
 - [ ] Source-binding pattern chosen
       Evidence: list each planned `skrub.var("<name>")` and state
@@ -343,7 +346,7 @@ Declare the pipeline as a skrub DataOps graph rooted at one or
 more `skrub.var(...)` calls — **not** as a bare
 `sklearn.Pipeline`. The `skrub.X(...)` / `skrub.y(...)` shortcuts
 are not acceptable roots (see S4). Look up the underlying
-signatures via `python-api`.
+signatures via `python -m skore_skills api get`.
 
 **If the user asks for `sklearn.Pipeline` / `build_pipeline()`:**
 do not `from sklearn.pipeline import Pipeline`. Redirect to
@@ -417,7 +420,8 @@ implement sklearn's `fit(X, y)` signature — it takes an
 environment dict. Pair with
 `skore.evaluate(learner, data={"data_dir": ..., ...}, splitter=...)`,
 never with `skore.evaluate(learner, X, y, ...)` (raises). See
-`evaluate-ml-pipeline`; confirm signatures via `python-api`.
+`evaluate-ml-pipeline`; confirm signatures via
+`python -m skore_skills api get`.
 
 **Cross-validation metadata at the X marker.** If the data has
 group structure (subjects, sessions, customer IDs, repeated
@@ -612,7 +616,8 @@ declaring the new experiment ready.
 
 ## Common patterns
 
-Short catalogue. Look up exact symbols in `python-api`. Full
+Short catalogue. Look up exact symbols with
+`python -m skore_skills api get`. Full
 catalogue with code: → `references/common_patterns.md`.
 
 1. **Heterogeneous columns** — skrub column selectors with `cols=`

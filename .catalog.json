@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "dc00e8ab9ba758d2a8b64c7311c4c95f4354278b64e7016517133f558b99cd53",
+  "catalog_hash": "51c72aefca713dcf4858e0e972a300575fc49ad85fcacff871386ce2fd89ab2c",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "553b63a73671686aedd41eb6ebe8f3090171859406369c8bfc9d84c7665574c2"
+      "hash": "4a958445aaa02cd529e345e31772943ae8b1c2f3c8fa161897ed5a8887cd146f"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "430849648a6e96080861bd0bef2f1ff0dd57c48a0bb8b1629f95ccd495eb1be1"
+      "hash": "647ed7a2d958f6ac088a97258058f5d6de0a93ff9cee221c8a0db476fb474b2d"
     },
     {
       "id": "test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
       "category": "orchestration",
       "subcategory": "test-strategies",
-      "hash": "a65d8bd6134264a905485f1d96cb3eb99f1f177fe413651efb4d817f6fae351f"
+      "hash": "287704582fd2b866657b027ab13e8fa42e654e24f0710def5efde3a3ea119a6d"
     },
     {
       "id": "audit-ml-pipeline",

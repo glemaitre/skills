@@ -63,9 +63,9 @@ channel.
   `journal/NN_<short_name>.md` is at least `approved` *and*
   `experiments/NN_<short_name>.py` exists with the matching stem.
 - **Symbol from memory is forbidden.** Any skrub /
-  scikit-learn name you write in the smoke test must come from a
-  `Skill(python-api)` / `Skill(python-api)` call **in this
-  turn**. The smoke test is a small file but it imports the
+  scikit-learn name you write in the smoke test must come from
+  `python -m skore_skills api get <dotted>` or a matching cache
+  read **in this turn**. The smoke test is a small file but it imports the
   predicting-package API surface; the same memory-forbidden rule
   applies.
 - **Don't shrink the assertion.** The hard assertion is exact
@@ -120,13 +120,13 @@ Pre-flight (smoke-test-ml-pipeline):
       (per `data-science-python-stack` § "Tier 1"). **Not skore** —
       see the Stop conditions; the smoke test is intentionally
       portable to any skrub-capable environment
-- [ ] Skill(python-api) consulted for skrub / sklearn symbols used in
+- [ ] API confirmed for skrub / sklearn symbols used in
       the test: <symbols, or "none">
-      Evidence: Read scratch/api/<lib>/<version>/<topic>.md (this turn)
+      Evidence: python -m skore_skills api get <dotted>
+                | Read scratch/api/<lib>/<version>/<topic>.md (this turn)
                 | Write scratch/api/<lib>/<version>/<topic>.md (this turn)
                 | "n/a — test only uses symbols already present in
                   src/<pkg>/ (build_learner / load_training_table / etc.)"
-      "Read python-api SKILL.md" alone is NOT evidence.
 - [ ] `journal/NN_<short_name>.md` read this turn (frozen sections:
       Question, Method) so the test asserts what the experiment claims
 - [ ] `experiments/NN_<short_name>.py` skimmed this turn for the env-dict

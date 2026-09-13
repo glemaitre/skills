@@ -52,10 +52,10 @@ read the report. The pipeline declaration is out of scope (see
   `classification_report`, or hand-rolled metric prints** — that
   silently rewrites this skill out of the project. See
   `data-science-python-stack` § "Missing dependency".
-- **Symbol from memory is forbidden.** Any `skore` entry point
-  (`evaluate`, `EstimatorReport`, `CrossValidationReport`,
-  `ComparisonReport`) and any sklearn splitter name must come from a
-  `Skill(python-api)` or `Skill(python-api)` call **in this turn**.
+- **Symbol from memory is forbidden.** Any new `skore` entry point
+  or sklearn splitter signature must come from
+  `python -m skore_skills api get <dotted>` or a matching cache
+  read **in this turn**.
   "I remember `KFold(n_splits=5)`" is not acceptable.
 - **The rule-3 table is not a substitute for the lookup.** The
   mapping table below tells you *which* splitter the data calls
@@ -169,12 +169,12 @@ tool call or an explicit decision documented in the response.
 Pre-flight (evaluate-ml-pipeline):
 - [ ] Tier 1 mandatory libs importable in this env: sklearn, skrub, skore
       (per `data-science-python-stack` § "Tier 1")
-- [ ] Skill(python-api) consulted for skore symbols (evaluate /
+- [ ] API confirmed for skore symbols (evaluate /
       report classes): <symbols>
-      Evidence: Read scratch/api/skore/<version>/<topic>.md (this turn)
+      Evidence: python -m skore_skills api get <dotted>
+                | Read scratch/api/skore/<version>/<topic>.md (this turn)
                 | Write scratch/api/skore/<version>/<topic>.md (this turn)
                 | "n/a — no new skore symbol introduced this turn"
-      "Read python-api SKILL.md" alone is NOT evidence.
 - [ ] Call site for `skore.evaluate(...)` / `project.put(...)`
       is `experiments/NN_*.py` (not `scratch/`, not a notebook,
       not `src/<pkg>/`). See Stop condition
@@ -182,13 +182,13 @@ Pre-flight (evaluate-ml-pipeline):
       `experiments/NN_*.py`".
       Evidence: Write experiments/<NN>_<name>.py (this turn) |
                 "the call already lives in an existing experiments/ file"
-- [ ] Skill(python-api) consulted for sklearn splitter: <name>
-      Evidence: Read scratch/api/sklearn/<version>/cv_splitters.md
+- [ ] API confirmed for sklearn splitter: <name>
+      Evidence: python -m skore_skills api get <dotted>
+                | Read scratch/api/sklearn/<version>/cv_splitters.md
                 (or topic-matching file, this turn)
                 | Write of the same (this turn)
                 | "n/a — splitter is one already in src/<pkg>/evaluate.py
                   and its arguments are unchanged"
-      "Read python-api SKILL.md" alone is NOT evidence.
 - [ ] split_kwargs at the X marker read: <groups | time | none>
 - [ ] Splitter chosen via rule 3 mapping table: <name + reason>
 - [ ] Data-passing form picked: <X, y> | <data={...}>
@@ -257,8 +257,8 @@ Pre-flight (evaluate-ml-pipeline):
    pattern (env-dict-style vs sklearn-style, how `data={...}` keys
    map to `skrub.var` roots, key conventions in the Project store)
    is in `python-api/references/skrub_interop.md`; for exact
-   signatures, look them up via `python-api` against the installed
-   skore version.
+   signatures, run `python -m skore_skills api get` against the
+   installed skore version.
 
 2. **Escalate to explicit report classes only when `evaluate` is too
    coarse.** The escalation order:
