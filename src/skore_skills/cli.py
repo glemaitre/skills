@@ -150,6 +150,41 @@ def style_cmd(paths: tuple[Path, ...]) -> None:
         raise SystemExit(code)
 
 
+@cli.group("env")
+def env_group() -> None:
+    """Detect the env manager and print install commands."""
+
+
+@env_group.command("detect")
+def env_detect() -> None:
+    """Print JSON evidence; exit non-zero when two managers are visible."""
+    import json
+
+    from skore_skills.env import detect
+
+    payload = detect(Path.cwd())
+    click.echo(json.dumps(payload, indent=2))
+    if payload["ambiguous"]:
+        raise SystemExit(1)
+
+
+@env_group.command("add")
+@click.argument("packages", nargs=-1, required=True)
+@click.option(
+    "--execute",
+    is_flag=True,
+    help="Run the install command instead of printing it.",
+)
+def env_add(packages: tuple[str, ...], execute: bool) -> None:
+    """Print (or run) the manager-specific add command."""
+    from skore_skills.env import add_packages
+
+    text, code = add_packages(Path.cwd(), list(packages), execute=execute)
+    click.echo(text, nl=False)
+    if code:
+        raise SystemExit(code)
+
+
 def main() -> None:
     """Run the CLI (``python -m skore_skills`` / console script)."""
     cli()
