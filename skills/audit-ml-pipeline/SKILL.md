@@ -42,7 +42,7 @@ description: >
   `python -m skore_skills cells run audit/<stem>.py`.
   **Read the Stop conditions and emit the Pre-flight
   checklist before any write or shell command.** Always invoke
-  `python-api` for skore symbol signatures — never write them from
+  `python -m skore_skills api get` for skore symbol signatures — never write them from
   memory.
 ---
 
@@ -125,7 +125,7 @@ conditions for the three-consumer rule.
   lookup shape is wrong (get is by id), not that the report is
   missing.
 - **Symbol from memory is forbidden.** Any `skore` / `skrub` /
-  `sklearn` symbol must come from `python-api` *this turn*. Cache
+  `sklearn` symbol must come from `python -m skore_skills api get` *this turn*. Cache
   hits under `scratch/api/skore/<version>/` count (Shape 0); inline
   memory does not.
 - **Agent feature missing → STOP and delegate.** If `ipython` /
@@ -196,7 +196,7 @@ Pre-flight (audit-ml-pipeline):
       Evidence: tool output of each
                 | JOURNAL.md Status `agent feature: installed`
                 Missing → STOP, delegate to python-env-manager G-AGENT-FEATURE
-- [ ] python-api consulted for skore symbols used:
+- [ ] API CLI consulted for skore symbols used:
       Project, summarize, get, report.checks.summarize, report.metrics.summarize
       Evidence: Read scratch/api/skore/<version>/<topic>.md (this turn)
                 | Write the same (this turn)
@@ -335,7 +335,7 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 
 | Callee | Why |
 |---|---|
-| `python-api` | Every skore symbol (`Project`, `project.summarize`, `project.get`, `report.checks.summarize`, `report.metrics.summarize`, `.frame()`). Cache hits first |
+| `python -m skore_skills api get` | Every skore symbol (`Project`, `project.summarize`, `project.get`, `report.checks.summarize`, `report.metrics.summarize`, `.frame()`). Cache hits first |
 | `python-env-manager` § Agent feature | When `ipython` / `pyright` are missing — G-AGENT-FEATURE gate |
 | `python-code-style` | After writing / editing `audit/<stem>.py` — bundled `ruff.toml` carries `audit/**` per-file ignores; also contextualizes the header to name the audited experiment and strips workflow/process prose |
 
@@ -376,7 +376,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | `evaluate-ml-pipeline` | Producer side. `skore.evaluate` + `project.put` live only in `experiments/NN_*.py` |
 | `organize-ml-workspace` | Workspace layout; four-way stem pairing |
 | `python-env-manager` | Agent feature install (G-AGENT-FEATURE). This skill requests; that skill installs |
-| `python-api` | skore symbol lookups. Cache hits first |
+| `python -m skore_skills api get` | skore symbol lookups. Cache hits first |
 | `python-code-style` | ruff after writing/editing `audit/<stem>.py` |
 | `data-science-python-stack` | Catalogues `ipython` + `pyright` under the agent feature |
 

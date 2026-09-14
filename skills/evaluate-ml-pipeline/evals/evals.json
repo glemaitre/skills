@@ -104,7 +104,7 @@
         "Refuse to mark `done` without the smoke test passing.",
         "Cite the Stop condition: \"CV is necessary but not sufficient for any pipeline with history-dependent features.\"",
         "Mention that `skore.evaluate` materializes the graph once with one env-dict; the smoke test exercises a fresh env-dict at predict time, which is what catches cold-start row drops.",
-        "Route to `smoke-test-ml-pipeline` (or its router `test-ml-pipeline`) before flipping the status.",
+        "Route to `smoke-test-ml-pipeline` before flipping the status.",
         "The response does NOT: Edit `journal/02_load_forecast.md` Status to `done`.",
         "The response does NOT: Edit `journal/JOURNAL.md` History row to `done`.",
         "The response does NOT: Treat clean CV as sufficient for a history-dependent pipeline."

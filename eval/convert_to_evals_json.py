@@ -17,7 +17,7 @@ Mapping:
 
 Usage:
     python3 eval/convert_to_evals_json.py                 # all skills with eval/<name>/prompts.md
-    python3 eval/convert_to_evals_json.py python-api …    # just the named skills
+    python3 eval/convert_to_evals_json.py build-ml-pipeline …  # named skills
     python3 eval/convert_to_evals_json.py --check         # exit non-zero if evals.json is stale
 """
 

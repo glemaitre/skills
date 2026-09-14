@@ -33,7 +33,7 @@ litellm = "*"
 pytest = ">=8"
 pytest-xdist = "*"
 python-dotenv = ">=1.0"
-# Shape 1 probes in tool-enabled python-api evals import these.
+# Tool-enabled API lookup evals import these.
 # Keep them off the default catalog environment.
 skrub = "==0.9.0"
 scikit-learn = "*"

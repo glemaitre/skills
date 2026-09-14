@@ -72,8 +72,8 @@ Read these once; they're referenced throughout.
 | You came here for… | → next |
 |---|---|
 | Declared pipeline → CV strategy | → `evaluate-ml-pipeline` (the `G-CV-SPLITTER` gate, rule 3) |
-| Declared pipeline → smoke test | → `test-ml-pipeline` → `smoke-test-ml-pipeline` |
-| Symbol lookup mid-declaration | → `python-api` (Shape 1 / 1b / 3) |
+| Declared pipeline → smoke test | → `smoke-test-ml-pipeline` |
+| Symbol lookup mid-declaration | → `python -m skore_skills api get` (Shape 1 / 1b / 3) |
 | Missing skrub/sklearn import | → `python-env-manager` § install |
 | Modified `pipeline.py` / `features.py` / `data.py` | → `python-code-style` (ruff + NumPyDoc) |
 
@@ -259,7 +259,7 @@ Layer 3: features take X + history as references.
 - **Symptom:** you catch yourself typing `pixi run python -c`
   or `python -c`.
 - **Recovery:** write the file first, then execute. **Inline is
-  forbidden regardless of length** (see `python-api` § Stop
+  forbidden regardless of length** (see `python -m skore_skills api get` § Stop
   conditions). No 2-line carve-out.
 
 ### S8. Don't filter warnings
@@ -403,7 +403,7 @@ at rows other than the one currently being processed?*
 
 **Worked examples** (full code, IID + history-dependent +
 counter-example): → `references/layer_examples.md`. Also see
-`python-api/references/pre_mark_alignment.md` for the
+`build-ml-pipeline/references/pre_mark_alignment.md` for the
 production-style three-layer walkthrough drawn from this
 workspace's 01_baseline.
 
@@ -553,7 +553,7 @@ STOP — target encoding / apply_func. When the user asks for
 the leaky function body "as requested" and then the fix. Cite
 statelessness + leakage. Propose sklearn TargetEncoder (or
 BaseEstimator + TransformerMixin) via `.skb.apply`. Mention
-python-api for the TargetEncoder signature.
+API CLI for the TargetEncoder signature.
 ```
 
 → next: Decision flow.
@@ -646,10 +646,10 @@ catalogue with code: → `references/common_patterns.md`.
 
 | Skill | Relationship |
 |---|---|
-| `python-api` | Authoritative lookup of sklearn / skrub / skore. Invoke whenever picking a symbol; cache hits first (Shape 0) |
+| `python -m skore_skills api get` | Authoritative lookup of sklearn / skrub / skore. Invoke whenever picking a symbol; cache hits first (Shape 0) |
 | `evaluate-ml-pipeline` | Owns `skore.evaluate`, CV selection, metric defaults. Consumes the `split_kwargs` wired at the X marker |
 | `smoke-test-ml-pipeline` | Executable proof of Rule 2's early-mark. Smoke failure → route back here; fix the topology, don't loosen the assertion |
-| `test-ml-pipeline` | Router for `tests/`. Smoke test pairs 1:1 with the experiment script |
+| `smoke-test-ml-pipeline` | Router for `tests/`. Smoke test pairs 1:1 with the experiment script |
 | `python-env-manager` | Detection + install commands. Invoke when `import skrub` raises |
 | `python-code-style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct `pixi run ruff check` drops the NumPyDoc convention |
 

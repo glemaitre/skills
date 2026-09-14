@@ -3,7 +3,7 @@
 *Workflow pattern (durable across library versions). For per-version
 signatures of `skore.evaluate`, `Project`, the report classes, or
 the `SkrubLearner` fit shape, see the workspace's
-`scratch/api/<lib>/<version>/` cache populated by `python-api`
+`scratch/api/<lib>/<version>/` cache populated by `python -m skore_skills api get`
 Shape 0/1/2/3.*
 
 `skore.evaluate(...)` is a dispatcher: depending on the
@@ -99,7 +99,7 @@ The return type depends on `splitter`:
 
 An explicit `splitter=` always overrides a DataOp `cv`.
 
-Confirm the exact dispatch rules via `python-api`
+Confirm the exact dispatch rules via `python -m skore_skills api get`
 (`inspect.signature(skore.evaluate)` + the docstring) against the
 installed skore version — the dispatch table can evolve.
 
@@ -196,7 +196,7 @@ report.checks.summarize().frame()    # automated checks (passed / issue / tip)
 `project.summarize()` returns a pandas DataFrame indexed by id with
 columns: `key`, `date`, `learner`, `ml_task`, `report_type`,
 `dataset` (hash), plus the per-metric `<metric>_mean` columns. The
-exact columns evolve with skore; see `python-api` § skore.
+exact columns evolve with skore; see `python -m skore_skills api get` § skore.
 
 ## Worked example — `experiments/01_baseline.py`
 
@@ -263,7 +263,7 @@ Note the clean separation:
 - **`splitter`** is the project's chosen cross-validator (the
   walk-forward splitter in `src/load_forecast/evaluate.py`).
 - **No agent-only `print` calls** — inspection is the agent's
-  scratch problem (see `python-api` § "`scratch/` conventions"),
+  scratch problem (see `python -m skore_skills api get` § "`scratch/` conventions"),
   not the script's. The bare `report` line is jupytext display,
   not a debug print.
 
@@ -272,14 +272,14 @@ Note the clean separation:
 If the default `evaluate(...)` dispatch doesn't fit (you need
 explicit `train_data=` / `test_data=` on `EstimatorReport`, or a
 multi-key `ComparisonReport`), construct the report class directly.
-Look up the signatures via `python-api` against the installed skore
+Look up the signatures via `python -m skore_skills api get` against the installed skore
 version — the kwargs differ between `EstimatorReport` (uses
 `train_data` / `test_data`) and `CrossValidationReport` (uses
 `splitter`).
 
 ## Companion references
 
-- `python-api/references/pre_mark_alignment.md` — the 3-layer
+- `build-ml-pipeline/references/pre_mark_alignment.md` — the 3-layer
   DataOps pattern that produces the `SkrubLearner` consumed here.
 - `build-ml-pipeline/references/source-binding.md` — when to use
   source-bound vars vs materialized `(X, y)` bindings.

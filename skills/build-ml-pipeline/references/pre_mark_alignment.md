@@ -3,7 +3,7 @@
 *Workflow pattern (durable across library versions). For per-version
 signatures or method surfaces of skrub / sklearn / skore, see the
 workspace's `scratch/api/<lib>/<version>/` cache populated by
-`python-api` Shape 0/1/2/3.*
+`python -m skore_skills api get` Shape 0/1/2/3.*
 
 The canonical shape for any pipeline where **features depend on history
 that isn't part of the predict-time row itself**: time-series lags,
@@ -201,7 +201,7 @@ The `data_dir_preview` parameter is an interactive-preview escape
 hatch — it makes `learner.skb.preview()` work in a notebook by giving
 the var a concrete value to bind against. Production runs pass the
 binding via `skore.evaluate(learner, data={"data_dir": ...}, ...)`
-(see `python-api/references/skrub_interop.md`).
+(see `build-ml-pipeline/references/skrub_interop.md`).
 
 ## When you would NOT use this pattern
 
@@ -220,7 +220,7 @@ case described here.
 
 ## Companion references
 
-- `python-api/references/skrub_interop.md` — how the
+- `build-ml-pipeline/references/skrub_interop.md` — how the
   `SkrubLearner` produced by this pattern integrates with
   `skore.evaluate`.
 - `build-ml-pipeline/references/source-binding.md` — why source-bound

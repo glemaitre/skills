@@ -33,7 +33,7 @@ description: >
   inspect a finished run's skore report rather than the raw dataset
   (`audit-ml-pipeline`); the user is past data understanding and wants
   pipeline / evaluation mechanics (`build-ml-pipeline` /
-  `evaluate-ml-pipeline`); a pure symbol lookup (`python-api`); EDA is
+  `evaluate-ml-pipeline`); a pure symbol lookup (`python -m skore_skills api get`); EDA is
   already recorded (`data/eda.md` + the JOURNAL EDA section exist) and
   the user is not asking to refresh it.
 
@@ -43,7 +43,7 @@ description: >
   from `templates/eda.py`, execute it via
   `python -m skore_skills cells run`, read the
   digest, and author `data/eda.md` + the JOURNAL EDA section. Always
-  resolve skrub / pandas / polars symbols via `python-api`, never from
+  resolve skrub / pandas / polars symbols via `python -m skore_skills api get`, never from
   memory.
 ---
 
@@ -159,10 +159,10 @@ The central rule. Surfaced as the first Stop condition below.
 - **Symbol from memory is forbidden.** Any `skrub` / `pandas` /
   `polars` symbol (`TableReport`, `TableReport.json`, `write_html`,
   `column_associations`, the tabular reader, …) must come from
-  `python-api` *this turn*. Cache hits under
+  `python -m skore_skills api get` *this turn*. Cache hits under
   `scratch/api/<lib>/<version>/` count; inline memory does not.
   **`TableReport.json()`'s key names are not formally documented and
-  drift across skrub versions — confirm them via `python-api` and
+  drift across skrub versions — confirm them via `python -m skore_skills api get` and
   parse defensively (`.get(...)`).**
 - **Library-agnostic — read facts off skrub, not pandas/polars.** The
   workspace may use pandas OR polars (G-TABULAR), whose summary
@@ -251,7 +251,7 @@ Pre-flight (explore-ml-data):
       Evidence: tool output | JOURNAL.md Status `agent feature: installed`
                 Missing → STOP, delegate to python-env-manager G-AGENT-FEATURE
                 (decline → fall back to skip path)
-- [ ] python-api consulted for symbols used:
+- [ ] API CLI consulted for symbols used:
         skrub.TableReport, TableReport.write_html, TableReport.json,
         skrub.column_associations, the tabular reader (load cell only)
       Evidence: Read/Write scratch/api/<lib>/<version>/<topic>.md (this turn)
@@ -408,7 +408,7 @@ detail lives in `data/eda.md`. On the **skip** path, only the
 | Callee | Why |
 |---|---|
 | `python-env-manager` § Agent feature | When `ipython` is missing on the run path — G-AGENT-FEATURE |
-| `python-api` | Every skrub / pandas / polars symbol. Cache hits first |
+| `python -m skore_skills api get` | Every skrub / pandas / polars symbol. Cache hits first |
 | `data-science-python-stack` | G-TABULAR (pandas / polars) if not yet recorded; skrub `TableReport` reference |
 | `python-code-style` | After writing `data/eda.py` — ruff format / check + contextualize the comments to this dataset (strip any leftover workflow/process prose) |
 
@@ -432,7 +432,7 @@ detail lives in `data/eda.md`. On the **skip** path, only the
 | `audit-ml-pipeline` | Same `cells run` CLI and bare-expression discipline |
 | `organize-ml-workspace` | Workspace layout; `data/` is user-owned — this skill is the one exception that writes `data/eda.*` into it |
 | `python-env-manager` | Agent feature install (G-AGENT-FEATURE). This skill requests; that skill installs |
-| `python-api` | skrub / pandas / polars symbol lookups. Cache hits first |
+| `python -m skore_skills api get` | skrub / pandas / polars symbol lookups. Cache hits first |
 | `data-science-python-stack` | G-TABULAR; skrub `TableReport` is catalogued there |
 | `python-code-style` | ruff after writing `data/eda.py` |
 

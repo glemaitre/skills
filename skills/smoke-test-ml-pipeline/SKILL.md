@@ -14,8 +14,8 @@ description: >
   steps will pass trivially. The smoke test is the executable
   proof of the X-marker placement rule from `build-ml-pipeline`.
 
-  TRIGGER when: `test-ml-pipeline` has dispatched here to write
-  the smoke test for an approved experiment; `pytest tests/smoke/`
+  TRIGGER when: an approved experiment needs its smoke test;
+  `pytest tests/smoke/`
   is failing on row count; the user asks "why is the smoke test
   failing?"; a pipeline edit in `build-ml-pipeline` needs an
   executable proof; an experiment script changes the pipeline
@@ -58,7 +58,7 @@ channel.
 ## Stop conditions — read before anything else
 
 - **No smoke test without an approved design note + script.** The pairing
-  rule from `test-ml-pipeline` is hard:
+  rule is hard:
   `tests/smoke/test_NN_<short_name>.py` exists only when
   `journal/NN_<short_name>.md` is at least `approved` *and*
   `experiments/NN_<short_name>.py` exists with the matching stem.
@@ -285,7 +285,7 @@ three layers — sources → predict-grid + alignment + `mark_as_X`
 described in `build-ml-pipeline` § "Common patterns" rule 2,
 with a full worked example (drawn from this workspace's
 01_baseline pipeline) in
-`python-api/references/pre_mark_alignment.md`. Read that
+`build-ml-pipeline/references/pre_mark_alignment.md`. Read that
 reference before constructing the predict env for an early-mark
 pipeline.
 
@@ -417,8 +417,6 @@ metric problem.
 
 ## Companion skills
 
-- **`test-ml-pipeline`** — the router that dispatched here.
-  Owns layout and pairing.
 - **`build-ml-pipeline`** — owns the X-marker placement rule
   the smoke test asserts. Smoke-test failure typically routes
   back here for a pipeline-shape fix.
@@ -430,13 +428,13 @@ metric problem.
   matching design note's Status.headline (which `evaluate-ml-pipeline`
   ultimately fills in after the run); the test does not import
   skore at runtime.
-- **`python-api`** / **`python-api`** — symbol references for
+- **`python -m skore_skills api get`** — symbol references for
   the predicting-package APIs the smoke test uses. Consult
   before naming any imported function in the test body.
-  `python-api` is **not** a smoke-test dependency — see the
+  `python -m skore_skills api get` is **not** a smoke-test dependency — see the
   "no skore import" Stop condition above. **Cache hits first**:
   check `scratch/api/<lib>/<version>/` before WebSearching;
-  cache new findings back there (per `python-api` Shape 0/3).
+  cache new findings back there (per `python -m skore_skills api get` Shape 0/3).
 - **`data-science-python-stack`** — declares pytest as a Tier 1
   mandatory dependency for any workspace using this skill.
 - **`python-code-style`** — **must be invoked** after writing or

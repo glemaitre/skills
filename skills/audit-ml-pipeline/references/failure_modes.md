@@ -19,7 +19,7 @@ Lookup shape is wrong: `get` is by id, not by key.
   `summary.loc[summary["key"] == "<NN>_<short_name>", "id"].iloc[0]`
   and set it as `REPORT_ID`.
 
-Never substitute by re-running `evaluate` + `put`. See `python-api`
+Never substitute by re-running `evaluate` + `put`. See `python -m skore_skills api get`
 § "Lookup failure ≠ artifact missing".
 
 ## `run_cells.py` exits with `ModuleNotFoundError: No module named 'IPython'`
@@ -46,7 +46,7 @@ report.checks.summarize().frame()
 ## Digest contains `**error:** AttributeError: 'X' object has no attribute 'Y'` for a `report.*` accessor
 
 Symbol drift between skore versions OR symbol-from-memory in the
-audit file. Consult `python-api` against the installed skore version,
+audit file. Consult `python -m skore_skills api get` against the installed skore version,
 update the cell, re-run the runner.
 
 ## Digest contains `**error:**` for the `project.get(REPORT_ID)` cell

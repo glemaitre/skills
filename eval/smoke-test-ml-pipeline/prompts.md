@@ -16,8 +16,7 @@ violated.
   `RMSE 0.083 ± 0.004 (5-fold CV)`.
 - `experiments/02_load_forecast.py` exists.
 - `src/<pkg>/data.py` exposes `build_supervised_frame(data_dir)`.
-- `tests/smoke/test_02_load_forecast.py` empty scaffold from
-  `test-ml-pipeline`.
+- `tests/smoke/test_02_load_forecast.py` is an empty scaffold.
 
 **Must do:**
 - Wire the **hard assertion**:

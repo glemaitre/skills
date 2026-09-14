@@ -21,7 +21,6 @@ DEFAULT_TIER_MODELS = {
 # Skills with no evals.json yet are listed so a later converter run
 # picks the right model without a harness edit.
 SKILL_TIER: dict[str, str] = {
-    "test-ml-pipeline": "small",
     "setup-workspace": "medium",
     "setup-python-env": "medium",
     "evaluate-ml-pipeline": "medium",
@@ -31,7 +30,6 @@ SKILL_TIER: dict[str, str] = {
     "explore-ml-data": "medium",
     "audit-ml-pipeline": "medium",
     "iterate-ml-experiment": "big",
-    "python-api": "big",
     "build-ml-pipeline": "big",
 }
 

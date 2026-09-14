@@ -19,14 +19,10 @@ keeps the last prose, and if needed nudges once for a final assistant
 message.
 Pytest checks `**Expect files:**` globs, `**Expect reads:**`
 tool-trace paths, and `**Expect cli:**` argv substrings on
-`run_skore_skills` after the loop. Lookup-gated `python-api` cases
-still use `run_python` probes until C09 rewrites them to
-`run_skore_skills`. `build-ml-pipeline` case 3 seeds
+`run_skore_skills` after the loop. `build-ml-pipeline` case 3 seeds
 `references/layer_examples.md`. The eval environment includes
 editable `skore-skills` plus skrub / scikit-learn / skore so both
-the CLI and leftover probes can import them.
-`python-api` case 4 (Shape 3 / WebFetch) has tools for cache files
-but no WebSearch/WebFetch tool yet.
+the CLI and any focused probes can import them.
 
 A `copy:` sandbox line copies a repo file into the temp root without
 inlining its body in `prompts.md` (`copy: <repo-rel> as <sandbox-rel>`).
@@ -81,7 +77,7 @@ files / empty) separately from `must-do-weak`.
 
 ```bash
 python3 eval/convert_to_evals_json.py              # every skill with prompts.md
-python3 eval/convert_to_evals_json.py python-api   # named skills only
+python3 eval/convert_to_evals_json.py build-ml-pipeline  # named skills only
 python3 eval/convert_to_evals_json.py --check      # fail if evals.json is stale
 ```
 
@@ -112,19 +108,19 @@ timeout so a hung socket still fails and retries.
 Defaults (override in `pixi.toml` or on the CLI):
 
 - **Tiers** (`SKILL_EVAL_TIER=assigned`): each skill runs on one model
-  - small — `openrouter/qwen/qwen3.7-flash`: `test-ml-pipeline`
+  - small — `openrouter/qwen/qwen3.7-flash`: no default assignment
   - medium — `openrouter/deepseek/deepseek-v4.1-flash`:
     `setup-workspace`, `setup-python-env`, `evaluate-ml-pipeline`,
     `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`
     (and, when they gain evals, `explore-ml-data`, `audit-ml-pipeline`)
-  - big — `openrouter/deepseek/deepseek-v4.1-flash`: `iterate-ml-experiment`,
-    `python-api`, `build-ml-pipeline`
+  - big — `openrouter/deepseek/deepseek-v4.1-flash`:
+    `iterate-ml-experiment`, `build-ml-pipeline`
 - judge: `openrouter/deepseek/deepseek-v4.1-flash` (not tiered)
 - mode: `with` (SKILL.md as system prompt)
 - Must-do pass ratio: `0.7` (diagnostic metric only; Must-NOT is
   always all-or-nothing and is what fails the node)
 
-`--skill-tier all` runs every skill on all three models (79 x 3).
+`--skill-tier all` runs every case on all three models.
 `--skill-tier small|medium|big` keeps only skills assigned to that
 tier. `--skill-model` / `SKILL_EVAL_MODELS` ignore the table and pin
 every collected case to the given model(s).
@@ -137,10 +133,10 @@ the matching key in `.env`.
 
 ```bash
 # One skill, pixi defaults
-pixi run -e eval eval -- -k python-api
+pixi run -e eval eval -- -k build-ml-pipeline
 
 # One case (node ids are `{skill}-case{N}-{title-slug}-{mode}-{model}`)
-pixi run -e eval eval -- -k 'python-api and case1'
+pixi run -e eval eval -- -k 'build-ml-pipeline and case1'
 
 # All skills, each on its assigned tier (~79 nodes)
 pixi run -e eval eval
@@ -157,7 +153,7 @@ pixi run -e eval eval -- \
   --skill-judge-model openrouter/deepseek/deepseek-v4.1-flash \
   --skill-mode both \
   --skill-pass-ratio 0.7 \
-  -k python-api
+  -k build-ml-pipeline
 ```
 
 A failing node prints per-group GEval scores (Must-do / Must-NOT), each

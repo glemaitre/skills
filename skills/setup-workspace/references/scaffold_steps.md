@@ -83,11 +83,11 @@ is rewritten with real content after the implementation chain.
 ## Step 6 — Empty `tests/smoke/`
 
 Create the folder. **Do NOT drop placeholder test files** —
-`test-ml-pipeline`'s Stop condition forbids a test file before
+`smoke-test-ml-pipeline`'s Stop condition forbids a test file before
 the matching design note is approved, and no design note exists
 at scaffold time.
 
-Per-experiment placeholders land later via `test-ml-pipeline`
+Per-experiment placeholders land later via `smoke-test-ml-pipeline`
 (called from `iterate-ml-experiment` § 3 once a design note is
 approved).
 
@@ -114,7 +114,7 @@ script runs.
 ## Step 8 — Empty `scratch/`
 
 Just `mkdir scratch`. **Do NOT drop a README inside** — the
-scratch convention is owned by `python-api` § "`scratch/`
+scratch convention is owned by `python -m skore_skills api get` § "`scratch/`
 conventions" and lives in that skill, not in a file on disk.
 The folder is the agent's ad-hoc workspace; its contents are
 gitignored entirely via step 10.
@@ -186,5 +186,5 @@ Hand off to the relevant sibling skill:
   `evaluate.py`.
 - `iterate-ml-experiment` for the design-note content and the
   conversational loop with the user.
-- `test-ml-pipeline` / `smoke-test-ml-pipeline` for the body of
+- `smoke-test-ml-pipeline` / `smoke-test-ml-pipeline` for the body of
   `tests/smoke/test_*.py`.
