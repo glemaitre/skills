@@ -47,9 +47,19 @@ def test_rejects_python_c(tmp_path: Path) -> None:
     assert "python -c" in out
 
 
-def test_rejects_absolute_path(tmp_path: Path) -> None:
+def test_rejects_posix_absolute_path(tmp_path: Path) -> None:
     box = Sandbox(tmp_path)
     out = box.dispatch("run_skore_skills", {"args": ["cells", "run", "/tmp/x.py"]})
+    assert out.startswith("error:")
+    assert "relative" in out
+
+
+def test_rejects_windows_absolute_path(tmp_path: Path) -> None:
+    box = Sandbox(tmp_path)
+    out = box.dispatch(
+        "run_skore_skills",
+        {"args": ["cells", "run", r"C:\temp\x.py"]},
+    )
     assert out.startswith("error:")
     assert "relative" in out
 
