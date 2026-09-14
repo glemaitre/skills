@@ -8,7 +8,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -17,6 +17,10 @@ TOOL_LOOP_CAP = 12
 RUN_PYTHON_TIMEOUT = 30
 RUN_SKORE_SKILLS_TIMEOUT = 30
 CELLS_TIMEOUT = 120
+
+
+def _is_absolute_path(raw: str) -> bool:
+    return PurePosixPath(raw).is_absolute() or PureWindowsPath(raw).is_absolute()
 
 TOOLS_NOTE = (
     "Harness note: you have tools this turn. The project root is a real "
@@ -123,7 +127,7 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
 
 def _repo_file(rel: str) -> Path:
     raw = (rel or "").strip()
-    if not raw or Path(raw).is_absolute():
+    if not raw or _is_absolute_path(raw):
         raise ValueError("copy source must be a repo-relative path")
     source = (REPO_ROOT / raw).resolve()
     try:
@@ -213,7 +217,7 @@ def parse_cli_args(raw: Any) -> list[str]:
     if any(tok == "-c" for tok in tokens) or "python -c" in joined:
         raise ValueError("python -c is rejected")
     for tok in tokens:
-        if Path(tok).is_absolute():
+        if _is_absolute_path(tok):
             raise ValueError("paths must be relative to the sandbox")
     return tokens
 
@@ -226,7 +230,7 @@ class Sandbox:
 
     def resolve(self, rel: str) -> Path:
         raw = (rel or ".").strip() or "."
-        if Path(raw).is_absolute():
+        if _is_absolute_path(raw):
             raise ValueError("path must be relative to the project root")
         target = (self.root / raw).resolve()
         try:
