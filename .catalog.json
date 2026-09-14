@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "d419d501d4f30e02c572d9c6be740c122eb2777115d3452620381ccdc124a4c8",
+  "catalog_hash": "3d392882c0bfdcf9003fe1dddf9467bc7efe25dab4f4439ab841ae7f81bb26b6",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -130,6 +130,51 @@
       "category": "reference",
       "subcategory": null,
       "hash": "93f9aea522edf150b7f87bbd64816e99dc1988b0d6e0355b95bdfca001cec403"
+    },
+    {
+      "id": "triage-ml-task",
+      "path": "skills/triage-ml-task",
+      "title": "Triage ML Task",
+      "summary": "Route an ambiguous ML request to a focused workflow pack.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "4bb4f7f6d0eba3faac3bfe3a31df29dd8cb380b28e44995c94cbe755027f6202"
+    },
+    {
+      "id": "setup-ml-project",
+      "path": "skills/setup-ml-project",
+      "title": "Set Up ML Project",
+      "summary": "Coordinate workspace, environment, and git setup.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "4a57244b0ab2aa51560d3a89fe71cd5be20e277775c89137be826d787dd9bb74"
+    },
+    {
+      "id": "setup-git",
+      "path": "skills/setup-git",
+      "title": "Set Up Git",
+      "summary": "Initialize safe version control for an ML workspace.",
+      "category": "action",
+      "subcategory": null,
+      "hash": "742d4e1d0593e3b2376b7dceb094214d86ebdad52211ad46f7096f95c608e328"
+    },
+    {
+      "id": "model-ml-pipeline",
+      "path": "skills/model-ml-pipeline",
+      "title": "Model ML Pipeline",
+      "summary": "Coordinate build, evaluation, and smoke testing.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "1212b8f6c5ff9a3d13881dc12697a72247c57d7bd1ebc6270bc12a57037f5f5f"
+    },
+    {
+      "id": "choose-python-library",
+      "path": "skills/choose-python-library",
+      "title": "Choose Python Library",
+      "summary": "Resolve a library choice and add the selected dependency.",
+      "category": "action",
+      "subcategory": null,
+      "hash": "e51b04f31b902ad52a5948ffa5745afce605c3df91ff9c5b72045be4482220e9"
     }
   ],
   "workflows": [
@@ -138,6 +183,9 @@
       "title": "Set Up an ML Workspace",
       "summary": "Scaffold an ML workspace, choose its Python stack, and configure its environment and code style.",
       "includes": [
+        "setup-ml-project",
+        "setup-git",
+        "choose-python-library",
         "organize-ml-workspace",
         "python-env-manager",
         "data-science-python-stack",
@@ -157,6 +205,7 @@
       "title": "Model an ML Pipeline",
       "summary": "Build, evaluate, and test an ML pipeline.",
       "includes": [
+        "model-ml-pipeline",
         "build-ml-pipeline",
         "evaluate-ml-pipeline",
         "test-ml-pipeline",
@@ -184,6 +233,10 @@
         "data-science-python-stack",
         "python-code-style",
         "python-api",
+        "setup-ml-project",
+        "setup-git",
+        "model-ml-pipeline",
+        "choose-python-library",
         "explore-ml-data",
         "build-ml-pipeline",
         "evaluate-ml-pipeline",

@@ -1,0 +1,21 @@
+{
+  "skill_name": "model-ml-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Approved model implementation",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Matching approved design note and experiment shell exist.]\n\nThe baseline design is approved. Implement and test the model.",
+      "expected_output": "Behavioural response satisfying: - Dispatch build, evaluate, then smoke-test in that order. - Preserve the matching experiment stem. It must NOT: - Replace skrub DataOps with a bare sklearn Pipeline. - Mark the experiment done while smoke tests fail.",
+      "files": [],
+      "expectations": [
+        "Dispatch build, evaluate, then smoke-test in that order.",
+        "Preserve the matching experiment stem.",
+        "The response does NOT: Replace skrub DataOps with a bare sklearn Pipeline.",
+        "The response does NOT: Mark the experiment done while smoke tests fail."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

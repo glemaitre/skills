@@ -1,0 +1,21 @@
+{
+  "skill_name": "triage-ml-task",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Ambiguous capability request",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.]\n\nWhat can you help me with on this machine learning project?",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Present the setup / eda / model / loop routes or ask which goal the user has. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Present the setup / eda / model / loop routes or ask which goal the user has.",
+        "The response does NOT: Start designing the next experiment.",
+        "The response does NOT: Claim to have loaded or executed every skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

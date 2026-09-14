@@ -106,6 +106,16 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 ## Skills in detail
 
+### Meta and setup actions
+
+| Skill | Description |
+| --- | --- |
+| [triage-ml-task](skills/triage-ml-task/SKILL.md) | Route an ambiguous request to a focused workflow pack. |
+| [setup-ml-project](skills/setup-ml-project/SKILL.md) | Coordinate workspace, environment, and git setup. |
+| [setup-git](skills/setup-git/SKILL.md) | Initialize safe version control for an ML workspace. |
+| [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Coordinate build, evaluation, and smoke testing. |
+| [choose-python-library](skills/choose-python-library/SKILL.md) | Resolve a library choice and add the selected dependency. |
+
 ### ML pipeline lifecycle
 
 | Skill | Description |
