@@ -21,8 +21,7 @@ description: >
 
 # Organize ML Workspace
 
-Decide where artifacts live. Do not design an experiment here:
-`iterate-ml-experiment` owns “design note first, then code.”
+Decide where artifacts live. Do not design an experiment here.
 
 ## Stop conditions
 
@@ -57,9 +56,10 @@ and manager manifests.
 - Manifest without matching `src/<pkg>/` → incomplete; reconfirm
   package name rather than inventing it.
 
-For a request to add an experiment to an existing workspace, hand
-off to `iterate-ml-experiment`; do not create `experiments/NN_*.py`
-before its design note is approved.
+For a request to add an experiment to an existing workspace, report
+that setup is complete and ask the user to run the model/loop pack or
+ask triage. Do not create `experiments/NN_*.py` before its design
+note is approved.
 
 ## Pre-flight
 

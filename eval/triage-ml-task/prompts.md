@@ -12,8 +12,8 @@
 
 **Must do:**
 - Name `python -m skore_skills status`.
-- Present the setup / eda / model / loop routes or ask which goal
-  the user has.
+- Present the setup / eda / model / loop routes.
+- Ask exactly one focused question to choose the user's goal.
 
 **Must NOT do:**
 - Start designing the next experiment.

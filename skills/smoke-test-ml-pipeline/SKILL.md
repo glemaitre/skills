@@ -21,13 +21,11 @@ description: >
   executable proof; an experiment script changes the pipeline
   shape and the matching smoke test needs revisiting.
 
-  SKIP when: the design note does not exist or is not yet
-  approved (route to `iterate-ml-experiment`); the user is asking
-  about a regression test or schema invariant (route to
-  `regression-test-ml-pipeline` /
-  `distribution-test-ml-pipeline` once those exist); the question
-  is the *interpretation* of CV metrics, not predict-time
-  correctness (route to `evaluate-ml-pipeline`).
+  STOP when `python -m skore_skills status` shows no approved design
+  or matching experiment script: explain the missing fact and ask
+  the user to run the model pack or ask triage. This action does not
+  cover regression/distribution tests or CV interpretation. Do not
+  require another action skill to be installed.
 
   HOW TO USE: read the matching experiment's `journal/NN_*.md` and
   `experiments/NN_*.py` first to understand the pipeline's source

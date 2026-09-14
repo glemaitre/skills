@@ -184,7 +184,8 @@ violated.
 - Mention that `skore.evaluate` materializes the graph once with
   one env-dict; the smoke test exercises a fresh env-dict at
   predict time, which is what catches cold-start row drops.
-- Route to `smoke-test-ml-pipeline` before flipping the status.
+- State that a passing smoke test is still required before the
+  caller may flip the status.
 
 **Must NOT do:**
 - Edit `journal/02_load_forecast.md` Status to `done`.

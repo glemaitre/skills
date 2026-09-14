@@ -26,12 +26,12 @@ description: >
   - The user asks to build / declare / set up a pipeline /
     classifier / regressor for X.
 
-  SKIP when: `.fit(...)` calls / training loops / `Trainer.fit` /
-  epoch loops; train/test split or cross-validation splitting;
-  hyperparameter search; persistence (`joblib.dump`, checkpointing);
-  evaluation / metrics / scoring; inference over a pre-trained
-  model; pure EDA; library-choice questions with no concrete
-  declaration in play.
+  STOP when `python -m skore_skills status` shows no scaffold,
+  approved design, or data contract: explain the missing fact and
+  ask the user to run the setup/model pack or ask triage. This
+  action does not cover fitting, CV, metrics, persistence, inference,
+  pure EDA, or abstract library choice. Do not require another
+  action skill to be installed.
 
   HOW TO USE: consult before the first declarative line and on
   every structural edit (added/swapped step, changed input columns,
@@ -67,15 +67,12 @@ Read these once; they're referenced throughout.
 - **Layers 1 / 2 / 3** — source / predict-grid + X-marker / features
   after the marker. Defined in Rule 2.
 
-## Next-step pointers — where you go after this skill
+## Completion
 
-| You came here for… | → next |
-|---|---|
-| Declared pipeline → CV strategy | → `evaluate-ml-pipeline` (the `G-CV-SPLITTER` gate, rule 3) |
-| Declared pipeline → smoke test | → `smoke-test-ml-pipeline` |
-| Symbol lookup mid-declaration | → `python -m skore_skills api get` (Shape 1 / 1b / 3) |
-| Missing skrub/sklearn import | → `python-env-manager` § install |
-| Modified `pipeline.py` / `features.py` / `data.py` | → `python-code-style` (ruff + NumPyDoc) |
+Return the declared graph and its verified API evidence. The caller
+decides whether to continue with evaluation or smoke testing. If a
+dependency or workspace fact is missing, state it and suggest the
+setup/model pack or triage rather than loading another action.
 
 Always re-emit the Pre-flight checklist with evidence before
 declaring the turn done.

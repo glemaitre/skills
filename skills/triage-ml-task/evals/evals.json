@@ -5,11 +5,12 @@
       "id": 1,
       "title": "Ambiguous capability request",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.]\n\nWhat can you help me with on this machine learning project?",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Present the setup / eda / model / loop routes or ask which goal the user has. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Present the setup / eda / model / loop routes. - Ask exactly one focused question to choose the user's goal. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "Present the setup / eda / model / loop routes or ask which goal the user has.",
+        "Present the setup / eda / model / loop routes.",
+        "Ask exactly one focused question to choose the user's goal.",
         "The response does NOT: Start designing the next experiment.",
         "The response does NOT: Claim to have loaded or executed every skill."
       ],

@@ -18,24 +18,17 @@ description: >
   user's raw data files.
 
   TRIGGER — any of:
-  - `iterate-ml-experiment` § 0 bootstrap, BEFORE the baseline design
-    note — the G-EDA gate fires here (run / skip).
+  - Bootstrap requires data understanding before baseline design.
   - The user asks to "explore the data", "do an EDA", "profile the
     dataset", "what does the data look like", "understand the data".
   - A new or changed data source needs (re-)understanding before the
     next experiment.
 
-  SKIP when: the workspace isn't scaffolded / bootstrapped yet —
-  `iterate-ml-experiment` § 0 owns bootstrap ordering and will
-  dispatch here at the G-EDA step; don't run standalone ahead of
-  scaffolding (route to `iterate-ml-experiment` / `organize-ml-
-  workspace`); there is no data to explore yet; the user wants to
-  inspect a finished run's skore report rather than the raw dataset
-  (`audit-ml-pipeline`); the user is past data understanding and wants
-  pipeline / evaluation mechanics (`build-ml-pipeline` /
-  `evaluate-ml-pipeline`); a pure symbol lookup (`python -m skore_skills api get`); EDA is
-  already recorded (`data/eda.md` + the JOURNAL EDA section exist) and
-  the user is not asking to refresh it.
+  STOP when `python -m skore_skills status` shows no scaffold or no
+  data: explain the missing fact and ask the user to run the setup
+  pack or ask triage. Also stop when the request is not raw-data EDA,
+  or when EDA is already recorded and no refresh was requested. Do
+  not require another action skill to be installed.
 
   HOW TO USE: run the Detection step (does `data/eda.md` + the JOURNAL
   EDA section already exist?), emit the Pre-flight checklist as
@@ -59,7 +52,7 @@ design note's learner / splitter / metric choices.
 
 | You came here for… | → next |
 |---|---|
-| Bootstrap, before the first baseline | → back to `iterate-ml-experiment` § 0; the EDA findings inform the auto-drafted `01_baseline.md` |
+| Bootstrap, before the first baseline | → return the EDA findings; they inform the baseline design |
 | User free-text ("explore the data") | → surface the findings; no further dispatch unless the user asks to model |
 | Re-understand a changed data source | → re-run, overwrite `data/eda.*`, refresh the JOURNAL EDA section |
 

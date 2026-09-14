@@ -19,10 +19,11 @@ description: >
   user asks how to pick a cross-validator; user wants to see a
   report / metrics / diagnostic plots for a fitted learner.
 
-  SKIP when: declaring the pipeline (use `build-ml-pipeline`);
-  hyperparameter / model search (separate skill); fitting,
-  persisting, or serving the final model; tracking or comparing
-  experiments across multiple runs over time (separate skill).
+  STOP when `python -m skore_skills status` shows no declared
+  learner or no approved design: explain the missing prerequisite
+  and ask the user to run the model pack or ask triage. Also stop
+  for hyperparameter search, final-model serving, or multi-run
+  tracking. Do not require another action skill to be installed.
 
   HOW TO USE: invoke before any evaluation call. **First, read the
   "Stop conditions" block at the top of the body and emit the
@@ -30,10 +31,9 @@ description: >
   mandatory before any evaluation code is written.** The structural
   facts about the data (group keys, time ordering) should already be
   encoded at the X marker via `split_kwargs` — if they aren't and you
-  can't tell from the data, return to `build-ml-pipeline` and ask the
-  user. For symbol-level lookups, defer to `python -m skore_skills api get` (skore
-  symbols) and `python -m skore_skills api get` (splitters); don't guess names from
-  memory.
+  can't tell from the data, report the missing pipeline fact and ask
+  the user. Confirm all symbols with
+  `python -m skore_skills api get`; don't guess names from memory.
 ---
 
 # Evaluate ML Pipeline

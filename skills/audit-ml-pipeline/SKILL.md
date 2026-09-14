@@ -15,8 +15,7 @@ description: >
   Never calls `skore.evaluate(...)` or `project.put(...)`.
 
   TRIGGER — any of:
-  - `iterate-ml-experiment` § 4 record-outcome — audit is dispatched
-    FIRST (replaces scratch probes for metric extraction).
+  - A completed run needs a read-only audit for outcome recording.
   - The user asks "audit experiment 02", "show me what 03 looks
     like", "re-audit 04 against the new report".
   - An experiment was re-run (same `put()` key overwritten) and the
@@ -24,14 +23,11 @@ description: >
   - The user wants a human-readable narrative of a past experiment
     without firing the full `iterate-from-skore` flow.
 
-  SKIP when: the design note isn't approved yet (route to
-  `iterate-ml-experiment`); the experiment hasn't been run (no report
-  on disk); the agent feature isn't installed (delegate to
-  `python-env-manager` § "Agent feature"); the user is mining the
-  report to source the *next* experiment (`iterate-from-skore`); the
-  user wants to explore the **raw dataset** rather than a finished
-  run's skore report (`explore-ml-data` — audit reads a report, not
-  the data).
+  STOP when `python -m skore_skills status` shows no approved design,
+  experiment report, or agent feature. Explain the missing fact and
+  ask the user to run the setup/model pack or ask triage. Also stop
+  when the request concerns raw-data EDA or sourcing a future
+  experiment. Do not require another action skill to be installed.
 
   HOW TO USE: confirm the four-way stem pairing exists (`journal/NN_*.md`
   approved + `experiments/NN_*.py` exists + smoke test passed +
