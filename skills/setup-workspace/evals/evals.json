@@ -1,17 +1,17 @@
 {
-  "skill_name": "organize-ml-workspace",
+  "skill_name": "setup-workspace",
   "evals": [
     {
       "id": 1,
       "title": "Fresh workspace bootstrap",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder (no `pyproject.toml`, no `src/`, no `experiments/`,\n  no `journal/`).\n- No `data/`, no `pixi.toml`.]\n\nSet up a fresh ML workspace in this folder. Tabular regression.",
-      "expected_output": "Behavioural response satisfying: - Identify as a **fresh** layout (no detection signals matched). - Name **G-PKG-NAME** as the next gate \u2014 the `src/<pkg>/` import name goes to the user via `AskUserQuestion`, with the folder name as the default, and is not picked here. - Name **G-TABULAR** \u2014 pandas / polars pick via the data-science-python-stack ask. It must NOT: - Run `pixi init` / `uv init` / `poetry init` on the user's behalf before G-ENV-MGR + G-PKG-NAME have passed. - Pick a package name silently from the folder name. - Write a runnable `experiments/01_baseline.py` whose body actually calls `build_learner` / `skore.evaluate` / `project.put` (uncommented). Enumerating the empty templated shell (imports, `# %%`, commented stubs, `<<PKG>>` placeholders) is allowed.",
+      "expected_output": "Behavioural response satisfying: - Identify as a **fresh** layout (no detection signals matched). - Name **G-PKG-NAME** as the next gate \u2014 the `src/<pkg>/` import name goes to the user via `AskUserQuestion`, with the folder name as the default, and is not picked here. - Name **G-TABULAR** \u2014 pandas / polars pick via `choose-python-library`. It must NOT: - Run `pixi init` / `uv init` / `poetry init` on the user's behalf before G-ENV-MGR + G-PKG-NAME have passed. - Pick a package name silently from the folder name. - Write a runnable `experiments/01_baseline.py` whose body actually calls `build_learner` / `skore.evaluate` / `project.put` (uncommented). Enumerating the empty templated shell (imports, `# %%`, commented stubs, `<<PKG>>` placeholders) is allowed.",
       "files": [],
       "expectations": [
         "Identify as a **fresh** layout (no detection signals matched).",
         "Name **G-PKG-NAME** as the next gate \u2014 the `src/<pkg>/` import name goes to the user via `AskUserQuestion`, with the folder name as the default, and is not picked here.",
-        "Name **G-TABULAR** \u2014 pandas / polars pick via the data-science-python-stack ask.",
-        "Mention **G-ENV-MGR** as routed via `python-env-manager`.",
+        "Name **G-TABULAR** \u2014 pandas / polars pick via `choose-python-library`.",
+        "Mention **G-ENV-MGR** as routed via `setup-python-env`.",
         "Name `python -m skore_skills scaffold --package <pkg>` as the action after the gates resolve.",
         "Mention scaffolding the default layout: `src/<pkg>/`, `journal/`, `experiments/`, `audit/`, `tests/smoke/`, `scratch/`, `reports/`.",
         "The response does NOT: Run `pixi init` / `uv init` / `poetry init` on the user's behalf before G-ENV-MGR + G-PKG-NAME have passed.",
@@ -136,7 +136,7 @@
         "Refuse to run `pixi init`.",
         "Cite that **G-ENV-MGR + G-PKG-NAME must pass first** \u2014 pixi on PATH is detection context, not permission.",
         "Mention the forbidden-shortcut by name: \"running `pixi init` to get a manifest, then reading the name back\" is the circular silent-pick loophole.",
-        "Route the env-manager pick to `python-env-manager` for the structured ask.",
+        "Route the env-manager pick to `setup-python-env` for the structured ask.",
         "The response does NOT: Run `pixi init` / `uv init` / `poetry init` in this turn.",
         "The response does NOT: Treat \"pixi is on PATH\" as resolving G-ENV-MGR.",
         "The response does NOT: Pick a package name from the folder via the `pixi init` side effect."

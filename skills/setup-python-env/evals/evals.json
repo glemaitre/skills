@@ -1,5 +1,5 @@
 {
-  "skill_name": "python-env-manager",
+  "skill_name": "setup-python-env",
   "evals": [
     {
       "id": 1,
@@ -100,7 +100,7 @@
     {
       "id": 6,
       "title": "Editable workspace install for a fresh scaffold",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Fresh scaffold from `organize-ml-workspace`.\n- `pyproject.toml` declares `src/<pkg>/`.\n- `pixi.toml` exists.\n- pixi is the manager (recorded).]\n\nThe workspace was just scaffolded. Wire the editable install for\n`src/<pkg>/`.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Fresh scaffold from `setup-workspace`.\n- `pyproject.toml` declares `src/<pkg>/`.\n- `pixi.toml` exists.\n- pixi is the manager (recorded).]\n\nThe workspace was just scaffolded. Wire the editable install for\n`src/<pkg>/`.",
       "expected_output": "Behavioural response satisfying: - Recognise this as the **Editable workspace package** sub-routine. - Propose the documented pixi two-step: `pixi add --pypi \"<pkg> @ .\"`, then `<pkg> = { path = \".\", editable = true }` in `pixi.toml`, then `pixi install`. - Explain that this lets `from <pkg>.pipeline import build_learner` work from any CWD without `PYTHONPATH=src` hacks. It must NOT: - Run `pip install -e .` (wrong manager in a pixi project). - Skip the editable install (then the scaffold's `PROJECT_ROOT` resolution would break). - Modify `pyproject.toml`'s `[project]` block ad-hoc to make the package \"findable\" by inference.",
       "files": [],
       "expectations": [

@@ -13,15 +13,12 @@ from skore_skills.cli import cli
 from skore_skills.scaffold import template_root
 
 SKILL_TEMPLATES = (
-    Path(__file__).resolve().parents[2]
-    / "skills"
-    / "organize-ml-workspace"
-    / "templates"
+    Path(__file__).resolve().parents[2] / "skills" / "setup-workspace" / "templates"
 )
 
 
 def test_packaged_templates_match_skill_tree() -> None:
-    """Package data stays in sync with organize-ml-workspace templates."""
+    """Package data stays in sync with setup-workspace templates."""
     packaged = template_root()
     skill_files = sorted(
         path.name for path in SKILL_TEMPLATES.iterdir() if path.is_file()

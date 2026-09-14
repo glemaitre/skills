@@ -112,11 +112,9 @@ timeout so a hung socket still fails and retries.
 Defaults (override in `pixi.toml` or on the CLI):
 
 - **Tiers** (`SKILL_EVAL_TIER=assigned`): each skill runs on one model
-  - small — `openrouter/qwen/qwen3.7-flash`: `test-ml-pipeline`,
-    `python-code-style`
+  - small — `openrouter/qwen/qwen3.7-flash`: `test-ml-pipeline`
   - medium — `openrouter/deepseek/deepseek-v4.1-flash`:
-    `organize-ml-workspace`, `python-env-manager`,
-    `data-science-python-stack`, `evaluate-ml-pipeline`,
+    `setup-workspace`, `setup-python-env`, `evaluate-ml-pipeline`,
     `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`
     (and, when they gain evals, `explore-ml-data`, `audit-ml-pipeline`)
   - big — `openrouter/deepseek/deepseek-v4.1-flash`: `iterate-ml-experiment`,

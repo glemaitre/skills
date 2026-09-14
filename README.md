@@ -112,6 +112,8 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | --- | --- |
 | [triage-ml-task](skills/triage-ml-task/SKILL.md) | Route an ambiguous request to a focused workflow pack. |
 | [setup-ml-project](skills/setup-ml-project/SKILL.md) | Coordinate workspace, environment, and git setup. |
+| [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
+| [setup-python-env](skills/setup-python-env/SKILL.md) | Configure dependencies, editable install, and Python code style. |
 | [setup-git](skills/setup-git/SKILL.md) | Initialize safe version control for an ML workspace. |
 | [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Coordinate build, evaluation, and smoke testing. |
 | [choose-python-library](skills/choose-python-library/SKILL.md) | Resolve a library choice and add the selected dependency. |
@@ -139,10 +141,9 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 | Skill | Description |
 | --- | --- |
-| [organize-ml-workspace](skills/organize-ml-workspace/SKILL.md) | An organized workspace to keep track of your experiments. |
-| [python-code-style](skills/python-code-style/SKILL.md) | Enforce best practices out-of-the-box from the Python ecosystem in your code. |
-| [python-env-manager](skills/python-env-manager/SKILL.md) | Bootstrapping the experiment setup based on your favorite Python environment manager. |
-| [data-science-python-stack](skills/data-science-python-stack/SKILL.md) | Opinionated one-library-per-job Python stack, organized into mandatory / user-choice / optional / transitive tiers. |
+| [setup-workspace](skills/setup-workspace/SKILL.md) | An organized workspace to keep track of experiments. |
+| [setup-python-env](skills/setup-python-env/SKILL.md) | Environment, editable install, Ruff configuration, and style execution. |
+| [choose-python-library](skills/choose-python-library/SKILL.md) | Select optional libraries without reopening fixed stack choices. |
 
 ### API references
 

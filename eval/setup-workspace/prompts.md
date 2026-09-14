@@ -1,9 +1,9 @@
-# organize-ml-workspace eval — golden prompts
+# setup-workspace eval — golden prompts
 
 Behavioural prompts scored manually against Must / Must NOT bullets.
 
 For each case the model gets:
-- `skills/organize-ml-workspace/SKILL.md` as the system prompt.
+- `skills/setup-workspace/SKILL.md` as the system prompt.
 - The case's `User prompt`, prefixed with the workspace-state block.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
@@ -26,9 +26,9 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 - Name **G-PKG-NAME** as the next gate — the `src/<pkg>/` import
   name goes to the user via `AskUserQuestion`, with the folder name
   as the default, and is not picked here.
-- Name **G-TABULAR** — pandas / polars pick via the
-  data-science-python-stack ask.
-- Mention **G-ENV-MGR** as routed via `python-env-manager`.
+- Name **G-TABULAR** — pandas / polars pick via
+  `choose-python-library`.
+- Mention **G-ENV-MGR** as routed via `setup-python-env`.
 - Name `python -m skore_skills scaffold --package <pkg>` as the
   action after the gates resolve.
 - Mention scaffolding the default layout: `src/<pkg>/`,
@@ -232,7 +232,7 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 - Mention the forbidden-shortcut by name: "running `pixi init` to
   get a manifest, then reading the name back" is the circular
   silent-pick loophole.
-- Route the env-manager pick to `python-env-manager` for the
+- Route the env-manager pick to `setup-python-env` for the
   structured ask.
 
 **Must NOT do:**

@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "3d392882c0bfdcf9003fe1dddf9467bc7efe25dab4f4439ab841ae7f81bb26b6",
+  "catalog_hash": "98955f959fde5b752ae495d82898cc82767db2ad727c23319d13183232834543",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -93,7 +93,7 @@
       "summary": "An organized workspace to keep track of your experiments.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "142aba1bd79c70acd1e5a5f9ed02fbe4d691bed6e35bcbb10714352439b1bd42"
+      "hash": "533b0d5e5a7691bbfe09c12444f3e5290f1a0ef439ba21666779c2c7153f0db6"
     },
     {
       "id": "python-code-style",
@@ -102,7 +102,7 @@
       "summary": "Enforce good practices out-of-the-box for the Python ecosystem for your code.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "8d18fd527085c49bd6d67cb3088c3c8bcd0eff8f986036ac1f2dde5ea1976bf1"
+      "hash": "8e13ace9c5f387ddcce3a91f8e9c4ee5bb6187000138781a8417c06fe073447b"
     },
     {
       "id": "python-env-manager",
@@ -111,7 +111,7 @@
       "summary": "Bootstrapping the experiment setup based on your favorite Python environment manager.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "2cb7aacd94861518847f5ded46e2b213f23f3ee32da3a495ab618953bb64497d"
+      "hash": "1a7d2cf880502819e7eebea3c0c61aea8ecf1c0321b2df50bdae597a8206083c"
     },
     {
       "id": "data-science-python-stack",
@@ -120,7 +120,7 @@
       "summary": "Opinionated one-library-per-job Python stack, organized into mandatory / user-choice / optional / transitive tiers.",
       "category": "reference",
       "subcategory": null,
-      "hash": "e77aa0b94063307c361cab411400ce6ad69be40b2585e84fa709a19f910abc6d"
+      "hash": "c5cd343e2eb7d5b456605172e79fb1ef3f8ee22ca04f6aad088fb7999f1dc145"
     },
     {
       "id": "python-api",
@@ -147,7 +147,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "4a57244b0ab2aa51560d3a89fe71cd5be20e277775c89137be826d787dd9bb74"
+      "hash": "8d651cbadd8a97169f908a76a928a225a6ce6b7e7d76e53d147ee8520c950957"
     },
     {
       "id": "setup-git",
@@ -175,6 +175,24 @@
       "category": "action",
       "subcategory": null,
       "hash": "e51b04f31b902ad52a5948ffa5745afce605c3df91ff9c5b72045be4482220e9"
+    },
+    {
+      "id": "setup-workspace",
+      "path": "skills/setup-workspace",
+      "title": "Set Up Workspace",
+      "summary": "Detect or scaffold the standard ML workspace layout.",
+      "category": "action",
+      "subcategory": null,
+      "hash": "0bf39c2ef95e44ef2350c127f3f206cac6d57fc13289b95bbbcd97f8e9083703"
+    },
+    {
+      "id": "setup-python-env",
+      "path": "skills/setup-python-env",
+      "title": "Set Up Python Environment",
+      "summary": "Configure dependencies, editable install, and Python code style.",
+      "category": "action",
+      "subcategory": null,
+      "hash": "d51ff27bad7eb7a07cc2201c1760223849268863878bdfdb254c9931241d75b5"
     }
   ],
   "workflows": [
@@ -184,12 +202,10 @@
       "summary": "Scaffold an ML workspace, choose its Python stack, and configure its environment and code style.",
       "includes": [
         "setup-ml-project",
+        "setup-workspace",
+        "setup-python-env",
         "setup-git",
-        "choose-python-library",
-        "organize-ml-workspace",
-        "python-env-manager",
-        "data-science-python-stack",
-        "python-code-style"
+        "choose-python-library"
       ]
     },
     {
@@ -228,12 +244,10 @@
       "title": "ML Experimentation Companion",
       "summary": "A machine learning experiment companion. Focus on the science, the companion organizes the rest with organized workspaces and reporting, auditable results where you are still the owner.",
       "includes": [
-        "organize-ml-workspace",
-        "python-env-manager",
-        "data-science-python-stack",
-        "python-code-style",
         "python-api",
         "setup-ml-project",
+        "setup-workspace",
+        "setup-python-env",
         "setup-git",
         "model-ml-pipeline",
         "choose-python-library",

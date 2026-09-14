@@ -10,9 +10,9 @@ description: >
 
 This meta skill owns ordering only:
 
-1. `organize-ml-workspace` — detect/glue or scaffold after package,
+1. `setup-workspace` — detect/glue or scaffold after package,
    tabular, environment-manager, and skore-mode gates.
-2. `python-env-manager` — install the editable package and required
+2. `setup-python-env` — install the editable package and required
    dependencies through the detected manager.
 3. `setup-git` — initialize version control only with the user's
    first-commit decision.

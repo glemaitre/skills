@@ -22,10 +22,8 @@ DEFAULT_TIER_MODELS = {
 # picks the right model without a harness edit.
 SKILL_TIER: dict[str, str] = {
     "test-ml-pipeline": "small",
-    "python-code-style": "small",
-    "organize-ml-workspace": "medium",
-    "python-env-manager": "medium",
-    "data-science-python-stack": "medium",
+    "setup-workspace": "medium",
+    "setup-python-env": "medium",
     "evaluate-ml-pipeline": "medium",
     "smoke-test-ml-pipeline": "medium",
     "iterate-from-skore": "medium",

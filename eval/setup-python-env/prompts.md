@@ -1,4 +1,4 @@
-# python-env-manager eval — golden prompts
+# setup-python-env eval — golden prompts
 
 Behavioural prompts. Pass = every Must do ticked, zero Must NOT
 violated.
@@ -158,7 +158,7 @@ violated.
 > `src/<pkg>/`.
 
 **Assumed workspace state:**
-- Fresh scaffold from `organize-ml-workspace`.
+- Fresh scaffold from `setup-workspace`.
 - `pyproject.toml` declares `src/<pkg>/`.
 - `pixi.toml` exists.
 - pixi is the manager (recorded).
