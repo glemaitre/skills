@@ -25,10 +25,14 @@ Canonical stages, one at a time:
 ## Procedure
 
 1. Run `python -m skore_skills status`.
-2. Read `loop_stage` and `policy`.
+2. Read `loop_stage` and `policy` (the `workspace` section of
+   `.skore`). If `.skore` is missing, that is expected: use the
+   filesystem snapshot and inferred `loop_stage`. Do not treat a
+   missing file as an empty project when `src/` or `journal/` exist.
 3. Ask **exactly one** question:
    - stay on this stage and go deeper,
    - move to the next stage,
+   - confirm/persist detected facts into `.skore`,
    - or change a persisted choice (`git.autocommit`, env, tabular).
 4. Name the pack or skill to load. Do not execute its methodology.
 
@@ -37,6 +41,8 @@ Canonical stages, one at a time:
 - Do not design experiments, write pipelines, or run EDA yourself.
 - Do not load every skill.
 - Do not invent workspace facts when status is unavailable.
+- Do not treat a missing `.skore` as an empty project when `src/`
+  or `journal/` exist.
 - Do not install packs without the user's request.
 - Do not treat iterate as the session owner.
 
