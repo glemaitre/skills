@@ -185,6 +185,44 @@ def env_add(packages: tuple[str, ...], execute: bool) -> None:
         raise SystemExit(code)
 
 
+@env_group.command("agent")
+@click.option(
+    "--execute",
+    is_flag=True,
+    help="Run the install and verification commands instead of printing them.",
+)
+@click.option("--project", help="Conda project name; defaults to package/root name.")
+@click.option(
+    "--requirements",
+    type=click.Path(dir_okay=False, path_type=Path),
+    help="pip-venv requirements file; defaults to requirements.txt.",
+)
+def env_agent(execute: bool, project: str | None, requirements: Path | None) -> None:
+    """Print or install IPython, pyright, and the LSP environment."""
+    from skore_skills.env import install_agent_feature
+
+    text, code = install_agent_feature(
+        Path.cwd(),
+        execute=execute,
+        project=project,
+        requirements=requirements,
+    )
+    click.echo(text, nl=False)
+    if code:
+        raise SystemExit(code)
+
+
+@env_group.command("check")
+def env_check() -> None:
+    """Check agent feature composition and pyright configuration."""
+    from skore_skills.env import check_agent_feature
+
+    text, code = check_agent_feature(Path.cwd())
+    click.echo(text, nl=False)
+    if code:
+        raise SystemExit(code)
+
+
 @cli.group("policy")
 def policy_group() -> None:
     """Read and write the ``workspace`` section of ``.skore``."""

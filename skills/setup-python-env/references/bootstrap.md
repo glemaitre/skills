@@ -132,10 +132,12 @@ with `× URL requirement must be preceded by a package name`.
 ### 7. Drop `pyrightconfig.json`
 
 ```bash
-sed -e 's|<PYTHON_PATH>|.pixi/envs/lsp/bin/python|g' \
-    .agents/skills/python-env-manager/templates/pyrightconfig.json \
-    > ./pyrightconfig.json
+python -m skore_skills env agent
+python -m skore_skills env agent --execute
 ```
+
+The first command prints the complete detected-manager plan. Review
+it before executing; the CLI writes the packaged pyright config.
 
 ### 8. Sync all four envs
 

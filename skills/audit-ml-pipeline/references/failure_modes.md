@@ -27,9 +27,8 @@ Never substitute by re-running `evaluate` + `put`. See `python -m skore_skills a
 Agent feature not installed in the env the runner is invoked from.
 **Delegate to `python-env-manager` § "Agent feature" via
 `G-AGENT-FEATURE`.** Do not type install commands from this skill.
-The per-manager install scripts under
-`.agents/skills/python-env-manager/scripts/install_agent_feature_<manager>.sh`
-do the full install + verification in one call.
+`python -m skore_skills env agent` prints the full plan;
+`env agent --execute` installs and verifies it.
 
 ## Cell renders as `<Display object at 0x…>` in the digest
 

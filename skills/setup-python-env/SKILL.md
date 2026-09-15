@@ -50,7 +50,7 @@ skill after the dependency is importable.
 - [ ] G-ENV-MGR: resolved | ask | n/a (one manifest manager)
 - [ ] Package route: default | dev | agent | G-ENV-SCOPE ask
 - [ ] G-AGENT-FEATURE: install | skip | n/a
-- [ ] Command: python -m skore_skills env add <packages>
+- [ ] Command: python -m skore_skills env add <packages> | env agent
 ```
 
 ## Detect
@@ -105,8 +105,19 @@ feature inferred from the task (for example `tuning` for optuna).
 ## Agent feature
 
 Ask before installing optional agent-only support. If approved, use
-the existing manager-specific script under `scripts/` and copy
-`templates/pyrightconfig.json` verbatim. Do not register a Jupyter
+the detected manager's CLI plan:
+
+```bash
+python -m skore_skills env agent
+python -m skore_skills env agent --execute
+python -m skore_skills env check
+```
+
+Inspect the print-only plan before `--execute`. The command installs
+IPython + pyright, composes the LSP environment, writes the packaged
+`pyrightconfig.json`, and verifies the tools. `env check` validates
+pixi, uv, and Poetry declarations; hatch, conda, and pip-venv return
+exit 2 with the manual-check reference. Do not register a Jupyter
 kernel. If declined, return to the caller's documented fallback.
 
 ## Python code style
@@ -146,6 +157,8 @@ do not use `pip install -e .` or `PYTHONPATH=src`.
 - no manager: ask; do not bootstrap.
 - hatch: follow the CLI's manifest-edit hint; there is no universal
   add command.
+- `env agent` print-only first; pass `--execute` only after reviewing
+  the manager-specific plan.
 - a forbidden substitute: keep the canonical stack package and
   surface the CLI refusal.
 

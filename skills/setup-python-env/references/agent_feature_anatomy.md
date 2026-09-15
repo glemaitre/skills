@@ -1,9 +1,9 @@
 # Python Env Manager — Agent feature anatomy
 
-Full anatomy of what the bundled `install_agent_feature_<manager>.sh`
-scripts do, how the resulting envs are wired, and how to invoke the
-audit runner afterwards. Load on first agent-feature install, or
-when debugging a failed install.
+Full anatomy of what `python -m skore_skills env agent` does, how the
+resulting envs are wired, and how to invoke the audit runner
+afterwards. Load on first agent-feature install, or when debugging a
+failed install.
 
 ## What the agent feature is
 
@@ -15,10 +15,9 @@ A project-scoped install of two agent-only tools plus a config:
   registration, no notebook conversion.
 - **`pyright`** — powers the opencode LSP integration for Python
   files. Surfaces import / type / undefined-symbol diagnostics in
-  the editor. Configured via the bundled `pyrightconfig.json`
-  template (this skill ships it at
-  `templates/pyrightconfig.json`; the install step copies it to
-  the project root).
+  the editor. Configured via the `pyrightconfig.json` template
+  packaged in the CLI; `env agent --execute` copies it to the
+  project root.
 - **`pyrightconfig.json`** at the project root, with
   `<PYTHON_PATH>` substituted for the lsp env's interpreter.
 
@@ -42,9 +41,9 @@ for the full layout.
 
 Why they're separate: see `references/composition_model.md`.
 
-## Per-manager invocations — what the scripts do
+## Per-manager invocations — what the CLI does
 
-Three actions per script, in order:
+Three actions per manager plan, in order:
 
 1. Install `ipython` + `pyright` into the agent feature.
 2. Compose / create the `lsp` env (manager-specific).
@@ -69,14 +68,21 @@ silently on them. `pythonPath` points directly at the interpreter
 and works uniformly. Sticking to a single form keeps the
 substitution table simple.
 
-## Why "run the script, don't retype"
+## Why "run the CLI, don't retype"
 
-Each script encodes per-manager footguns (poetry's
+The CLI encodes per-manager footguns (poetry's
 `virtualenvs.in-project`, hatch's no-composition, conda's
 machine-local paths) that were learned the hard way. Re-typing the
 commands by hand — especially for smaller / less-careful models —
 is the named forbidden shortcut: each footgun missed produces a
-silent failure mode the script catches.
+silent failure mode the CLI catches. Run the print-only command,
+review it, then execute:
+
+```bash
+python -m skore_skills env agent
+python -m skore_skills env agent --execute
+python -m skore_skills env check
+```
 
 Per-manager footgun catalogue: `references/per_manager_footguns.md`.
 
@@ -109,11 +115,9 @@ conda run -n <project>-agent python -m skore_skills cells run audit/<stem>.py
 The runner streams the digest to stdout by default. Pass a
 second arg `<dst.md>` to also write to a file.
 
-## `pyrightconfig.json` — bundled template
+## `pyrightconfig.json` — packaged template
 
-Lives at
-`.agents/skills/python-env-manager/templates/pyrightconfig.json`.
-One placeholder the install step substitutes:
+The CLI packages the template and substitutes one placeholder:
 
 - `<PYTHON_PATH>` — interpreter of the lsp env (manager-specific).
 
