@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "5763ffd399a0fe45f3951cf403649294ccb8ebf9fb64a41eae1390346ba142a3",
+  "catalog_hash": "f6deda2b2dc78ed26d4f5ff7f0b7aa26f30f2c684f334e42bc8824e5ec18f179",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -51,10 +51,19 @@
       "hash": "834739f198dc4a29f04d2dd7dc17f9afb62bfe64fb5b609e571e95dd076471c5"
     },
     {
+      "id": "manage-ml-backlog",
+      "path": "skills/manage-ml-backlog",
+      "title": "Manage ML Backlog",
+      "summary": "Record experiment outcomes and next-lever backlog rows.",
+      "category": "action",
+      "subcategory": null,
+      "hash": "2c3ac65b39c7c36fa39e374161a8c6ab79d11f4c2d4d83bb67a17cf2686f5070"
+    },
+    {
       "id": "iterate-ml-experiment",
       "path": "skills/iterate-ml-experiment",
       "title": "Iterate ML Experiment",
-      "summary": "Design, keep track of experiments and iterate on them.",
+      "summary": "Deprecated pointer to triage and backlog.",
       "category": "orchestration",
       "subcategory": "dispatchers",
       "hash": "5ed623d8c5d64ea08b3086c5e0460fc918c5ae7677ff0b40a95a172826ca87d0"
@@ -212,9 +221,10 @@
     {
       "id": "loop",
       "title": "Iterate on ML Experiments",
-      "summary": "Design, audit, and source successive experiments.",
+      "summary": "Triage the loop, audit reports, and manage the experiment backlog.",
       "includes": [
-        "iterate-ml-experiment",
+        "triage-ml-task",
+        "manage-ml-backlog",
         "iterate-from-skore",
         "iterate-from-user",
         "audit-ml-pipeline"
@@ -236,7 +246,8 @@
         "evaluate-ml-pipeline",
         "smoke-test-ml-pipeline",
         "audit-ml-pipeline",
-        "iterate-ml-experiment",
+        "triage-ml-task",
+        "manage-ml-backlog",
         "iterate-from-skore",
         "iterate-from-user"
       ]
