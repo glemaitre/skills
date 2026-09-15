@@ -234,6 +234,16 @@ lsp = { features = ["default", "dev", "agent"] }
     assert payload["pythonPath"] == ".pixi/envs/lsp/bin/python"
 
 
+def test_write_pyright_config_escapes_windows_paths(tmp_path: Path) -> None:
+    """Backslashes in interpreter paths must produce valid JSON."""
+    from skore_skills.env import _write_pyright_config
+
+    windows_path = r"C:\Users\runner\hatch-lsp\Scripts\python.exe"
+    _write_pyright_config(tmp_path, windows_path)
+    payload = json.loads((tmp_path / "pyrightconfig.json").read_text(encoding="utf-8"))
+    assert payload["pythonPath"] == windows_path
+
+
 def _write_agent_workspace(root: Path, manager: str) -> None:
     """Write a minimal valid declarative agent layout."""
     if manager == "pixi":

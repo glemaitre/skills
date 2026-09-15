@@ -312,7 +312,9 @@ def _resolve_python_path(root: Path, plan: AgentPlan) -> str:
         )
         if result.returncode:
             raise ValueError("hatch could not locate the lsp environment")
-        return str(Path(result.stdout.strip()) / "bin" / "python")
+        # as_posix keeps JSON-safe separators; Path(str) on Windows would
+        # otherwise turn "/tmp/..." into "\tmp\..." and break the config.
+        return (Path(result.stdout.strip()) / "bin" / "python").as_posix()
     if plan.manager == "conda":
         result = subprocess.run(
             ["conda", "info", "--base"],
@@ -330,8 +332,12 @@ def _resolve_python_path(root: Path, plan: AgentPlan) -> str:
 def _write_pyright_config(root: Path, python_path: str) -> None:
     """Write the packaged pyright configuration with its interpreter path."""
     template = files("skore_skills").joinpath("templates/pyrightconfig.json")
-    body = template.read_text(encoding="utf-8").replace("<PYTHON_PATH>", python_path)
-    (root / "pyrightconfig.json").write_text(body, encoding="utf-8")
+    payload = json.loads(template.read_text(encoding="utf-8"))
+    payload["pythonPath"] = python_path
+    (root / "pyrightconfig.json").write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def install_agent_feature(
