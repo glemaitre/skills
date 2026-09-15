@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "405a261aede816be7a91aa4489b38e660942e5e234e53119b56e8d8f594784a9",
+  "catalog_hash": "5763ffd399a0fe45f3951cf403649294ccb8ebf9fb64a41eae1390346ba142a3",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -51,19 +51,10 @@
       "hash": "834739f198dc4a29f04d2dd7dc17f9afb62bfe64fb5b609e571e95dd076471c5"
     },
     {
-      "id": "manage-ml-backlog",
-      "path": "skills/manage-ml-backlog",
-      "title": "Manage ML Backlog",
-      "summary": "Record experiment outcomes and next-lever backlog rows.",
-      "category": "action",
-      "subcategory": null,
-      "hash": "2c3ac65b39c7c36fa39e374161a8c6ab79d11f4c2d4d83bb67a17cf2686f5070"
-    },
-    {
       "id": "iterate-ml-experiment",
       "path": "skills/iterate-ml-experiment",
       "title": "Iterate ML Experiment",
-      "summary": "Deprecated pointer to triage and backlog.",
+      "summary": "Design, keep track of experiments and iterate on them.",
       "category": "orchestration",
       "subcategory": "dispatchers",
       "hash": "5ed623d8c5d64ea08b3086c5e0460fc918c5ae7677ff0b40a95a172826ca87d0"
@@ -129,7 +120,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "c3eb28b6b9312d427118b26349b0f5bb0cc7f8d63e9acb004cf133d9fc9c0c50"
+      "hash": "e399eb1d771b2e4939c7de81279e81c6d275c5b7bf4e99ffc160b43cb323523b"
     },
     {
       "id": "setup-ml-project",
@@ -174,7 +165,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "02ad9917edc48a21c51a374f9514661a9ddc8b1445c70408236ef10c654fe601"
+      "hash": "daad49123ed50f874c7fd997703dc45d33cc5c40daf632e4ca5be73f909d5f91"
     },
     {
       "id": "setup-python-env",
@@ -221,10 +212,9 @@
     {
       "id": "loop",
       "title": "Iterate on ML Experiments",
-      "summary": "Triage the loop, audit reports, and manage the experiment backlog.",
+      "summary": "Design, audit, and source successive experiments.",
       "includes": [
-        "triage-ml-task",
-        "manage-ml-backlog",
+        "iterate-ml-experiment",
         "iterate-from-skore",
         "iterate-from-user",
         "audit-ml-pipeline"
@@ -246,8 +236,7 @@
         "evaluate-ml-pipeline",
         "smoke-test-ml-pipeline",
         "audit-ml-pipeline",
-        "triage-ml-task",
-        "manage-ml-backlog",
+        "iterate-ml-experiment",
         "iterate-from-skore",
         "iterate-from-user"
       ]
