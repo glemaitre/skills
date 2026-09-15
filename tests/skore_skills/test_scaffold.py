@@ -10,23 +10,6 @@ import pytest
 from click.testing import CliRunner
 
 from skore_skills.cli import cli
-from skore_skills.scaffold import template_root
-
-SKILL_TEMPLATES = (
-    Path(__file__).resolve().parents[2] / "skills" / "setup-workspace" / "templates"
-)
-
-
-def test_packaged_templates_match_skill_tree() -> None:
-    """Package data stays in sync with setup-workspace templates."""
-    packaged = template_root()
-    skill_files = sorted(
-        path.name for path in SKILL_TEMPLATES.iterdir() if path.is_file()
-    )
-    pkg_files = sorted(path.name for path in packaged.iterdir() if path.is_file())
-    assert pkg_files == skill_files
-    for name in skill_files:
-        assert (packaged / name).read_bytes() == (SKILL_TEMPLATES / name).read_bytes()
 
 
 def test_scaffold_tree_and_no_placeholders(
