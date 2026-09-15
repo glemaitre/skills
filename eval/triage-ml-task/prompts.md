@@ -12,9 +12,11 @@
 
 **Must do:**
 - Name `python -m skore_skills status`.
-- Present the setup / eda / model / loop routes.
-- Ask exactly one focused question to choose the user's goal.
+- Name the current `loop_stage` (or equivalent stage).
+- Ask exactly one focused question: stay, go deeper, next stage,
+  or change a persisted choice.
 
 **Must NOT do:**
 - Start designing the next experiment.
 - Claim to have loaded or executed every skill.
+- Treat `iterate-ml-experiment` as the session owner.

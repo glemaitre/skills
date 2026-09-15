@@ -17,8 +17,11 @@ This meta skill owns ordering only:
 3. `setup-git` — initialize version control only with the user's
    first-commit decision.
 
+Stop when setup is a safe scaffold. Load `triage-ml-task` rather
+than starting EDA or a pipeline.
+
 Run `python -m skore_skills status` before dispatch and after setup
-to surface missing pieces.
+to surface missing pieces and persist policy facts.
 
 ## Stop conditions
 

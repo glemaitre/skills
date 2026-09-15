@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "d40befc40c4b718c06842cb36125275f53f3ad346007c74c95a89827e1e8c2a8",
+  "catalog_hash": "aa8ce12fcba92a25dcc6ad4f33a928ed9b5ab30ec914d89d8c4df0c1af4531e4",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -120,7 +120,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "67241d6276c99766065468b9f80452779d80a2f5292e3b0502418af563abf2da"
+      "hash": "c3eb28b6b9312d427118b26349b0f5bb0cc7f8d63e9acb004cf133d9fc9c0c50"
     },
     {
       "id": "setup-ml-project",
@@ -129,7 +129,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "8d651cbadd8a97169f908a76a928a225a6ce6b7e7d76e53d147ee8520c950957"
+      "hash": "0a0165c5bd3879bd1d3d8b6faa4a8aa2402370119bdf42fddea674bfa383d212"
     },
     {
       "id": "setup-git",
