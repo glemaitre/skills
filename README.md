@@ -64,7 +64,7 @@ companion:
 skore skills install setup  # workspace, environment, stack, style
 skore skills install eda    # data exploration
 skore skills install model  # build, evaluate, test, smoke
-skore skills install loop   # iterate, source, audit
+skore skills install loop   # triage, backlog, audit, sourcing
 ```
 
 `skore skills install ml-experimentation` remains the complete pack,
@@ -110,7 +110,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 | Skill | Description |
 | --- | --- |
-| [triage-ml-task](skills/triage-ml-task/SKILL.md) | Route an ambiguous request to a focused workflow pack. |
+| [triage-ml-task](skills/triage-ml-task/SKILL.md) | Own the canonical loop and ask one next-stage question. |
 | [setup-ml-project](skills/setup-ml-project/SKILL.md) | Coordinate workspace, environment, and git setup. |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
 | [setup-python-env](skills/setup-python-env/SKILL.md) | Configure dependencies, editable install, and Python code style. |
@@ -132,7 +132,8 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 | Skill | Description |
 | --- | --- |
-| [iterate-ml-experiment](skills/iterate-ml-experiment/SKILL.md) | Design, keep track of experiments, and iterate on them. |
+| [iterate-ml-experiment](skills/iterate-ml-experiment/SKILL.md) | Deprecated one-release pointer to triage and backlog. |
+| [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md) | Record experiment outcomes and next-lever backlog rows. |
 | [iterate-from-skore](skills/iterate-from-skore/SKILL.md) | Use skore to run diagnostics and checks that can be reported and addressed in the next experiment. |
 | [iterate-from-user](skills/iterate-from-user/SKILL.md) | As a user, be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo). |
 

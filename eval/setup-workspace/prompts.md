@@ -137,6 +137,8 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 **Must do:**
 - Run `python -m skore_skills scaffold --package churnlab` via
   `run_skore_skills`; the resulting template tree is the scaffold.
+- Keep the scaffolded `journal/JOURNAL.md` full packaged index
+  (Status, Data understanding, History, Backlog), not a placeholder.
 - Refuse to write `experiments/01_baseline.py` with a **runnable
   body** during the scaffold turn.
 - Cite the rule: "design note first, then code" /

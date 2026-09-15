@@ -94,22 +94,17 @@ approved).
 Verify `pytest` is on the manifest (per `data-science-python-stack`
 § Tier 1); if not, hand off to `python-env-manager` to add it.
 
-## Step 7 — Placeholder `journal/JOURNAL.md`
+## Step 7 — `journal/JOURNAL.md`
 
-Drop a literal one-line placeholder:
+`python -m skore_skills scaffold --package <pkg>` writes the
+packaged journal index with Status, Data understanding, History, and
+Backlog sections. Do not replace it with a one-line placeholder.
 
-```
-# PLAN
-
-<!-- placeholder; populated by iterate-ml-experiment on first invocation -->
-```
-
-This skill **does NOT** read `iterate-ml-experiment`'s
-template — each skill owns its own template surface.
-`iterate-ml-experiment` rewrites `JOURNAL.md` from its own
-`templates/JOURNAL.md` and writes the matching
-`journal/01_baseline.md`, validated **before** the experiment
-script runs.
+For an existing workspace where the index is missing, use
+`python -m skore_skills scaffold --journal`. A model-stage design
+note is created separately with
+`python -m skore_skills scaffold --journal --stem <NN_short_name>`
+and must be approved before its experiment script is written.
 
 ## Step 8 — Empty `scratch/`
 

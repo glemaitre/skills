@@ -106,19 +106,42 @@ def check_workspace(fmt: str) -> None:
 
 @cli.command("scaffold")
 @click.option(
-    "--package", "package_name", required=True, help="Snake-case import name."
+    "--package", "package_name", help="Snake-case import name for a full scaffold."
+)
+@click.option(
+    "--journal",
+    is_flag=True,
+    help="Initialize JOURNAL.md instead of the full workspace.",
+)
+@click.option(
+    "--stem",
+    help="With --journal, also create journal/NN_short_name.md.",
 )
 @click.option(
     "--force",
     is_flag=True,
-    help="Overwrite an existing src/ / experiments / pyproject layout.",
+    help="Overwrite files owned by the selected scaffold mode.",
 )
-def scaffold_cmd(package_name: str, force: bool) -> None:
-    """Copy the organize-ml-workspace templates into the current directory."""
-    from skore_skills.scaffold import scaffold
+def scaffold_cmd(
+    package_name: str | None,
+    journal: bool,
+    stem: str | None,
+    force: bool,
+) -> None:
+    """Copy full-workspace or journal templates into the current directory."""
+    from skore_skills.scaffold import scaffold, scaffold_journal
+
+    if (package_name is None) == (not journal):
+        raise click.UsageError("choose exactly one of --package or --journal")
+    if stem is not None and not journal:
+        raise click.UsageError("--stem requires --journal")
 
     try:
-        written = scaffold(Path.cwd(), package_name, force=force)
+        if journal:
+            written = scaffold_journal(Path.cwd(), stem=stem, force=force)
+        else:
+            assert package_name is not None
+            written = scaffold(Path.cwd(), package_name, force=force)
     except ValueError as exc:
         raise click.ClickException(str(exc)) from exc
     for path in written:
