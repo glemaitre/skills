@@ -27,8 +27,6 @@ CLI
 ---
 ``python -m skore_skills cells run <src.py> [<dst.md>]``
 
-Also ``python run_cells.py <src.py> [<dst.md>]`` via the skill shim.
-
 Always streams the digest to stdout. When ``<dst.md>`` is supplied the
 digest is also written to that file (parent created if missing).
 
@@ -266,7 +264,7 @@ def run(src_path: Path, out_path: Path | None = None) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry point: ``python run_cells.py <src.py> [<dst.md>]``.
+    """CLI entry point: ``python -m skore_skills cells run <src.py> [<dst.md>]``.
 
     Always streams the digest to stdout.  The optional second argument
     ``<dst.md>`` causes the digest to also be written to that file.

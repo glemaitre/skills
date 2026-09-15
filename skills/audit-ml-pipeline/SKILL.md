@@ -288,8 +288,7 @@ python -m skore_skills cells run audit/<stem>.py
 The CLI streams the digest to stdout. Pass a second arg
 `scratch/audit/<stem>/audit.md` to also write to a file (parent
 created if missing). For a pixi agent environment, prefix with
-`pixi run -e agent`. Stale copies may still call
-`scripts/run_cells.py`; prefer the CLI. Details:
+`pixi run -e agent`. Details:
 `python -m skore_skills cells run --help`.
 
 ### Re-execution semantics
@@ -380,8 +379,6 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 
 - `templates/audit.py` — per-experiment audit file skeleton. Copy
   + substitute; don't rewrite from memory.
-- `scripts/run_cells.py` — shim for one release; prefer
-  `python -m skore_skills cells run`.
 
 ## References (load on demand)
 

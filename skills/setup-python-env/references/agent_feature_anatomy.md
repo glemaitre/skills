@@ -9,8 +9,7 @@ when debugging a failed install.
 
 A project-scoped install of two agent-only tools plus a config:
 
-- **`ipython`** — powers the shared in-process cell runner at
-  `audit-ml-pipeline/scripts/run_cells.py` via
+- **`ipython`** — powers `python -m skore_skills cells run` via
   `InteractiveShell.run_cell`. Used by `audit-ml-pipeline` (audit
   files) and `explore-ml-data` (`data/eda.py`). No kernel
   registration, no notebook conversion.
@@ -89,34 +88,22 @@ examples below show an audit file; for EDA pass `data/eda.py`.
 
 ```bash
 # pixi
-pixi run -e agent python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  audit/<stem>.py
+pixi run -e agent python -m skore_skills cells run audit/<stem>.py
 
 # uv
-uv run --group agent python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  audit/<stem>.py
+uv run --group agent python -m skore_skills cells run audit/<stem>.py
 
 # poetry
-poetry run python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  audit/<stem>.py
+poetry run python -m skore_skills cells run audit/<stem>.py
 
 # hatch
-hatch run agent:python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  audit/<stem>.py
+hatch run agent:python -m skore_skills cells run audit/<stem>.py
 
 # conda
-conda run -n <project>-agent python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  audit/<stem>.py
+conda run -n <project>-agent python -m skore_skills cells run audit/<stem>.py
 
 # pip + venv
-.venv-agent/bin/python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  audit/<stem>.py
+.venv-agent/bin/python -m skore_skills cells run audit/<stem>.py
 ```
 
 The runner streams the digest to stdout by default. Pass a

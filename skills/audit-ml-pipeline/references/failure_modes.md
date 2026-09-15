@@ -22,7 +22,7 @@ Lookup shape is wrong: `get` is by id, not by key.
 Never substitute by re-running `evaluate` + `put`. See `python -m skore_skills api get`
 § "Lookup failure ≠ artifact missing".
 
-## `run_cells.py` exits with `ModuleNotFoundError: No module named 'IPython'`
+## `cells run` exits with `ModuleNotFoundError: No module named 'IPython'`
 
 Agent feature not installed in the env the runner is invoked from.
 **Delegate to `python-env-manager` § "Agent feature" via

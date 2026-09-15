@@ -328,8 +328,6 @@ python -m skore_skills cells run data/eda.py
 The CLI streams the digest to stdout. Pass a second arg
 `scratch/eda/eda.md` to also write the digest to a file.
 For a pixi agent environment, prefix with `pixi run -e agent`.
-Stale skill copies may still call
-`audit-ml-pipeline/scripts/run_cells.py`; prefer the CLI.
 
 **Prerequisites for the run path:** the workspace package must be
 importable (`from <pkg> import PROJECT_ROOT` — editable install done
@@ -436,8 +434,7 @@ detail lives in `data/eda.md`. On the **skip** path, only the
 - `templates/eda.md` — the `data/eda.md` report skeleton.
 
 The cell runner is **the CLI** —
-`python -m skore_skills cells run`. A shim
-`audit-ml-pipeline/scripts/run_cells.py` remains for one release.
+`python -m skore_skills cells run`.
 
 ## References (load on demand)
 

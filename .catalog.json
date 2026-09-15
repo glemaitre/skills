@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "ca1b3e8fe58bf79da281c444ad222f4c6836a78ba2a1110f92146cabcbc1d1a7",
+  "catalog_hash": "38ab7010ea9f299e7ec8233dd1d54b883505fabd5f6acdc9bd8e736caf778034",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "87c76d5b6a81af2660c3f2ba2de0e2e5bcdd4955ea76fc7569c2d1b8430e974b"
+      "hash": "17fce9394ddb0f5c3a00c4d6246acaa9821b96f66f5e078f2005367091053203"
     },
     {
       "id": "build-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "834739f198dc4a29f04d2dd7dc17f9afb62bfe64fb5b609e571e95dd076471c5"
+      "hash": "b0d6906e23cc9545f9d624b1306c50d668f163e19320b194738ccc54f1b63fa8"
     },
     {
       "id": "iterate-ml-experiment",
@@ -174,7 +174,7 @@
       "summary": "Configure dependencies, editable install, and Python code style.",
       "category": "action",
       "subcategory": null,
-      "hash": "d51ff27bad7eb7a07cc2201c1760223849268863878bdfdb254c9931241d75b5"
+      "hash": "e78e660ed29a6caca6395f7ca2cc4b3d9bb15eb8f355dcafb1a1b68a6db8973a"
     }
   ],
   "workflows": [
