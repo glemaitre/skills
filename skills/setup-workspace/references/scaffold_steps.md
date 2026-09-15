@@ -162,13 +162,14 @@ fix (switch to specific input patterns) rather than silently editing.
 
 ## Step 11 — `ruff.toml` + first ruff pass
 
-**Hand off to `python-code-style` § "Initial setup".** That skill
-owns its own `templates/ruff.toml`, writes it to the project
-root, and runs `ruff format` + `ruff check` against the modules
-dropped at step 4.
+`python -m skore_skills scaffold` writes the packaged `ruff.toml`.
+For an existing workspace where it is missing, run
+`python -m skore_skills style --init`. Then hand off to
+`python-code-style` § "Initial setup" to run `ruff format` +
+`ruff check` against the modules dropped at step 4.
 
-**Do not copy `templates/ruff.toml` by hand** and run ruff
-yourself — invoking the skill is what teaches the agent the
+**Do not recreate `ruff.toml` by hand** and run ruff yourself —
+invoking the skill is what teaches the agent the
 NumPyDoc docstring convention (parameter shape in the type slot,
 `Parameters` / `Returns` / `Raises` sections, blank line after
 the one-line summary); the config alone only enforces ruff's

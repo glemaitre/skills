@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "e28db77eba45bab3f5546c18704e7bbdc8b4267b2ff1dca67d225c2889c014fd",
+  "catalog_hash": "20de18b75cb0bd6ed3831816b519ff23d167cfffbb480e8e2ab1b4eb532c2e50",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -165,7 +165,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "0045d653f490e71f79302ea0e0df74529079a7bebf6b28d9a2352b6a7971a7c4"
+      "hash": "5ed8e1daa9e6fd026937214adf2271b363596a50f21403cff2339157c23b5d64"
     },
     {
       "id": "setup-python-env",
@@ -174,7 +174,7 @@
       "summary": "Configure dependencies, editable install, and Python code style.",
       "category": "action",
       "subcategory": null,
-      "hash": "b8fc3febbf706efa762dc89fea39174c27b86319f8624b5e367b205160ec5c00"
+      "hash": "2220d4d76a3b45365f4d2dc03432a8f7e1ea47318b3453aeff93154c91f94037"
     }
   ],
   "workflows": [

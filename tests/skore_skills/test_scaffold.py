@@ -28,6 +28,7 @@ def test_scaffold_tree_and_no_placeholders(
     assert (tmp_path / "experiments" / "01_baseline.py").is_file()
     assert (tmp_path / "pyproject.toml").is_file()
     assert (tmp_path / ".gitignore").is_file()
+    assert (tmp_path / "ruff.toml").is_file()
     assert (tmp_path / "journal" / "JOURNAL.md").is_file()
     pyproject = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
     assert 'name = "demo-pkg"' in pyproject

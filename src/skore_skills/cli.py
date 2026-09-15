@@ -131,13 +131,25 @@ def scaffold_cmd(package_name: str, force: bool) -> None:
     nargs=-1,
     type=click.Path(path_type=Path),
 )
-def style_cmd(paths: tuple[Path, ...]) -> None:
+@click.option(
+    "--init",
+    "initialize",
+    is_flag=True,
+    help="Copy the packaged ruff.toml when it is missing.",
+)
+def style_cmd(paths: tuple[Path, ...], initialize: bool) -> None:
     """Run ruff check --fix then format on defaults or PATHS.
 
     Default globs: ``src/``, ``experiments/``, ``audit/``, ``data/eda.py``,
-    top-level ``*.py``. Does not write ``ruff.toml``.
+    top-level ``*.py``. ``--init`` without PATHS only writes ``ruff.toml``.
     """
-    from skore_skills.style import run_style
+    from skore_skills.style import initialize_style, run_style
+
+    if initialize:
+        created = initialize_style(Path.cwd())
+        click.echo("wrote ruff.toml" if created else "ruff.toml already exists")
+        if not paths:
+            return
 
     def warn(message: str) -> None:
         click.echo(message, err=True)

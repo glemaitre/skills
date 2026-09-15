@@ -123,7 +123,13 @@ kernel. If declined, return to the caller's documented fallback.
 ## Python code style
 
 Setup also owns the root Ruff configuration. If `ruff.toml` is
-missing, copy `templates/ruff.toml` verbatim. After Python edits run:
+missing from an existing workspace, copy the packaged configuration:
+
+```bash
+python -m skore_skills style --init
+```
+
+Fresh `scaffold` runs include the same file. After Python edits run:
 
 ```bash
 python -m skore_skills style <touched paths>

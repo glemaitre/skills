@@ -5,6 +5,7 @@ from __future__ import annotations
 import subprocess
 import sys
 from collections.abc import Callable, Sequence
+from importlib.resources import files
 from pathlib import Path
 
 SKIP_DIR_NAMES = (".pixi", ".venv", "venv", "node_modules")
@@ -14,6 +15,16 @@ RUFF_MISSING = (
     "Install it with the project env manager (see python-env-manager), "
     "e.g. `pixi add --feature dev ruff`."
 )
+
+
+def initialize_style(root: Path) -> bool:
+    """Copy the packaged ``ruff.toml`` when the workspace has none."""
+    destination = root / "ruff.toml"
+    if destination.exists():
+        return False
+    template = files("skore_skills").joinpath("data/ruff.toml")
+    destination.write_text(template.read_text(encoding="utf-8"), encoding="utf-8")
+    return True
 
 
 def default_targets(root: Path) -> list[Path]:

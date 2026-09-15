@@ -99,5 +99,7 @@ def scaffold(root: Path, package: str, *, force: bool = False) -> list[Path]:
         raw = (templates / name).read_text(encoding="utf-8")
         write(dest, render_template(raw, package, pyproject=name == "pyproject.toml"))
 
+    ruff = files("skore_skills").joinpath("data/ruff.toml")
+    write(Path("ruff.toml"), ruff.read_text(encoding="utf-8"))
     write(Path("journal") / "JOURNAL.md", "# Journal\n")
     return written

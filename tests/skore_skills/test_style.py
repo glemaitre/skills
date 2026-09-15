@@ -12,6 +12,31 @@ from skore_skills import style as style_mod
 from skore_skills.cli import cli
 
 
+def test_style_init_copies_packaged_config(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``style --init`` writes the shared config without requiring ruff."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["style", "--init"])
+    assert result.exit_code == 0, result.output
+    config = tmp_path / "ruff.toml"
+    assert config.is_file()
+    assert 'target-version = "py312"' in config.read_text(encoding="utf-8")
+
+
+def test_style_init_preserves_existing_config(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Initialization never overwrites a workspace's Ruff policy."""
+    config = tmp_path / "ruff.toml"
+    config.write_text("line-length = 100\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["style", "--init"])
+    assert result.exit_code == 0, result.output
+    assert "already exists" in result.output
+    assert config.read_text(encoding="utf-8") == "line-length = 100\n"
+
+
 def test_style_missing_ruff(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Missing ruff exits non-zero with an env-manager install hint."""
     monkeypatch.chdir(tmp_path)
