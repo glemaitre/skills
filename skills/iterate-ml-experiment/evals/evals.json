@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "Bootstrap detection",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Workspace exists with `src/`, `experiments/`, `journal/` scaffolded\n  by `organize-ml-workspace`.\n- `journal/JOURNAL.md` is the one-line placeholder dropped by\n  `organize-ml-workspace`; History is empty.\n- `data/README.md` exists and describes a tabular regression task\n  (predict `target` from a mixed-type DataFrame).]\n\nLet's start. Build me a quick baseline for this dataset.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Workspace exists with `src/`, `experiments/`, `journal/` scaffolded\n  by `setup-workspace`.\n- `journal/JOURNAL.md` is the one-line placeholder dropped by\n  `setup-workspace`; History is empty.\n- `data/README.md` exists and describes a tabular regression task\n  (predict `target` from a mixed-type DataFrame).]\n\nLet's start. Build me a quick baseline for this dataset.",
       "expected_output": "Behavioural response satisfying: - Identify this as **bootstrap mode** (no History rows). - Mention reading `data/README.md` to derive a goal default before asking the user. - Reference the **config gates** that fire in bootstrap (G-PKG-NAME, G-ENV-MGR, G-TABULAR, G-CV-SPLITTER) \u2014 at least name two of them. It must NOT: - Offer the four sourcing options (`skore` / `user` / `my-pick` / `B<N>`) as a pick \u2014 \"How would you like me to source\u2026\", `AskUserQuestion`, or a numbered menu. A pre-flight row titled \"Sourcing menu presented\" with evidence `n/a \u2014 bootstrap` is not presenting the menu. - Treat the \"quick\" framing as permission to skip all gates (the forbidden-shortcut named \"Bootstrap mode \u2192 skip ALL questions\"). - Create `experiments/01_baseline.py` before the design note exists and is approved.",
       "files": [],
       "expectations": [
@@ -170,18 +170,17 @@
     },
     {
       "id": 5,
-      "title": "Three-skill implementation chain (no shortcut into evaluate.py)",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` exists, approved.\n- `experiments/01_baseline.py` placeholder exists from\n  `organize-ml-workspace`.\n- `src/<pkg>/pipeline.py`, `features.py`, `data.py`, `evaluate.py`\n  do not exist yet.]\n\nGreat, the baseline design note is approved. Go ahead and write\n`evaluate.py` with `KFold(5)` \u2014 it's obviously the right splitter\nfor this IID tabular task.",
-      "expected_output": "Behavioural response satisfying: - Refuse to write `evaluate.py` directly. - Cite the **three-skill chain** requirement: `build-ml-pipeline` \u2192 `evaluate-ml-pipeline` \u2192 `test-ml-pipeline`. - Mention that `evaluate-ml-pipeline` **owns the CV-strategy decision** and surfaces it via `AskUserQuestion` \u2014 even when `KFold(5)` \"feels right\" the skill must be invoked. It must NOT: - Open `src/<pkg>/evaluate.py` in Write/Edit during this turn. - Hard-code `KFold(5)` anywhere without invoking `evaluate-ml-pipeline` first. - Skip the `python-api` consultation for signatures used in the evaluation call.",
+      "title": "Model-meta implementation chain (no shortcut into evaluate.py)",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` exists, approved.\n- `experiments/01_baseline.py` placeholder exists from\n  `setup-workspace`.\n- `src/<pkg>/pipeline.py`, `features.py`, `data.py`, `evaluate.py`\n  do not exist yet.]\n\nGreat, the baseline design note is approved. Go ahead and write\n`evaluate.py` with `KFold(5)` \u2014 it's obviously the right splitter\nfor this IID tabular task.",
+      "expected_output": "Behavioural response satisfying: - Refuse to write `evaluate.py` directly. - Dispatch `model-ml-pipeline`, which owns build \u2192 evaluate \u2192 smoke-test ordering. - Mention that evaluation owns the CV-strategy decision and its user gate; `KFold(5)` cannot be hard-coded from memory. It must NOT: - Open `src/<pkg>/evaluate.py` in Write/Edit during this turn. - Hard-code `KFold(5)` anywhere before the model meta dispatch. - Inline the child skills' implementation procedures in iterate.",
       "files": [],
       "expectations": [
         "Refuse to write `evaluate.py` directly.",
-        "Cite the **three-skill chain** requirement: `build-ml-pipeline` \u2192 `evaluate-ml-pipeline` \u2192 `test-ml-pipeline`.",
-        "Mention that `evaluate-ml-pipeline` **owns the CV-strategy decision** and surfaces it via `AskUserQuestion` \u2014 even when `KFold(5)` \"feels right\" the skill must be invoked.",
-        "Propose to invoke `build-ml-pipeline` first (the order matters).",
+        "Dispatch `model-ml-pipeline`, which owns build \u2192 evaluate \u2192 smoke-test ordering.",
+        "Mention that evaluation owns the CV-strategy decision and its user gate; `KFold(5)` cannot be hard-coded from memory.",
         "The response does NOT: Open `src/<pkg>/evaluate.py` in Write/Edit during this turn.",
-        "The response does NOT: Hard-code `KFold(5)` anywhere without invoking `evaluate-ml-pipeline` first.",
-        "The response does NOT: Skip the `python-api` consultation for signatures used in the evaluation call."
+        "The response does NOT: Hard-code `KFold(5)` anywhere before the model meta dispatch.",
+        "The response does NOT: Inline the child skills' implementation procedures in iterate."
       ],
       "tools": false,
       "sandbox": [],

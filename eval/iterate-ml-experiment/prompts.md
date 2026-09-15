@@ -28,9 +28,9 @@ violation in any transcript** (hard rule).
 
 **Assumed workspace state:**
 - Workspace exists with `src/`, `experiments/`, `journal/` scaffolded
-  by `organize-ml-workspace`.
+  by `setup-workspace`.
 - `journal/JOURNAL.md` is the one-line placeholder dropped by
-  `organize-ml-workspace`; History is empty.
+  `setup-workspace`; History is empty.
 - `data/README.md` exists and describes a tabular regression task
   (predict `target` from a mixed-type DataFrame).
 
@@ -240,7 +240,7 @@ violation in any transcript** (hard rule).
 
 ---
 
-## CASE_05 — Three-skill implementation chain (no shortcut into evaluate.py)
+## CASE_05 — Model-meta implementation chain (no shortcut into evaluate.py)
 
 **User prompt:**
 > Great, the baseline design note is approved. Go ahead and write
@@ -250,25 +250,21 @@ violation in any transcript** (hard rule).
 **Assumed workspace state:**
 - `journal/01_baseline.md` exists, approved.
 - `experiments/01_baseline.py` placeholder exists from
-  `organize-ml-workspace`.
+  `setup-workspace`.
 - `src/<pkg>/pipeline.py`, `features.py`, `data.py`, `evaluate.py`
   do not exist yet.
 
 **Must do:**
 - Refuse to write `evaluate.py` directly.
-- Cite the **three-skill chain** requirement:
-  `build-ml-pipeline` → `evaluate-ml-pipeline` → `test-ml-pipeline`.
-- Mention that `evaluate-ml-pipeline` **owns the CV-strategy
-  decision** and surfaces it via `AskUserQuestion` — even when
-  `KFold(5)` "feels right" the skill must be invoked.
-- Propose to invoke `build-ml-pipeline` first (the order matters).
+- Dispatch `model-ml-pipeline`, which owns build → evaluate →
+  smoke-test ordering.
+- Mention that evaluation owns the CV-strategy decision and its
+  user gate; `KFold(5)` cannot be hard-coded from memory.
 
 **Must NOT do:**
 - Open `src/<pkg>/evaluate.py` in Write/Edit during this turn.
-- Hard-code `KFold(5)` anywhere without invoking
-  `evaluate-ml-pipeline` first.
-- Skip the `python-api` consultation for signatures used in the
-  evaluation call.
+- Hard-code `KFold(5)` anywhere before the model meta dispatch.
+- Inline the child skills' implementation procedures in iterate.
 
 ---
 
