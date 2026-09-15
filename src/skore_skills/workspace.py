@@ -10,6 +10,8 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
+from skore_skills.policy import infer_loop_stage, load_policy
+
 # First-signal-wins order from python-env-manager § Detection.
 MANAGER_ORDER = ("pixi", "uv", "poetry", "hatch", "conda", "pip-venv")
 
@@ -24,6 +26,8 @@ STATUS_KEYS = (
     "ruff_toml",
     "git",
     "last_history_stem",
+    "policy",
+    "loop_stage",
 )
 
 
@@ -163,6 +167,9 @@ def snapshot(root: Path) -> dict[str, Any]:
         "git": (root / ".git").exists(),
         "last_history_stem": last_history_stem(root),
     }
+    policy = load_policy(root)
+    payload["policy"] = policy
+    payload["loop_stage"] = infer_loop_stage(root, policy, payload)
     return payload
 
 

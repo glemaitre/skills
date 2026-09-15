@@ -185,6 +185,27 @@ def env_add(packages: tuple[str, ...], execute: bool) -> None:
         raise SystemExit(code)
 
 
+@cli.group("policy")
+def policy_group() -> None:
+    """Read and write ``.skore-workspace.json``."""
+
+
+@policy_group.command("set")
+@click.argument("key")
+@click.argument("value")
+def policy_set(key: str, value: str) -> None:
+    """Set one dotted policy key and print the saved JSON."""
+    import json
+
+    from skore_skills.policy import set_policy_value
+
+    try:
+        payload = set_policy_value(Path.cwd(), key, value)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(json.dumps(payload, indent=2))
+
+
 def main() -> None:
     """Run the CLI (``python -m skore_skills`` / console script)."""
     cli()
