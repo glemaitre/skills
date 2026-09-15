@@ -28,6 +28,9 @@ def test_scaffold_tree_and_no_placeholders(
     assert (tmp_path / "experiments" / "01_baseline.py").is_file()
     assert (tmp_path / "pyproject.toml").is_file()
     assert (tmp_path / ".gitignore").is_file()
+    gitignore = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    assert ".*" in gitignore.splitlines()
+    assert "!.gitignore" in gitignore
     assert (tmp_path / "ruff.toml").is_file()
     assert (tmp_path / "journal" / "JOURNAL.md").is_file()
     journal = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")

@@ -4,14 +4,33 @@
     {
       "id": 1,
       "title": "First repository",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `.env` and raw data are present and must remain untracked.]\n\nInitialize git here and make the first commit.",
-      "expected_output": "Behavioural response satisfying: - Propose git initialization, inspect/merge ignore rules, and show status. - Ask before creating the first commit. It must NOT: - Stage `.env` or raw data. - Commit, push, or create a remote without confirmation.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `.env` and raw data are present and must remain untracked.\n- `policy.git.autocommit` is `null` (never asked).]\n\nInitialize git here and make the first commit.",
+      "expected_output": "Behavioural response satisfying: - Name `git init`. - Name `python -m skore_skills git ignore-merge`. - Ask once whether later stages may autocommit (`on` vs `off`) and persist with `python -m skore_skills policy set git.autocommit`. It must NOT: - Stage `.env` or raw data. - Commit, push, or create a remote without confirmation. - Use `python -m skore_skills git end-turn` to create the first commit.",
       "files": [],
       "expectations": [
-        "Propose git initialization, inspect/merge ignore rules, and show status.",
-        "Ask before creating the first commit.",
+        "Name `git init`.",
+        "Name `python -m skore_skills git ignore-merge`.",
+        "Ask once whether later stages may autocommit (`on` vs `off`) and persist with `python -m skore_skills policy set git.autocommit`.",
+        "Ask before creating the first commit, then use `git add` and `git commit -m`.",
         "The response does NOT: Stage `.env` or raw data.",
-        "The response does NOT: Commit, push, or create a remote without confirmation."
+        "The response does NOT: Commit, push, or create a remote without confirmation.",
+        "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "Autocommit already persisted",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- A git repository exists.\n- `policy.git.autocommit` is already `on`.]\n\nGit is already initialized. Check ignore rules.",
+      "expected_output": "Behavioural response satisfying: - Run or name `python -m skore_skills git ignore-merge`. - Skip the autocommit policy question because it is already `on`. It must NOT: - Re-ask whether later stages may autocommit. - Run `git push`.",
+      "files": [],
+      "expectations": [
+        "Run or name `python -m skore_skills git ignore-merge`.",
+        "Skip the autocommit policy question because it is already `on`.",
+        "The response does NOT: Re-ask whether later stages may autocommit.",
+        "The response does NOT: Run `git push`."
       ],
       "tools": false,
       "sandbox": [],

@@ -31,7 +31,7 @@ def test_status_empty_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     assert payload["git"] is False
     assert payload["last_history_stem"] is None
     assert payload["loop_stage"] == "setup"
-    assert payload["policy"]["git"]["autocommit"] == "ask"
+    assert payload["policy"]["git"]["autocommit"] is None
 
 
 def test_status_text_format(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -78,7 +78,7 @@ def test_status_organized_fixture(
             "package": None,
             "tabular": None,
             "skore_mode": None,
-            "git": {"autocommit": "ask"},
+            "git": {"autocommit": None},
             "loop": {"stage": None, "stem": None},
         },
         "loop_stage": "implement",

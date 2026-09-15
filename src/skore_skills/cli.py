@@ -279,6 +279,54 @@ def policy_set(key: str, value: str) -> None:
     click.echo(json.dumps(payload, indent=2))
 
 
+@cli.group("git")
+def git_group() -> None:
+    """Merge ignore rules and print the end-of-turn persist hook."""
+
+
+@git_group.command("ignore-merge")
+@click.option(
+    "--keep",
+    "keep_paths",
+    multiple=True,
+    help="Force-track a hidden path after the user decides to keep it.",
+)
+def git_ignore_merge_cmd(keep_paths: tuple[str, ...]) -> None:
+    """Union packaged ignore rules into ``.gitignore``. No git commands."""
+    from skore_skills.git import render_git_json, run_ignore_merge
+
+    try:
+        payload, code = run_ignore_merge(Path.cwd(), keep=keep_paths)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(render_git_json(payload), nl=False)
+    if code:
+        raise SystemExit(code)
+
+
+@git_group.command("end-turn")
+@click.option(
+    "--stage",
+    required=True,
+    type=click.Choice(
+        ["setup", "eda", "implement", "evaluate", "backlog"],
+        case_sensitive=True,
+    ),
+    help="Loop stage that just finished.",
+)
+def git_end_turn_cmd(stage: str) -> None:
+    """Print whether to load ``persist-ml-git``. Never commits."""
+    from skore_skills.git import render_git_json, run_end_turn
+
+    try:
+        payload, code = run_end_turn(Path.cwd(), stage)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(render_git_json(payload), nl=False)
+    if code:
+        raise SystemExit(code)
+
+
 def main() -> None:
     """Run the CLI (``python -m skore_skills`` / console script)."""
     cli()

@@ -14,10 +14,13 @@
         "Mention **G-ENV-MGR** as routed via `setup-python-env`.",
         "Name `python -m skore_skills scaffold --package <pkg>` as the action after the gates resolve.",
         "Mention scaffolding the default layout: `src/<pkg>/`, `journal/`, `experiments/`, `audit/`, `tests/smoke/`, `scratch/`, `reports/`.",
+        "Name `python -m skore_skills git end-turn --stage setup` at the end of the turn.",
+        "If that command returns `invoke`, load `persist-ml-git`.",
         "The response does NOT: Run `pixi init` / `uv init` / `poetry init` on the user's behalf before G-ENV-MGR + G-PKG-NAME have passed.",
         "The response does NOT: Pick a package name silently from the folder name.",
         "The response does NOT: Write a runnable `experiments/01_baseline.py` whose body actually calls `build_learner` / `skore.evaluate` / `project.put` (uncommented). Enumerating the empty templated shell (imports, `# %%`, commented stubs, `<<PKG>>` placeholders) is allowed.",
-        "The response does NOT: Default to pandas silently because \"skore pulls it in\"."
+        "The response does NOT: Default to pandas silently because \"skore pulls it in\".",
+        "The response does NOT: Run `git commit` in this skill or `git push`."
       ],
       "tools": false,
       "sandbox": [],

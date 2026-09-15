@@ -5,13 +5,16 @@
       "id": 1,
       "title": "Record outcome into History",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Audit digest exists with a headline ROC-AUC.\n- Smoke tests passed.\n- History row for `01_baseline` is `running`.]\n\nThe 01_baseline run finished. Record it.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Copy the headline result into the History row and ask triage. It must NOT: - Invent a metric that is not in the digest or user text. - Draft `02_*.py` in this turn.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Copy the headline result into the History row and ask triage. - Name `python -m skore_skills git end-turn --stage backlog`. It must NOT: - Invent a metric that is not in the digest or user text. - Draft `02_*.py` in this turn. - Run `git commit` in this skill or `git push`.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
         "Copy the headline result into the History row and ask triage.",
+        "Name `python -m skore_skills git end-turn --stage backlog`.",
+        "If that command returns `invoke`, load `persist-ml-git`.",
         "The response does NOT: Invent a metric that is not in the digest or user text.",
-        "The response does NOT: Draft `02_*.py` in this turn."
+        "The response does NOT: Draft `02_*.py` in this turn.",
+        "The response does NOT: Run `git commit` in this skill or `git push`."
       ],
       "tools": false,
       "sandbox": [],

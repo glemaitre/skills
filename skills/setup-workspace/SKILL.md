@@ -129,6 +129,12 @@ tests/smoke/test_NN_<short>.py
 audit/NN_<short>.py
 ```
 
+## End of turn
+
+Run `python -m skore_skills git end-turn --stage setup`. If JSON
+`action` is `invoke`, load `persist-ml-git` and follow it. Then
+load `triage-ml-task`. Do not run `git commit` in this skill.
+
 ## References
 
 - `references/g_skore_mode.md`

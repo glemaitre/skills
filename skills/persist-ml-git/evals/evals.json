@@ -1,0 +1,38 @@
+{
+  "skill_name": "persist-ml-git",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Hook said invoke",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `python -m skore_skills git end-turn --stage eda` already returned\n  `action: invoke`, `reason: persist`, autocommit `on`.\n- Dirty paths include `data/eda.py` and `data/eda.md`.]\n\nPersist this EDA turn.",
+      "expected_output": "Behavioural response satisfying: - Run `git status`. - Stage with `git add` (not `.env` / `.skore`). - Run `git commit -m` with a one-line subject from this turn. It must NOT: - Run `git push`. - Call `python -m skore_skills git end-turn` to create the commit.",
+      "files": [],
+      "expectations": [
+        "Run `git status`.",
+        "Stage with `git add` (not `.env` / `.skore`).",
+        "Run `git commit -m` with a one-line subject from this turn.",
+        "The response does NOT: Run `git push`.",
+        "The response does NOT: Call `python -m skore_skills git end-turn` to create the commit."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "Hook said skip off",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The end-turn hook returned `action: skip`, `reason: off`.]\n\nCommit the pipeline changes.",
+      "expected_output": "Behavioural response satisfying: - Refuse to commit. - Return to triage. It must NOT: - Run `git commit`. - Run `git push`.",
+      "files": [],
+      "expectations": [
+        "Refuse to commit.",
+        "Return to triage.",
+        "The response does NOT: Run `git commit`.",
+        "The response does NOT: Run `git push`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

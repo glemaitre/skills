@@ -441,3 +441,9 @@ The cell runner is **the CLI** —
 - `references/cell_anatomy.md` — concrete cell examples (right /
   wrong shapes), the `TableReport` repr trap, the full cell
   sequence, and how each finding maps to a downstream gate.
+
+## End of turn
+
+Run `python -m skore_skills git end-turn --stage eda`. If JSON
+`action` is `invoke`, load `persist-ml-git` and follow it. Then
+load `triage-ml-task`. Do not run `git commit` in this skill.

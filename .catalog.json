@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "234829ea15722097bffe68a172724736c5d71a08b78274e5aeeba5aacf575713",
+  "catalog_hash": "0d49eeb0d26630181ce3f6fc60566f34ad6adeb8610d1665f819cb7f52b3824b",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "17fce9394ddb0f5c3a00c4d6246acaa9821b96f66f5e078f2005367091053203"
+      "hash": "b8b66da72f1b3dd107dd1121d9d5cd22e7b3a2a42b0457c1b26baaac0b118cce"
     },
     {
       "id": "build-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "a589dec48b17fe33975fa4a6c93134ef5b43616b40f68ca097d1fb244ee5c443"
+      "hash": "733a15e43534576c2892e819bd74ea21a6f9f7e22a652fba54e432e345ead2b9"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "b5e28567979743bdbf238bdbe555d376d638ec9da0f54f16560bf6590f4529e0"
+      "hash": "305acabbb4c70b140fb2205cc51c773db9ae8bc0abcc0be9bb1247e62d603607"
     },
     {
       "id": "iterate-ml-experiment",
@@ -138,7 +138,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "0a0165c5bd3879bd1d3d8b6faa4a8aa2402370119bdf42fddea674bfa383d212"
+      "hash": "6469b6e85760efc93d994268055c9587e97bd886d88d21a8ad2216ef51c0c446"
     },
     {
       "id": "setup-git",
@@ -147,7 +147,16 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "742d4e1d0593e3b2376b7dceb094214d86ebdad52211ad46f7096f95c608e328"
+      "hash": "37a774ab4af29f119386472bc12c5b7475f3148dabe446304f8ac616b3f2dc4f"
+    },
+    {
+      "id": "persist-ml-git",
+      "path": "skills/persist-ml-git",
+      "title": "Persist ML Git",
+      "summary": "Commit the current loop stage with the real git CLI when the end-turn hook says invoke.",
+      "category": "action",
+      "subcategory": null,
+      "hash": "2b18fe98771fb071681ddcdfd2535ed181ec8f5d0ec68c1e5a833c4463f5ab80"
     },
     {
       "id": "model-ml-pipeline",
@@ -156,7 +165,7 @@
       "summary": "Coordinate build, evaluation, and smoke testing.",
       "category": "meta",
       "subcategory": null,
-      "hash": "61d2c25db4de45f79dad3d071a73e4e5e86d4160cde9d1b734cc057aba6b68c5"
+      "hash": "77118ffe192d27cd6d324ac8b61e024f37e84b5f3cb452924c25d6885ec95704"
     },
     {
       "id": "choose-python-library",
@@ -174,7 +183,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "4e18db201bdbac082c06ebd8ef941efe80f8bcf7c5010c460dbd651e8b538af4"
+      "hash": "aa6129b64993a3aec07b3a9e78200b610d052145cb862574449fe956023988b6"
     },
     {
       "id": "setup-python-env",
@@ -196,6 +205,7 @@
         "setup-workspace",
         "setup-python-env",
         "setup-git",
+        "persist-ml-git",
         "choose-python-library"
       ]
     },
@@ -204,7 +214,8 @@
       "title": "Explore ML Data",
       "summary": "Install the data exploration workflow.",
       "includes": [
-        "explore-ml-data"
+        "explore-ml-data",
+        "persist-ml-git"
       ]
     },
     {
@@ -215,7 +226,8 @@
         "model-ml-pipeline",
         "build-ml-pipeline",
         "evaluate-ml-pipeline",
-        "smoke-test-ml-pipeline"
+        "smoke-test-ml-pipeline",
+        "persist-ml-git"
       ]
     },
     {
@@ -227,7 +239,8 @@
         "manage-ml-backlog",
         "iterate-from-skore",
         "iterate-from-user",
-        "audit-ml-pipeline"
+        "audit-ml-pipeline",
+        "persist-ml-git"
       ]
     },
     {
@@ -239,6 +252,7 @@
         "setup-workspace",
         "setup-python-env",
         "setup-git",
+        "persist-ml-git",
         "model-ml-pipeline",
         "choose-python-library",
         "explore-ml-data",

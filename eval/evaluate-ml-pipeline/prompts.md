@@ -28,6 +28,9 @@ violated.
   `KFold` signatures (or Read the matching caches already listed).
 - Mention `data={...}` (env-dict) for `SkrubLearner`, NOT
   positional `X, y`.
+- Name `python -m skore_skills git end-turn --stage evaluate` at
+  the end of the turn.
+- If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
 - Recommend `cross_val_score`, `cross_validate`,
@@ -36,6 +39,7 @@ violated.
   variance, even on imbalance).
 - Pre-pin metrics (e.g. `scoring="neg_mean_squared_error"`) — trust
   skore defaults.
+- Run `git commit` in this skill or `git push`.
 
 ---
 

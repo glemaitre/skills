@@ -15,7 +15,9 @@ This meta skill owns ordering only:
 2. `setup-python-env` — install the editable package and required
    dependencies through the detected manager.
 3. `setup-git` — initialize version control only with the user's
-   first-commit decision.
+   first-commit decision. Persist autocommit (`on`/`off`) once via
+   `policy set`. Later stages run
+   `python -m skore_skills git end-turn` then `persist-ml-git`.
 
 Stop when setup is a safe scaffold. Load `triage-ml-task` rather
 than starting EDA or a pipeline.

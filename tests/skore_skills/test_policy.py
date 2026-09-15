@@ -39,6 +39,12 @@ def test_policy_set_cli(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None
     assert json.loads(status.output)["policy"]["git"]["autocommit"] == "off"
 
 
+def test_policy_set_rejects_invalid_autocommit(tmp_path: Path) -> None:
+    """Autocommit accepts only ``off`` or ``on``."""
+    with pytest.raises(ValueError, match="off or on"):
+        set_policy_value(tmp_path, "git.autocommit", "maybe")
+
+
 def test_policy_set_rejects_unknown_key(tmp_path: Path) -> None:
     """Unknown keys fail before writing."""
     with pytest.raises(ValueError, match="unknown policy key"):

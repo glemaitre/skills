@@ -12,9 +12,12 @@
         "Map empty `split_kwargs` + IID \u2192 **`KFold`** per the mapping table.",
         "Name `python -m skore_skills api get` for `skore.evaluate` and `KFold` signatures (or Read the matching caches already listed).",
         "Mention `data={...}` (env-dict) for `SkrubLearner`, NOT positional `X, y`.",
+        "Name `python -m skore_skills git end-turn --stage evaluate` at the end of the turn.",
+        "If that command returns `invoke`, load `persist-ml-git`.",
         "The response does NOT: Recommend `cross_val_score`, `cross_validate`, `classification_report`, or hand-rolled `print(mean_squared_error(...))`.",
         "The response does NOT: Default to `StratifiedKFold` (forbidden \u2014 compresses across-fold variance, even on imbalance).",
-        "The response does NOT: Pre-pin metrics (e.g. `scoring=\"neg_mean_squared_error\"`) \u2014 trust skore defaults."
+        "The response does NOT: Pre-pin metrics (e.g. `scoring=\"neg_mean_squared_error\"`) \u2014 trust skore defaults.",
+        "The response does NOT: Run `git commit` in this skill or `git push`."
       ],
       "tools": false,
       "sandbox": [],

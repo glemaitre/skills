@@ -1,0 +1,21 @@
+{
+  "skill_name": "explore-ml-data",
+  "evals": [
+    {
+      "id": 1,
+      "title": "End of turn uses git hook",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data/eda.md` was just written.]\n\nEDA is done. Close the turn.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills git end-turn --stage eda`. - If that command returns `invoke`, load `persist-ml-git`. It must NOT: - Run `git commit` in this skill. - Run `git push`.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills git end-turn --stage eda`.",
+        "If that command returns `invoke`, load `persist-ml-git`.",
+        "The response does NOT: Run `git commit` in this skill.",
+        "The response does NOT: Run `git push`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

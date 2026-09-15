@@ -434,3 +434,9 @@ API CLI is only for the signature after the name.
   teaches the parameter-shape-in-type-slot, `Parameters` /
   `Returns` / `Yields` sections, and the imperative one-line
   summary.
+
+## End of turn
+
+Run `python -m skore_skills git end-turn --stage evaluate`. If JSON
+`action` is `invoke`, load `persist-ml-git` and follow it. Then
+load `triage-ml-task`. Do not run `git commit` in this skill.

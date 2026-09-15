@@ -15,10 +15,13 @@
 **Must do:**
 - Name `python -m skore_skills status`.
 - Copy the headline result into the History row and ask triage.
+- Name `python -m skore_skills git end-turn --stage backlog`.
+- If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
 - Invent a metric that is not in the digest or user text.
 - Draft `02_*.py` in this turn.
+- Run `git commit` in this skill or `git push`.
 
 ---
 

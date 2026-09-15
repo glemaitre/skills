@@ -16,7 +16,7 @@ POLICY_FILENAME = ".skore"
 LEGACY_POLICY_FILENAME = ".skore-workspace.json"
 WORKSPACE_KEY = "workspace"
 
-AUTOCOMMIT_VALUES = ("off", "ask", "on")
+AUTOCOMMIT_VALUES = ("off", "on")
 LOOP_STAGES = ("setup", "eda", "implement", "evaluate", "audit", "backlog")
 
 POLICY_SET_KEYS = (
@@ -41,7 +41,7 @@ def empty_policy() -> dict[str, Any]:
         "package": None,
         "tabular": None,
         "skore_mode": None,
-        "git": {"autocommit": "ask"},
+        "git": {"autocommit": None},
         "loop": {"stage": None, "stem": None},
     }
 
@@ -60,7 +60,11 @@ def _merge_loaded(raw: Any) -> dict[str, Any]:
             data[key] = raw[key]
     git = raw.get("git")
     if isinstance(git, dict) and "autocommit" in git:
-        data["git"] = {"autocommit": git["autocommit"]}
+        data["git"] = {
+            "autocommit": git["autocommit"]
+            if git["autocommit"] in AUTOCOMMIT_VALUES
+            else None
+        }
     loop = raw.get("loop")
     if isinstance(loop, dict):
         merged = dict(data["loop"])
@@ -153,8 +157,12 @@ def set_policy_value(root: Path, key: str, value: str) -> dict[str, Any]:
     if key not in POLICY_SET_KEYS:
         raise ValueError(f"unknown policy key: {key}")
     parsed: Any = None if value in {"", "null", "none"} else value
-    if key == "git.autocommit" and parsed not in AUTOCOMMIT_VALUES:
-        raise ValueError("git.autocommit must be off, ask, or on")
+    if (
+        key == "git.autocommit"
+        and parsed is not None
+        and parsed not in AUTOCOMMIT_VALUES
+    ):
+        raise ValueError("git.autocommit must be off or on")
     if key == "loop.stage" and parsed is not None and parsed not in LOOP_STAGES:
         raise ValueError(f"loop.stage must be one of {', '.join(LOOP_STAGES)}")
     policy = load_policy(root)

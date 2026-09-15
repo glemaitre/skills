@@ -34,4 +34,9 @@ Before new library symbols are written, use
 - Do not persist a result as done while smoke tests fail.
 - Do not duplicate child-skill methodology in this dispatcher.
 
+After build and smoke succeed, run
+`python -m skore_skills git end-turn --stage implement`. If JSON
+`action` is `invoke`, load `persist-ml-git` and follow it. Then
+load `triage-ml-task`. Do not run `git commit` in this skill.
+
 This first version is intentionally narrow pending joint review.

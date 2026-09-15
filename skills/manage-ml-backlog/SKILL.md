@@ -52,4 +52,8 @@ Stable `B<N>` indices. Do not renumber on removal.
 - Do not mark `done` while smoke is red.
 - G-DESIGN stays in the implement/evaluate skills, not here.
 
-End of turn is triage.
+## End of turn
+
+Run `python -m skore_skills git end-turn --stage backlog`. If JSON
+`action` is `invoke`, load `persist-ml-git` and follow it. Then
+load `triage-ml-task`. Do not run `git commit` in this skill.

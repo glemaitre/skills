@@ -13,10 +13,14 @@
 **Must do:**
 - Dispatch build, evaluate, then smoke-test in that order.
 - Preserve the matching experiment stem.
+- Name `python -m skore_skills git end-turn --stage implement`
+  after build and smoke.
+- If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
 - Replace skrub DataOps with a bare sklearn Pipeline.
 - Mark the experiment done while smoke tests fail.
+- Run `git commit` in this skill or `git push`.
 
 ---
 

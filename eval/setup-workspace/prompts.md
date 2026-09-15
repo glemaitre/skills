@@ -34,6 +34,9 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 - Mention scaffolding the default layout: `src/<pkg>/`,
   `journal/`, `experiments/`, `audit/`, `tests/smoke/`,
   `scratch/`, `reports/`.
+- Name `python -m skore_skills git end-turn --stage setup` at the
+  end of the turn.
+- If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
 - Run `pixi init` / `uv init` / `poetry init` on the user's behalf
@@ -44,6 +47,7 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
   (uncommented). Enumerating the empty templated shell (imports,
   `# %%`, commented stubs, `<<PKG>>` placeholders) is allowed.
 - Default to pandas silently because "skore pulls it in".
+- Run `git commit` in this skill or `git push`.
 
 ---
 

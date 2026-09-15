@@ -14,8 +14,10 @@
 - Dispatch workspace, environment, then git setup in that order.
 - Ask for unresolved package, tabular, manager, and skore-mode
   decisions before scaffold/install actions.
+- Name `setup-git` for the git step.
 
 **Must NOT do:**
 - Run `pip install`.
 - Commit without asking.
 - Write a runnable baseline experiment.
+- Run `git push`.

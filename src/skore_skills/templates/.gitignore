@@ -1,7 +1,3 @@
-# pixi environments
-.pixi/*
-!.pixi/config.toml
-
 # python build / cache
 __pycache__/
 *.egg-info/
@@ -52,3 +48,13 @@ mlartifacts/
 
 # skore-cli hub keys + workspace policy (never commit)
 .skore
+
+# hidden files/dirs (exceptions below)
+.*
+!.gitignore
+!.gitattributes
+
+# pixi: ignore the env, keep committed config
+!.pixi/
+.pixi/*
+!.pixi/config.toml
