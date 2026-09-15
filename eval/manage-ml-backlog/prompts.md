@@ -37,3 +37,25 @@
 - Silently pick `B1`.
 - Load `iterate-ml-experiment` as the session owner.
 - Start `build-ml-pipeline`.
+
+---
+
+## CASE_03 — Missing journal index uses packaged shape
+
+**User prompt:**
+> Start the experiment backlog for this workspace.
+
+**Assumed workspace state:**
+- `journal/` exists but `journal/JOURNAL.md` is missing.
+
+**Must do:**
+- Name `python -m skore_skills scaffold --journal` as the
+  initialization command.
+- State that the packaged index provides Status, Data understanding,
+  History, and Backlog.
+- Return to triage after initialization.
+
+**Must NOT do:**
+- Recreate the index shape from memory.
+- Load the deprecated `iterate-ml-experiment` skill.
+- Draft or implement an experiment in this turn.

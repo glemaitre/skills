@@ -16,7 +16,9 @@ evaluate, or audit methodology.
 
 1. Run `python -m skore_skills status`. Require an approved stem
    and a report/audit digest when recording a done outcome.
-2. Read `journal/JOURNAL.md` History and Backlog.
+2. Read `journal/JOURNAL.md` History and Backlog. If the index is
+   missing, initialize the packaged shape with
+   `python -m skore_skills scaffold --journal`; do not invent it.
 3. If recording a run: copy the headline metric from the audit
    digest or the user's value. Do not invent numbers. Update the
    matching History row (`planned` → `done` only if smoke passed).
@@ -25,7 +27,10 @@ evaluate, or audit methodology.
    most a few next-lever options (`skore:<stem>`, `user`,
    `my-pick:<stem>`).
 5. Ask triage: draft the next experiment now, pick a Backlog row,
-   or stop.
+   or stop. When a row is selected, the model stage can create its
+   design-note shell with
+   `python -m skore_skills scaffold --journal --stem <NN_short_name>`.
+   Do not draft it in this backlog turn.
 
 Use the existing table shapes in `journal/JOURNAL.md`:
 

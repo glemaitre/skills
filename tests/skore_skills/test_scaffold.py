@@ -46,6 +46,9 @@ def test_scaffold_tree_and_no_placeholders(
     assert (tmp_path / "pyproject.toml").is_file()
     assert (tmp_path / ".gitignore").is_file()
     assert (tmp_path / "journal" / "JOURNAL.md").is_file()
+    journal = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
+    assert "## History" in journal
+    assert "## Backlog" in journal
     pyproject = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
     assert 'name = "demo-pkg"' in pyproject
     experiment = (tmp_path / "experiments" / "01_baseline.py").read_text(
@@ -84,9 +87,10 @@ def test_scaffold_refuses_without_force(
 
 
 def test_scaffold_requires_package() -> None:
-    """``--package`` is mandatory."""
+    """A scaffold mode is mandatory."""
     result = CliRunner().invoke(cli, ["scaffold"])
     assert result.exit_code != 0
+    assert "--package or --journal" in result.output
 
 
 def test_scaffold_rejects_invalid_package(
@@ -97,3 +101,61 @@ def test_scaffold_rejects_invalid_package(
     result = CliRunner().invoke(cli, ["scaffold", "--package", "demo-pkg"])
     assert result.exit_code != 0
     assert "identifier" in result.output
+
+
+def test_scaffold_journal_index_and_design(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Journal mode initializes the index and a substituted design note."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(
+        cli,
+        ["scaffold", "--journal", "--stem", "02_target_transform"],
+    )
+    assert result.exit_code == 0, result.output
+    journal = tmp_path / "journal" / "JOURNAL.md"
+    design = tmp_path / "journal" / "02_target_transform.md"
+    assert "## History" in journal.read_text(encoding="utf-8")
+    assert design.read_text(encoding="utf-8").startswith("# 02_target_transform\n")
+
+
+def test_scaffold_journal_preserves_index_and_refuses_existing_design(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Journal mode preserves the index and requires force for a design."""
+    journal_dir = tmp_path / "journal"
+    journal_dir.mkdir()
+    index = journal_dir / "JOURNAL.md"
+    index.write_text("# Existing\n", encoding="utf-8")
+    design = journal_dir / "01_baseline.md"
+    design.write_text("# Existing design\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(
+        cli,
+        ["scaffold", "--journal", "--stem", "01_baseline"],
+    )
+    assert result.exit_code != 0
+    assert "refusing to overwrite" in result.output
+    assert index.read_text(encoding="utf-8") == "# Existing\n"
+    assert design.read_text(encoding="utf-8") == "# Existing design\n"
+    forced = CliRunner().invoke(
+        cli,
+        ["scaffold", "--journal", "--stem", "01_baseline", "--force"],
+    )
+    assert forced.exit_code == 0, forced.output
+    assert "## History" in index.read_text(encoding="utf-8")
+    assert design.read_text(encoding="utf-8").startswith("# 01_baseline\n")
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["scaffold", "--journal", "--stem", "../bad"],
+        ["scaffold", "--package", "demo", "--stem", "01_baseline"],
+        ["scaffold", "--package", "demo", "--journal"],
+    ],
+)
+def test_scaffold_journal_rejects_bad_modes(argv: list[str]) -> None:
+    """Journal mode rejects unsafe stems and conflicting options."""
+    result = CliRunner().invoke(cli, argv)
+    assert result.exit_code != 0

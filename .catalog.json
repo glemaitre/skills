@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "f6deda2b2dc78ed26d4f5ff7f0b7aa26f30f2c684f334e42bc8824e5ec18f179",
+  "catalog_hash": "0e5cd648422b4d67a7b42df95dfa360446d9a7ab68695cf7934af9253673a6b6",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "2c3ac65b39c7c36fa39e374161a8c6ab79d11f4c2d4d83bb67a17cf2686f5070"
+      "hash": "b5e28567979743bdbf238bdbe555d376d638ec9da0f54f16560bf6590f4529e0"
     },
     {
       "id": "iterate-ml-experiment",
@@ -66,7 +66,7 @@
       "summary": "Deprecated pointer to triage and backlog.",
       "category": "orchestration",
       "subcategory": "dispatchers",
-      "hash": "5ed623d8c5d64ea08b3086c5e0460fc918c5ae7677ff0b40a95a172826ca87d0"
+      "hash": "e6129cd4976c56084a078cea7e98e1b6d17308379a060aab7c83b45be8c657d9"
     },
     {
       "id": "iterate-from-skore",
@@ -156,7 +156,7 @@
       "summary": "Coordinate build, evaluation, and smoke testing.",
       "category": "meta",
       "subcategory": null,
-      "hash": "1212b8f6c5ff9a3d13881dc12697a72247c57d7bd1ebc6270bc12a57037f5f5f"
+      "hash": "61d2c25db4de45f79dad3d071a73e4e5e86d4160cde9d1b734cc057aba6b68c5"
     },
     {
       "id": "choose-python-library",
@@ -174,7 +174,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "daad49123ed50f874c7fd997703dc45d33cc5c40daf632e4ca5be73f909d5f91"
+      "hash": "a18c3047597bd810e6237d97621238462fdfd0e21a51b05e00c6914962b58642"
     },
     {
       "id": "setup-python-env",

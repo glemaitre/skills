@@ -80,9 +80,10 @@ After gates resolve:
 python -m skore_skills scaffold --package <pkg>
 ```
 
-The CLI copies packaged templates and substitutes the import name.
-Do not reproduce the old per-template write recipe and do not pass
-`--force` during normal setup.
+The CLI copies packaged templates, substitutes the import name, and
+writes the full journal index (Status, Data understanding, History,
+Backlog). Do not reproduce the old per-template write recipe and do
+not pass `--force` during normal setup.
 
 The default workspace contract is:
 

@@ -32,6 +32,24 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "Missing journal index uses packaged shape",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/` exists but `journal/JOURNAL.md` is missing.]\n\nStart the experiment backlog for this workspace.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills scaffold --journal` as the initialization command. - State that the packaged index provides Status, Data understanding, History, and Backlog. - Return to triage after initialization. It must NOT: - Recreate the index shape from memory. - Load the deprecated `iterate-ml-experiment` skill. - Draft or implement an experiment in this turn.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills scaffold --journal` as the initialization command.",
+        "State that the packaged index provides Status, Data understanding, History, and Backlog.",
+        "Return to triage after initialization.",
+        "The response does NOT: Recreate the index shape from memory.",
+        "The response does NOT: Load the deprecated `iterate-ml-experiment` skill.",
+        "The response does NOT: Draft or implement an experiment in this turn."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }
