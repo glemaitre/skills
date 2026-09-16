@@ -7,7 +7,7 @@ For each case the model gets:
 - The case's `User prompt`, prefixed with the workspace-state block.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
+violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 
 ---
 
@@ -20,6 +20,9 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 - Empty folder (no `pyproject.toml`, no `src/`, no `experiments/`,
   no `journal/`).
 - No `data/`, no `pixi.toml`.
+- Not dispatched by `setup-ml-project`; `status.skills` reports
+  `choose-python-library`, `persist-ml-git`, and `triage-ml-task`
+  `true`.
 
 **Must do:**
 - Identify as a **fresh** layout (no detection signals matched).
@@ -28,19 +31,21 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
   as the default, and is not picked here.
 - Name **G-TABULAR** — pandas / polars pick via
   `choose-python-library`.
-- Mention **G-ENV-MGR** as routed via `setup-python-env`.
+- Report the unresolved environment manager as a `status` fact
+  (`policy.env_manager` / `env_manager`) rather than asking
+  G-ENV-MGR here.
 - Name `python -m skore_skills scaffold --package <pkg>` as the
   action after the gates resolve.
 - Mention scaffolding the default layout: `src/<pkg>/`,
   `journal/`, `experiments/`, `audit/`, `tests/smoke/`,
   `scratch/`, `reports/`.
 - Name `python -m skore_skills git end-turn --stage setup` at the
-  end of the turn.
+  end of this standalone turn.
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
-- Run `pixi init` / `uv init` / `poetry init` on the user's behalf
-  before G-ENV-MGR + G-PKG-NAME have passed.
+- Ask G-ENV-MGR or pick an environment manager in this skill.
+- Run `pixi init` / `uv init` / `poetry init` on the user's behalf.
 - Pick a package name silently from the folder name.
 - Write a runnable `experiments/01_baseline.py` whose body actually
   calls `build_learner` / `skore.evaluate` / `project.put`
@@ -233,16 +238,46 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT in any transcript.
 
 **Must do:**
 - Refuse to run `pixi init`.
-- Cite that **G-ENV-MGR + G-PKG-NAME must pass first** — pixi on
+- Cite that the manager is not this skill's gate and that pixi on
   PATH is detection context, not permission.
+- Cite that **G-PKG-NAME must pass** before the layout goes down.
 - Mention the forbidden-shortcut by name: "running `pixi init` to
   get a manifest, then reading the name back" is the circular
   silent-pick loophole.
-- Route the env-manager pick to `setup-python-env` for the
-  structured ask.
 
 **Must NOT do:**
 - Run `pixi init` / `uv init` / `poetry init` in this turn.
-- Treat "pixi is on PATH" as resolving G-ENV-MGR.
+- Treat "pixi is on PATH" as resolving the manager.
 - Pick a package name from the folder via the `pixi init` side
   effect.
+
+---
+
+## CASE_08 — Manager-only root, dispatched turn
+
+**User prompt:**
+> The environment manager is ready. Put the workspace layout down.
+
+**Assumed workspace state:**
+- `setup-ml-project` dispatched this turn.
+- `pixi.toml` exists plus the `pyproject.toml` that `pixi init`
+  wrote; no `src/`, no `experiments/`, no `journal/`.
+- `status` reports `env_manager: pixi`, `has_src: false`,
+  G-PKG-NAME `churnlab`, G-SKORE-MODE `local`, G-TABULAR `pandas`.
+
+**Must do:**
+- Classify the root as **manager-only**: a scaffold target, not an
+  existing layout to glue onto.
+- Name `python -m skore_skills scaffold --package churnlab`.
+- State that the existing `pyproject.toml` and `.gitignore` are
+  kept by the scaffold.
+- Report the editable install as the remaining step owned by the
+  environment turn.
+- Return control to `setup-ml-project` at the end of the turn.
+
+**Must NOT do:**
+- Pass `--force` to `scaffold`.
+- Treat the manifest as an existing layout and refuse to scaffold.
+- Run `python -m skore_skills git end-turn`, load `persist-ml-git`,
+  or load `triage-ml-task` from this dispatched turn.
+- Run the editable install or `env add` here.

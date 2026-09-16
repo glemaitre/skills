@@ -120,9 +120,7 @@ def test_end_turn_ambiguous_invokes_resolve(
     assert ".python-version" in payload["ambiguous_dotfiles"]
 
 
-def test_end_turn_clean_skips(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_end_turn_clean_skips(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """A clean tree with autocommit on is a skip."""
     monkeypatch.chdir(tmp_path)
     _init_repo(tmp_path)
@@ -139,9 +137,7 @@ def test_end_turn_clean_skips(
     assert payload["reason"] in {"clean", "nothing_to_commit"}
 
 
-def test_ignore_merge_additive(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_ignore_merge_additive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Existing ignore lines are kept; packaged patterns are appended."""
     monkeypatch.chdir(tmp_path)
     _write(tmp_path / ".gitignore", "custom-keep/\n")
@@ -196,8 +192,6 @@ def test_ignore_merge_rejects_keep_env(
 ) -> None:
     """Secrets cannot be force-tracked."""
     monkeypatch.chdir(tmp_path)
-    result = CliRunner().invoke(
-        cli, ["git", "ignore-merge", "--keep", ".env"]
-    )
+    result = CliRunner().invoke(cli, ["git", "ignore-merge", "--keep", ".env"])
     assert result.exit_code != 0
     assert "blocked" in result.output.lower() or "keep" in result.output.lower()

@@ -9,12 +9,37 @@ import pytest
 from click.testing import CliRunner
 
 from skore_skills.cli import cli
+from skore_skills.installed_skills import SIDECAR
 from skore_skills.workspace import STATUS_KEYS, snapshot
 
 
 def _write(path: Path, text: str = "") -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
+
+
+def _write_sidecar(target: Path, skill_id: str) -> None:
+    _write(
+        target / skill_id / SIDECAR,
+        json.dumps({"id": skill_id, "release": "v0", "hash": "abc"}) + "\n",
+    )
+
+
+def _write_catalog(target: Path, skill_ids: list[str]) -> None:
+    skills = [{"id": name, "path": f"skills/{name}"} for name in skill_ids]
+    _write(
+        target / ".catalog.json",
+        json.dumps({"sources": {"probabl-ai/skills": {"skills": skills}}}) + "\n",
+    )
+
+
+@pytest.fixture(autouse=True)
+def _isolated_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Keep ``--global`` installs from leaking into status tests."""
+    home = tmp_path / "isolated-home"
+    home.mkdir()
+    monkeypatch.setattr("skore_skills.installed_skills.Path.home", lambda: home)
+    return home
 
 
 def test_status_empty_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -32,6 +57,10 @@ def test_status_empty_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     assert payload["last_history_stem"] is None
     assert payload["loop_stage"] == "setup"
     assert payload["policy"]["git"]["autocommit"] is None
+    flags = payload["skills"]
+    assert flags
+    assert flags["setup-git"] is False
+    assert all(value is False for value in flags.values())
 
 
 def test_status_text_format(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -62,6 +91,7 @@ def test_status_organized_fixture(
     result = CliRunner().invoke(cli, ["status"])
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
+    skills = payload.pop("skills")
     assert payload == {
         "package": "demo-pkg",
         "env_manager": "pixi",
@@ -83,6 +113,8 @@ def test_status_organized_fixture(
         },
         "loop_stage": "implement",
     }
+    assert skills
+    assert all(value is False for value in skills.values())
 
 
 @pytest.mark.parametrize(
@@ -169,3 +201,83 @@ def test_check_workspace_empty_text(
     result = CliRunner().invoke(cli, ["check", "workspace", "--format", "text"])
     assert result.exit_code == 1
     assert result.output == "not scaffolded\n"
+
+
+def test_status_skills_fallback_catalog_all_false(tmp_path: Path) -> None:
+    """No sidecars: released catalog ids are present and all ``false``."""
+    flags = snapshot(tmp_path)["skills"]
+    assert flags["setup-git"] is False
+    assert flags["setup-workspace"] is False
+    assert all(value is False for value in flags.values())
+
+
+def test_status_skills_ignores_skill_md_without_sidecar(tmp_path: Path) -> None:
+    """A bare ``SKILL.md`` is not an install record."""
+    _write(tmp_path / ".claude" / "skills" / "setup-git" / "SKILL.md")
+    flags = snapshot(tmp_path)["skills"]
+    assert flags["setup-git"] is False
+
+
+def test_status_skills_from_sidecar_and_target_catalog(tmp_path: Path) -> None:
+    """Sidecars mark install; the target catalog is the id universe."""
+    target = tmp_path / ".agents" / "skills"
+    _write_catalog(target, ["setup-git", "setup-workspace", "setup-python-env"])
+    _write_sidecar(target, "setup-git")
+    flags = snapshot(tmp_path)["skills"]
+    assert flags == {
+        "setup-git": True,
+        "setup-python-env": False,
+        "setup-workspace": False,
+    }
+
+
+def test_status_skills_from_global_home(tmp_path: Path, _isolated_home: Path) -> None:
+    """A ``--global`` sidecar under ``$HOME`` counts as installed."""
+    target = _isolated_home / ".agents" / "skills"
+    _write_catalog(target, ["setup-git", "setup-workspace"])
+    _write_sidecar(target, "setup-workspace")
+    flags = snapshot(tmp_path)["skills"]
+    assert flags["setup-workspace"] is True
+    assert flags["setup-git"] is False
+
+
+def test_status_skills_unknown_without_any_catalog(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """No sidecars and no readable released catalog → empty mapping."""
+    monkeypatch.setattr(
+        "skore_skills.installed_skills._released_skill_ids", lambda: set()
+    )
+    assert snapshot(tmp_path)["skills"] == {}
+
+
+def test_status_skills_from_unknown_harness_dir(tmp_path: Path) -> None:
+    """A harness this package never heard of is still discovered."""
+    target = tmp_path / ".futureharness" / "skills"
+    _write_sidecar(target, "setup-git")
+    assert snapshot(tmp_path)["skills"]["setup-git"] is True
+
+
+def test_status_skills_from_nested_harness_dir(tmp_path: Path) -> None:
+    """A target one level deeper (``.codeium/windsurf/skills``) is found."""
+    target = tmp_path / ".codeium" / "windsurf" / "skills"
+    _write_catalog(target, ["setup-git", "setup-workspace"])
+    _write_sidecar(target, "setup-git")
+    flags = snapshot(tmp_path)["skills"]
+    assert flags == {"setup-git": True, "setup-workspace": False}
+
+
+def test_status_skills_catalog_only_target(tmp_path: Path) -> None:
+    """A target catalog with no sidecars defines the universe as false."""
+    _write_catalog(tmp_path / ".agents" / "skills", ["alpha-skill", "beta-skill"])
+    flags = snapshot(tmp_path)["skills"]
+    assert flags == {"alpha-skill": False, "beta-skill": False}
+
+
+def test_status_skills_ignores_out_of_bound_depth(tmp_path: Path) -> None:
+    """Sidecars deeper than ``<dot-dir>/<sub>/skills`` are not scanned."""
+    deep = tmp_path / ".cache" / "a" / "b" / "skills"
+    _write_sidecar(deep, "deep-skill")
+    flags = snapshot(tmp_path)["skills"]
+    assert "deep-skill" not in flags
+    assert all(value is False for value in flags.values())

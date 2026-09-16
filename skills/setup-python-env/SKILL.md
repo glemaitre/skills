@@ -14,14 +14,25 @@ description: >
 
   SKIP non-Python tools and already-installed dependencies.
 
-  HOW TO USE: run `env detect`, resolve gates, then run `env add`.
-  Never use a different manager from the project manifest.
+  HOW TO USE: run `env detect`, resolve gates, then either bootstrap
+  the manager or run `env add`. Never use a different manager from
+  the project manifest.
 ---
 
 # Python Env Manager
 
 Detect first. Add with the detected manager. Return to the calling
 skill after the dependency is importable.
+
+This skill has two modes. Pick one per turn from
+`python -m skore_skills status` and `env detect`:
+
+- **Bootstrap** (no manager yet): resolve G-ENV-MGR, persist it with
+  `python -m skore_skills policy set env_manager <manager>`, and run
+  the manager's `init`. Nothing else. No ML stack, no editable
+  install, no tabular pick.
+- **Add** (manager in place): `env add` for requested packages, plus
+  the editable workspace package once `status.has_src` is true.
 
 ## Stop conditions
 
@@ -41,15 +52,24 @@ skill after the dependency is importable.
 - Install unpinned unless the user asks or compatibility requires a
   pin.
 - Do not run system bootstrap installers (`curl | sh`).
+- **A missing layout is a status fact, not a route.** When
+  `status.has_src` is false, say the editable install is pending and
+  stop there. Do not load `setup-workspace`, do not scaffold, and do
+  not create `src/<pkg>/` yourself.
+- **Bootstrap does not install the ML stack.** The tabular library
+  and skore mode belong to later turns; adding them here can lock a
+  choice the user has not made.
 
 ## Pre-flight
 
 ```
 - [ ] Detection: python -m skore_skills env detect
+- [ ] Mode: bootstrap | add
 - [ ] Manager: pixi | uv | poetry | hatch | conda | pip-venv | none
 - [ ] G-ENV-MGR: resolved | ask | n/a (one manifest manager)
 - [ ] Package route: default | dev | agent | G-ENV-SCOPE ask
 - [ ] G-AGENT-FEATURE: install | skip | n/a
+- [ ] Editable: has_src true | pending (status fact)
 - [ ] Command: python -m skore_skills env add <packages> | env agent
 ```
 
@@ -142,6 +162,9 @@ the type slot.
 
 ## Editable workspace package (pixi)
 
+Only once `status.has_src` is true and `pyproject.toml` declares the
+package. On a manager-only root, report this step as pending instead.
+
 For a fresh `src/<pkg>/` scaffold:
 
 ```bash
@@ -160,7 +183,9 @@ do not use `pip install -e .` or `PYTHONPATH=src`.
 ## Failure handling
 
 - `env detect` ambiguous: ask; do not call `env add`.
-- no manager: ask; do not bootstrap.
+- no manager: ask; do not bootstrap before the answer.
+- no `src/<pkg>/`: skip the editable install and report it as
+  pending; do not scaffold from here.
 - hatch: follow the CLI's manifest-edit hint; there is no universal
   add command.
 - `env agent` print-only first; pass `--execute` only after reviewing

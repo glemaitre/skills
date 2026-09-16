@@ -15,8 +15,9 @@ description: >
    choice.
 3. For a genuine choice, present the smallest useful option set and
    ask the user. Do not pick silently.
-4. After the user chooses, dispatch `python-env-manager` and use
-   `python -m skore_skills env add <package>`.
+4. After the user chooses, add it with
+   `python -m skore_skills env add <package>` and run the manager
+   command that prints.
 5. Confirm symbols with `python -m skore_skills api get <dotted>`
    before writing calls.
 

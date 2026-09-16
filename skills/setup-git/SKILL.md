@@ -26,8 +26,11 @@ description: >
    confirmation, `git add -- <paths>` then
    `git commit -m "<one-line subject>"` from this setup turn.
    Later stages use `python -m skore_skills git end-turn` then
-   `persist-ml-git`.
-7. Load `triage-ml-task`.
+   `persist-ml-git`; when that skill is not installed, those stages
+   report the pending paths instead of committing.
+7. When `setup-ml-project` dispatched this turn, return control to
+   it. Otherwise load `triage-ml-task` if `status.skills` reports it
+   installed, else stop.
 
 ## Stop conditions
 

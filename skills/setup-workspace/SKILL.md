@@ -14,8 +14,8 @@ description: >
   evaluation, or API mechanics owned by sibling skills.
 
   HOW TO USE: detect first. For a fresh layout resolve package,
-  tabular library, environment manager, and skore mode gates, then
-  run `python -m skore_skills scaffold --package <pkg>`. For an
+  tabular library, and skore mode gates, then run
+  `python -m skore_skills scaffold --package <pkg>`. For an
   existing layout, glue to it without renaming or overwriting.
 ---
 
@@ -31,10 +31,15 @@ Decide where artifacts live. Do not design an experiment here.
   layout, ask for the `src/<pkg>/` import name and propose the
   snake-case folder name as default. “You pick” does not resolve it.
   A complete `[project] name` + matching `src/<pkg>/` resolves it.
-- **G-ENV-MGR is owned by `setup-python-env`.** A manager on PATH
-  is context, not permission. Do not run `pixi init` before the gate.
-- **G-TABULAR is asked through `choose-python-library`.** Do not
-  silently choose pandas.
+- **G-ENV-MGR is not this skill's gate.** Read it from
+  `python -m skore_skills status` (`policy.env_manager` /
+  `env_manager`). When it is unresolved, report that as a status
+  fact; do not ask it here and do not run `pixi init` / `uv init`.
+  A manager on PATH is context, not permission.
+- **G-TABULAR is asked, not inferred.** Load
+  `choose-python-library` when `status.skills` reports it present;
+  otherwise ask pandas vs polars here. Do not silently choose
+  pandas.
 - **G-SKORE-MODE is asked:** local, hub, or mlflow; local is the
   proposed default. Keep a recorded mode unless an explicit migration
   is approved.
@@ -51,10 +56,14 @@ Decide where artifacts live. Do not design an experiment here.
 Inspect root `pyproject.toml`, `src/`, `experiments/`, `journal/`,
 and manager manifests.
 
-- Any coherent signal → **existing/glue**. Reuse package and paths.
-- No signals → **fresh**. Resolve all gates before scaffolding.
-- Manifest without matching `src/<pkg>/` → incomplete; reconfirm
-  package name rather than inventing it.
+- `src/` or `experiments/` present → **existing/glue**. Reuse
+  package and paths.
+- No signals → **fresh**. Resolve the gates before scaffolding.
+- Manager manifest (`pixi.toml`, and the `pyproject.toml` its
+  `init` writes) without `src/<pkg>/` → **manager-only**: still a
+  scaffold target. Reconfirm the package name rather than inventing
+  it, then run `scaffold --package <pkg>`; it keeps the existing
+  `pyproject.toml` and `.gitignore`. Do not pass `--force`.
 
 For a request to add an experiment to an existing workspace, report
 that setup is complete and ask the user to run the model/loop pack or
@@ -64,10 +73,10 @@ note is approved.
 ## Pre-flight
 
 ```
-- [ ] Layout: fresh | existing/glue
+- [ ] Layout: fresh | manager-only | existing/glue
 - [ ] G-PKG-NAME: <pkg> | ask
 - [ ] G-TABULAR: pandas | polars | ask
-- [ ] G-ENV-MGR: <manager> | setup-python-env
+- [ ] G-ENV-MGR: <manager from status> | unresolved (status fact)
 - [ ] G-SKORE-MODE: local | hub | mlflow | ask
 - [ ] Command: python -m skore_skills scaffold --package <pkg>
 ```
@@ -99,8 +108,9 @@ reports/                   durable human-facing exports
 data/                      user-owned inputs; EDA deliverables only
 ```
 
-The package scaffold must be installed editable through
-`setup-python-env` before imports are expected from every CWD.
+The package scaffold must be installed editable before imports are
+expected from every CWD. That install is not this skill's work:
+report it as the remaining step.
 
 ## Existing workspace
 
@@ -131,9 +141,16 @@ audit/NN_<short>.py
 
 ## End of turn
 
-Run `python -m skore_skills git end-turn --stage setup`. If JSON
-`action` is `invoke`, load `persist-ml-git` and follow it. Then
-load `triage-ml-task`. Do not run `git commit` in this skill.
+When `setup-ml-project` dispatched this turn, report the layout and
+return control to it. Do not run the git hook, `persist-ml-git`, or
+`triage-ml-task` from here.
+
+Standalone (no dispatcher), run
+`python -m skore_skills git end-turn --stage setup`. If JSON
+`action` is `invoke`, load `persist-ml-git` when
+`status.skills` reports it installed; if it is not installed, list
+the pending paths and stop. Then load `triage-ml-task` when it is
+installed, otherwise stop. Never run `git commit` in this skill.
 
 ## References
 

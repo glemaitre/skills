@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "0d49eeb0d26630181ce3f6fc60566f34ad6adeb8610d1665f819cb7f52b3824b",
+  "catalog_hash": "58dfcbd3595e61d8163ab8116ec859f88b8869c1f2d555035960970750038dd9",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -138,7 +138,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "6469b6e85760efc93d994268055c9587e97bd886d88d21a8ad2216ef51c0c446"
+      "hash": "44662caeff4f78afd58660939b37172407f288851d8b424ecada1b5476169f73"
     },
     {
       "id": "setup-git",
@@ -147,7 +147,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "37a774ab4af29f119386472bc12c5b7475f3148dabe446304f8ac616b3f2dc4f"
+      "hash": "bfa9d66d29d3ff5eb069ac8fd42e9d7c9903528f21fe305ee93bd64439f1ec88"
     },
     {
       "id": "persist-ml-git",
@@ -174,7 +174,7 @@
       "summary": "Resolve a library choice and add the selected dependency.",
       "category": "action",
       "subcategory": null,
-      "hash": "e51b04f31b902ad52a5948ffa5745afce605c3df91ff9c5b72045be4482220e9"
+      "hash": "8e47b18d20a52dbec1549480deb060d77865e3bd7c7635240ce58c346425c12b"
     },
     {
       "id": "setup-workspace",
@@ -183,7 +183,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "aa6129b64993a3aec07b3a9e78200b610d052145cb862574449fe956023988b6"
+      "hash": "d12a569532b0bd27a6263899dfe6a6aeaafc6514eb19c83b98a35a9d74b703f2"
     },
     {
       "id": "setup-python-env",
@@ -192,7 +192,7 @@
       "summary": "Configure dependencies, editable install, and Python code style.",
       "category": "action",
       "subcategory": null,
-      "hash": "2220d4d76a3b45365f4d2dc03432a8f7e1ea47318b3453aeff93154c91f94037"
+      "hash": "29da5b9242c6a9f94e8edc396248838480fd2cb71f23c43397fd2b37e271bff4"
     }
   ],
   "workflows": [

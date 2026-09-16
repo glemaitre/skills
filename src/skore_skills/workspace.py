@@ -10,6 +10,7 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
+from skore_skills.installed_skills import installed_skills
 from skore_skills.policy import infer_loop_stage, load_policy
 
 # First-signal-wins order from python-env-manager § Detection.
@@ -28,6 +29,7 @@ STATUS_KEYS = (
     "last_history_stem",
     "policy",
     "loop_stage",
+    "skills",
 )
 
 
@@ -170,6 +172,7 @@ def snapshot(root: Path) -> dict[str, Any]:
     policy = load_policy(root)
     payload["policy"] = policy
     payload["loop_stage"] = infer_loop_stage(root, policy, payload)
+    payload["skills"] = installed_skills(root)
     return payload
 
 

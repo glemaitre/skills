@@ -11,11 +11,18 @@ a fresh workspace.
 - G-ENV-MGR fired and the user picked `pixi` (or another manager —
   mirror the same flow with the per-manager equivalents from
   SKILL.md § "Install commands — by manager").
-- G-SKORE-MODE has resolved (SKILL.md § "Tier 1 install: skore
-  variant per mode" reads the `skore mode:` row).
-- G-TABULAR has resolved (the tabular library pick lives in
-  `organize-ml-workspace` § G-TABULAR).
-- G-PKG-NAME has resolved (`organize-ml-workspace` § G-PKG-NAME).
+
+That is the whole gate list. G-PKG-NAME, G-TABULAR, and
+G-SKORE-MODE belong to the workspace turn and are **not**
+prerequisites here.
+
+## Which steps run when
+
+Steps 1–3 are the bootstrap mode: manager on PATH, `init`, and the
+env layout. Stop there when `status.has_src` is false — the stack,
+the tabular library, and the editable install need the package
+layout first. Steps 4–9 are the add mode, once `src/<pkg>/` and the
+resolved gates exist.
 
 ## The 9 steps (pixi)
 
@@ -91,10 +98,9 @@ keeping the `mlflow>=3` pin for the mlflow variant. See SKILL.md
 § "Tier 1 install: skore variant per mode" for the full source-aware
 table.
 
-If G-SKORE-MODE hasn't fired yet at bootstrap time (rare —
-`organize-ml-workspace` fires it alongside G-PKG-NAME and
-G-TABULAR), route back to that skill before issuing the install
-command. `ruff` / `pytest` / `jupyterlab` / `ipykernel` are added
+If G-SKORE-MODE hasn't resolved yet, this step is not ready: report
+it as pending (a status fact) and stop instead of guessing a
+variant. `ruff` / `pytest` / `jupyterlab` / `ipykernel` are added
 by step 3 (the `[feature.dev]` declaration); `ipython` / `pyright`
 are added by step 3 (the `[feature.agent]` declaration). No
 per-install ask needed — the layout dictates the routing.
@@ -106,7 +112,7 @@ to rebuild graphviz's plugin cache — see SKILL.md § "skrub install
 
 ### 5. Add the tabular library
 
-Per G-TABULAR (`organize-ml-workspace`):
+Per G-TABULAR, once the workspace turn has resolved it:
 
 - pandas branch: `pixi add pandas pyarrow`
 - polars branch: `pixi add polars`

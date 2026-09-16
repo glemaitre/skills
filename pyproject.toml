@@ -24,8 +24,11 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/skore_skills"]
 
+[tool.hatch.build.targets.wheel.force-include]
+".catalog.json" = "skore_skills/data/catalog.json"
+
 [tool.hatch.build.targets.sdist]
-include = ["src/skore_skills"]
+include = ["src/skore_skills", ".catalog.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/skore_skills"]

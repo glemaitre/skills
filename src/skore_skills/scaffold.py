@@ -13,6 +13,12 @@ INVALID_PACKAGE = "package name must be a Python identifier (snake_case)"
 MISSING_TEMPLATE = "packaged scaffold templates are missing"
 INVALID_STEM = "journal stem must look like NN_short_name"
 
+# Root files an env manager may already own (``pixi init`` writes
+# ``pyproject.toml`` and ``.gitignore``). Kept unless ``--force``.
+PRESERVED_ROOT_FILES = frozenset(
+    {Path("pyproject.toml"), Path(".gitignore"), Path("ruff.toml")}
+)
+
 SRC_TEMPLATES = {
     "src___init__.py": "__init__.py",
     "src_data.py": "data.py",
@@ -42,12 +48,12 @@ def render_template(text: str, package: str, *, pyproject: bool = False) -> str:
 
 
 def layout_exists(root: Path) -> bool:
-    """Return True if a scaffolded layout is already present."""
-    return (
-        (root / "src").exists()
-        or (root / "pyproject.toml").is_file()
-        or (root / "experiments").exists()
-    )
+    """Return True if a scaffolded layout is already present.
+
+    A manager-only root (``pixi.toml`` / ``pyproject.toml`` from
+    ``pixi init``) is not a finished layout.
+    """
+    return (root / "src").exists() or (root / "experiments").exists()
 
 
 def scaffold(root: Path, package: str, *, force: bool = False) -> list[Path]:
@@ -85,6 +91,8 @@ def scaffold(root: Path, package: str, *, force: bool = False) -> list[Path]:
 
     def write(rel: Path, body: str) -> None:
         dest = root / rel
+        if rel in PRESERVED_ROOT_FILES and dest.is_file() and not force:
+            return
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(body, encoding="utf-8")
         written.append(rel)

@@ -114,6 +114,27 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "Empty folder: bootstrap only",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder; no manifests, no `src/`, no `journal/`.\n- `status` reports `env_manager: none`, `has_src: false`.\n- pixi is on PATH.]\n\nStart the setup: get the Python environment going.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env detect` and identify the **bootstrap** mode. - Fire **G-ENV-MGR** and wait for the pick (pixi recommended). - Name `python -m skore_skills policy set env_manager <manager>` to persist the answer once it is given. It must NOT: - Run the editable install (`pixi add --pypi \"<pkg> @ .\"`) or ask for a package name. - Add the ML stack (`scikit-learn` / `skrub` / `skore`) or a tabular library in this turn. - Load `setup-workspace` or scaffold `src/<pkg>/` to unblock the editable install.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills env detect` and identify the **bootstrap** mode.",
+        "Fire **G-ENV-MGR** and wait for the pick (pixi recommended).",
+        "Name `python -m skore_skills policy set env_manager <manager>` to persist the answer once it is given.",
+        "Limit the turn to the manager's `init` plus the env layout.",
+        "Report the editable install as pending because `has_src` is false.",
+        "The response does NOT: Run the editable install (`pixi add --pypi \"<pkg> @ .\"`) or ask for a package name.",
+        "The response does NOT: Add the ML stack (`scikit-learn` / `skrub` / `skore`) or a tabular library in this turn.",
+        "The response does NOT: Load `setup-workspace` or scaffold `src/<pkg>/` to unblock the editable install.",
+        "The response does NOT: Run `pixi init` before the gate resolves."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

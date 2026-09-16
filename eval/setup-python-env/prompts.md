@@ -177,3 +177,34 @@ violated.
   resolution would break).
 - Modify `pyproject.toml`'s `[project]` block ad-hoc to make the
   package "findable" by inference.
+
+---
+
+## CASE_07 — Empty folder: bootstrap only
+
+**User prompt:**
+> Start the setup: get the Python environment going.
+
+**Assumed workspace state:**
+- Empty folder; no manifests, no `src/`, no `journal/`.
+- `status` reports `env_manager: none`, `has_src: false`.
+- pixi is on PATH.
+
+**Must do:**
+- Name `python -m skore_skills env detect` and identify the
+  **bootstrap** mode.
+- Fire **G-ENV-MGR** and wait for the pick (pixi recommended).
+- Name `python -m skore_skills policy set env_manager <manager>` to
+  persist the answer once it is given.
+- Limit the turn to the manager's `init` plus the env layout.
+- Report the editable install as pending because `has_src` is
+  false.
+
+**Must NOT do:**
+- Run the editable install (`pixi add --pypi "<pkg> @ ."`) or ask
+  for a package name.
+- Add the ML stack (`scikit-learn` / `skrub` / `skore`) or a
+  tabular library in this turn.
+- Load `setup-workspace` or scaffold `src/<pkg>/` to unblock the
+  editable install.
+- Run `pixi init` before the gate resolves.

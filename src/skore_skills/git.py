@@ -237,9 +237,7 @@ def run_ignore_merge(
 def run_end_turn(root: Path, stage: str) -> tuple[dict[str, Any], int]:
     """Print whether to load ``persist-ml-git``. Never commits."""
     if stage not in END_TURN_STAGES:
-        raise ValueError(
-            f"stage must be one of {', '.join(END_TURN_STAGES)}"
-        )
+        raise ValueError(f"stage must be one of {', '.join(END_TURN_STAGES)}")
     policy = load_policy(root)
     autocommit = policy.get("git", {}).get("autocommit")
     if not _has_repo(root):

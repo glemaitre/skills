@@ -73,6 +73,38 @@ def test_scaffold_refuses_without_force(
     assert forced.exit_code == 0, forced.output
 
 
+def test_scaffold_on_manager_only_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A ``pixi init`` root still scaffolds and keeps the manager's files."""
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "pixi.toml").write_text(
+        '[workspace]\nname = "demo"\n', encoding="utf-8"
+    )
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text('[project]\nname = "demo"\n', encoding="utf-8")
+    gitignore = tmp_path / ".gitignore"
+    gitignore.write_text("# pixi\n.pixi/\n", encoding="utf-8")
+    result = CliRunner().invoke(cli, ["scaffold", "--package", "demo_pkg"])
+    assert result.exit_code == 0, result.output
+    assert (tmp_path / "src" / "demo_pkg" / "pipeline.py").is_file()
+    assert (tmp_path / "journal" / "JOURNAL.md").is_file()
+    assert pyproject.read_text(encoding="utf-8") == '[project]\nname = "demo"\n'
+    assert gitignore.read_text(encoding="utf-8") == "# pixi\n.pixi/\n"
+
+
+def test_scaffold_force_replaces_preserved_root_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``--force`` still replaces the packaged root configuration."""
+    monkeypatch.chdir(tmp_path)
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text('[project]\nname = "stale"\n', encoding="utf-8")
+    result = CliRunner().invoke(cli, ["scaffold", "--package", "demo_pkg", "--force"])
+    assert result.exit_code == 0, result.output
+    assert 'name = "demo-pkg"' in pyproject.read_text(encoding="utf-8")
+
+
 def test_scaffold_requires_package() -> None:
     """A scaffold mode is mandatory."""
     result = CliRunner().invoke(cli, ["scaffold"])
