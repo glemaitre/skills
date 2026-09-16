@@ -2,7 +2,7 @@
 name: choose-python-library
 description: >
   Resolve a genuine choice between Python libraries for one job,
-  then ask the environment manager to add the chosen dependency.
+  then ask `add-python-package` to add the chosen dependency.
   Trigger for competing-library questions or an optional package not
   already fixed by the project stack.
 ---
@@ -15,9 +15,10 @@ description: >
    choice.
 3. For a genuine choice, present the smallest useful option set and
    ask the user. Do not pick silently.
-4. After the user chooses, add it with
-   `python -m skore_skills env add <package>` and run the manager
-   command that prints.
+4. After the user chooses, load `add-python-package` when
+   `status.skills` reports it installed. If it is not installed,
+   name the package and stop. Do not call `env add` from this
+   skill.
 5. Confirm symbols with `python -m skore_skills api get <dotted>`
    before writing calls.
 

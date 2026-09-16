@@ -6,7 +6,7 @@ to actually fill the `<SKORE_PROJECT_INIT>` substitution or debug a
 hub-vs-local mismatch.
 
 Cross-referenced from `SKILL.md` § Stop conditions and § Decision
-flow step 2a, and from `python-env-manager` § Tier 1 install
+flow step 2a, and from `add-python-package` § Tier 1 install
 (skore variant), `audit-ml-pipeline` § Read-only contract.
 
 ## Project init forms — concrete side-by-side
@@ -159,7 +159,7 @@ artifacts:
 | Downstream artifact | local-mode shape | hub-mode shape | mlflow-mode shape |
 |---|---|---|---|
 | `<SKORE_PROJECT_INIT>` in `experiments/NN_*.py` and `audit/NN_*.py` | `skore.Project(name="<project-name>", mode="local", workspace=str(PROJECT_ROOT / "reports"))` | `from skore import login; login(mode="hub"); skore.Project(name="<project-name>", mode="hub", workspace="<hub-workspace>")` | `skore.Project(name="<experiment-name>", mode="mlflow", tracking_uri="<mlflow-tracking-uri>")` |
-| Tier 1 skore install variant (per `python-env-manager` § Tier 1 install) | `pixi add skore` (or equivalent) | `pixi add "skore[hub]"` (or equivalent) | `pixi add "skore[mlflow]" "mlflow>=3"` (or equivalent — the `mlflow>=3` pin is required) |
+| Tier 1 skore install variant (via `add-python-package`) | `pixi add skore` (or equivalent) | `pixi add "skore[hub]"` (or equivalent) | `pixi add "skore[mlflow]" "mlflow>=3"` (or equivalent — the `mlflow>=3` pin is required) |
 | `Workspace decisions` rows in `JOURNAL.md` | `skore mode: local` | `skore mode: hub` + `skore hub workspace: <name>` | `skore mode: mlflow` + `skore mlflow tracking uri: <uri>` |
 
 `name=` is a bare project name in **all three** modes — local uses it
@@ -205,7 +205,7 @@ Procedure:
    `Workspace decisions` row.
 3. Rewrite **every** `<SKORE_PROJECT_INIT>` block in `experiments/`
    AND `audit/`.
-4. Update the install variant via `python-env-manager` (plain
+4. Update the install variant via `add-python-package` (plain
    `skore` ↔ `skore[hub]` ↔ `skore[mlflow]` + `mlflow>=3`).
 5. Document the switch in `JOURNAL.md` History as a horizontal
    divider (same shape as goal pivots — see `iterate-ml-experiment`

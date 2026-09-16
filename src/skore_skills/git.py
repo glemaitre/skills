@@ -67,10 +67,7 @@ def _has_repo(root: Path) -> bool:
 
 def _is_blocked(rel: str) -> bool:
     path = Path(rel)
-    for part in path.parts:
-        if part in BLOCKED_NAMES or part.startswith(".env"):
-            return True
-    return False
+    return any(part in BLOCKED_NAMES or part.startswith(".env") for part in path.parts)
 
 
 def _resolve_keep(root: Path, keep: Sequence[str]) -> list[str]:
@@ -255,15 +252,15 @@ def run_end_turn(root: Path, stage: str) -> tuple[dict[str, Any], int]:
     status = _porcelain_paths(root)
     ambiguous = list_ambiguous_dotfiles(root)
     staged, blocked = _commit_candidates(root)
-    common = dict(
-        loop_stage=stage,
-        autocommit=autocommit,
-        repo=True,
-        status=status,
-        staged=staged,
-        blocked=blocked,
-        ambiguous_dotfiles=ambiguous,
-    )
+    common = {
+        "loop_stage": stage,
+        "autocommit": autocommit,
+        "repo": True,
+        "status": status,
+        "staged": staged,
+        "blocked": blocked,
+        "ambiguous_dotfiles": ambiguous,
+    }
     if autocommit is None:
         return (_payload(**common, action="skip", reason="unanswered"), 0)
     if autocommit == "off":

@@ -38,8 +38,8 @@ Decide where artifacts live. Do not design an experiment here.
   A manager on PATH is context, not permission.
 - **G-TABULAR is asked, not inferred.** Load
   `choose-python-library` when `status.skills` reports it present;
-  otherwise ask pandas vs polars here. Do not silently choose
-  pandas.
+  otherwise ask pandas vs polars here. Persist the answer. Do **not**
+  install pandas/skore from this skill.
 - **G-SKORE-MODE is asked:** local, hub, or mlflow; local is the
   proposed default. Keep a recorded mode unless an explicit migration
   is approved.

@@ -18,7 +18,7 @@ Evidence: ls project_root | tool output (this turn) → matched signal "<signal>
 
 Example: `pixi.toml present → pixi`.
 
-### Gate rows (G-ENV-MGR, G-ENV-SCOPE, G-AGENT-FEATURE)
+### Gate rows (G-ENV-MGR, G-ENV-SCOPE, agent tools (ruff / ipython / ipykernel))
 
 Evidence is one of:
 

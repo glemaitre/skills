@@ -1,7 +1,6 @@
 """Read-only filesystem snapshot of an ML workspace.
 
-Detection copies the python-env-manager table (files at the project
-root only). Ambient PATH managers are ignored.
+Detection uses root manifests only. Ambient PATH managers are ignored.
 """
 
 from __future__ import annotations
@@ -13,7 +12,6 @@ from typing import Any
 from skore_skills.installed_skills import installed_skills
 from skore_skills.policy import infer_loop_stage, load_policy
 
-# First-signal-wins order from python-env-manager § Detection.
 MANAGER_ORDER = ("pixi", "uv", "poetry", "hatch", "conda", "pip-venv")
 
 STATUS_KEYS = (
@@ -60,9 +58,10 @@ def manager_evidence(root: Path) -> dict[str, list[str]]:
     ]
     if pixi_files:
         evidence["pixi"] = pixi_files
-
     pyproject = load_pyproject(root)
     tools = pyproject.get("tool", {}) if isinstance(pyproject.get("tool"), dict) else {}
+    if "pixi" in tools and "pixi" not in evidence:
+        evidence["pixi"] = ["pyproject.toml:[tool.pixi]"]
 
     uv_bits: list[str] = []
     if (root / "uv.lock").is_file():
@@ -83,8 +82,9 @@ def manager_evidence(root: Path) -> dict[str, list[str]]:
     hatch_bits: list[str] = []
     if (root / "hatch.toml").is_file():
         hatch_bits.append("hatch.toml")
-    if "hatch" in tools:
-        hatch_bits.append("pyproject.toml:[tool.hatch]")
+    hatch_tool = tools.get("hatch")
+    if isinstance(hatch_tool, dict) and "envs" in hatch_tool:
+        hatch_bits.append("pyproject.toml:[tool.hatch.envs]")
     if hatch_bits:
         evidence["hatch"] = hatch_bits
 
@@ -146,6 +146,15 @@ def last_history_stem(root: Path) -> str | None:
     return notes[-1].stem
 
 
+def ruff_is_configured(root: Path) -> bool:
+    """Return True if ``ruff.toml`` or ``[tool.ruff]`` is present."""
+    if (root / "ruff.toml").is_file():
+        return True
+    pyproject = load_pyproject(root)
+    tool = pyproject.get("tool")
+    return isinstance(tool, dict) and "ruff" in tool
+
+
 def is_scaffolded(root: Path) -> bool:
     """Return True if ``src/`` or ``journal/`` exists.
 
@@ -165,7 +174,7 @@ def snapshot(root: Path) -> dict[str, Any]:
         "has_journal": (root / "journal").is_dir(),
         "has_tests": (root / "tests").is_dir(),
         "eda": "present" if (root / "data" / "eda.md").is_file() else "missing",
-        "ruff_toml": (root / "ruff.toml").is_file(),
+        "ruff_toml": ruff_is_configured(root),
         "git": (root / ".git").exists(),
         "last_history_stem": last_history_stem(root),
     }

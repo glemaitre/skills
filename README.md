@@ -139,10 +139,15 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 ### Workspace and tooling
 
+Breaking: catalog ids `python-env-manager` and `python-code-style` are
+removed. Run `skore skills remove` on any leftover sidecars and
+reinstall the setup pack.
+
 | Skill | Description |
 | --- | --- |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | An organized workspace to keep track of experiments. |
-| [setup-python-env](skills/setup-python-env/SKILL.md) | Environment, editable install, Ruff configuration, and style execution. |
+| [setup-python-env](skills/setup-python-env/SKILL.md) | Bootstrap the env manager and agent tools (ruff, ipython, ipykernel). |
+| [add-python-package](skills/add-python-package/SKILL.md) | Add a dependency, or ask the user when they manage the env. |
 | [choose-python-library](skills/choose-python-library/SKILL.md) | Select optional libraries without reopening fixed stack choices. |
 
 ### API references

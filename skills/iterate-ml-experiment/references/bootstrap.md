@@ -47,7 +47,7 @@ the **G-EDA** gate — binary **run** / **skip**:
   implications) and `data/eda_<table>.html`, and fills the
   `## Data understanding (EDA)` section of `JOURNAL.md`. Requires the
   agent feature (`ipython`); if missing, `explore-ml-data` routes to
-  `python-env-manager` § Agent feature (`G-AGENT-FEATURE`) — so on the
+  `add-python-package` § Agent feature (`agent tools (ruff / ipython / ipykernel)`) — so on the
   run path the agent feature can get installed here, at bootstrap,
   before the baseline. The raw data may live outside `data/`; reuse
   the location already found when deriving the goal in Step 3 rather
@@ -130,11 +130,11 @@ gate the workflow normally fires still fires.
 | Gate ID | Picks | Owning skill | When it fires |
 |---------|-------|--------------|---------------|
 | `G-PKG-NAME` | `src/<pkg>/` import name | `organize-ml-workspace` | **Before** any `pyproject.toml` / `pixi.toml` creation |
-| `G-ENV-MGR` | Python env manager (`pixi`, `uv`, `poetry`, `hatch`, `conda`, `pip+venv`). The 3-feature layout (`default` / `dev` / `agent`) is enforced automatically — no scope sub-pick. | `python-env-manager` | **Before** any `pixi init` / `pixi add` / equivalent |
+| `G-ENV-MGR` | Python env manager (`pixi`, `uv`, `poetry`, `hatch`, `conda`, `pip+venv`). Two-env layout (`default` / `agent`). | `setup-python-env` | **Before** any `env init` / `pixi add` / equivalent |
 | `G-TABULAR` | Tabular library (`pandas` / `polars`) + other Tier 2 contested-library picks | `data-science-python-stack` | **Before** any `Write` of `data.py` / experiment script importing the contested library |
 | `G-SKORE-MODE` | Skore Project mode (`local` / `hub` / `mlflow`) + hub workspace name or MLflow tracking URI | `organize-ml-workspace` | **Before** any `pyproject.toml` write / the skore install variant |
 | `G-EDA` | Explore the data (run / skip) | `explore-ml-data` | **Before** the `journal/01_baseline.md` draft — so EDA findings can inform the learner / metric defaults and the later CV-strategy choice |
-| `G-AGENT-FEATURE` | Install `ipython` + `pyright` (install / skip) | `python-env-manager` | **Conditional** — fires when G-EDA = run and the agent feature isn't present (the EDA cell runner needs `ipython`). Otherwise deferred to the first audit at § 4. Decline → EDA falls back to skip |
+| agent tools | Install ruff / ipython / ipykernel with bootstrap | `setup-python-env` | Part of managed bootstrap; if unmanaged, `add-python-package` asks |
 | `G-DESIGN` | Explicit user approval of `journal/01_baseline.md` | `iterate-ml-experiment` § 3 | **Before** any `Write` of `experiments/01_baseline.py` / `src/<pkg>/*.py` content authored from the design note |
 | `G-CV-SPLITTER` | Cross-validator family for `skore.evaluate` (`KFold`, `GroupKFold`, `TimeSeriesSplit`, ...) | `evaluate-ml-pipeline` | **Inside the § 3 chain, AFTER G-DESIGN** — at the evaluate step, before any `Write` of `src/<pkg>/evaluate.py`; mandatory even when `split_kwargs` is empty (the empty case is itself a justified pick). NOT an upfront config gate |
 | `G-RUN` | "Run now" vs "leave for later" once smoke tests pass | `iterate-ml-experiment` § 3 | **Before** the shell call that executes `experiments/01_baseline.py` |
@@ -147,9 +147,9 @@ menu doesn't. The persistent gates (`G-PKG-NAME`, `G-ENV-MGR`,
 recorded in `JOURNAL.md` Status `Workspace decisions` so a later
 session reads the decision instead of re-asking; `G-EDA` is recorded
 in the `Data understanding (EDA)` section. `G-DESIGN`, `G-RUN`, and
-`G-AGENT-FEATURE` are not `Workspace decisions` rows — `G-DESIGN` /
+`agent tools (ruff / ipython / ipykernel)` are not `Workspace decisions` rows — `G-DESIGN` /
 `G-RUN` are per-experiment, and the agent-feature status has its own
-row owned by `python-env-manager`.
+row owned by `add-python-package`.
 
 ### Free-text doesn't resolve config gates
 

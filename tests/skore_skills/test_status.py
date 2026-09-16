@@ -108,6 +108,7 @@ def test_status_organized_fixture(
             "package": None,
             "tabular": None,
             "skore_mode": None,
+            "env": {"managed": None},
             "git": {"autocommit": None},
             "loop": {"stage": None, "stem": None},
         },
@@ -115,6 +116,17 @@ def test_status_organized_fixture(
     }
     assert skills
     assert all(value is False for value in skills.values())
+
+
+def test_status_hatchling_build_is_not_hatch_env_manager(tmp_path: Path) -> None:
+    """``[tool.hatch.build]`` alone is a build backend, not hatch envs."""
+    _write(
+        tmp_path / "pyproject.toml",
+        '[tool.hatch.build.targets.wheel]\npackages = ["src/pkg"]\n',
+    )
+    assert snapshot(tmp_path)["env_manager"] == "none"
+    _write(tmp_path / "pyproject.toml", "[tool.ruff]\nline-length = 88\n")
+    assert snapshot(tmp_path)["ruff_toml"] is True
 
 
 @pytest.mark.parametrize(
@@ -131,7 +143,8 @@ def test_status_organized_fixture(
         ({"poetry.lock": ""}, (), None, "poetry"),
         ({}, (), '[tool.poetry]\nname = "x"\n', "poetry"),
         ({"hatch.toml": ""}, (), None, "hatch"),
-        ({}, (), "[tool.hatch.build]\n", "hatch"),
+        ({}, (), "[tool.hatch.envs.default]\n", "hatch"),
+        ({}, (), "[tool.pixi.workspace]\nchannels = []\n", "pixi"),
         ({"environment.yml": "name: x\n"}, (), None, "conda"),
         ({"environment.yaml": "name: x\n"}, (), None, "conda"),
         ({"requirements.txt": "click\n"}, (".venv",), None, "pip-venv"),

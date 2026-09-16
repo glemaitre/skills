@@ -1,9 +1,13 @@
 {
   "mandatory": [
+    "ruff",
+    "ipython",
+    "ipykernel"
+  ],
+  "stage": [
     "scikit-learn",
     "skrub",
     "skore",
-    "ruff",
     "pytest"
   ],
   "competing": {

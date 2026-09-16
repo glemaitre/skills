@@ -144,8 +144,8 @@ The central rule. Surfaced as the first Stop condition below.
   Free-text "go fast" / "quick baseline" does NOT resolve it.
 - **Agent feature required to execute.** The cell runner needs
   `ipython`. If it is missing and the user chose **run**, STOP and
-  delegate to `python-env-manager` § "Agent feature"
-  (`G-AGENT-FEATURE`). Do NOT type `pixi add ... ipython` yourself;
+  delegate to `add-python-package` § "Agent feature"
+  (`agent tools (ruff / ipython / ipykernel)`). Do NOT type `pixi add ... ipython` yourself;
   do NOT fabricate EDA output with hand-written `print()`s. If the
   user declines the agent feature, **fall back to the skip path**
   (record `Status: skipped`) — never loop between run and install.
@@ -195,7 +195,7 @@ The central rule. Surfaced as the first Stop condition below.
   no learner pick. Record *implications* in `data/eda.md`; the picks
   happen in their owning gates (`G-CV-SPLITTER`, the baseline note).
 - **Harness "no clarifying questions" hints do NOT waive G-EDA or
-  G-AGENT-FEATURE.** Both fire regardless.
+  agent tools (ruff / ipython / ipykernel).** Both fire regardless.
 - **Post-hoc audit — required before ending the turn.** Walk every
   pre-flight row; surface unfilled Evidence cells explicitly.
 
@@ -210,8 +210,8 @@ The central rule. Surfaced as the first Stop condition below.
 | Clean / impute / drop columns in `data/eda.py` and re-save the raw file | EDA is read-only against raw data. Cleaning belongs in the pipeline (`build-ml-pipeline`), applied at fit time for train/test consistency |
 | Assume the raw data is in `data/` | The raw source may live anywhere; only the deliverables are pinned to `data/`. Set `RAW = <LOAD_RAW_DATA>` to wherever the data actually is |
 | Gitignore the whole `data/` folder | The committed deliverables (`data/eda.*`) live there. Ignore only specific input patterns, and ask the user first |
-| Run EDA without the agent feature by hand-writing the expected output | Fabricated EDA is worse than none. Missing runner → G-AGENT-FEATURE (install) or the skip path |
-| `pixi add ipython` directly from this skill | Install is owned by `python-env-manager`. This skill *requests* via G-AGENT-FEATURE |
+| Run EDA without the agent feature by hand-writing the expected output | Fabricated EDA is worse than none. Missing runner → agent tools (ruff / ipython / ipykernel) (install) or the skip path |
+| `pixi add ipython` directly from this skill | Install is owned by `add-python-package`. This skill *requests* via agent tools (ruff / ipython / ipykernel) |
 | Drop the authored `data/eda.md` and leave only the HTML | The `.md` carries the modelling implications the baseline note cites and the JOURNAL section links. Both are required |
 | Invent column meanings not visible in the data | Report what the data shows. Domain semantics the user didn't state go in an explicit "open questions" list, not as asserted fact |
 | Forget the JOURNAL § Data understanding update | The section is the index entry; without it later sessions can't find the EDA. It is part of "done" |
@@ -242,7 +242,7 @@ Pre-flight (explore-ml-data):
 - [ ] Agent feature available (run path only):
         `pixi run -e agent ipython -c "print(0)"` exit 0
       Evidence: tool output | JOURNAL.md Status `agent feature: installed`
-                Missing → STOP, delegate to python-env-manager G-AGENT-FEATURE
+                Missing → STOP, delegate to add-python-package agent tools (ruff / ipython / ipykernel)
                 (decline → fall back to skip path)
 - [ ] API CLI consulted for symbols used:
         skrub.TableReport, TableReport.write_html, TableReport.json,
@@ -333,7 +333,7 @@ For a pixi agent environment, prefix with `pixi run -e agent`.
 importable (`from <pkg> import PROJECT_ROOT` — editable install done
 during scaffold) and `skrub` installed (Tier 1). If either import
 fails, the digest shows the `ImportError`; route to
-`python-env-manager` for the missing piece rather than working around
+`add-python-package` for the missing piece rather than working around
 it.
 
 ### Re-execution semantics
@@ -398,10 +398,10 @@ detail lives in `data/eda.md`. On the **skip** path, only the
 
 | Callee | Why |
 |---|---|
-| `python-env-manager` § Agent feature | When `ipython` is missing on the run path — G-AGENT-FEATURE |
+| `add-python-package` | When `ipython` is missing on the run path |
 | `python -m skore_skills api get` | Every skrub / pandas / polars symbol. Cache hits first |
 | `data-science-python-stack` | G-TABULAR (pandas / polars) if not yet recorded; skrub `TableReport` reference |
-| `python-code-style` | After writing `data/eda.py` — ruff format / check + contextualize the comments to this dataset (strip any leftover workflow/process prose) |
+| `python -m skore_skills style` | After writing `data/eda.py` — ruff format / check + contextualize the comments to this dataset (strip any leftover workflow/process prose) |
 
 ## What this skill does NOT do
 
@@ -411,7 +411,7 @@ detail lives in `data/eda.md`. On the **skip** path, only the
   for those picks.
 - Edit `src/<pkg>/` or the experiment / audit files.
 - Clean, transform, or re-save the user's raw data.
-- Install `ipython` / `pyright` (`python-env-manager` owns).
+- Install `ipython` (`add-python-package` owns).
 - Open or write the skore Project.
 - Render commits or PRs.
 
@@ -422,10 +422,10 @@ detail lives in `data/eda.md`. On the **skip** path, only the
 | `iterate-ml-experiment` | Caller. § 0 fires G-EDA before the baseline note; the EDA findings seed the note's Method / Risks |
 | `audit-ml-pipeline` | Same `cells run` CLI and bare-expression discipline |
 | `organize-ml-workspace` | Workspace layout; `data/` is user-owned — this skill is the one exception that writes `data/eda.*` into it |
-| `python-env-manager` | Agent feature install (G-AGENT-FEATURE). This skill requests; that skill installs |
+| `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |
 | `python -m skore_skills api get` | skrub / pandas / polars symbol lookups. Cache hits first |
 | `data-science-python-stack` | G-TABULAR; skrub `TableReport` is catalogued there |
-| `python-code-style` | ruff after writing `data/eda.py` |
+| `python -m skore_skills style` | ruff after writing `data/eda.py` |
 
 ## Templates and assets
 
@@ -435,6 +435,14 @@ detail lives in `data/eda.md`. On the **skip** path, only the
 
 The cell runner is **the CLI** —
 `python -m skore_skills cells run`.
+
+
+## Need a package?
+
+When an import is missing, load `add-python-package` if
+`status.skills.add-python-package` is true. That skill owns
+`env add` and the unmanaged ask. Do not run `env add` here.
+If the skill is not installed, name the package and stop.
 
 ## References (load on demand)
 

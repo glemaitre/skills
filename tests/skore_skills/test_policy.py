@@ -39,6 +39,28 @@ def test_policy_set_cli(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None
     assert json.loads(status.output)["policy"]["git"]["autocommit"] == "off"
 
 
+def test_policy_set_env_managed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``env.managed`` accepts true/false aliases."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["policy", "set", "env.managed", "false"])
+    assert result.exit_code == 0, result.output
+    saved = json.loads((tmp_path / ".skore").read_text())
+    assert saved["workspace"]["env"]["managed"] is False
+    status = json.loads(CliRunner().invoke(cli, ["status"]).output)
+    assert status["policy"]["env"]["managed"] is False
+    again = CliRunner().invoke(cli, ["policy", "set", "env.managed", "yes"])
+    assert again.exit_code == 0, again.output
+    assert json.loads(again.output)["env"]["managed"] is True
+
+
+def test_policy_set_rejects_invalid_managed(tmp_path: Path) -> None:
+    """Managed accepts only boolean aliases."""
+    with pytest.raises(ValueError, match="true or false"):
+        set_policy_value(tmp_path, "env.managed", "maybe")
+
+
 def test_policy_set_rejects_invalid_autocommit(tmp_path: Path) -> None:
     """Autocommit accepts only ``off`` or ``on``."""
     with pytest.raises(ValueError, match="off or on"):

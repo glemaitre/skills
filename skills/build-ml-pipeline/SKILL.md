@@ -123,10 +123,10 @@ bottom; any match means STOP.
 
 ### S1. Missing dependency
 
-- **Rule:** `import skrub` raising means `python-env-manager` is
+- **Rule:** `import skrub` raising means `add-python-package` is
   next, not a substitute library.
 - **Symptom:** `ModuleNotFoundError: No module named 'skrub'`.
-- **Recovery:** invoke `python-env-manager` for the install
+- **Recovery:** invoke `add-python-package` for the install
   command. Do NOT substitute with `sklearn.Pipeline` /
   `make_pipeline` / `FunctionTransformer` — that silently rewrites
   this skill out of the project.
@@ -263,7 +263,7 @@ Layer 3: features take X + history as references.
 
 - **Rule:** no `warnings.filterwarnings(...)` in `pipeline.py` or
   scratch probes unless the user explicitly asks. See
-  `python-code-style` § Stop conditions.
+  `python -m skore_skills style` § Stop conditions.
 
 ## Forbidden shortcuts
 
@@ -647,8 +647,16 @@ catalogue with code: → `references/common_patterns.md`.
 | `evaluate-ml-pipeline` | Owns `skore.evaluate`, CV selection, metric defaults. Consumes the `split_kwargs` wired at the X marker |
 | `smoke-test-ml-pipeline` | Executable proof of Rule 2's early-mark. Smoke failure → route back here; fix the topology, don't loosen the assertion |
 | `smoke-test-ml-pipeline` | Router for `tests/`. Smoke test pairs 1:1 with the experiment script |
-| `python-env-manager` | Detection + install commands. Invoke when `import skrub` raises |
-| `python-code-style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct `pixi run ruff check` drops the NumPyDoc convention |
+| `add-python-package` | Detection + install commands. Invoke when `import skrub` raises |
+| `python -m skore_skills style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct `pixi run ruff check` drops the NumPyDoc convention |
+
+
+## Need a package?
+
+When an import is missing, load `add-python-package` if
+`status.skills.add-python-package` is true. That skill owns
+`env add` and the unmanaged ask. Do not run `env add` here.
+If the skill is not installed, name the package and stop.
 
 ## References (load on demand)
 

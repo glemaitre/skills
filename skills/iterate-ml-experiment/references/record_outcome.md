@@ -39,7 +39,7 @@ Agent feature missing, report not landed in the Project, hub
 auth expired, script crashed before `project.put`: **do not
 fabricate report content from memory.** Recovery is owned by
 `audit-ml-pipeline` (re-run the runner once the issue is fixed)
-or `python-env-manager` (G-AGENT-FEATURE). If the user wants to
+or `add-python-package` (agent tools (ruff / ipython / ipykernel)). If the user wants to
 record the outcome anyway, ask them for the headline metric (and
 a one-line note on anything that looked off), set the design
 note's Implication to `deferred — audit not accessible this

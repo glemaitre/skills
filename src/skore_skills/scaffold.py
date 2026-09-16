@@ -15,9 +15,7 @@ INVALID_STEM = "journal stem must look like NN_short_name"
 
 # Root files an env manager may already own (``pixi init`` writes
 # ``pyproject.toml`` and ``.gitignore``). Kept unless ``--force``.
-PRESERVED_ROOT_FILES = frozenset(
-    {Path("pyproject.toml"), Path(".gitignore"), Path("ruff.toml")}
-)
+PRESERVED_ROOT_FILES = frozenset({Path("pyproject.toml"), Path(".gitignore")})
 
 SRC_TEMPLATES = {
     "src___init__.py": "__init__.py",
@@ -102,20 +100,27 @@ def scaffold(root: Path, package: str, *, force: bool = False) -> list[Path]:
         write(Path("src") / package / dest_name, render_template(raw, package))
 
     for name, dest in (
-        ("pyproject.toml", Path("pyproject.toml")),
+        ("pyproject.toml.template", Path("pyproject.toml")),
         (".gitignore", Path(".gitignore")),
         ("experiment.py", Path("experiments") / "01_baseline.py"),
     ):
         raw = (templates / name).read_text(encoding="utf-8")
-        write(dest, render_template(raw, package, pyproject=name == "pyproject.toml"))
+        write(
+            dest, render_template(raw, package, pyproject=name.startswith("pyproject"))
+        )
 
-    ruff = files("skore_skills").joinpath("data/ruff.toml")
-    write(Path("ruff.toml"), ruff.read_text(encoding="utf-8"))
     journal = files("skore_skills").joinpath("data/JOURNAL.md")
     write(
         Path("journal") / "JOURNAL.md",
         render_template(journal.read_text(encoding="utf-8"), package),
     )
+    from skore_skills.style import ensure_ruff_in_pyproject
+
+    pyproject_path = root / "pyproject.toml"
+    if pyproject_path.is_file() and ensure_ruff_in_pyproject(pyproject_path):
+        rel = Path("pyproject.toml")
+        if rel not in written:
+            written.append(rel)
     return written
 
 

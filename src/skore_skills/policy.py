@@ -21,6 +21,7 @@ LOOP_STAGES = ("setup", "eda", "implement", "evaluate", "audit", "backlog")
 
 POLICY_SET_KEYS = (
     "env_manager",
+    "env.managed",
     "package",
     "tabular",
     "skore_mode",
@@ -30,8 +31,10 @@ POLICY_SET_KEYS = (
 )
 
 _POLICY_FLAT_KEYS = frozenset(
-    {"env_manager", "package", "tabular", "skore_mode", "git", "loop"}
+    {"env_manager", "env", "package", "tabular", "skore_mode", "git", "loop"}
 )
+MANAGED_TRUE = ("true", "on", "yes")
+MANAGED_FALSE = ("false", "off", "no")
 
 
 def empty_policy() -> dict[str, Any]:
@@ -41,6 +44,7 @@ def empty_policy() -> dict[str, Any]:
         "package": None,
         "tabular": None,
         "skore_mode": None,
+        "env": {"managed": None},
         "git": {"autocommit": None},
         "loop": {"stage": None, "stem": None},
     }
@@ -58,6 +62,15 @@ def _merge_loaded(raw: Any) -> dict[str, Any]:
     for key in ("env_manager", "package", "tabular", "skore_mode"):
         if key in raw:
             data[key] = raw[key]
+    env = raw.get("env")
+    if isinstance(env, dict) and "managed" in env:
+        managed = env["managed"]
+        if managed is True or managed is False:
+            data["env"] = {"managed": managed}
+        elif isinstance(managed, str) and managed.lower() in MANAGED_TRUE:
+            data["env"] = {"managed": True}
+        elif isinstance(managed, str) and managed.lower() in MANAGED_FALSE:
+            data["env"] = {"managed": False}
     git = raw.get("git")
     if isinstance(git, dict) and "autocommit" in git:
         data["git"] = {
@@ -165,11 +178,21 @@ def set_policy_value(root: Path, key: str, value: str) -> dict[str, Any]:
         raise ValueError("git.autocommit must be off or on")
     if key == "loop.stage" and parsed is not None and parsed not in LOOP_STAGES:
         raise ValueError(f"loop.stage must be one of {', '.join(LOOP_STAGES)}")
+    if key == "env.managed" and parsed is not None:
+        lowered = str(parsed).lower()
+        if lowered in MANAGED_TRUE:
+            parsed = True
+        elif lowered in MANAGED_FALSE:
+            parsed = False
+        else:
+            raise ValueError("env.managed must be true or false")
     policy = load_policy(root)
     if key.startswith("git."):
         policy["git"][key.split(".", 1)[1]] = parsed
     elif key.startswith("loop."):
         policy["loop"][key.split(".", 1)[1]] = parsed
+    elif key.startswith("env."):
+        policy["env"][key.split(".", 1)[1]] = parsed
     else:
         policy[key] = parsed
     save_policy(root, policy)

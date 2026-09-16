@@ -108,7 +108,7 @@ channel.
   `warnings.filterwarnings(...)` in the test body, no
   `filterwarnings = [...]` in `pytest.ini` /
   `pyproject.toml` — unless the user explicitly asks. See
-  `python-code-style` § Stop conditions.
+  `python -m skore_skills style` § Stop conditions.
 
 ## Pre-flight — emit this checklist as visible text before any test code
 
@@ -435,7 +435,7 @@ metric problem.
   cache new findings back there (per `python -m skore_skills api get` Shape 0/3).
 - **`data-science-python-stack`** — declares pytest as a Tier 1
   mandatory dependency for any workspace using this skill.
-- **`python-code-style`** — **must be invoked** after writing or
+- **`python -m skore_skills style`** — **must be invoked** after writing or
   editing `tests/smoke/test_NN_*.py`. Running `pixi run ruff
   check` directly without invoking this skill silently drops the
   NumPyDoc docstring convention the stack expects: ruff's
@@ -443,3 +443,10 @@ metric problem.
   teaches the parameter-shape-in-type-slot and the section
   layout (`Parameters` / `Returns` / `Notes`) the test fixture +
   test function should use.
+
+## Need a package?
+
+When an import is missing, load `add-python-package` if
+`status.skills.add-python-package` is true. That skill owns
+`env add` and the unmanaged ask. Do not run `env add` here.
+If the skill is not installed, name the package and stop.

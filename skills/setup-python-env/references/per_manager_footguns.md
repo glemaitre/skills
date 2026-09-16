@@ -1,93 +1,34 @@
-# Python Env Manager — per-manager footguns
-
-Manager-specific traps when composing the `lsp` env and writing
-`pyrightconfig.json`. SKILL.md links here from § "Composition model"
-and § "Agent feature install". Read this when a per-manager CLI plan
-fails, or before recommending a manager to a user.
-
-`python -m skore_skills env agent` encodes the workarounds for each
-of these footguns. If you find yourself re-typing the equivalent
-commands by hand, you are almost certainly going to hit one of these
-failure modes — inspect the CLI plan and run it with `--execute`.
+# Per-manager footguns (no LSP)
 
 ## pixi
 
-The `lsp` env grows on every optional-feature addition (per
-`SKILL.md` § "Where does the package belong?" — § "Procedure when a
-new named feature is picked"). When G-ENV-SCOPE creates a new
-feature `foo`, the same step must append `"foo"` to `lsp`'s
-`features` list, then re-run `pixi install -e lsp`. Forgetting
-either step is the most common drift: the new dep is installable
-into the `foo` env but pyright doesn't see it → legitimate code
-shows "unresolved import" warnings.
-
-`env agent` covers the initial install only — when adding optional
-features later, follow the procedure in SKILL.md § G-ENV-SCOPE.
+Do not write both `pixi.toml` and `[tool.pixi]` in pyproject — pixi
+prefers `pixi.toml` if both exist. `env init --manager pixi` refuses
+when `pixi.toml` is present. Prefer `[tool.pixi.*]` in pyproject.
 
 ## uv
 
-`uv sync` without `--all-groups` will install only the default
-group. The `lsp` env is the same `.venv` as every other env (uv is
-single-env per project); the composition is by sync flags, not by
-env name. Use `uv sync --all-groups` after every dep add to keep
-`.venv` current.
-
-`env agent --execute` runs `uv sync --all-groups`, so this is handled
-at install time. After later optional-feature additions, the agent
-must re-run `uv sync --all-groups` (or the CLI) to keep `.venv`
-indexed by pyright.
+Agent tools: `uv add --group agent`. Runtime: `uv add` into
+`[project.dependencies]`. Resync with `uv sync --group agent`.
 
 ## poetry
 
-If `virtualenvs.in-project` is false (poetry's default), the env
-lives in poetry's user-level cache dir, and the `pythonPath` in
-`pyrightconfig.json` becomes absolute and machine-local — not
-portable across machines / CI.
-
-`env agent --execute` runs `poetry config virtualenvs.in-project
-true` as its first step, forcing the env to `.venv` at the project
-root. This makes the `pythonPath` in `pyrightconfig.json` portable.
-**If a user has already installed poetry deps into the cache dir
-before this gate fires**, the CLI will create a new `.venv` and the cached env is
-orphaned — surface this to the user before running.
+Use PEP 621 `[project]` plus PEP 735 `[dependency-groups]`.
+`poetry add --group agent` for ruff/ipython/ipykernel.
 
 ## hatch
 
-`hatch env find <name>` returns an absolute path in hatch's data
-dir (`~/.local/share/hatch/env/virtual/...`), not project-
-relative. The `pyrightconfig.json` is therefore machine-local —
-not portable.
+No universal add command. `env add` prints an edit hint. Agent env
+is `[tool.hatch.envs.agent]`. Do not treat `[tool.hatch.build]` as
+an env-manager signal.
 
-Hatch envs do not compose. The `agent` env and the `lsp` env must
-both list every runtime dep explicitly. The CLI errors
-out if those sections aren't authored in `pyproject.toml`; it
-does NOT attempt to fill them in (the runtime dep list is the
-user's contract).
+## conda / mamba
 
-For new projects, recommend pixi or uv over hatch when the LSP
-integration is in scope. The duplication cost compounds with
-every optional feature.
-
-## conda
-
-The envs dir is global (`conda env list` shows paths). The
-`pyrightconfig.json` `pythonPath` will point at an absolute path
-under that dir, which is machine-local. Not portable across
-machines / CI.
-
-The duplicated-deps cost from `SKILL.md` § "Where does the
-package belong?" applies — every dep lands in three separate envs
-(`<project>-agent`, `<project>-lsp`, the runtime env). The
-CLI requires `environment-agent.yml` and
-`environment-lsp.yml` at cwd; it doesn't attempt to derive deps
-from a single `environment.yml`.
+Cannot live in pyproject. `environment.yml` (runtime) and
+`environment-agent.yml` (tools).
 
 ## pip + venv
 
-The manager-of-last-resort. No manifest, no reproducibility, no
-shared cache between `.venv-agent` and `.venv-lsp`. Recommend
-migration to a managed alternative (pixi by default) before
-investing in the LSP integration.
-
-The CLI accepts the runtime-deps file via `--requirements`;
-it cannot derive the deps from any project metadata.
+Prefer `[project.dependencies]` + `[dependency-groups]` when a
+pyproject exists. `requirements.txt` only if that is already the
+project contract.

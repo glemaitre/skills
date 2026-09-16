@@ -1,202 +1,98 @@
 ---
 name: setup-python-env
 description: >
-  Detect the Python environment manager and add packages through it.
-  Uses `python -m skore_skills env detect` for evidence and
-  `python -m skore_skills env add <packages>` for the manager-specific
-  command. Keeps user gates for no manager, ambiguous managers,
-  ambiguous dependency scope, and the optional agent feature.
+  Bootstrap a Python environment manager and two named envs
+  (default runtime, agent tools). Detect with
+  `python -m skore_skills env detect`, persist manager and
+  `env.managed`, then run `env init --manager`. Does not add
+  stage ML libraries.
 
-  TRIGGER before installing, adding, pinning, upgrading, or removing
-  Python packages; when a workflow reports a missing dependency; when
-  bootstrapping a Python project; or when IPython/pyright agent support
-  is requested.
+  TRIGGER when bootstrapping a Python project or when no
+  environment manager is recorded yet.
 
-  SKIP non-Python tools and already-installed dependencies.
+  SKIP adding packages after bootstrap — load add-python-package.
+  SKIP non-Python tools.
 
-  HOW TO USE: run `env detect`, resolve gates, then either bootstrap
-  the manager or run `env add`. Never use a different manager from
-  the project manifest.
+  HOW TO USE: detect, ask managed vs user-managed, ask the
+  manager when needed, then `env init`. Narrate every choice.
 ---
 
-# Python Env Manager
+# Set Up Python Environment
 
-Detect first. Add with the detected manager. Return to the calling
-skill after the dependency is importable.
+Bootstrap only. Name every choice this turn: manager,
+`env.managed`, two-env layout, packages `ruff` / `ipython` /
+`ipykernel`. Do not install sklearn, skrub, skore, pandas,
+jupyterlab, or pyright.
 
-This skill has two modes. Pick one per turn from
-`python -m skore_skills status` and `env detect`:
-
-- **Bootstrap** (no manager yet): resolve G-ENV-MGR, persist it with
-  `python -m skore_skills policy set env_manager <manager>`, and run
-  the manager's `init`. Nothing else. No ML stack, no editable
-  install, no tabular pick.
-- **Add** (manager in place): `env add` for requested packages, plus
-  the editable workspace package once `status.has_src` is true.
+Adding a later dependency is `add-python-package`, not this skill.
 
 ## Stop conditions
 
 - **Wrong-manager install is forbidden.** Never `pip install` in a
-  pixi project. Mixed state is not tracked and a later install/sync
-  can undo it.
-- **No silent bootstrap.** If no manager is detected, ask the user.
-  Recommend pixi, but do not run `pixi init` before confirmation.
-  A manager on PATH is context, not permission.
-- **No silent ambiguity resolution.** If multiple project or ambient
-  managers are visible, ask which environment is the target.
-- **Known packages route automatically.** Runtime packages go to
-  default; development tools to dev; IPython/pyright to agent.
-  Ask `G-ENV-SCOPE` only for ambiguous extras such as optuna,
-  xgboost, or mlflow: default vs a new named feature.
-- Urgency and “you pick” do not resolve a gate.
-- Install unpinned unless the user asks or compatibility requires a
-  pin.
-- Do not run system bootstrap installers (`curl | sh`).
-- **A missing layout is a status fact, not a route.** When
-  `status.has_src` is false, say the editable install is pending and
-  stop there. Do not load `setup-workspace`, do not scaffold, and do
-  not create `src/<pkg>/` yourself.
-- **Bootstrap does not install the ML stack.** The tabular library
-  and skore mode belong to later turns; adding them here can lock a
-  choice the user has not made.
+  pixi project.
+- **No silent bootstrap.** If no manager is detected, ask. Recommend
+  from `env detect` `recommended`: policy `env_manager`, then a
+  unique manifest, then `provenance.manager` (`skore` install
+  path), then pixi → uv → poetry → hatch → conda → pip-venv.
+  PATH of other tools is not permission. Do not run `curl | sh`.
+- **No silent ambiguity.** If `ambiguous` is true, ask which
+  manifest is the project manager. If `mismatch` is true, ask:
+  recorded policy disagrees with the unique manifest.
+- **User opt-out.** If the user manages the env, persist
+  `env.managed` false and **stop**. Do not `env init` or `env add`.
+  Name ruff / ipython / ipykernel as tools they may want later.
+- **Do not hand-edit manager TOML.** `env init` is the only writer
+  of manager tables. Do not create `pixi.toml` when pixi can live in
+  pyproject. Do not create `src/`.
+- **A missing layout is a status fact.** When `has_src` is false,
+  editable install is pending. Do not scaffold here.
 
 ## Pre-flight
 
 ```
 - [ ] Detection: python -m skore_skills env detect
-- [ ] Mode: bootstrap | add
-- [ ] Manager: pixi | uv | poetry | hatch | conda | pip-venv | none
-- [ ] G-ENV-MGR: resolved | ask | n/a (one manifest manager)
-- [ ] Package route: default | dev | agent | G-ENV-SCOPE ask
-- [ ] G-AGENT-FEATURE: install | skip | n/a
-- [ ] Editable: has_src true | pending (status fact)
-- [ ] Command: python -m skore_skills env add <packages> | env agent
+- [ ] G-ENV-MGR: <manager> | ask
+- [ ] env.managed: true | false | ask (default true)
+- [ ] Command: python -m skore_skills env init --manager <name>
+- [ ] Narrated: default + agent; ruff, ipython, ipykernel
 ```
 
-## Detect
+## Sequence
 
-Run at project root:
+1. `python -m skore_skills env detect` and `status` (policy).
+2. Rank managers from `recommended`. Ask when none, `ambiguous`,
+   or `mismatch`.
+3. Ask whether **we** manage the env (default yes). Persist
+   `python -m skore_skills policy set env.managed true` or `false`.
+4. If unmanaged: stop after detection. Do not init.
+5. If managed: `policy set env_manager <manager>`, then
 
-```bash
-python -m skore_skills env detect
-```
+   ```bash
+   python -m skore_skills env init --manager <manager>
+   ```
 
-The JSON contains `env_manager`, `managers`, `evidence`, and
-`ambiguous`. Root manifests are authoritative only when exactly one
-manager is visible. Also surface an active ambient environment that
-conflicts with the project (for example conda active beside
-`pixi.toml`) and ask which target to use.
+   Review the printed `next:` command (install/sync). Do not invent
+   TOML. No sklearn/skrub/skore/pandas/jupyterlab/pyright.
+6. After workspace exists (`has_src`), editable install is
+   `add-python-package` (or the dispatcher), not a second bootstrap
+   mode here.
 
-If detection returns `none`, ask:
+## Two environments
 
-1. pixi (recommended)
-2. uv
-3. poetry
-4. hatch
-5. conda/mamba
-6. pip + venv
+- **default** — project runtime. Empty after bootstrap.
+- **agent** — default plus ruff, ipython, ipykernel. Interpreter for
+  `cells run` and ruff.
 
-Wait for the answer before bootstrap.
+uv/poetry: default dependencies plus an `agent` group. Hatch/conda:
+two envs. No `dev` env, no `lsp` env, no pyright.
 
-## Add packages
+Ruff config is `[tool.ruff]` in `pyproject.toml`. Leftover
+`ruff.toml` is still valid. Run style with
+`python -m skore_skills style`.
 
-After the gates resolve:
+## References
 
-```bash
-python -m skore_skills env add <package> [<package> ...]
-```
-
-By default the CLI prints the detected manager's command; execute it
-only after checking the output. For pixi, a runtime package such as
-`skrub`, `pandas`, or `scikit-learn` prints `pixi add <package>`.
-Never replace that with pip/uv/poetry.
-
-The three-feature policy is:
-
-- `default`: runtime Python stack
-- `dev`: tests, lint, notebooks
-- `agent`: IPython and pyright
-
-The current CLI prints the base manager command. If a known non-default
-feature is needed, add the manager's feature flag to that printed
-command. For an ambiguous extra, ask first: `default` or a new named
-feature inferred from the task (for example `tuning` for optuna).
-
-## Agent feature
-
-Ask before installing optional agent-only support. If approved, use
-the detected manager's CLI plan:
-
-```bash
-python -m skore_skills env agent
-python -m skore_skills env agent --execute
-python -m skore_skills env check
-```
-
-Inspect the print-only plan before `--execute`. The command installs
-IPython + pyright, composes the LSP environment, writes the packaged
-`pyrightconfig.json`, and verifies the tools. `env check` validates
-pixi, uv, and Poetry declarations; hatch, conda, and pip-venv return
-exit 2 with the manual-check reference. Do not register a Jupyter
-kernel. If declined, return to the caller's documented fallback.
-
-## Python code style
-
-Setup also owns the root Ruff configuration. If `ruff.toml` is
-missing from an existing workspace, copy the packaged configuration:
-
-```bash
-python -m skore_skills style --init
-```
-
-Fresh `scaffold` runs include the same file. After Python edits run:
-
-```bash
-python -m skore_skills style <touched paths>
-```
-
-Ruff remains manual: no PostToolUse/PreToolUse hook, no black/isort
-substitution, and no widening to untouched files. Public functions
-use numpydoc `Parameters` / `Returns` sections with array shapes in
-the type slot.
-
-## Editable workspace package (pixi)
-
-Only once `status.has_src` is true and `pyproject.toml` declares the
-package. On a manager-only root, report this step as pending instead.
-
-For a fresh `src/<pkg>/` scaffold:
-
-```bash
-pixi add --pypi "<pkg> @ ."
-```
-
-Then ensure the pixi manifest contains:
-
-```toml
-<pkg> = { path = ".", editable = true }
-```
-
-Run `pixi install`. This makes `from <pkg>...` work from any CWD;
-do not use `pip install -e .` or `PYTHONPATH=src`.
-
-## Failure handling
-
-- `env detect` ambiguous: ask; do not call `env add`.
-- no manager: ask; do not bootstrap before the answer.
-- no `src/<pkg>/`: skip the editable install and report it as
-  pending; do not scaffold from here.
-- hatch: follow the CLI's manifest-edit hint; there is no universal
-  add command.
-- `env agent` print-only first; pass `--execute` only after reviewing
-  the manager-specific plan.
-- a forbidden substitute: keep the canonical stack package and
-  surface the CLI refusal.
-
-## References (load on demand)
-
-- `references/ambient_detection.md`
 - `references/bootstrap.md`
-- `references/editable_workspace.md`
-- `references/agent_feature_anatomy.md`
+- `references/composition_model.md`
+- `references/install_commands_anatomy.md`
 - `references/per_manager_footguns.md`

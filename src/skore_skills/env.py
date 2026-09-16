@@ -1,17 +1,18 @@
-"""Detect the project env manager and emit install commands."""
+"""Detect the project env manager and emit install / init commands."""
 
 from __future__ import annotations
 
 import json
-import shlex
+import os
+import shutil
 import subprocess
-import tomllib
-from dataclasses import dataclass
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
-from skore_skills.workspace import MANAGER_ORDER, manager_evidence, package_name
+from skore_skills.policy import load_policy
+from skore_skills.style import RUFF_PYPROJECT_TABLE, ensure_ruff_in_pyproject
+from skore_skills.workspace import MANAGER_ORDER, manager_evidence
 
 HATCH_ADD_HINT = (
     "hatch has no universal add command; edit pyproject.toml "
@@ -20,21 +21,90 @@ HATCH_ADD_HINT = (
 )
 NO_MANAGER = "no env manager detected; record one before installing packages"
 AMBIGUOUS = "multiple env managers are visible; do not pick automatically"
-UNSUPPORTED_CHECK = (
-    "{manager} agent layout check is not supported; "
-    "see setup-python-env/references/per_manager_footguns.md"
+UNMANAGED = "environment is user-managed (env.managed is false); do not install"
+PIXI_TOML_PRESENT = (
+    "pixi.toml already exists; refuse to add [tool.pixi] to pyproject.toml"
 )
-AGENT_PACKAGES = ("ipython", "pyright")
+INIT_EXISTS = "manager tables already present; pass --force to replace them"
+INIT_MISMATCH = "detected manager {detected!r} does not match --manager {wanted!r}"
+AGENT_PACKAGES = ("ruff", "ipython", "ipykernel")
 
+_SKELETON = """\
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-@dataclass(frozen=True)
-class AgentPlan:
-    """Commands and interpreter path for an agent-feature install."""
+[project]
+name = "workspace"
+version = "0.1.0"
+description = "ML experimentation workspace."
+requires-python = ">=3.11"
+dependencies = []
 
-    manager: str
-    install: tuple[tuple[str, ...], ...]
-    verify: tuple[tuple[str, ...], ...]
-    python_path: str
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+"""
+
+_PIXI_TABLE = """
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[tool.pixi.feature.agent.dependencies]
+ruff = "*"
+ipython = "*"
+ipykernel = "*"
+
+[tool.pixi.environments]
+default = { features = ["default"], solve-group = "default" }
+agent = { features = ["default", "agent"], solve-group = "default" }
+"""
+
+_UV_GROUPS = """
+[tool.uv]
+
+[dependency-groups]
+agent = ["ruff", "ipython", "ipykernel"]
+"""
+
+_PIP_GROUPS = """
+[dependency-groups]
+agent = ["ruff", "ipython", "ipykernel"]
+"""
+
+_POETRY_GROUPS = """
+[tool.poetry]
+package-mode = false
+
+[dependency-groups]
+agent = ["ruff", "ipython", "ipykernel"]
+"""
+
+_HATCH_ENV = """
+[tool.hatch.envs.default]
+
+[tool.hatch.envs.agent]
+dependencies = ["ruff", "ipython", "ipykernel"]
+"""
+
+_CONDA_DEFAULT = """\
+name: workspace
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+"""
+
+_CONDA_AGENT = """\
+name: workspace-agent
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+  - ruff
+  - ipython
+  - ipykernel
+"""
 
 
 def load_stack_policy() -> dict[str, Any]:
@@ -43,11 +113,117 @@ def load_stack_policy() -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+_CONDA_PREFIX_MARKERS = (
+    "miniconda",
+    "miniconda3",
+    "mambaforge",
+    "micromamba",
+    "anaconda",
+    "anaconda3",
+)
+
+
+def _resolve_skore_binary() -> Path | None:
+    """Return the real path of ``skore`` or ``skore-cli`` on PATH."""
+    for name in ("skore", "skore-cli"):
+        found = shutil.which(name)
+        if found is None:
+            continue
+        path = Path(found)
+        try:
+            return path.resolve()
+        except OSError:
+            return path
+    return None
+
+
+def _manager_from_skore_path(path: Path) -> str | None:
+    """Map a ``skore`` install path to a project manager, or None if weak."""
+    parts = [part.lower() for part in path.parts]
+    posix = path.as_posix().lower()
+    if "pipx" in parts:
+        return None
+    if ".pixi" in parts or "/pixi/bin/" in posix:
+        return "pixi"
+    uv_tool = os.environ.get("UV_TOOL_DIR")
+    if uv_tool:
+        try:
+            if path.resolve().is_relative_to(Path(uv_tool).resolve()):
+                return "uv"
+        except (OSError, ValueError):
+            pass
+    if "uv" in parts and "tools" in parts:
+        return "uv"
+    if "/uv/tools/" in posix:
+        return "uv"
+    parent = path.parent
+    prefix = parent.parent if parent.name in {"bin", "Scripts"} else parent
+    if (prefix / "conda-meta").is_dir():
+        return "conda"
+    if any(marker in parts for marker in _CONDA_PREFIX_MARKERS):
+        return "conda"
+    return None
+
+
+def skore_cli_provenance() -> dict[str, str | None]:
+    """Return how ``skore`` was installed, for ``recommended`` ranking only."""
+    path = _resolve_skore_binary()
+    if path is None:
+        return {"manager": None, "path": None}
+    return {"manager": _manager_from_skore_path(path), "path": str(path)}
+
+
+def _recorded_manager(root: Path) -> str | None:
+    recorded = load_policy(root).get("env_manager")
+    if recorded in MANAGER_ORDER:
+        return recorded
+    return None
+
+
+def _order_with_lead(lead: str | None) -> list[str]:
+    order = list(MANAGER_ORDER)
+    if lead in order:
+        order.remove(lead)
+        order.insert(0, lead)
+    return order
+
+
+def _recommended(
+    root: Path,
+    evidence: dict[str, list[str]],
+    provenance_manager: str | None,
+) -> list[str]:
+    """Return manager names in ask order.
+
+    Policy, then a unique manifest, then ``skore`` provenance, then
+    ``MANAGER_ORDER``.
+    """
+    recorded = _recorded_manager(root)
+    present = [name for name in MANAGER_ORDER if name in evidence]
+    if recorded is not None:
+        return _order_with_lead(recorded)
+    if len(present) == 1:
+        return present
+    if present:
+        return [name for name in MANAGER_ORDER if name in present]
+    if provenance_manager in MANAGER_ORDER:
+        return _order_with_lead(provenance_manager)
+    return list(MANAGER_ORDER)
+
+
+def _mismatch(root: Path, evidence: dict[str, list[str]]) -> bool:
+    recorded = _recorded_manager(root)
+    present = [name for name in MANAGER_ORDER if name in evidence]
+    return recorded is not None and len(present) == 1 and present[0] != recorded
+
+
 def detect(root: Path) -> dict[str, Any]:
     """Return detection JSON for ``root``.
 
     When two or more managers are visible, ``ambiguous`` is true and
     ``env_manager`` is null — the CLI must not pick a winner.
+    ``recommended`` may still rank a recorded policy or ``skore``
+    provenance; those do not change ``env_manager``.
     """
     evidence = manager_evidence(root)
     managers = [name for name in MANAGER_ORDER if name in evidence]
@@ -58,11 +234,16 @@ def detect(root: Path) -> dict[str, Any]:
         env_manager = None
     else:
         env_manager = managers[0]
+    provenance = skore_cli_provenance()
     return {
         "env_manager": env_manager,
         "managers": managers,
         "evidence": evidence,
         "ambiguous": ambiguous,
+        "mismatch": _mismatch(root, evidence),
+        "recommended": _recommended(root, evidence, provenance["manager"]),
+        "provenance": provenance,
+        "managed": load_policy(root).get("env", {}).get("managed"),
     }
 
 
@@ -77,12 +258,23 @@ def forbidden_reason(package: str) -> str | None:
     return None
 
 
-def install_argv(manager: str, packages: list[str]) -> list[str] | None:
+def install_argv(
+    manager: str,
+    packages: list[str],
+    *,
+    feature: str | None = None,
+) -> list[str] | None:
     """Return the manager-specific add command, or None for hatch."""
+    extra: list[str] = []
+    if feature:
+        if manager == "pixi":
+            extra = ["--feature", feature]
+        elif manager in {"uv", "poetry"}:
+            extra = ["--group", feature]
     commands: dict[str, list[str]] = {
-        "pixi": ["pixi", "add", *packages],
-        "uv": ["uv", "add", *packages],
-        "poetry": ["poetry", "add", *packages],
+        "pixi": ["pixi", "add", *extra, *packages],
+        "uv": ["uv", "add", *extra, *packages],
+        "poetry": ["poetry", "add", *extra, *packages],
         "conda": ["conda", "install", "-c", "conda-forge", *packages],
         "pip-venv": ["pip", "install", *packages],
     }
@@ -93,11 +285,16 @@ def install_argv(manager: str, packages: list[str]) -> list[str] | None:
     return commands[manager]
 
 
+def _unmanaged(root: Path) -> bool:
+    return load_policy(root).get("env", {}).get("managed") is False
+
+
 def add_packages(
     root: Path,
     packages: list[str],
     *,
     execute: bool = False,
+    feature: str | None = None,
 ) -> tuple[str, int]:
     """Build (or run) install commands for ``packages``.
 
@@ -105,6 +302,8 @@ def add_packages(
     """
     if not packages:
         return "need at least one package\n", 2
+    if _unmanaged(root):
+        return UNMANAGED + "\n", 1
     for name in packages:
         reason = forbidden_reason(name)
         if reason is not None:
@@ -115,7 +314,7 @@ def add_packages(
     manager = payload["env_manager"]
     if manager in {None, "none"}:
         return NO_MANAGER + "\n", 1
-    argv = install_argv(str(manager), packages)
+    argv = install_argv(str(manager), packages, feature=feature)
     if argv is None:
         text = HATCH_ADD_HINT + "\n"
         if execute:
@@ -128,331 +327,80 @@ def add_packages(
     return rendered, completed.returncode
 
 
-def _poetry_groups(root: Path) -> list[str]:
-    """Return Poetry dependency groups declared in either supported format."""
-    data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
-    groups = set(data.get("dependency-groups", {}))
-    poetry = data.get("tool", {}).get("poetry", {})
-    if isinstance(poetry, dict):
-        legacy = poetry.get("group", {})
-        if isinstance(legacy, dict):
-            groups.update(legacy)
-    groups.add("agent")
-    return sorted(str(group) for group in groups)
+def _ensure_pyproject(root: Path) -> Path:
+    path = root / "pyproject.toml"
+    if not path.is_file():
+        path.write_text(_SKELETON + "\n" + RUFF_PYPROJECT_TABLE, encoding="utf-8")
+    else:
+        ensure_ruff_in_pyproject(path)
+    return path
 
 
-def agent_plan(
+def _append_if_missing(path: Path, marker: str, block: str, *, force: bool) -> bool:
+    text = path.read_text(encoding="utf-8") if path.is_file() else ""
+    if marker in text and not force:
+        return False
+    if marker in text and force:
+        # Keep existing file; caller treats False as already-present.
+        return False
+    path.write_text(text.rstrip() + "\n" + block.strip() + "\n", encoding="utf-8")
+    return True
+
+
+def init_environment(
     root: Path,
     manager: str,
     *,
-    project: str | None = None,
-    requirements: Path | None = None,
-) -> AgentPlan:
-    """Build the manager-specific agent feature command plan."""
-    if manager == "pixi":
-        manifest = root / "pixi.toml"
-        if not manifest.is_file():
-            raise ValueError("pixi.toml not found at project root")
-        text = manifest.read_text(encoding="utf-8")
-        commands: list[tuple[str, ...]] = [
-            ("pixi", "add", "--feature", "agent", *AGENT_PACKAGES)
-        ]
-        if not any(line.strip().startswith("lsp") for line in text.splitlines()):
-            commands.append(
-                (
-                    "pixi",
-                    "project",
-                    "environment",
-                    "add",
-                    "lsp",
-                    "--feature",
-                    "default",
-                    "--feature",
-                    "dev",
-                    "--feature",
-                    "agent",
-                )
-            )
-        commands.append(("pixi", "install", "-e", "lsp"))
-        return AgentPlan(
-            manager,
-            tuple(commands),
-            (
-                ("pixi", "run", "-e", "agent", "ipython", "-c", "print('ok')"),
-                ("pixi", "run", "-e", "agent", "pyright", "--version"),
-            ),
-            ".pixi/envs/lsp/bin/python",
-        )
-    if manager == "uv":
-        if not (root / "pyproject.toml").is_file():
-            raise ValueError("pyproject.toml not found at project root")
-        return AgentPlan(
-            manager,
-            (
-                ("uv", "add", "--group", "agent", *AGENT_PACKAGES),
-                ("uv", "sync", "--all-groups"),
-            ),
-            (
-                ("uv", "run", "--group", "agent", "python", "-c", "import IPython"),
-                ("uv", "run", "--group", "agent", "pyright", "--version"),
-            ),
-            ".venv/bin/python",
-        )
-    if manager == "poetry":
-        if not (root / "pyproject.toml").is_file():
-            raise ValueError("pyproject.toml not found at project root")
-        groups = ",".join(_poetry_groups(root))
-        return AgentPlan(
-            manager,
-            (
-                ("poetry", "config", "virtualenvs.in-project", "true"),
-                ("poetry", "add", "--group", "agent", *AGENT_PACKAGES),
-                ("poetry", "install", "--with", groups),
-            ),
-            (
-                ("poetry", "run", "python", "-c", "import IPython"),
-                ("poetry", "run", "pyright", "--version"),
-            ),
-            ".venv/bin/python",
-        )
-    if manager == "hatch":
-        data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
-        envs = data.get("tool", {}).get("hatch", {}).get("envs", {})
-        if not isinstance(envs, dict) or not {"agent", "lsp"} <= set(envs):
-            raise ValueError(
-                "declare [tool.hatch.envs.agent] and [tool.hatch.envs.lsp] first"
-            )
-        return AgentPlan(
-            manager,
-            (("hatch", "env", "create", "agent"), ("hatch", "env", "create", "lsp")),
-            (
-                ("hatch", "run", "agent:python", "-c", "import IPython"),
-                ("hatch", "run", "agent:pyright", "--version"),
-            ),
-            "<hatch-lsp>/bin/python",
-        )
-    if manager == "conda":
-        project = project or package_name(root) or root.name
-        for name in ("environment-agent.yml", "environment-lsp.yml"):
-            if not (root / name).is_file():
-                raise ValueError(f"{name} not found at project root")
-        return AgentPlan(
-            manager,
-            (
-                ("conda", "env", "create", "-f", "environment-agent.yml"),
-                ("conda", "env", "create", "-f", "environment-lsp.yml"),
-            ),
-            (
-                (
-                    "conda",
-                    "run",
-                    "-n",
-                    f"{project}-agent",
-                    "python",
-                    "-c",
-                    "import IPython",
-                ),
-                ("conda", "run", "-n", f"{project}-agent", "pyright", "--version"),
-            ),
-            f"<conda-base>/envs/{project}-lsp/bin/python",
-        )
-    if manager == "pip-venv":
-        requirements = requirements or Path("requirements.txt")
-        req = root / requirements
-        if not req.is_file():
-            raise ValueError(f"requirements file not found: {requirements}")
-        return AgentPlan(
-            manager,
-            (
-                ("python3", "-m", "venv", ".venv-agent"),
-                (".venv-agent/bin/python", "-m", "pip", "install", "--upgrade", "pip"),
-                (
-                    ".venv-agent/bin/python",
-                    "-m",
-                    "pip",
-                    "install",
-                    "-r",
-                    str(requirements),
-                    *AGENT_PACKAGES,
-                ),
-                ("python3", "-m", "venv", ".venv-lsp"),
-                (".venv-lsp/bin/python", "-m", "pip", "install", "--upgrade", "pip"),
-                (
-                    ".venv-lsp/bin/python",
-                    "-m",
-                    "pip",
-                    "install",
-                    "-r",
-                    str(requirements),
-                    "ruff",
-                    "pytest",
-                    "jupyterlab",
-                    "ipykernel",
-                    *AGENT_PACKAGES,
-                ),
-            ),
-            (
-                (".venv-agent/bin/python", "-c", "import IPython"),
-                (".venv-agent/bin/pyright", "--version"),
-            ),
-            ".venv-lsp/bin/python",
-        )
-    raise ValueError(f"unknown manager {manager!r}")
-
-
-def _resolve_python_path(root: Path, plan: AgentPlan) -> str:
-    """Resolve manager-specific absolute interpreter placeholders."""
-    if plan.manager == "hatch":
-        result = subprocess.run(
-            ["hatch", "env", "find", "lsp"],
-            check=False,
-            capture_output=True,
-            text=True,
-            cwd=root,
-        )
-        if result.returncode:
-            raise ValueError("hatch could not locate the lsp environment")
-        # as_posix keeps JSON-safe separators; Path(str) on Windows would
-        # otherwise turn "/tmp/..." into "\tmp\..." and break the config.
-        return (Path(result.stdout.strip()) / "bin" / "python").as_posix()
-    if plan.manager == "conda":
-        result = subprocess.run(
-            ["conda", "info", "--base"],
-            check=False,
-            capture_output=True,
-            text=True,
-            cwd=root,
-        )
-        if result.returncode:
-            raise ValueError("conda could not report its base directory")
-        return plan.python_path.replace("<conda-base>", result.stdout.strip())
-    return plan.python_path
-
-
-def _write_pyright_config(root: Path, python_path: str) -> None:
-    """Write the packaged pyright configuration with its interpreter path."""
-    template = files("skore_skills").joinpath("templates/pyrightconfig.json")
-    payload = json.loads(template.read_text(encoding="utf-8"))
-    payload["pythonPath"] = python_path
-    (root / "pyrightconfig.json").write_text(
-        json.dumps(payload, indent=2) + "\n",
-        encoding="utf-8",
-    )
-
-
-def install_agent_feature(
-    root: Path,
-    *,
-    execute: bool = False,
-    project: str | None = None,
-    requirements: Path | None = None,
+    force: bool = False,
 ) -> tuple[str, int]:
-    """Print or execute the detected manager's agent-feature plan."""
+    """Write manager + agent tables. Does not create ``src/`` or install."""
+    if manager not in MANAGER_ORDER:
+        return f"unknown manager {manager!r}\n", 2
+    if _unmanaged(root):
+        return UNMANAGED + "\n", 1
     payload = detect(root)
-    if payload["ambiguous"]:
-        return AMBIGUOUS + "\n", 1
-    manager = payload["env_manager"]
-    if manager in {None, "none"}:
-        return NO_MANAGER + "\n", 1
-    try:
-        plan = agent_plan(
-            root,
-            str(manager),
-            project=project,
-            requirements=requirements,
+    detected = payload["env_manager"]
+    if detected not in {None, "none", manager}:
+        return INIT_MISMATCH.format(detected=detected, wanted=manager) + "\n", 1
+    if manager == "pixi" and (root / "pixi.toml").is_file():
+        return PIXI_TOML_PRESENT + "\n", 1
+
+    written: list[str] = []
+    if manager == "conda":
+        default = root / "environment.yml"
+        agent = root / "environment-agent.yml"
+        if default.is_file() and not force:
+            return INIT_EXISTS + "\n", 1
+        default.write_text(_CONDA_DEFAULT, encoding="utf-8")
+        agent.write_text(_CONDA_AGENT, encoding="utf-8")
+        written.extend(["environment.yml", "environment-agent.yml"])
+        follow = "conda env create -f environment-agent.yml"
+        return "wrote " + ", ".join(written) + f"\nnext: {follow}\n", 0
+
+    path = _ensure_pyproject(root)
+    if manager == "pixi":
+        added = _append_if_missing(path, "[tool.pixi", _PIXI_TABLE, force=force)
+        follow = "pixi install -e agent"
+    elif manager == "uv":
+        added = _append_if_missing(path, "[tool.uv]", _UV_GROUPS, force=force)
+        follow = "uv sync --group agent"
+    elif manager == "poetry":
+        added = _append_if_missing(path, "[tool.poetry]", _POETRY_GROUPS, force=force)
+        follow = "poetry install --with agent"
+    elif manager == "hatch":
+        added = _append_if_missing(
+            path, "[tool.hatch.envs.agent]", _HATCH_ENV, force=force
         )
-    except (OSError, tomllib.TOMLDecodeError, ValueError) as exc:
-        return f"{exc}\n", 1
-
-    lines = [shlex.join(command) for command in plan.install]
-    lines.append(f"write pyrightconfig.json (pythonPath={plan.python_path})")
-    lines.extend(shlex.join(command) for command in plan.verify)
-    rendered = "\n".join(lines) + "\n"
-    if not execute:
-        return rendered, 0
-
-    try:
-        for command in plan.install:
-            result = subprocess.run(command, check=False, cwd=root)
-            if result.returncode:
-                return rendered, result.returncode
-        python_path = _resolve_python_path(root, plan)
-        _write_pyright_config(root, python_path)
-        for command in plan.verify:
-            result = subprocess.run(command, check=False, cwd=root)
-            if result.returncode:
-                return rendered, result.returncode
-    except (FileNotFoundError, ValueError) as exc:
-        return rendered + f"{exc}\n", 1
-    return rendered, 0
-
-
-def _pyright_check(root: Path, expected: str) -> tuple[bool, str]:
-    """Check the project pyright config and expected interpreter."""
-    path = root / "pyrightconfig.json"
-    if not path.is_file():
-        return False, "pyrightconfig.json missing"
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return False, "pyrightconfig.json is invalid JSON"
-    actual = payload.get("pythonPath")
-    if actual != expected:
-        return False, f"pythonPath is {actual!r}; expected {expected!r}"
-    return True, f"pythonPath = {expected}"
-
-
-def check_agent_feature(root: Path) -> tuple[str, int]:
-    """Check agent-feature composition for pixi, uv, or Poetry."""
-    payload = detect(root)
-    if payload["ambiguous"]:
-        return AMBIGUOUS + "\n", 1
-    manager = payload["env_manager"]
-    if manager in {None, "none"}:
-        return NO_MANAGER + "\n", 1
-    if manager not in {"pixi", "uv", "poetry"}:
-        return UNSUPPORTED_CHECK.format(manager=manager) + "\n", 2
-
-    failures: list[str] = []
-    notes: list[str] = []
-    try:
-        if manager == "pixi":
-            text = (root / "pixi.toml").read_text(encoding="utf-8")
-            failures.extend(
-                f"feature {feature!r} is not declared"
-                for feature in ("dev", "agent")
-                if f"[feature.{feature}" not in text
-            )
-            lsp_lines = [
-                line for line in text.splitlines() if line.strip().startswith("lsp")
-            ]
-            if not lsp_lines or not all(
-                f'"{feature}"' in lsp_lines[0]
-                for feature in ("default", "dev", "agent")
-            ):
-                failures.append("lsp must include default, dev, and agent")
-            expected = ".pixi/envs/lsp/bin/python"
-        else:
-            data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
-            groups = set(data.get("dependency-groups", {}))
-            if manager == "poetry":
-                poetry = data.get("tool", {}).get("poetry", {})
-                legacy = poetry.get("group", {}) if isinstance(poetry, dict) else {}
-                if isinstance(legacy, dict):
-                    groups.update(legacy)
-            failures.extend(
-                f"group {group!r} is not declared"
-                for group in ("dev", "agent")
-                if group not in groups
-            )
-            expected = ".venv/bin/python"
-    except (OSError, tomllib.TOMLDecodeError) as exc:
-        return f"{exc}\n", 1
-
-    ok, note = _pyright_check(root, expected)
-    (notes if ok else failures).append(note)
-    lines = [f"env agent check: {manager}"]
-    lines.extend(f"[ok] {note}" for note in notes)
-    lines.extend(f"[FAIL] {failure}" for failure in failures)
-    lines.append("agent layout OK" if not failures else "agent layout has drift")
-    return "\n".join(lines) + "\n", int(bool(failures))
+        follow = "hatch env create agent"
+    else:
+        added = _append_if_missing(
+            path, "[dependency-groups]", _PIP_GROUPS, force=force
+        )
+        req = root / "requirements.txt"
+        if not req.is_file() or force:
+            req.write_text("ruff\nipython\nipykernel\n", encoding="utf-8")
+            added = True
+        follow = "python -m venv .venv && .venv/bin/pip install -r requirements.txt"
+    if not added:
+        return INIT_EXISTS + "\n", 1
+    return f"updated {path.name}\nnext: {follow}\n", 0

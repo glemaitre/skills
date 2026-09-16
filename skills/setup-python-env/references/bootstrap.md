@@ -1,184 +1,29 @@
-# Python Env Manager — Bootstrap detail
+# Bootstrap
 
-Full step-by-step pixi bootstrap when no manager is detected.
-Cross-referenced from SKILL.md § Bootstrap. Load when scaffolding
-a fresh workspace.
+`setup-python-env` is bootstrap-only. Later installs go through
+`add-python-package`.
 
-## Pre-conditions
+## Steps
 
-- Detection (SKILL.md § Detection) found nothing at the project
-  root.
-- G-ENV-MGR fired and the user picked `pixi` (or another manager —
-  mirror the same flow with the per-manager equivalents from
-  SKILL.md § "Install commands — by manager").
+1. `python -m skore_skills env detect` + `status`.
+2. Rank with JSON `recommended`: `policy.env_manager` first; else a
+   unique manifest; else `provenance.manager` from the `skore`
+   binary; else pixi → uv → poetry → hatch → conda → pip-venv.
+   Ask when none, `ambiguous`, or `mismatch`. PATH of other tools
+   is not permission.
+3. Ask whether we manage the env (default yes). Persist
+   `env.managed`.
+4. Unmanaged: stop. Name ruff / ipython / ipykernel; do not install.
+5. Managed, no (or matching) manifest: persist `env_manager`, then
+   `python -m skore_skills env init --manager <manager>`. That
+   command writes manager tables, the agent feature/group
+   (ruff, ipython, ipykernel), and `[tool.ruff]` if missing.
+6. Do not create `src/`. Do not run `pixi init --format pyproject`
+   if it would steal layout; `env init` writes `[tool.pixi]` itself
+   and refuses when `pixi.toml` already exists.
+7. Editable install waits for `has_src`. Prefer `add-python-package`.
 
-That is the whole gate list. G-PKG-NAME, G-TABULAR, and
-G-SKORE-MODE belong to the workspace turn and are **not**
-prerequisites here.
+## What bootstrap does not install
 
-## Which steps run when
-
-Steps 1–3 are the bootstrap mode: manager on PATH, `init`, and the
-env layout. Stop there when `status.has_src` is false — the stack,
-the tabular library, and the editable install need the package
-layout first. Steps 4–9 are the add mode, once `src/<pkg>/` and the
-resolved gates exist.
-
-## The 9 steps (pixi)
-
-### 1. Check pixi is on PATH
-
-```bash
-command -v pixi
-```
-
-If pixi is not installed, surface the install command and **ask the
-user to run it** (do not run `curl | sh` yourself):
-
-- Linux/macOS: `curl -fsSL https://pixi.sh/install.sh | sh`
-- Windows: `iwr -useb https://pixi.sh/install.ps1 | iex`
-
-### 2. Initialize the manifest
-
-```bash
-pixi init
-```
-
-Creates `pixi.toml` in the current directory. The default
-generated content is minimal; the next step replaces it.
-
-### 3. Apply the enforced 4-env layout
-
-No user ask — the layout is the convention (SKILL.md § "Where does
-the package belong?"). Edit `pixi.toml`:
-
-```toml
-[feature.default.dependencies]
-# runtime deps land here (added in step 5)
-
-[feature.dev.dependencies]
-ruff = "*"
-pytest = "*"
-jupyterlab = "*"
-ipykernel = "*"
-
-[feature.agent.dependencies]
-ipython = "*"
-pyright = "*"
-
-[environments]
-default = { features = ["default"],                       solve-group = "default" }
-dev     = { features = ["default", "dev"],                solve-group = "default" }
-agent   = { features = ["default", "agent"],              solve-group = "default" }
-lsp     = { features = ["default", "dev", "agent"],       solve-group = "default" }
-```
-
-The `lsp` env composes every feature so the opencode LSP /
-pyright sees every import path the user could write across `src/`
-/ `tests/` / `experiments/` / `audit/`.
-
-### 4. Add Tier 1 runtime deps to `default`
-
-The skore install variant follows G-SKORE-MODE. Pixi pulls from
-conda-forge by default, so the `[jupyter]` extra is **not** needed
-(it ships with the conda-forge package):
-
-- `skore mode: local`  → `pixi add scikit-learn skrub skore`
-- `skore mode: hub`    → `pixi add scikit-learn skrub "skore[hub]"`
-- `skore mode: mlflow` → `pixi add scikit-learn skrub "skore[mlflow]" "mlflow>=3"`
-
-The `mlflow` variant pins `mlflow>=3` explicitly: `skore[mlflow]`
-alone can let the solver pick an old mlflow (2.x) the skore MLflow
-backend doesn't support.
-
-For PyPI-based managers running the analogous bootstrap (uv /
-poetry / hatch / pip+venv), substitute `skore[jupyter]` (local),
-`skore[hub,jupyter]` (hub), or `skore[mlflow,jupyter]` (mlflow) —
-keeping the `mlflow>=3` pin for the mlflow variant. See SKILL.md
-§ "Tier 1 install: skore variant per mode" for the full source-aware
-table.
-
-If G-SKORE-MODE hasn't resolved yet, this step is not ready: report
-it as pending (a status fact) and stop instead of guessing a
-variant. `ruff` / `pytest` / `jupyterlab` / `ipykernel` are added
-by step 3 (the `[feature.dev]` declaration); `ipython` / `pyright`
-are added by step 3 (the `[feature.agent]` declaration). No
-per-install ask needed — the layout dictates the routing.
-
-**macOS post-install:** because skrub just landed, run
-`pixi run dot -c` (or the manager-equivalent env-run) once on macOS
-to rebuild graphviz's plugin cache — see SKILL.md § "skrub install
-— macOS post-install". Linux + Windows: skip.
-
-### 5. Add the tabular library
-
-Per G-TABULAR, once the workspace turn has resolved it:
-
-- pandas branch: `pixi add pandas pyarrow`
-- polars branch: `pixi add polars`
-
-### 6. Wire the editable workspace package
-
-Per `references/editable_workspace.md`:
-
-```bash
-pixi add --pypi "<pkg> @ ."
-```
-
-Then edit `pixi.toml` `[pypi-dependencies]` to flip the entry to:
-
-```toml
-<pkg> = { path = ".", editable = true }
-```
-
-Then `pixi install`. The name-prefixed `<pkg> @ .` syntax is
-required by pixi 0.69; the bare `--editable .` form is rejected
-with `× URL requirement must be preceded by a package name`.
-
-### 7. Drop `pyrightconfig.json`
-
-```bash
-python -m skore_skills env agent
-python -m skore_skills env agent --execute
-```
-
-The first command prints the complete detected-manager plan. Review
-it before executing; the CLI writes the packaged pyright config.
-
-### 8. Sync all four envs
-
-```bash
-pixi install                # syncs default
-pixi install -e dev
-pixi install -e agent
-pixi install -e lsp         # largest of the four; what pyright reads from
-```
-
-### 9. Verify
-
-```bash
-pixi run python -c "import sklearn, skrub, skore"   # Tier 1
-pixi run -e dev ruff --version                       # dev
-pixi run -e agent ipython -c "print(0)"              # agent
-pixi run -e agent pyright --version                  # agent
-ls pyrightconfig.json                                # config dropped
-```
-
-All commands must succeed before declaring the bootstrap complete.
-
-## Other managers
-
-If the user picked a different manager (uv / poetry / hatch /
-conda), mirror this flow with:
-
-- The manager's `init` command (uv `init`, poetry `init`, hatch
-  `new`, conda `create -n <project>`).
-- The analogous 4-env mapping from SKILL.md § "Install commands —
-  by manager" (uv groups, poetry groups, hatch envs, conda named
-  envs).
-- The per-manager editable install from
-  `references/editable_workspace.md`.
-- The per-manager `<PYTHON_PATH>` substitution from
-  `references/agent_feature_anatomy.md`.
-
-The 9-step shape is identical; only the commands change.
+scikit-learn, skrub, skore, pandas/polars, pytest, jupyterlab,
+pyright. Pytest is added when smoke tests appear.

@@ -51,10 +51,8 @@ Copy `templates/pyproject.toml` to the project root, substituting
 already declares the package via `[project]` + a build backend's
 package-discovery section.
 
-**Then hand off to `python-env-manager` § "Editable workspace
-package"** for the actual install. Do NOT run the install
-command yourself — that skill owns env-manager picks (G-ENV-MGR)
-and the per-manager install command.
+**Then load `add-python-package`** for the editable install once
+`has_src` is true. Do NOT run the install command yourself.
 
 ## Step 4 — Create `src/<pkg>/`
 
@@ -71,8 +69,7 @@ Each is a skeleton; the actual content lands later when
 Copy `templates/experiment.py`, **substituting `<pkg>`** with the
 package name from step 2. This substitution is load-bearing: the
 `<pkg>` literals appear in `from <pkg> import ...` statements and
-are Python syntax errors if left in place — `python-code-style`'s
-ruff pass at step 11 will fail on them.
+are Python syntax errors if left in place — `python -m skore_skills style` at step 11 will fail on them.
 
 The other placeholders (`<short title>`, `YYYY-MM-DD`,
 `<project-name>`, `<experiment-key>`) sit inside markdown comments
@@ -92,7 +89,7 @@ Per-experiment placeholders land later via `smoke-test-ml-pipeline`
 approved).
 
 Verify `pytest` is on the manifest (per `data-science-python-stack`
-§ Tier 1); if not, hand off to `python-env-manager` to add it.
+§ Tier 1); if not, load `add-python-package` to add it.
 
 ## Step 7 — `journal/JOURNAL.md`
 
@@ -155,13 +152,15 @@ fix (switch to specific input patterns) rather than silently editing.
 `explore-ml-data` re-checks this at EDA time
 (`git check-ignore data/eda.md`).
 
-## Step 11 — `ruff.toml` + first ruff pass
+## Step 11 — `[tool.ruff]` + first ruff pass
 
-`python -m skore_skills scaffold` writes the packaged `ruff.toml`.
+`python -m skore_skills scaffold` writes `[tool.ruff]` in
+`pyproject.toml` (or merges it into an existing pyproject). Do not
+drop a new `ruff.toml`. Then run `python -m skore_skills style`.
+
 For an existing workspace where it is missing, run
-`python -m skore_skills style --init`. Then hand off to
-`python-code-style` § "Initial setup" to run `ruff format` +
-`ruff check` against the modules dropped at step 4.
+`python -m skore_skills style --init` then `style`. Do not recreate
+`ruff.toml` by hand.
 
 **Do not recreate `ruff.toml` by hand** and run ruff yourself —
 invoking the skill is what teaches the agent the

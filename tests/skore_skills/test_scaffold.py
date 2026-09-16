@@ -31,12 +31,14 @@ def test_scaffold_tree_and_no_placeholders(
     gitignore = (tmp_path / ".gitignore").read_text(encoding="utf-8")
     assert ".*" in gitignore.splitlines()
     assert "!.gitignore" in gitignore
-    assert (tmp_path / "ruff.toml").is_file()
+    pyproject = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert not (tmp_path / "ruff.toml").exists()
     assert (tmp_path / "journal" / "JOURNAL.md").is_file()
     journal = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
     assert "## History" in journal
     assert "## Backlog" in journal
     pyproject = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.ruff]" in pyproject
     assert 'name = "demo-pkg"' in pyproject
     experiment = (tmp_path / "experiments" / "01_baseline.py").read_text(
         encoding="utf-8"
@@ -89,8 +91,29 @@ def test_scaffold_on_manager_only_root(
     assert result.exit_code == 0, result.output
     assert (tmp_path / "src" / "demo_pkg" / "pipeline.py").is_file()
     assert (tmp_path / "journal" / "JOURNAL.md").is_file()
-    assert pyproject.read_text(encoding="utf-8") == '[project]\nname = "demo"\n'
+    kept = pyproject.read_text(encoding="utf-8")
+    assert '[project]\nname = "demo"\n' in kept
+    assert "[tool.ruff]" in kept
     assert gitignore.read_text(encoding="utf-8") == "# pixi\n.pixi/\n"
+
+
+def test_scaffold_keeps_existing_tool_pixi(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Scaffold does not replace a pyproject that already has ``[tool.pixi]``."""
+    monkeypatch.chdir(tmp_path)
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text(
+        '[project]\nname = "demo"\n\n'
+        '[tool.pixi.workspace]\nchannels = ["conda-forge"]\n',
+        encoding="utf-8",
+    )
+    result = CliRunner().invoke(cli, ["scaffold", "--package", "demo_pkg"])
+    assert result.exit_code == 0, result.output
+    text = pyproject.read_text(encoding="utf-8")
+    assert "[tool.pixi.workspace]" in text
+    assert 'name = "demo"' in text
+    assert "[tool.ruff]" in text
 
 
 def test_scaffold_force_replaces_preserved_root_files(

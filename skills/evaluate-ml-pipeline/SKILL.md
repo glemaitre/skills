@@ -45,7 +45,7 @@ read the report. The pipeline declaration is out of scope (see
 ## Stop conditions — read before anything else
 
 - **Missing dependency.** If `import skore` raises in this project's
-  env, STOP. **Invoke `python-env-manager`** to detect the manager
+  env, STOP. **Invoke `add-python-package`** to detect the manager
   and produce the right install command (the project may not use
   pixi); surface the command to the user and wait for confirmation.
   **Do not drop back to `cross_val_score`, `cross_validate`,
@@ -120,7 +120,7 @@ read the report. The pipeline declaration is out of scope (see
   inline cap" is removed.
 - **Don't filter warnings.** No `warnings.filterwarnings(...)`
   around `skore.evaluate(...)` or the CV splitter unless the user
-  explicitly asks. See `python-code-style` § Stop conditions.
+  explicitly asks. See `python -m skore_skills style` § Stop conditions.
 - **`skore.evaluate(...)` and `project.put(...)` live only in
   `experiments/NN_*.py`.** The experiment script is the sole
   producer of a report in the workspace's skore Project.
@@ -153,7 +153,7 @@ read the report. The pipeline declaration is out of scope (see
   unclear intent); it never overrides a gate a skill explicitly
   mandates. The same override rule applies to every other
   mandatory `AskUserQuestion` in this stack —
-  `python-env-manager` § "Where does the package belong?",
+  `add-python-package` § "Where does the package belong?",
   `data-science-python-stack` § Tier 2 (pandas vs polars),
   `iterate-ml-experiment` § 2 (sourcing menu), `iterate-from-user`
   § "The entry-point AskUserQuestion". When in doubt: the user's
@@ -419,13 +419,13 @@ API CLI is only for the signature after the name.
   Fires at `iterate-ml-experiment` § 4 record-outcome.
 - **`smoke-test-ml-pipeline`** — router for `tests/`. Owns layout and
   the stem pairing between an experiment and its smoke test.
-- **`python-env-manager`** — detection + install commands for the
+- **`add-python-package`** — detection + install commands for the
   project's environment manager (pixi / uv / poetry / hatch / conda
   / pip+venv). **Invoke whenever** the Stop condition on
   `import skore` fires, or whenever any other dependency is missing
   from the env. Don't infer the manager or hand-craft the install
   command — that skill owns it.
-- **`python-code-style`** — **must be invoked** after writing or
+- **`python -m skore_skills style`** — **must be invoked** after writing or
   editing `src/<pkg>/evaluate.py` (and, if a custom splitter is
   authored, the module that holds it). Running `pixi run ruff
   check` directly without invoking this skill silently drops the
@@ -440,3 +440,10 @@ API CLI is only for the signature after the name.
 Run `python -m skore_skills git end-turn --stage evaluate`. If JSON
 `action` is `invoke`, load `persist-ml-git` and follow it. Then
 load `triage-ml-task`. Do not run `git commit` in this skill.
+
+## Need a package?
+
+When an import is missing, load `add-python-package` if
+`status.skills.add-python-package` is true. That skill owns
+`env add` and the unmanaged ask. Do not run `env add` here.
+If the skill is not installed, name the package and stop.

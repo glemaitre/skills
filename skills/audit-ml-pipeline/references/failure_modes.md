@@ -25,10 +25,10 @@ Never substitute by re-running `evaluate` + `put`. See `python -m skore_skills a
 ## `cells run` exits with `ModuleNotFoundError: No module named 'IPython'`
 
 Agent feature not installed in the env the runner is invoked from.
-**Delegate to `python-env-manager` § "Agent feature" via
-`G-AGENT-FEATURE`.** Do not type install commands from this skill.
-`python -m skore_skills env agent` prints the full plan;
-`env agent --execute` installs and verifies it.
+**Delegate to `add-python-package` § "Agent feature" via
+`agent tools (ruff / ipython / ipykernel)`.** Do not type install commands from this skill.
+`python -m skore_skills env init` prints the full plan;
+`env init --execute` installs and verifies it.
 
 ## Cell renders as `<Display object at 0x…>` in the digest
 

@@ -5,26 +5,62 @@ from __future__ import annotations
 import subprocess
 import sys
 from collections.abc import Callable, Sequence
-from importlib.resources import files
 from pathlib import Path
 
 SKIP_DIR_NAMES = (".pixi", ".venv", "venv", "node_modules")
 DEFAULT_DIRS = ("src", "experiments", "audit")
 RUFF_MISSING = (
     "ruff is not installed in this interpreter. "
-    "Install it with the project env manager (see python-env-manager), "
-    "e.g. `pixi add --feature dev ruff`."
+    "Install it with the project env manager "
+    "(python -m skore_skills env add --feature agent ruff)."
 )
+RUFF_PYPROJECT_TABLE = """\
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "D"]
+
+[tool.ruff.lint.per-file-ignores]
+"experiments/**" = ["E402", "B018", "D100", "D103"]
+"audit/**" = ["E402", "B018", "D100", "D103"]
+"data/eda.py" = ["E402", "B018", "D100", "D103"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.format]
+docstring-code-format = true
+"""
+
+
+def ruff_configured(root: Path) -> bool:
+    """Return True if ruff.toml or ``[tool.ruff]`` exists."""
+    if (root / "ruff.toml").is_file():
+        return True
+    path = root / "pyproject.toml"
+    return path.is_file() and "[tool.ruff" in path.read_text(encoding="utf-8")
+
+
+def ensure_ruff_in_pyproject(path: Path) -> bool:
+    """Append ``[tool.ruff]`` to ``path`` when missing. Return True if written."""
+    text = path.read_text(encoding="utf-8") if path.is_file() else ""
+    if "[tool.ruff" in text:
+        return False
+    path.write_text(text.rstrip() + "\n\n" + RUFF_PYPROJECT_TABLE, encoding="utf-8")
+    return True
 
 
 def initialize_style(root: Path) -> bool:
-    """Copy the packaged ``ruff.toml`` when the workspace has none."""
-    destination = root / "ruff.toml"
-    if destination.exists():
+    """Ensure ``[tool.ruff]`` in pyproject.toml when no ruff config exists."""
+    if ruff_configured(root):
         return False
-    template = files("skore_skills").joinpath("data/ruff.toml")
-    destination.write_text(template.read_text(encoding="utf-8"), encoding="utf-8")
-    return True
+    path = root / "pyproject.toml"
+    if not path.is_file():
+        path.write_text(RUFF_PYPROJECT_TABLE, encoding="utf-8")
+        return True
+    return ensure_ruff_in_pyproject(path)
 
 
 def default_targets(root: Path) -> list[Path]:
@@ -89,8 +125,8 @@ def run_style(
     targets = explicit if explicit else default_targets(root)
     if not targets:
         return 0
-    if warn is not None and not explicit and not (root / "ruff.toml").is_file():
-        warn("no ruff.toml at project root; running ruff with its defaults")
+    if warn is not None and not explicit and not ruff_configured(root):
+        warn("no [tool.ruff] in pyproject.toml; running ruff with its defaults")
     check = subprocess.run(ruff_argv("check", "--fix", targets=targets), check=False)
     fmt = subprocess.run(ruff_argv("format", targets=targets), check=False)
     if check.returncode:

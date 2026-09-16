@@ -1,0 +1,86 @@
+{
+  "skill_name": "add-python-package",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Managed add",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Pixi project (`pixi.toml` or `[tool.pixi]`).\n- `status.policy.env.managed` is true.\n- `env_manager` is pixi.]\n\nAdd skrub to the project.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env detect` / status. - Name `python -m skore_skills env add skrub` and the printed `pixi add skrub`. - Route skrub to default (not `--feature agent`). It must NOT: - Run `pip install skrub`. - Re-bootstrap with `env init`.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills env detect` / status.",
+        "Name `python -m skore_skills env add skrub` and the printed `pixi add skrub`.",
+        "Route skrub to default (not `--feature agent`).",
+        "The response does NOT: Run `pip install skrub`.",
+        "The response does NOT: Re-bootstrap with `env init`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "Unmanaged default: I will handle it",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.env.managed` is false.\n- Manager is pixi (manifest present).]\n\nWe need pandas for EDA.",
+      "expected_output": "Behavioural response satisfying: - Ask with two options; default **I will handle it**. - Name the package and the manager command (`pixi add pandas` or print-only `env add` as a hint). - Return without waiting after the default choice. It must NOT: - Run `env add` or `pixi add` itself. - Treat unmanaged as silent skip without naming the package.",
+      "files": [],
+      "expectations": [
+        "Ask with two options; default **I will handle it**.",
+        "Name the package and the manager command (`pixi add pandas` or print-only `env add` as a hint).",
+        "Return without waiting after the default choice.",
+        "The response does NOT: Run `env add` or `pixi add` itself.",
+        "The response does NOT: Treat unmanaged as silent skip without naming the package."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "Unmanaged: please install now",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.env.managed` is false.\n- User picks **Please install this now**.]\n\nInstall pytest, and wait until I say it is done.",
+      "expected_output": "Behavioural response satisfying: - Show the manager command (pytest on default, not agent). - Wait for the user to confirm. - Still not execute `env add`. It must NOT: - Run `python -m skore_skills env add pytest --execute`. - Put pytest in `--feature agent`.",
+      "files": [],
+      "expectations": [
+        "Show the manager command (pytest on default, not agent).",
+        "Wait for the user to confirm.",
+        "Still not execute `env add`.",
+        "The response does NOT: Run `python -m skore_skills env add pytest --execute`.",
+        "The response does NOT: Put pytest in `--feature agent`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "Forbidden substitute",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed pixi project.]\n\nAdd xgboost.",
+      "expected_output": "Behavioural response satisfying: - Refuse using the stack substitute (HistGradientBoosting). - Surface the CLI refusal if `env add xgboost` is printed. It must NOT: - Install xgboost.",
+      "files": [],
+      "expectations": [
+        "Refuse using the stack substitute (HistGradientBoosting).",
+        "Surface the CLI refusal if `env add xgboost` is printed.",
+        "The response does NOT: Install xgboost."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 5,
+      "title": "Unresolved manager",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `env.managed` is null / unanswered.\n- `env detect` reports none or unmanaged-unasked.]\n\nAdd ruff.",
+      "expected_output": "Behavioural response satisfying: - Say the env is unresolved and stop (or triage). Do not bootstrap `setup-python-env` by catalog id if D20 still applies; status is enough. It must NOT: - Run `env init`. - Run `env add` while managed is unanswered.",
+      "files": [],
+      "expectations": [
+        "Say the env is unresolved and stop (or triage). Do not bootstrap `setup-python-env` by catalog id if D20 still applies; status is enough.",
+        "The response does NOT: Run `env init`.",
+        "The response does NOT: Run `env add` while managed is unanswered."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

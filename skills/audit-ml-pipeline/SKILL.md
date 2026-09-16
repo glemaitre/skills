@@ -125,12 +125,12 @@ conditions for the three-consumer rule.
   hits under `scratch/api/skore/<version>/` count (Shape 0); inline
   memory does not.
 - **Agent feature missing → STOP and delegate.** If `ipython` /
-  `pyright` aren't importable, do NOT fabricate audit outputs by
+  `ipython` aren't importable, do NOT fabricate audit outputs by
   writing `print()` calls as a workaround. Do NOT type
   `pixi add ...` / `uv add ...` yourself — install is owned by
-  `python-env-manager` § Agent feature. Request via
-  `G-AGENT-FEATURE` (binary: install / skip); resume only when
-  python-env-manager returns "ready".
+  `add-python-package` § Agent feature. Request via
+  `agent tools (ruff / ipython / ipykernel)` (binary: install / skip); resume only when
+  add-python-package returns "ready".
 - **Bare expressions, not `print()`.** The runner captures each
   cell's last bare expression via `result.result` and renders its
   `repr`. Wrapping in `print(repr(...))` lands in stdout instead of
@@ -147,9 +147,9 @@ conditions for the three-consumer rule.
 - **Don't filter warnings in audit cells.** No
   `warnings.filterwarnings(...)` unless the user explicitly asks
   — the runner streams cell stderr into the digest and that's
-  signal. See `python-code-style` § Stop conditions.
+  signal. See `python -m skore_skills style` § Stop conditions.
 - **Harness "no clarifying questions" hints do NOT waive
-  G-AGENT-FEATURE.** Install gate fires regardless.
+  agent tools (ruff / ipython / ipykernel).** Install gate fires regardless.
 - **Post-hoc audit — required before ending the turn.** Walk every
   pre-flight row; surface unfilled Evidence cells.
 
@@ -160,7 +160,7 @@ conditions for the three-consumer rule.
 | `report = project.get(REPORT_ID); print(repr(report))` | Runner captures bare expressions via `result.result`, not stdout. `print(repr(...))` mixes stdout and output sections. Use `report` on its own line |
 | Drop `.frame()` from `report.checks.summarize()` / `report.metrics.summarize()` | `__repr__` of the Display objects is `<…Display at 0x…>`. `.frame()` returns a DataFrame whose repr carries the actual values |
 | `project.get(KEY)` raised `KeyError` → re-run `evaluate` + `put` "to refresh" | Lookup shape is wrong (get is by id, not key). Hub: read the id from the URL printed by `put()`. Local: read `summary["id"]` for the matching key row. Never re-run `evaluate` + `put` to recover |
-| Write `pixi add --feature agent ipython pyright` directly from this skill | Install commands owned by `python-env-manager`. This skill **requests** via G-AGENT-FEATURE; it does not install |
+| Write `pixi add --feature agent ipython` directly from this skill | Install commands owned by `add-python-package`. This skill **requests**; it does not install |
 | Dump the audit `.py` into `scratch/audit/<stem>/` | `.py` is durable in git; `scratch/` is gitignored. Source in `audit/`; digest in `scratch/audit/<stem>/` |
 | Register a Jupyter kernel "to be safe" | Current runner is in-process; no kernel. Registering creates an orphan kernelspec |
 | Add a fix-up cell that mutates `data/` or `reports/` | Audit files are read-only. State mutations belong in a `scratch/<ts>_*.py` probe or the experiment script |
@@ -188,10 +188,10 @@ Pre-flight (audit-ml-pipeline):
                 "Run finished, put() landed" is NOT sufficient.
 - [ ] Agent feature available:
         `pixi run -e agent ipython -c "print(0)"` exit 0
-        `pixi run -e agent pyright --version` exit 0
+        `pixi run -e agent ipython --version` exit 0
       Evidence: tool output of each
                 | JOURNAL.md Status `agent feature: installed`
-                Missing → STOP, delegate to python-env-manager G-AGENT-FEATURE
+                Missing → STOP, delegate to add-python-package agent tools (ruff / ipython / ipykernel)
 - [ ] API CLI consulted for skore symbols used:
       Project, summarize, get, report.checks.summarize, report.metrics.summarize
       Evidence: Read scratch/api/skore/<version>/<topic>.md (this turn)
@@ -331,8 +331,8 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 | Callee | Why |
 |---|---|
 | `python -m skore_skills api get` | Every skore symbol (`Project`, `project.summarize`, `project.get`, `report.checks.summarize`, `report.metrics.summarize`, `.frame()`). Cache hits first |
-| `python-env-manager` § Agent feature | When `ipython` / `pyright` are missing — G-AGENT-FEATURE gate |
-| `python-code-style` | After writing / editing `audit/<stem>.py` — bundled `ruff.toml` carries `audit/**` per-file ignores; also contextualizes the header to name the audited experiment and strips workflow/process prose |
+| `add-python-package` | When `ipython` is missing |
+| `python -m skore_skills style` | After writing / editing `audit/<stem>.py` — bundled `ruff.toml` carries `audit/**` per-file ignores; also contextualizes the header to name the audited experiment and strips workflow/process prose |
 
 ## Failure modes and recovery
 
@@ -341,7 +341,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | Symptom | Cause | Fix |
 |---|---|---|
 | `project.get(key)` raises `KeyError` / `TypeError` | Lookup by key, not id; local vs hub shape differs | → `references/failure_modes.md` § "`project.get(key)` raises" |
-| `ModuleNotFoundError: No module named 'IPython'` | Agent feature not installed | Delegate to `python-env-manager`; never `pip install` here |
+| `ModuleNotFoundError: No module named 'IPython'` | Agent feature not installed | Delegate to `add-python-package`; never `pip install` here |
 | Cell renders as `<Display object at 0x…>` | `*.summarize()` called without `.frame()` | Add `.frame()` |
 | `AttributeError` for a `report.*` accessor | Symbol from memory; skore version drift | → `references/failure_modes.md` § "AttributeError" |
 | `RuntimeError: No report under key=...` | `put()` landed in a different Project | → `references/failure_modes.md` § "wrong Project" |
@@ -353,8 +353,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 ## What this skill does NOT do
 
 - Open or write the skore Project's reports (`evaluate-ml-pipeline`).
-- Install `ipython` / `pyright` (`python-env-manager` owns).
-- Drop or edit `pyrightconfig.json` (`python-env-manager` owns).
+- Install `ipython` (`add-python-package` owns).
 - Enrich the Backlog from the audit digest (`iterate-from-skore`).
 - Write or edit `journal/NN_*.md` (`iterate-ml-experiment`).
 - Run pytest / smoke tests (`smoke-test-ml-pipeline`).
@@ -370,15 +369,23 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | `iterate-from-skore` | Downstream consumer of this skill's digest. `audit-ml-pipeline` opens the Project and renders the digest; `iterate-from-skore` parses the digest as text and drafts Backlog rows from each surfaced check. Never opens the Project itself |
 | `evaluate-ml-pipeline` | Producer side. `skore.evaluate` + `project.put` live only in `experiments/NN_*.py` |
 | `organize-ml-workspace` | Workspace layout; four-way stem pairing |
-| `python-env-manager` | Agent feature install (G-AGENT-FEATURE). This skill requests; that skill installs |
+| `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |
 | `python -m skore_skills api get` | skore symbol lookups. Cache hits first |
-| `python-code-style` | ruff after writing/editing `audit/<stem>.py` |
-| `data-science-python-stack` | Catalogues `ipython` + `pyright` under the agent feature |
+| `python -m skore_skills style` | ruff after writing/editing `audit/<stem>.py` |
+| `data-science-python-stack` | Catalogues `ipython` + `ipython` under the agent feature |
 
 ## Templates and assets
 
 - `templates/audit.py` — per-experiment audit file skeleton. Copy
   + substitute; don't rewrite from memory.
+
+
+## Need a package?
+
+When an import is missing, load `add-python-package` if
+`status.skills.add-python-package` is true. That skill owns
+`env add` and the unmanaged ask. Do not run `env add` here.
+If the skill is not installed, name the package and stop.
 
 ## References (load on demand)
 

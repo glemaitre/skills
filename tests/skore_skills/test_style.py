@@ -15,13 +15,14 @@ from skore_skills.cli import cli
 def test_style_init_copies_packaged_config(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """``style --init`` writes the shared config without requiring ruff."""
+    """``style --init`` writes ``[tool.ruff]`` without requiring ruff."""
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["style", "--init"])
     assert result.exit_code == 0, result.output
-    config = tmp_path / "ruff.toml"
+    config = tmp_path / "pyproject.toml"
     assert config.is_file()
     assert 'target-version = "py312"' in config.read_text(encoding="utf-8")
+    assert not (tmp_path / "ruff.toml").exists()
 
 
 def test_style_init_preserves_existing_config(
@@ -33,7 +34,7 @@ def test_style_init_preserves_existing_config(
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["style", "--init"])
     assert result.exit_code == 0, result.output
-    assert "already exists" in result.output
+    assert "already configured" in result.output
     assert config.read_text(encoding="utf-8") == "line-length = 100\n"
 
 
@@ -54,7 +55,7 @@ def test_style_missing_ruff(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setattr(style_mod.subprocess, "run", fake_run)
     result = CliRunner().invoke(cli, ["style"])
     assert result.exit_code != 0
-    assert "python-env-manager" in result.output or "pixi add" in result.output
+    assert "env add" in result.output
 
 
 def test_style_default_globs_skip_vendored(
@@ -96,7 +97,7 @@ def test_style_default_globs_skip_vendored(
     assert str(tmp_path / "top.py") in check_argv
     assert "node_modules" in joined  # exclude flag
     assert str(tmp_path / "node_modules") not in check_argv
-    assert "no ruff.toml" in result.output
+    assert "no [tool.ruff]" in result.output
 
 
 def test_style_given_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -120,7 +121,7 @@ def test_style_given_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> N
     assert result.exit_code == 0, result.output
     assert any(str(target) in argv for argv in seen)
     assert not any(str(tmp_path / "src") in argv for argv in seen)
-    assert "no ruff.toml" not in result.output
+    assert "no [tool.ruff]" not in result.output
 
 
 def test_style_fixes_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

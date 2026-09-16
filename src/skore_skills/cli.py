@@ -158,19 +158,23 @@ def scaffold_cmd(
     "--init",
     "initialize",
     is_flag=True,
-    help="Copy the packaged ruff.toml when it is missing.",
+    help="Write [tool.ruff] into pyproject.toml when it is missing.",
 )
 def style_cmd(paths: tuple[Path, ...], initialize: bool) -> None:
     """Run ruff check --fix then format on defaults or PATHS.
 
     Default globs: ``src/``, ``experiments/``, ``audit/``, ``data/eda.py``,
-    top-level ``*.py``. ``--init`` without PATHS only writes ``ruff.toml``.
+    top-level ``*.py``. ``--init`` without PATHS only writes ``[tool.ruff]``.
     """
     from skore_skills.style import initialize_style, run_style
 
     if initialize:
         created = initialize_style(Path.cwd())
-        click.echo("wrote ruff.toml" if created else "ruff.toml already exists")
+        click.echo(
+            "wrote [tool.ruff] in pyproject.toml"
+            if created
+            else "ruff already configured"
+        )
         if not paths:
             return
 
@@ -210,49 +214,43 @@ def env_detect() -> None:
     is_flag=True,
     help="Run the install command instead of printing it.",
 )
-def env_add(packages: tuple[str, ...], execute: bool) -> None:
+@click.option(
+    "--feature",
+    "--group",
+    "feature",
+    help="Manager feature/group (pixi --feature, uv/poetry --group).",
+)
+def env_add(packages: tuple[str, ...], execute: bool, feature: str | None) -> None:
     """Print (or run) the manager-specific add command."""
     from skore_skills.env import add_packages
 
-    text, code = add_packages(Path.cwd(), list(packages), execute=execute)
-    click.echo(text, nl=False)
-    if code:
-        raise SystemExit(code)
-
-
-@env_group.command("agent")
-@click.option(
-    "--execute",
-    is_flag=True,
-    help="Run the install and verification commands instead of printing them.",
-)
-@click.option("--project", help="Conda project name; defaults to package/root name.")
-@click.option(
-    "--requirements",
-    type=click.Path(dir_okay=False, path_type=Path),
-    help="pip-venv requirements file; defaults to requirements.txt.",
-)
-def env_agent(execute: bool, project: str | None, requirements: Path | None) -> None:
-    """Print or install IPython, pyright, and the LSP environment."""
-    from skore_skills.env import install_agent_feature
-
-    text, code = install_agent_feature(
-        Path.cwd(),
-        execute=execute,
-        project=project,
-        requirements=requirements,
+    text, code = add_packages(
+        Path.cwd(), list(packages), execute=execute, feature=feature
     )
     click.echo(text, nl=False)
     if code:
         raise SystemExit(code)
 
 
-@env_group.command("check")
-def env_check() -> None:
-    """Check agent feature composition and pyright configuration."""
-    from skore_skills.env import check_agent_feature
+@env_group.command("init")
+@click.option(
+    "--manager",
+    required=True,
+    type=click.Choice(
+        ["pixi", "uv", "poetry", "hatch", "conda", "pip-venv"],
+        case_sensitive=True,
+    ),
+)
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Replace conda environment files if they already exist.",
+)
+def env_init(manager: str, force: bool) -> None:
+    """Write manager and agent tables into pyproject.toml (or conda YAML)."""
+    from skore_skills.env import init_environment
 
-    text, code = check_agent_feature(Path.cwd())
+    text, code = init_environment(Path.cwd(), manager, force=force)
     click.echo(text, nl=False)
     if code:
         raise SystemExit(code)

@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "58dfcbd3595e61d8163ab8116ec859f88b8869c1f2d555035960970750038dd9",
+  "catalog_hash": "77f287107e3ee55214ed06413ba9368d58b2208ba39ce3dbb47efc642ac3c990",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b8b66da72f1b3dd107dd1121d9d5cd22e7b3a2a42b0457c1b26baaac0b118cce"
+      "hash": "cd11596439d5c021f875e6797c14ed5285caf705c033ea367bd64c68ec439b12"
     },
     {
       "id": "build-ml-pipeline",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "8a486a0eed9ac71e22886aa03ee7eaec70f2952d9f3111f5d38225e16733c4ea"
+      "hash": "8946d2d258021ccd036979bef8e2e717a7b2de08d5db4ba02eefe66f06919541"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "733a15e43534576c2892e819bd74ea21a6f9f7e22a652fba54e432e345ead2b9"
+      "hash": "b8f923597726a535f131e7cf2979e05633f2725f5a58261b9353982e7614b247"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
       "category": "orchestration",
       "subcategory": "test-strategies",
-      "hash": "1be41cbc39dbf4ceca178f2f0f7ca321d03d12694de80a7ff1012fd2ce0bc44e"
+      "hash": "23703992926f3dae9701ded2fad8445ec99131b3b4650b5c4be5f2d844cbdf0f"
     },
     {
       "id": "audit-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "0389b212b1bf93c435a3c2c9da223ca07d41a31a4c2e3ff928547f519b65fa7d"
+      "hash": "b57d0f8a061dbacc11e319010b2105466856f1a29815db330bd245bd37a34e94"
     },
     {
       "id": "manage-ml-backlog",
@@ -66,7 +66,7 @@
       "summary": "Deprecated pointer to triage and backlog.",
       "category": "orchestration",
       "subcategory": "dispatchers",
-      "hash": "e6129cd4976c56084a078cea7e98e1b6d17308379a060aab7c83b45be8c657d9"
+      "hash": "5883802ee29d80eca654c77f0a226aca2981fd12a4f445faf15b2d814a325181"
     },
     {
       "id": "iterate-from-skore",
@@ -96,24 +96,6 @@
       "hash": "533b0d5e5a7691bbfe09c12444f3e5290f1a0ef439ba21666779c2c7153f0db6"
     },
     {
-      "id": "python-code-style",
-      "path": "skills/python-code-style",
-      "title": "Python Code Style",
-      "summary": "Enforce good practices out-of-the-box for the Python ecosystem for your code.",
-      "category": "tooling",
-      "subcategory": "code-quality",
-      "hash": "8e13ace9c5f387ddcce3a91f8e9c4ee5bb6187000138781a8417c06fe073447b"
-    },
-    {
-      "id": "python-env-manager",
-      "path": "skills/python-env-manager",
-      "title": "Python Environment Manager",
-      "summary": "Bootstrapping the experiment setup based on your favorite Python environment manager.",
-      "category": "tooling",
-      "subcategory": "project-setup",
-      "hash": "1a7d2cf880502819e7eebea3c0c61aea8ecf1c0321b2df50bdae597a8206083c"
-    },
-    {
       "id": "data-science-python-stack",
       "path": "skills/data-science-python-stack",
       "title": "Data Science Python Stack",
@@ -138,7 +120,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "44662caeff4f78afd58660939b37172407f288851d8b424ecada1b5476169f73"
+      "hash": "904cb0efb2e8ac11e83a8dd20533f296842ebeac26632e11708ea805fc7a75bc"
     },
     {
       "id": "setup-git",
@@ -174,7 +156,16 @@
       "summary": "Resolve a library choice and add the selected dependency.",
       "category": "action",
       "subcategory": null,
-      "hash": "8e47b18d20a52dbec1549480deb060d77865e3bd7c7635240ce58c346425c12b"
+      "hash": "b0eb7e11603c61d4fdad55f9e6e6c6fc2202fccb406d4f64212652b6066ea136"
+    },
+    {
+      "id": "add-python-package",
+      "path": "skills/add-python-package",
+      "title": "Add Python Package",
+      "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
+      "category": "action",
+      "subcategory": null,
+      "hash": "27913277d317daa5b91702ef6eb91cab71a339c4c675deef38973c347f6d6920"
     },
     {
       "id": "setup-workspace",
@@ -183,16 +174,16 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "d12a569532b0bd27a6263899dfe6a6aeaafc6514eb19c83b98a35a9d74b703f2"
+      "hash": "2d8d477425a15d2bb1a3f711d9175f82194b4fd108ecfe2cc14c3c35a1c02aaf"
     },
     {
       "id": "setup-python-env",
       "path": "skills/setup-python-env",
       "title": "Set Up Python Environment",
-      "summary": "Configure dependencies, editable install, and Python code style.",
+      "summary": "Detect the env manager, persist managed vs user-managed, and init two envs plus agent tools.",
       "category": "action",
       "subcategory": null,
-      "hash": "29da5b9242c6a9f94e8edc396248838480fd2cb71f23c43397fd2b37e271bff4"
+      "hash": "ab0b013bc14dd236be310b4c6cede40dbbe5bed76ca0ed5807b586e8deedc620"
     }
   ],
   "workflows": [
@@ -206,7 +197,8 @@
         "setup-python-env",
         "setup-git",
         "persist-ml-git",
-        "choose-python-library"
+        "choose-python-library",
+        "add-python-package"
       ]
     },
     {
@@ -215,6 +207,7 @@
       "summary": "Install the data exploration workflow.",
       "includes": [
         "explore-ml-data",
+        "add-python-package",
         "persist-ml-git"
       ]
     },
@@ -227,6 +220,7 @@
         "build-ml-pipeline",
         "evaluate-ml-pipeline",
         "smoke-test-ml-pipeline",
+        "add-python-package",
         "persist-ml-git"
       ]
     },
@@ -240,6 +234,7 @@
         "iterate-from-skore",
         "iterate-from-user",
         "audit-ml-pipeline",
+        "add-python-package",
         "persist-ml-git"
       ]
     },
@@ -255,6 +250,7 @@
         "persist-ml-git",
         "model-ml-pipeline",
         "choose-python-library",
+        "add-python-package",
         "explore-ml-data",
         "build-ml-pipeline",
         "evaluate-ml-pipeline",
