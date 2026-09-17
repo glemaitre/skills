@@ -10,7 +10,7 @@
 **Assumed workspace state:**
 - `python -m skore_skills git end-turn --stage eda` already returned
   `action: invoke`, `reason: persist`, autocommit `on`.
-- Dirty paths include `data/eda.py` and `data/eda.md`.
+- Dirty paths include `eda/eda.py` and `eda/eda.md`.
 
 **Must do:**
 - Run `git status`.

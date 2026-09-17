@@ -8,7 +8,7 @@
 > EDA is done. Close the turn.
 
 **Assumed workspace state:**
-- `data/eda.md` was just written.
+- `eda/eda.md` was just written.
 
 **Must do:**
 - Name `python -m skore_skills git end-turn --stage eda`.
@@ -38,7 +38,7 @@
 - Persist `policy set tabular` after confirmation.
 - Load `add-python-package` for the chosen frame library and
   `skrub` (confirm skrub is required).
-- Do not place `data/eda.py` before the gate resolves.
+- Do not place `eda/eda.py` before the gate resolves.
 
 **Must NOT do:**
 - Silent-default pandas and write `eda.py` first.

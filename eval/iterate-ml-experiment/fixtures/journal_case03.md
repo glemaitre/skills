@@ -32,7 +32,7 @@ stem).
 - **Status:** done — 2026-09-01
 - **Summary:** Mixed-type claims table; target is right-skewed; a
   free-text column carries most of the residual after the baseline.
-- **Report:** [data/eda.md](../data/eda.md)
+- **Report:** [eda/eda.md](../eda/eda.md)
 
 ## History
 

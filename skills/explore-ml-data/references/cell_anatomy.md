@@ -1,6 +1,6 @@
 # Explore ML Data — Cell anatomy
 
-Concrete cell shapes for `data/eda.py`, the `TableReport` repr trap,
+Concrete cell shapes for `eda/eda.py`, the `TableReport` repr trap,
 the library-agnostic (skrub) approach, and how each finding maps to a
 downstream modelling gate. SKILL.md carries the compact cell
 sequence; load this when you are actually writing or debugging the
@@ -184,7 +184,7 @@ skrub.column_associations(RAW).head(20)
 ```
 
 - A feature with an **implausibly perfect** association to the target
-  is a leakage flag — name it in `data/eda.md` § Associations and
+  is a leakage flag — name it in `eda/eda.md` § Associations and
   raise it as an open question, do not silently keep it.
 
 ## Multiple tables
@@ -199,7 +199,7 @@ the join key. Don't try to associate columns across unjoined tables.
 `TableReport` computes stats over the whole frame and
 `column_associations` is roughly O(columns²). On very large datasets,
 load a row sample for the report (e.g. the first N rows or a random
-sample via the tabular lib) and say so in `data/eda.md` — the goal is
+sample via the tabular lib) and say so in `eda/eda.md` — the goal is
 a fast, representative read, not exhaustive stats.
 
 ## What NOT to do in these cells
@@ -216,8 +216,8 @@ a fast, representative read, not exhaustive stats.
 After the run:
 
 1. Read the digest (stdout, or `scratch/eda/eda.md`).
-2. Author `data/eda.md` from `templates/eda.md` — every claim
+2. Author `eda/eda.md` from `templates/eda.md` — every claim
    grounded in the digest; the **Modelling implications** section is
    the payoff the baseline note cites.
 3. Write the `journal/JOURNAL.md` § "Data understanding (EDA)" 2–4
-   line summary + link to `data/eda.md`.
+   line summary + link to `eda/eda.md`.

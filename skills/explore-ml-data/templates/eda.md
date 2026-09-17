@@ -1,6 +1,6 @@
 <!--
 Exploratory data analysis summary for this workspace, written from
-the data/eda.py run. Ground every claim in what the run actually
+the eda/eda.py run. Ground every claim in what the run actually
 showed — do not invent facts. Keep "Modelling implications" as
 candidate suggestions to weigh when designing the model, not final
 decisions.
@@ -8,7 +8,7 @@ decisions.
 
 # EDA — <project / dataset name>
 
-_Generated from `data/eda.py` on <YYYY-MM-DD>._
+_Generated from `eda/eda.py` on <YYYY-MM-DD>._
 
 ## Dataset at a glance
 

@@ -10,10 +10,10 @@ dist/
 .ruff_cache/
 .mypy_cache/
 
-# data artifacts — you own the data/ layout.
-# Do NOT ignore the whole data/ folder: the EDA outputs
-# (data/eda.py, data/eda.md, data/eda_*.html) live there and should
-# stay committed. To keep large/local-only raw INPUTS out of git,
+# data artifacts — you own the data/ layout (raw inputs).
+# Do NOT ignore the whole data/ folder if you want samples committed.
+# EDA deliverables live in eda/ (eda.py, eda.md, eda_*.html) and
+# should stay tracked. To keep large/local-only raw INPUTS out of git,
 # ignore specific input paths only, e.g.:
 # data/raw/
 # data/*.parquet

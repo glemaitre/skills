@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import ast
 import compileall
 from pathlib import Path
 
@@ -25,7 +24,20 @@ def test_scaffold_tree_and_no_placeholders(
     assert (src / "features.py").is_file()
     assert (src / "pipeline.py").is_file()
     assert (src / "evaluate.py").is_file()
-    assert (tmp_path / "experiments" / "01_baseline.py").is_file()
+    assert not (tmp_path / "experiments" / "01_baseline.py").exists()
+    assert not (tmp_path / "data" / "eda.py").exists()
+    for rel in (
+        "src/README.md",
+        "experiments/README.md",
+        "journal/README.md",
+        "eda/README.md",
+        "data/README.md",
+        "audit/README.md",
+        "tests/smoke/README.md",
+        "scratch/README.md",
+        "reports/README.md",
+    ):
+        assert (tmp_path / rel).is_file(), rel
     assert (tmp_path / "pyproject.toml").is_file()
     assert (tmp_path / ".gitignore").is_file()
     gitignore = (tmp_path / ".gitignore").read_text(encoding="utf-8")
@@ -37,21 +49,10 @@ def test_scaffold_tree_and_no_placeholders(
     journal = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
     assert "## History" in journal
     assert "## Backlog" in journal
-    pyproject = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[eda/eda.md]" in journal
     assert "[tool.ruff]" in pyproject
+    assert '"eda/**"' in pyproject
     assert 'name = "demo-pkg"' in pyproject
-    experiment = (tmp_path / "experiments" / "01_baseline.py").read_text(
-        encoding="utf-8"
-    )
-    assert "from demo_pkg import PROJECT_ROOT" in experiment
-    assert "<pkg>" not in experiment
-    tree = ast.parse(experiment)
-    assert not any(
-        isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and node.func.attr in {"evaluate", "put"}
-        for node in ast.walk(tree)
-    )
     for path in tmp_path.rglob("*"):
         if path.is_file() and path.suffix in {".py", ".toml", ".md"}:
             text = path.read_text(encoding="utf-8")

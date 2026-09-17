@@ -35,7 +35,7 @@ RAW.shape
 # ## Table overview
 #
 # Per-table report (column types, distributions, associations) saved to
-# `data/eda_<table>.html`, plus a compact per-column summary: dtype,
+# `eda/eda_<table>.html`, plus a compact per-column summary: dtype,
 # fraction missing, and number of unique values.
 
 # %%
@@ -106,4 +106,4 @@ skrub.column_associations(RAW).head(20)
 # ## Summary
 #
 # The findings and their modelling implications are written up in
-# `data/eda.md`.
+# `eda/eda.md`.

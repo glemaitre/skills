@@ -42,9 +42,9 @@ that the exception, not the default.
 Before drafting the baseline, dispatch to `explore-ml-data`. This is
 the **G-EDA** gate — binary **run** / **skip**:
 
-- **run** → the skill places and executes `data/eda.py` via the
-  shared cell runner, writes `data/eda.md` (findings + modelling
-  implications) and `data/eda_<table>.html`, and fills the
+- **run** → the skill places and executes `eda/eda.py` via the
+  shared cell runner, writes `eda/eda.md` (findings + modelling
+  implications) and `eda/eda_<table>.html`, and fills the
   `## Data understanding (EDA)` section of `JOURNAL.md`. Requires the
   agent feature (`ipython`); if missing, `explore-ml-data` routes to
   `add-python-package` § Agent feature (`agent tools (ruff / ipython / ipykernel)`) — so on the

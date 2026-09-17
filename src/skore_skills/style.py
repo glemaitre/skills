@@ -8,7 +8,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 SKIP_DIR_NAMES = (".pixi", ".venv", "venv", "node_modules")
-DEFAULT_DIRS = ("src", "experiments", "audit")
+DEFAULT_DIRS = ("src", "experiments", "audit", "eda")
 RUFF_MISSING = (
     "ruff is not installed in this interpreter. "
     "Install it with the project env manager "
@@ -25,7 +25,7 @@ select = ["E", "F", "W", "I", "B", "UP", "D"]
 [tool.ruff.lint.per-file-ignores]
 "experiments/**" = ["E402", "B018", "D100", "D103"]
 "audit/**" = ["E402", "B018", "D100", "D103"]
-"data/eda.py" = ["E402", "B018", "D100", "D103"]
+"eda/**" = ["E402", "B018", "D100", "D103"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
@@ -70,9 +70,6 @@ def default_targets(root: Path) -> list[Path]:
         path = root / name
         if path.is_dir() and path.name not in SKIP_DIR_NAMES:
             targets.append(path)
-    eda = root / "data" / "eda.py"
-    if eda.is_file():
-        targets.append(eda)
     targets.extend(path for path in sorted(root.glob("*.py")) if path.is_file())
     return targets
 

@@ -51,8 +51,8 @@ read the report. The pipeline declaration is out of scope (see
   That command selects conda-forge for pixi/conda and PyPI
   requirements for other managers. Confirm the add; do not spell
   `skore[...]` in this skill. See
-  `setup-workspace/references/g_skore_mode.md` and
-  `setup-python-env/references/skore_variant.md`.
+  `evaluate-ml-pipeline/references/g_skore_mode.md` and
+  `add-python-package/references/skore_variant.md`.
   If mode is already recorded, do not re-ask.
 - **Missing dependency.** If `import skore` raises in this project's
   env, STOP. Fire G-SKORE-MODE first if `policy.skore_mode` is
@@ -460,5 +460,5 @@ If the skill is not installed, name the package and stop.
 
 ## References
 
-- `setup-workspace/references/g_skore_mode.md` (G-SKORE-MODE table;
-  this skill owns the gate)
+- `references/g_skore_mode.md` (G-SKORE-MODE table; this skill
+  owns the gate)

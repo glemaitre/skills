@@ -1,18 +1,17 @@
 ---
 name: setup-workspace
 description: >
-  Detect an existing ML workspace or scaffold a fresh one. Reusable
-  code lives in `src/<pkg>/`; experiments are `# %%` scripts;
-  design notes and index live in `journal/`. Existing conventions
-  always win.
+  Detect an existing ML workspace or scaffold a fresh one via
+  `python -m skore_skills scaffold --package <pkg>`. Cookiecutter
+  only: directories, README.md files, and src/<pkg>/ stubs.
 
   TRIGGER for a new ML project layout or first scaffold.
 
   SKIP pipeline, evaluation, EDA, and library choice.
 
   HOW TO USE: detect first. For a fresh or manager-only layout,
-  ask G-PKG-NAME, then `python -m skore_skills scaffold --package
-  <pkg>`. For an existing layout, glue without renaming.
+  ask G-PKG-NAME, then scaffold. For an existing layout, glue
+  without renaming.
 ---
 
 # Set Up Workspace
@@ -51,12 +50,11 @@ after listing the boxes.
    python -m skore_skills scaffold --package <pkg>
    ```
 
+   The CLI writes the tree and each folder `README.md`. Do not
+   recreate those files from memory.
 3. Existing: add only glue the user asked for. No rename, no
    overwrite, no `--force`.
-4. If the user wants a **new experiment**, load
-   `iterate-ml-experiment` or `triage-ml-task` when installed. Do
-   not write `experiments/NN_*.py` here.
-5. If `setup-ml-project` dispatched this turn and is in this
+4. If `setup-ml-project` dispatched this turn and is in this
    session, return to it; else stop. Standalone:
    `python -m skore_skills git end-turn --stage setup`. If JSON
    `action` is `invoke`, load `persist-ml-git` when installed.
@@ -67,20 +65,21 @@ after listing the boxes.
 - Do not ask env manager, tabular library, or skore mode.
 - Do not run `pixi init` / `uv init`.
 - Do not install packages or editable-install.
-- Scaffold may leave an empty experiment shell. Do not write a
-  runnable `build_learner` / `skore.evaluate` / `project.put` body.
-- Do not evaluate or `project.put` from `scratch/`.
+- Do not write experiment or EDA bodies.
 - Never `git commit` here.
 
-## Layout (`scaffold` writes this)
+## Layout (CLI writes this)
 
 ```text
 src/<pkg>/
 experiments/
-journal/JOURNAL.md
+journal/
+eda/
+data/
 audit/
 tests/smoke/
 scratch/
 reports/
-data/
 ```
+
+Each directory has `README.md`.

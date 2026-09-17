@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "e565a2624f3254849df94a823214937990db29cf5089924b0cfec032daf3173b",
+  "catalog_hash": "3beb95865b8df35181a8e6a870fe1cdff8f467eb0e97cbe6f1df224406befa51",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b66719b7bb70b8d5916e17c498266197277a3c3b2792f8afd4f762e60b709f03"
+      "hash": "6b986becf5891d5a5b2628e1d0de2ac08cbe6e22cbd1112fc98082f8ab812394"
     },
     {
       "id": "build-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b9f1c2562ce69508557e2cb57efd5ea22494569df79d3fab067a8342e8836758"
+      "hash": "a440969c5283cbbbd1e1bc4f6d5b8e00d1e3aa09657f86a83ace8743d7d1252f"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b57d0f8a061dbacc11e319010b2105466856f1a29815db330bd245bd37a34e94"
+      "hash": "af490109f5ad737d014a23e957c8a1ea45e00e352d360845c83acf1f800c9256"
     },
     {
       "id": "manage-ml-backlog",
@@ -66,7 +66,7 @@
       "summary": "Deprecated pointer to triage and backlog.",
       "category": "orchestration",
       "subcategory": "dispatchers",
-      "hash": "5883802ee29d80eca654c77f0a226aca2981fd12a4f445faf15b2d814a325181"
+      "hash": "20cb1501f4f4eac89a557b9da2eecb9377cee46010d7982a4cfbf31c3cd1d4e0"
     },
     {
       "id": "iterate-from-skore",
@@ -138,7 +138,7 @@
       "summary": "Commit the current loop stage with the real git CLI when the end-turn hook says invoke.",
       "category": "action",
       "subcategory": null,
-      "hash": "4b6abd907d0f1e82d0394288a94a18646d6ae13c797afb9d72c097d1f172e87e"
+      "hash": "0f5ce6b4c3498f0db3d3fc0ee0850124f7cacdc881e8f93eb63340cc9eaee457"
     },
     {
       "id": "model-ml-pipeline",
@@ -165,7 +165,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "8d0d7b94f5d696980052115f8b06ec967237d39932041fed7bcb9a7d01098708"
+      "hash": "57390c593ab50173fa2a7c40ce2f11a9b32c07853e72a80743dc882c050a2360"
     },
     {
       "id": "setup-workspace",
@@ -174,7 +174,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "4f8550a2e479e0e319f157398ce3f191062a3df46eab36e612c3e9bcfb93fa2d"
+      "hash": "aa7eddec71bebd1f818d15fb0ccae012aa1810ff680dd8208342e40d949b6981"
     },
     {
       "id": "setup-python-env",
@@ -183,7 +183,7 @@
       "summary": "Detect the env manager, persist managed vs user-managed, and init two envs plus agent tools.",
       "category": "action",
       "subcategory": null,
-      "hash": "a3aa8ce97b13c9f9a9930d95c972d5aca20146bbd48084a29d5354a8f895bde2"
+      "hash": "440895d66aee51f4b25b412c53a6f893d0beecbc62efea6825698fea06bfc768"
     }
   ],
   "workflows": [

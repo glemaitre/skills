@@ -163,7 +163,7 @@ def scaffold_cmd(
 def style_cmd(paths: tuple[Path, ...], initialize: bool) -> None:
     """Run ruff check --fix then format on defaults or PATHS.
 
-    Default globs: ``src/``, ``experiments/``, ``audit/``, ``data/eda.py``,
+    Default globs: ``src/``, ``experiments/``, ``audit/``, ``eda/``,
     top-level ``*.py``. ``--init`` without PATHS only writes ``[tool.ruff]``.
     """
     from skore_skills.style import initialize_style, run_style

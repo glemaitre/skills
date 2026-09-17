@@ -37,7 +37,6 @@ violated.
 **Must NOT do:**
 - Install scikit-learn, skrub, skore, or pandas in this turn.
 - Run `pixi init` before the gates resolve.
-- Install pyright or write `pyrightconfig.json`.
 - Load `setup-workspace` or create `src/`.
 
 ---

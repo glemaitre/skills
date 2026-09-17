@@ -64,7 +64,7 @@ after listing the boxes.
 
    If the mode is unset, return to `evaluate-ml-pipeline`. Do not
    spell `skore[...]` or pick conda vs PyPI yourself. See
-   `setup-python-env/references/skore_variant.md`.
+   `add-python-package/references/skore_variant.md`.
 6. Else `python -m skore_skills env route <pkg>`. Then:
 
    - `scope` `default` → `env add --execute <pkg>`
@@ -83,4 +83,4 @@ installed it, or when they chose to handle it themselves.
 
 ## References
 
-- `setup-python-env/references/skore_variant.md`
+- `references/skore_variant.md`

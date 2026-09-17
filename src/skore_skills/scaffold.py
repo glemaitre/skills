@@ -25,6 +25,19 @@ SRC_TEMPLATES = {
     "src_evaluate.py": "evaluate.py",
 }
 
+# Directory README.md files (cookiecutter). ``tests/smoke`` is nested.
+LAYOUT_READMES = (
+    ("readme_src.md", Path("src") / "README.md"),
+    ("readme_experiments.md", Path("experiments") / "README.md"),
+    ("readme_journal.md", Path("journal") / "README.md"),
+    ("readme_eda.md", Path("eda") / "README.md"),
+    ("readme_data.md", Path("data") / "README.md"),
+    ("readme_audit.md", Path("audit") / "README.md"),
+    ("readme_tests_smoke.md", Path("tests") / "smoke" / "README.md"),
+    ("readme_scratch.md", Path("scratch") / "README.md"),
+    ("readme_reports.md", Path("reports") / "README.md"),
+)
+
 
 def template_root() -> Path:
     """Return the packaged copy of organize-ml-workspace templates."""
@@ -102,12 +115,15 @@ def scaffold(root: Path, package: str, *, force: bool = False) -> list[Path]:
     for name, dest in (
         ("pyproject.toml.template", Path("pyproject.toml")),
         (".gitignore", Path(".gitignore")),
-        ("experiment.py", Path("experiments") / "01_baseline.py"),
     ):
         raw = (templates / name).read_text(encoding="utf-8")
         write(
             dest, render_template(raw, package, pyproject=name.startswith("pyproject"))
         )
+
+    for name, dest in LAYOUT_READMES:
+        raw = (templates / name).read_text(encoding="utf-8")
+        write(dest, render_template(raw, package))
 
     journal = files("skore_skills").joinpath("data/JOURNAL.md")
     write(

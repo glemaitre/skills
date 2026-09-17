@@ -20,8 +20,7 @@ description: >
 # Set Up Python Environment
 
 Bootstrap only. Packages this turn: `ruff`, `ipython`, `ipykernel`.
-Do not install sklearn, skrub, skore, pandas, jupyterlab, or
-pyright.
+Stage libraries go through `add-python-package`.
 
 ## Pre-flight
 
@@ -63,7 +62,3 @@ after listing the boxes.
 
 - **default** — project runtime, empty after bootstrap.
 - **agent** — default plus ruff, ipython, ipykernel.
-
-## References
-
-- `references/bootstrap.md`

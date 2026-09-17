@@ -36,7 +36,7 @@ this block on later sessions avoids re-deciding what's already settled.
 ## Data understanding (EDA)
 
 <!--
-Short index entry — the full analysis lives in data/eda.md. If the
+Short index entry — the full analysis lives in eda/eda.md. If the
 data exploration was skipped, keep just the Status: skipped line.
 -->
 
@@ -44,7 +44,7 @@ data exploration was skipped, keep just the Status: skipped line.
 - **Summary:** <2–4 lines — dataset shape, target balance/skew, and the
   one or two findings that most shape the modelling choices. "n/a"
   until the data has been explored.>
-- **Report:** [data/eda.md](../data/eda.md)
+- **Report:** [eda/eda.md](../eda/eda.md)
 
 ## History
 

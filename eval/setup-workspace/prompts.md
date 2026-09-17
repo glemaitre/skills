@@ -35,8 +35,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 - Name `python -m skore_skills scaffold --package <pkg>` as the
   action after G-PKG-NAME.
 - Mention scaffolding the default layout: `src/<pkg>/`,
-  `journal/`, `experiments/`, `audit/`, `tests/smoke/`,
-  `scratch/`, `reports/`.
+  `journal/`, `experiments/`, `eda/`, `data/`, `audit/`,
+  `tests/smoke/`, `scratch/`, `reports/`, each with `README.md`.
 - Name `python -m skore_skills git end-turn --stage setup` at the
   end of this standalone turn.
 - If that command returns `invoke`, load `persist-ml-git`.
@@ -45,10 +45,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 - Ask G-ENV-MGR or pick an environment manager in this skill.
 - Run `pixi init` / `uv init` / `poetry init` on the user's behalf.
 - Pick a package name silently from the folder name.
-- Write a runnable `experiments/01_baseline.py` whose body actually
-  calls `build_learner` / `skore.evaluate` / `project.put`
-  (uncommented). Enumerating the empty templated shell (imports,
-  `# %%`, commented stubs, `<<PKG>>` placeholders) is allowed.
+- Write a runnable `experiments/01_baseline.py`. Scaffold does not
+  create that file.
 - Default to pandas, persist `tabular`, or load
   `choose-python-library` (G-TABULAR belongs on EDA).
 - Run `git commit` in this skill or `git push`.
@@ -74,8 +72,7 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 - Detect the **existing layout** from the signals (pyproject.toml,
   `src/claim_predictor/`, `experiments/`, `journal/`).
 - Glue to existing folders / names — no renames, no relocates.
-- Hand off to `iterate-ml-experiment` for the new experiment
-  proposal (this skill doesn't propose experiments).
+- Do not write a new experiment file here.
 - Keep `claim_predictor` as the package / import name (do not
   rename `src/` or the import).
 
@@ -134,7 +131,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 
 **Expect files:**
 - `src/churnlab/pipeline.py`
-- `experiments/01_baseline.py`
+- `eda/README.md`
+- `experiments/README.md`
 - `journal/JOURNAL.md`
 - `pyproject.toml`
 
@@ -146,22 +144,13 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
   `run_skore_skills`; the resulting template tree is the scaffold.
 - Keep the scaffolded `journal/JOURNAL.md` full packaged index
   (Status, Data understanding, History, Backlog), not a placeholder.
-- Refuse to write `experiments/01_baseline.py` with a **runnable
-  body** during the scaffold turn.
-- Hand the experiment body to the model-loop skill; do not write
-  it here.
-- An empty or templated `experiments/01_baseline.py` shell
-  (imports / `# %%` / commented stubs / `<pkg>` placeholders)
-  counts as the Decision-flow drop. Do not require the words
-  "step 5" or `<<PKG>>`. The real body lands only after
-  design-note approval.
+- Do not create `experiments/01_baseline.py`. The CLI writes
+  `experiments/README.md` only.
 
 **Must NOT do:**
-- Write a runnable `experiments/01_baseline.py` with a real
-  build_learner call, `skore.evaluate`, and `project.put` in this
-  turn.
-- Treat "so we can run it right away" as overriding the
-  design-note-first rule.
+- Create `experiments/01_baseline.py` in this turn.
+- Treat "so we can run it right away" as a reason to write
+  experiment code during scaffold.
 
 ---
 
@@ -177,8 +166,7 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 
 **Must do:**
 - Detect an **existing** layout.
-- Hand off to `iterate-ml-experiment` (or triage). Do not pick
-  new file vs in-place edit here.
+- Do not write a new experiment file or pick new vs in-place edit.
 
 **Must NOT do:**
 - Silently pick "edit in place" or "create new file".

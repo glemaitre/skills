@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "Hook said invoke",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `python -m skore_skills git end-turn --stage eda` already returned\n  `action: invoke`, `reason: persist`, autocommit `on`.\n- Dirty paths include `data/eda.py` and `data/eda.md`.]\n\nPersist this EDA turn.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `python -m skore_skills git end-turn --stage eda` already returned\n  `action: invoke`, `reason: persist`, autocommit `on`.\n- Dirty paths include `eda/eda.py` and `eda/eda.md`.]\n\nPersist this EDA turn.",
       "expected_output": "Behavioural response satisfying: - Run `git status`. - Stage with `git add` (not `.env` / `.skore`). - Run `git commit -m` with a one-line subject from this turn. It must NOT: - Run `git push`. - Call `python -m skore_skills git end-turn` to create the commit.",
       "files": [],
       "expectations": [
