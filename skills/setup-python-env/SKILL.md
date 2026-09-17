@@ -55,7 +55,9 @@ after listing the boxes.
    Do not hand-edit TOML. Do not run `pixi init`. Do not create
    `src/`. If verify reports missing agent tools, load
    `add-python-package` for ruff / ipython / ipykernel (agent
-   feature), not a second `env init`.
+   feature) when that skill is installed, not a second `env init`.
+   If `add-python-package` is not installed, name ruff / ipython /
+   ipykernel and stop.
 
 ## Two environments
 

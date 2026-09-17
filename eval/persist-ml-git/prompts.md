@@ -33,7 +33,7 @@
 
 **Must do:**
 - Refuse to commit.
-- Return to triage.
+- Load `triage-ml-task` if installed, else stop.
 
 **Must NOT do:**
 - Run `git commit`.

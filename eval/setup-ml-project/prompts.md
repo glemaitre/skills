@@ -13,10 +13,10 @@
   `true`.
 
 **Must do:**
-- Emit the Pre-flight then load the child skills (do not stop
-  after listing boxes).
-- Load `setup-python-env`, then `setup-workspace`, then
-  `add-python-package` (editable only), then `setup-git`.
+- Emit the Pre-flight then ask (do not stop after listing boxes).
+- AskUserQuestion multi-select of installed pieces (env,
+  workspace, editable, git) with **every installed box
+  preselected**. Do not auto-run all four before the answer.
 - Leave manager, `env.managed`, and package-name questions to
   those skills. Do not ask G-TABULAR or G-SKORE-MODE.
 
@@ -29,10 +29,11 @@
 - Commit without asking.
 - Write a runnable baseline experiment.
 - Run `git push`.
+- Leave a setup box unchecked because the folder is empty.
 
 ---
 
-## CASE_02 — Editable install waits for the layout
+## CASE_02 — Continue setup, all boxes still on
 
 **User prompt:**
 > Continue the setup.
@@ -45,15 +46,18 @@
 
 **Must do:**
 - Read `status` first and treat the manager as already resolved.
-- Load `setup-workspace` next (`has_src` is false).
-- Schedule `add-python-package` for the editable install only
-  after `has_src` is true. Do not install sklearn/skrub/skore.
-- Finish with `setup-git`.
+- Ask the multi-select with **all installed pieces preselected**
+  (not only remaining work).
+- If the user keeps workspace + git: load `setup-workspace` then
+  `setup-git`; schedule editable only after `has_src`. Do not
+  install sklearn/skrub/skore.
+- Do not re-ask G-ENV-MGR in this meta.
 
 **Must NOT do:**
 - Re-ask G-ENV-MGR.
 - Pass `--force` to `scaffold`.
 - Wire the editable install before the layout exists.
+- Uncheck env/workspace/git because env already exists.
 
 ---
 
@@ -70,7 +74,8 @@
   `persist-ml-git: false`, `triage-ml-task: true`.
 
 **Must do:**
-- Dispatch the environment and workspace steps normally.
+- Ask the multi-select of **installed** pieces only. Omit git
+  because `setup-git` is not installed.
 - State in one line that git setup is skipped because `setup-git`
   is not installed.
 - Finish the rest of setup rather than stopping at the missing
@@ -81,3 +86,4 @@
   missing skill.
 - Invent the `setup-git` procedure from memory.
 - Treat the missing skill as an error that aborts setup.
+- Show a git checkbox.

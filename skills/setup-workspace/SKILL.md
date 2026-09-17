@@ -54,12 +54,13 @@ after listing the boxes.
 3. Existing: add only glue the user asked for. No rename, no
    overwrite, no `--force`.
 4. If the user wants a **new experiment**, load
-   `iterate-ml-experiment` (or `triage-ml-task`). Do not write
-   `experiments/NN_*.py` here.
-5. If `setup-ml-project` dispatched this turn, return to it.
-   Standalone: `python -m skore_skills git end-turn --stage setup`.
-   If JSON `action` is `invoke`, load `persist-ml-git` when
-   installed. Then load `triage-ml-task` when installed.
+   `iterate-ml-experiment` or `triage-ml-task` when installed. Do
+   not write `experiments/NN_*.py` here.
+5. If `setup-ml-project` dispatched this turn and is in this
+   session, return to it; else stop. Standalone:
+   `python -m skore_skills git end-turn --stage setup`. If JSON
+   `action` is `invoke`, load `persist-ml-git` when installed.
+   Then load `triage-ml-task` when installed.
 
 ## Stop conditions
 

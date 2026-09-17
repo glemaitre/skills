@@ -11,7 +11,8 @@ description: >
 
 The hook already ran this turn. Follow its JSON. Run `git` yourself.
 
-1. If `action` is `skip`, stop. Do not nag. Load `triage-ml-task`.
+1. If `action` is `skip`, stop. Do not nag. Load `triage-ml-task`
+   if installed, else stop.
 2. If `reason` is `resolve-dotfiles`, ask once which hidden paths
    to keep. Then
    `python -m skore_skills git ignore-merge --keep <path>` or leave
@@ -20,7 +21,7 @@ The hook already ran this turn. Follow its JSON. Run `git` yourself.
    `git add -- <paths>`. Never `.env` or `.skore`.
 4. Commit with a **one-line** subject from this turn's files and
    intent: `git commit -m "…"`. Do not use a canned stage slogan.
-5. Load `triage-ml-task`.
+5. Load `triage-ml-task` if installed, else stop.
 
 ## Stop conditions
 

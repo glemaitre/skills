@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "886e804e204d5d14e1b82835efc47a9edd670206b68bf9d49a163b8789fd0ce1",
+  "catalog_hash": "e565a2624f3254849df94a823214937990db29cf5089924b0cfec032daf3173b",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -111,7 +111,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "e399eb1d771b2e4939c7de81279e81c6d275c5b7bf4e99ffc160b43cb323523b"
+      "hash": "39109f312e906adac8293265e57dddaa075db3c3a74da8f7a2c968bc282663da"
     },
     {
       "id": "setup-ml-project",
@@ -120,7 +120,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "b910f53cb6de69efb0536fdfb7a4a86df3e4e8c380e458ba56d0ee260adbd3ec"
+      "hash": "a9352a55af73304d1ffa9eb328ced1dfd69af1f4f65b24e75e91462963dae9f3"
     },
     {
       "id": "setup-git",
@@ -129,7 +129,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "e14533774d3e1f790bdd04b977b1547c888943112c1b6ed1ed6baeab6c326423"
+      "hash": "513b3107d04076e03548fba421c965bf5b521e77a490592d8520d9b13b848bc4"
     },
     {
       "id": "persist-ml-git",
@@ -138,7 +138,7 @@
       "summary": "Commit the current loop stage with the real git CLI when the end-turn hook says invoke.",
       "category": "action",
       "subcategory": null,
-      "hash": "2b18fe98771fb071681ddcdfd2535ed181ec8f5d0ec68c1e5a833c4463f5ab80"
+      "hash": "4b6abd907d0f1e82d0394288a94a18646d6ae13c797afb9d72c097d1f172e87e"
     },
     {
       "id": "model-ml-pipeline",
@@ -165,7 +165,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "e0dfc46ac63869dd199cc2a5fc8908cb0582fe0b7f6f6f0f56799c39edc09844"
+      "hash": "8d0d7b94f5d696980052115f8b06ec967237d39932041fed7bcb9a7d01098708"
     },
     {
       "id": "setup-workspace",
@@ -174,7 +174,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "73054bed8a12b11de49e3492fbcaea05d59ef514e7bc123d6ed1165fe07f506e"
+      "hash": "4f8550a2e479e0e319f157398ce3f191062a3df46eab36e612c3e9bcfb93fa2d"
     },
     {
       "id": "setup-python-env",
@@ -183,7 +183,7 @@
       "summary": "Detect the env manager, persist managed vs user-managed, and init two envs plus agent tools.",
       "category": "action",
       "subcategory": null,
-      "hash": "de362d55be7162e3283de3be3872553e9df65ac37c312b9655b0cc126dcfd712"
+      "hash": "a3aa8ce97b13c9f9a9930d95c972d5aca20146bbd48084a29d5354a8f895bde2"
     }
   ],
   "workflows": [

@@ -36,7 +36,8 @@ after listing the boxes.
 
 1. `python -m skore_skills status` and `env detect`.
 2. If `policy.env.managed` is null: env is unresolved. Say so and
-   stop. Do not bootstrap here.
+   stop. Do not bootstrap here. Do not load `setup-python-env` by
+   catalog id unless the user asked for env setup.
 3. If `managed` is false: **do not** `--execute`. Ask with two
    options:
 
@@ -53,7 +54,7 @@ after listing the boxes.
    ```
 
    Never `pip install -e .` in a pixi project. If `has_src` is
-   false, stop and send the caller to `setup-workspace`.
+   false, stop. Name `setup-workspace` only if it is installed.
 5. If the package is Skore, read the persisted `policy.skore_mode`
    and run:
 
