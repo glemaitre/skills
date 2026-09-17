@@ -5,9 +5,10 @@
       "id": 1,
       "title": "Bootstrap narrates two envs",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder; no manifests, no `src/`.\n- `status` reports `env_manager: none`, `has_src: false`.\n- `policy.env.managed` is unset.\n- pixi is on PATH.]\n\nStart the setup: get the Python environment going.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env detect` and treat this as bootstrap, not a package add. - Fire G-ENV-MGR using `recommended` (pixi first unless `.skore` recorded another manager or `provenance.manager` names one). PATH of other tools is not permission. - Ask whether we manage the env (default yes) and persist `env.managed`. It must NOT: - Install scikit-learn, skrub, skore, or pandas in this turn. - Run `pixi init` before the gates resolve. - Install pyright or write `pyrightconfig.json`.",
+      "expected_output": "Behavioural response satisfying: - Emit the Pre-flight then run the commands (do not stop after listing boxes). - Name `python -m skore_skills env detect` and treat this as bootstrap, not a package add. - Fire G-ENV-MGR using `recommended` (pixi first unless `.skore` recorded another manager or `provenance.manager` names one). PATH of other tools is not permission. It must NOT: - Install scikit-learn, skrub, skore, or pandas in this turn. - Run `pixi init` before the gates resolve. - Install pyright or write `pyrightconfig.json`.",
       "files": [],
       "expectations": [
+        "Emit the Pre-flight then run the commands (do not stop after listing boxes).",
         "Name `python -m skore_skills env detect` and treat this as bootstrap, not a package add.",
         "Fire G-ENV-MGR using `recommended` (pixi first unless `.skore` recorded another manager or `provenance.manager` names one). PATH of other tools is not permission.",
         "Ask whether we manage the env (default yes) and persist `env.managed`.",

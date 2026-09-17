@@ -667,3 +667,125 @@ def test_env_init_mentions_sync(
     assert result.exit_code == 0, result.output
     assert "next: pixi install -e agent" in result.output
     assert "run: python -m skore_skills env sync" in result.output
+
+
+@pytest.mark.parametrize(
+    ("fixture", "mode", "expected"),
+    [
+        ("pixi", "local", "pixi add skore"),
+        ("pixi", "hub", "pixi add skore"),
+        ("pixi", "mlflow", "pixi add skore mlflow>=3"),
+        ("uv", "local", "uv add skore"),
+        ("uv", "hub", "uv add skore[hub]"),
+        ("uv", "mlflow", "uv add skore[mlflow] mlflow>=3"),
+        ("poetry", "hub", "poetry add skore[hub]"),
+        ("pip-venv", "hub", "pip install skore[hub]"),
+        (
+            "conda",
+            "hub",
+            "conda install -n fixture-conda -c conda-forge skore",
+        ),
+        (
+            "conda",
+            "mlflow",
+            "conda install -n fixture-conda -c conda-forge skore mlflow>=3",
+        ),
+    ],
+)
+def test_env_add_skore_manager_mode_matrix(
+    fixture: str,
+    mode: str,
+    expected: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Skore uses conda packages for pixi/conda and PyPI elsewhere."""
+    monkeypatch.chdir(FIXTURES / fixture)
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", mode])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == expected
+
+
+def test_env_add_skore_hatch_writes_pypi_requirement(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hatch records the mode-specific PyPI requirement."""
+    (tmp_path / "hatch.toml").write_text("# hatch\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "hub"])
+    assert result.exit_code == 0, result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"skore[hub]"' in text
+
+    second = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "hub"])
+    assert second.exit_code == 0, second.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert text.count('"skore[hub]"') == 1
+
+
+def test_env_add_skore_execute_runs_subprocess(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Managed ``--execute`` runs the resolved manager command."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(
+        cli, ["env", "add-skore", "--mode", "mlflow", "--execute"]
+    )
+    assert result.exit_code == 0, result.output
+    assert seen == [["pixi", "add", "skore", "mlflow>=3"]]
+
+
+def test_env_add_skore_refuses_unmanaged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Skore install preserves the managed-environment gate."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(
+        cli, ["env", "add-skore", "--mode", "local", "--execute"]
+    )
+    assert result.exit_code != 0
+    assert "user-managed" in result.output
+
+
+@pytest.mark.parametrize("fixture", ["none", "ambiguous"])
+def test_env_add_skore_refuses_unresolved_manager(
+    fixture: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Skore source is never selected without one manifest manager."""
+    monkeypatch.chdir(FIXTURES / fixture)
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "local"])
+    assert result.exit_code != 0
+
+
+def test_env_add_skore_rejects_invalid_mode() -> None:
+    """The CLI rejects an unknown Skore mode."""
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "remote"])
+    assert result.exit_code != 0
+
+
+def test_add_skore_rejects_invalid_mode_library(tmp_path: Path) -> None:
+    """Library callers receive a usage error for an unknown mode."""
+    from skore_skills.env import add_skore
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    text, code = add_skore(tmp_path, "remote")
+    assert code == 2
+    assert "unknown skore mode" in text

@@ -10,67 +10,41 @@ description: >
   TRIGGER when bootstrapping a Python project or when no
   environment manager is recorded yet.
 
-  SKIP adding packages after bootstrap — load add-python-package.
-  SKIP non-Python tools.
+  SKIP adding later packages — load add-python-package.
+  SKIP scaffolding src/ — that is setup-workspace.
 
   HOW TO USE: detect, ask managed vs user-managed, ask the
   manager when needed, then env init, env sync, env verify.
-  Narrate every choice.
 ---
 
 # Set Up Python Environment
 
-Bootstrap only. Name every choice this turn: manager,
-`env.managed`, two-env layout, packages `ruff` / `ipython` /
-`ipykernel`. Do not install sklearn, skrub, skore, pandas,
-jupyterlab, or pyright.
-
-Adding a later dependency is `add-python-package`, not this skill.
-
-## Stop conditions
-
-- **Wrong-manager install is forbidden.** Never `pip install` in a
-  pixi project.
-- **No silent bootstrap.** If no manager is detected, ask. Recommend
-  from `env detect` `recommended`: policy `env_manager`, then a
-  unique manifest, then `provenance.manager` (`skore` install
-  path), then pixi → uv → poetry → hatch → conda → pip-venv.
-  PATH of other tools is not permission. Do not run `curl | sh`.
-- **No silent ambiguity.** If `ambiguous` is true, ask which
-  manifest is the project manager. If `mismatch` is true, ask:
-  recorded policy disagrees with the unique manifest.
-- **User opt-out.** If the user manages the env, persist
-  `env.managed` false and **stop**. Do not `env init`, `env sync`,
-  or `env add`. Name ruff / ipython / ipykernel as tools they may
-  want later.
-- **Do not hand-edit manager TOML.** `env init` is the only writer
-  of manager tables. Do not create `pixi.toml` when pixi can live in
-  pyproject. Do not create `src/`. Do not invent `pixi install` or
-  `pixi init`; run `env sync`.
-- **A missing layout is a status fact.** When `has_src` is false,
-  editable install is pending. Do not scaffold here.
+Bootstrap only. Packages this turn: `ruff`, `ipython`, `ipykernel`.
+Do not install sklearn, skrub, skore, pandas, jupyterlab, or
+pyright.
 
 ## Pre-flight
 
+Tick, then immediately run the matching sequence step. Do not stop
+after listing the boxes.
+
 ```
-- [ ] Detection: python -m skore_skills env detect
-- [ ] G-ENV-MGR: <manager> | ask
-- [ ] env.managed: true | false | ask (default true)
-- [ ] Command: python -m skore_skills env init --manager <name>
-- [ ] Command: python -m skore_skills env sync --execute
-- [ ] Command: python -m skore_skills env verify --execute
-- [ ] Narrated: default + agent; ruff, ipython, ipykernel
+- [ ] env detect + status
+- [ ] G-ENV-MGR: ask if none / ambiguous / mismatch; else keep recorded
+- [ ] env.managed: ask (default true) and persist
+- [ ] unmanaged → stop | managed → env init --manager, env sync --execute, env verify --execute
 ```
 
 ## Sequence
 
-1. `python -m skore_skills env detect` and `status` (policy).
-2. Rank managers from `recommended`. Ask when none, `ambiguous`,
-   or `mismatch`.
+1. `python -m skore_skills env detect` and `status`.
+2. **G-ENV-MGR.** Ask the manager when `env_manager` is `none`,
+   `ambiguous`, or `mismatch`. Use JSON `recommended` as the ask
+   order. PATH is not permission. Do not `curl | sh`.
 3. Ask whether **we** manage the env (default yes). Persist
    `python -m skore_skills policy set env.managed true` or `false`.
-4. If unmanaged: stop after detection. Do not init or sync.
-5. If managed: `policy set env_manager <manager>`, then
+4. Unmanaged: stop. Name ruff / ipython / ipykernel; do not init.
+5. Managed: `policy set env_manager <manager>`, then
 
    ```bash
    python -m skore_skills env init --manager <manager>
@@ -78,29 +52,16 @@ Adding a later dependency is `add-python-package`, not this skill.
    python -m skore_skills env verify --execute
    ```
 
-   Do not invent TOML or manager argv. If verify reports missing
-   agent tools, `env route` + `env add --feature agent --execute`,
-   not a second `env init`. No sklearn/skrub/skore/pandas/jupyterlab/pyright.
-6. After workspace exists (`has_src`), editable install is
-   `add-python-package` (or the dispatcher), not a second bootstrap
-   mode here.
+   Do not hand-edit TOML. Do not run `pixi init`. Do not create
+   `src/`. If verify reports missing agent tools, load
+   `add-python-package` for ruff / ipython / ipykernel (agent
+   feature), not a second `env init`.
 
 ## Two environments
 
-- **default** — project runtime. Empty after bootstrap.
-- **agent** — default plus ruff, ipython, ipykernel. Interpreter for
-  `cells run` and ruff.
-
-uv/poetry: default dependencies plus an `agent` group. Hatch/conda:
-two envs. No `dev` env, no `lsp` env, no pyright.
-
-Ruff config is `[tool.ruff]` in `pyproject.toml`. Leftover
-`ruff.toml` is still valid. Run style with
-`python -m skore_skills style`.
+- **default** — project runtime, empty after bootstrap.
+- **agent** — default plus ruff, ipython, ipykernel.
 
 ## References
 
 - `references/bootstrap.md`
-- `references/composition_model.md`
-- `references/install_commands_anatomy.md`
-- `references/per_manager_footguns.md`

@@ -17,6 +17,8 @@ violated.
 - pixi is on PATH.
 
 **Must do:**
+- Emit the Pre-flight then run the commands (do not stop after
+  listing boxes).
 - Name `python -m skore_skills env detect` and treat this as
   bootstrap, not a package add.
 - Fire G-ENV-MGR using `recommended` (pixi first unless `.skore`

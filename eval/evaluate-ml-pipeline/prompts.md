@@ -16,6 +16,7 @@ violated.
 - `src/<pkg>/pipeline.py` exists with `build_learner` returning a
   `SkrubLearner`. The X-marker has empty `split_kwargs`.
 - `experiments/01_baseline.py` is the scaffold placeholder.
+- `policy.skore_mode` is `local`.
 - Cache exists at `scratch/api/sklearn/1.8.0/cv_splitters.md`
   covering `KFold` / `GroupKFold` / `TimeSeriesSplit`, and at
   `scratch/api/skore/0.18.0/evaluate.md`.
@@ -223,3 +224,49 @@ violated.
 **Must NOT do:**
 - Approve the scratch probe with `evaluate` + `put`.
 - Treat scratch as a producer of reports.
+
+---
+
+## CASE_08 — G-SKORE-MODE unset at first evaluate
+
+**User prompt:**
+> Wire `evaluate.py` for the baseline.
+
+**Assumed workspace state:**
+- `journal/01_baseline.md` approved.
+- `src/<pkg>/pipeline.py` has `build_learner`.
+- `policy.skore_mode` is unset. `import skore` may fail.
+- `add-python-package` is installed.
+
+**Must do:**
+- Ask G-SKORE-MODE (local recommended / hub / mlflow) before
+  writing `skore.evaluate`.
+- Persist `policy set skore_mode` after the user answers.
+- Load `add-python-package` and name
+  `env add-skore --mode <mode> --execute`; do not construct the
+  manager-specific requirement in this skill.
+
+**Must NOT do:**
+- Silent-default `mode="local"` without asking.
+- Drop back to `cross_val_score` because skore is missing.
+- Re-ask G-TABULAR.
+- Send `skore[hub]` / `skore[mlflow]` directly to pixi or conda.
+
+---
+
+## CASE_09 — Recorded skore mode is not re-asked
+
+**User prompt:**
+> Wire `evaluate.py` for the baseline.
+
+**Assumed workspace state:**
+- Same as CASE_01.
+- `policy.skore_mode` is `local`.
+- `skore` imports.
+
+**Must do:**
+- Use local mode; do not re-ask G-SKORE-MODE.
+- Pick `skore.evaluate` as the entry point.
+
+**Must NOT do:**
+- Re-open local vs hub vs mlflow.

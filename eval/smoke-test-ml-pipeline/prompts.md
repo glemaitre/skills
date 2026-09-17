@@ -174,3 +174,23 @@ violated.
   `build_learner`.
 - Wrap the predictor with NaN-handling.
 - Add a try/except that catches the row-count mismatch.
+
+---
+
+## CASE_07 — Missing pytest goes to add-python-package
+
+**User prompt:**
+> Write the smoke test for `01_baseline`.
+
+**Assumed workspace state:**
+- Design note approved; experiment script exists.
+- `pytest` is not installed in the project env.
+
+**Must do:**
+- STOP and load `add-python-package` for `pytest` on default
+  (confirm).
+- Do not put pytest on `--feature agent`.
+
+**Must NOT do:**
+- `pip install pytest`.
+- Call `env add` from this skill.

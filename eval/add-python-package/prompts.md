@@ -13,6 +13,8 @@
 - `env_manager` is pixi.
 
 **Must do:**
+- Emit the Pre-flight then run the commands (do not stop after
+  listing boxes).
 - Name `python -m skore_skills env detect` / status.
 - Name `python -m skore_skills env add --execute skrub` (or
   `env route` then that add). Do not invent `pixi add` from memory.
@@ -99,3 +101,22 @@
 **Must NOT do:**
 - Run `env init`.
 - Run `env add` while managed is unanswered.
+
+---
+
+## CASE_06 — Skore source follows the project manager
+
+**User prompt:**
+> Install Skore for Hub mode.
+
+**Assumed workspace state:**
+- Managed pixi project.
+- `policy.skore_mode` is `hub`.
+
+**Must do:**
+- Run `python -m skore_skills env add-skore --mode hub --execute`.
+
+**Must NOT do:**
+- Run `pixi add "skore[hub]"`.
+- Add Skore with `--pypi`.
+- Infer the package source from PATH.

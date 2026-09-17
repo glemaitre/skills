@@ -123,11 +123,14 @@ bottom; any match means STOP.
 
 ### S1. Missing dependency
 
-- **Rule:** `import skrub` raising means `add-python-package` is
-  next, not a substitute library.
-- **Symptom:** `ModuleNotFoundError: No module named 'skrub'`.
-- **Recovery:** invoke `add-python-package` for the install
-  command. Do NOT substitute with `sklearn.Pipeline` /
+- **Rule:** `import skrub` or `import sklearn` raising means
+  `add-python-package` is next, not a substitute library. Confirm
+  then add `skrub` and `scikit-learn` (enforced). Do not reopen
+  skrub DataOps vs bare `sklearn.Pipeline`.
+- **Symptom:** `ModuleNotFoundError: No module named 'skrub'`
+  or `sklearn`.
+- **Recovery:** invoke `add-python-package` for `skrub` and
+  `scikit-learn`. Do NOT substitute with `sklearn.Pipeline` /
   `make_pipeline` / `FunctionTransformer` — that silently rewrites
   this skill out of the project.
 

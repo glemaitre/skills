@@ -14,7 +14,7 @@ so the target can `read_file` the history-dependent JOIN example
 (the same file `SKILL.md` points at). Other cases stay single-turn.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
+violated. Overall: ≥ 7/8 cases pass and no Must NOT violated.
 
 ---
 
@@ -249,3 +249,23 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
   `GroupKFold` only as what `evaluate-ml-pipeline` owns later is
   not a violation.
 - Leave `split_kwargs` empty without surfacing the group question.
+
+---
+
+## CASE_08 — Missing skrub/sklearn goes to add-python-package
+
+**User prompt:**
+> Declare the baseline learner.
+
+**Assumed workspace state:**
+- Design note approved.
+- `import skrub` raises `ModuleNotFoundError`.
+
+**Must do:**
+- STOP and load `add-python-package` for `skrub` and
+  `scikit-learn` (confirm).
+- Keep skrub DataOps as the graph; do not reopen vs Pipeline.
+
+**Must NOT do:**
+- Substitute `sklearn.Pipeline` / `make_pipeline`.
+- Call `env add` from this skill.

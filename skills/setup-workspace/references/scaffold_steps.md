@@ -1,10 +1,11 @@
-# Scaffold steps — full Decision flow with rationale
+# Scaffold steps — rationale
 
-SKILL.md has the 12-step compact form. This file elaborates the
-rationale and examples per step. Load when the inline version
-doesn't answer a "why does this step do X?" question.
+`python -m skore_skills scaffold --package <pkg>` is the primary
+action. This file is rationale only; do not re-run a 12-step
+manual template copy. Load when the inline SKILL.md sequence
+does not answer a "why" question.
 
-## Step 1 — Detection
+## Detection
 
 Run `ls`/Glob on the project root. The Detection table in SKILL.md
 lists the signals. **Any signal present → glue.** No signal → fresh

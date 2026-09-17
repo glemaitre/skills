@@ -21,21 +21,50 @@ description: >
 The only skill that knows `python -m skore_skills env add`. Callers
 must not splice manager commands themselves.
 
+## Pre-flight
+
+Tick, then immediately run the matching sequence step. Do not stop
+after listing the boxes.
+
+```
+- [ ] status + env detect
+- [ ] env.managed: null → stop | false → ask, no --execute | true → continue
+- [ ] this turn: editable | add-skore | env route then env add --execute
+```
+
 ## Sequence
 
 1. `python -m skore_skills status` and `env detect`.
 2. If `policy.env.managed` is null: env is unresolved. Say so and
-   stop (or send the user to setup/triage). Do not bootstrap here.
-3. If this turn is the workspace package and `has_src` is true:
+   stop. Do not bootstrap here.
+3. If `managed` is false: **do not** `--execute`. Ask with two
+   options:
+
+   1. **I will handle it** (default) — name the package(s) and
+      print-only `env add` (or `env add-skore --mode <mode>`).
+      Do not wait; return.
+   2. **Please install this now** — show the same command, wait
+      until the user confirms it is done, then return.
+
+4. If this turn is the workspace package and `has_src` is true:
 
    ```bash
    python -m skore_skills env add --editable --execute
    ```
 
-   when `managed` is true. Never `pip install -e .` in a pixi
-   project. If `has_src` is false, stop and send the caller to
-   `setup-workspace`.
-4. Else `python -m skore_skills env route <pkg>`. Then:
+   Never `pip install -e .` in a pixi project. If `has_src` is
+   false, stop and send the caller to `setup-workspace`.
+5. If the package is Skore, read the persisted `policy.skore_mode`
+   and run:
+
+   ```bash
+   python -m skore_skills env add-skore --mode <mode> --execute
+   ```
+
+   If the mode is unset, return to `evaluate-ml-pipeline`. Do not
+   spell `skore[...]` or pick conda vs PyPI yourself. See
+   `setup-python-env/references/skore_variant.md`.
+6. Else `python -m skore_skills env route <pkg>`. Then:
 
    - `scope` `default` → `env add --execute <pkg>`
    - `scope` `agent` → `env add --feature agent --execute <pkg>`
@@ -43,18 +72,14 @@ must not splice manager commands themselves.
      `--feature` / `--group`
    - refuse → stop; do not install
 
-   When `managed` is true, always pass `--execute`. Never paste
-   `pixi add` / `uv add` / `pip install` from memory.
-5. If `managed` is false: **do not** run `env add --execute` (the
-   CLI also refuses). Still ask with two options:
-
-   1. **I will handle it** (default) — name the package(s) and
-      print-only `env add` as a hint. Do not wait; return.
-   2. **Please install this now** — show the same command, wait
-      until the user confirms it is done, then return. Still do
-      not `--execute`.
+   Always pass `--execute`. Never paste `pixi add` / `uv add` /
+   `pip install` from memory.
 
 Forbidden substitutes stay in the CLI (`python-stack.json`).
 
 Return when the import is available, when the user confirmed they
 installed it, or when they chose to handle it themselves.
+
+## References
+
+- `setup-python-env/references/skore_variant.md`

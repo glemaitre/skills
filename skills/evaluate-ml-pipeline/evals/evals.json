@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "Standard skore.evaluate entry, IID tabular",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` approved.\n- `src/<pkg>/pipeline.py` exists with `build_learner` returning a\n  `SkrubLearner`. The X-marker has empty `split_kwargs`.\n- `experiments/01_baseline.py` is the scaffold placeholder.\n- Cache exists at `scratch/api/sklearn/1.8.0/cv_splitters.md`\n  covering `KFold` / `GroupKFold` / `TimeSeriesSplit`, and at\n  `scratch/api/skore/0.18.0/evaluate.md`.]\n\nWire `evaluate.py` for the baseline. Tabular regression, no\ngroups, no temporal ordering.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` approved.\n- `src/<pkg>/pipeline.py` exists with `build_learner` returning a\n  `SkrubLearner`. The X-marker has empty `split_kwargs`.\n- `experiments/01_baseline.py` is the scaffold placeholder.\n- `policy.skore_mode` is `local`.\n- Cache exists at `scratch/api/sklearn/1.8.0/cv_splitters.md`\n  covering `KFold` / `GroupKFold` / `TimeSeriesSplit`, and at\n  `scratch/api/skore/0.18.0/evaluate.md`.]\n\nWire `evaluate.py` for the baseline. Tabular regression, no\ngroups, no temporal ordering.",
       "expected_output": "Behavioural response satisfying: - Pick **`skore.evaluate(learner, data={...}, splitter=...)`** as the entry point (not `cross_val_score`, not `cross_validate`). - Map empty `split_kwargs` + IID \u2192 **`KFold`** per the mapping table. - Name `python -m skore_skills api get` for `skore.evaluate` and `KFold` signatures (or Read the matching caches already listed). It must NOT: - Recommend `cross_val_score`, `cross_validate`, `classification_report`, or hand-rolled `print(mean_squared_error(...))`. - Default to `StratifiedKFold` (forbidden \u2014 compresses across-fold variance, even on imbalance). - Pre-pin metrics (e.g. `scoring=\"neg_mean_squared_error\"`) \u2014 trust skore defaults.",
       "files": [],
       "expectations": [
@@ -129,6 +129,40 @@
         "Recommend using `project.summarize()` + `project.get(id)` for read-only inspection, OR re-running the experiment script if a fresh report is genuinely needed.",
         "The response does NOT: Approve the scratch probe with `evaluate` + `put`.",
         "The response does NOT: Treat scratch as a producer of reports."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 8,
+      "title": "G-SKORE-MODE unset at first evaluate",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` approved.\n- `src/<pkg>/pipeline.py` has `build_learner`.\n- `policy.skore_mode` is unset. `import skore` may fail.\n- `add-python-package` is installed.]\n\nWire `evaluate.py` for the baseline.",
+      "expected_output": "Behavioural response satisfying: - Ask G-SKORE-MODE (local recommended / hub / mlflow) before writing `skore.evaluate`. - Persist `policy set skore_mode` after the user answers. - Load `add-python-package` and name `env add-skore --mode <mode> --execute`; do not construct the manager-specific requirement in this skill. It must NOT: - Silent-default `mode=\"local\"` without asking. - Drop back to `cross_val_score` because skore is missing. - Re-ask G-TABULAR.",
+      "files": [],
+      "expectations": [
+        "Ask G-SKORE-MODE (local recommended / hub / mlflow) before writing `skore.evaluate`.",
+        "Persist `policy set skore_mode` after the user answers.",
+        "Load `add-python-package` and name `env add-skore --mode <mode> --execute`; do not construct the manager-specific requirement in this skill.",
+        "The response does NOT: Silent-default `mode=\"local\"` without asking.",
+        "The response does NOT: Drop back to `cross_val_score` because skore is missing.",
+        "The response does NOT: Re-ask G-TABULAR.",
+        "The response does NOT: Send `skore[hub]` / `skore[mlflow]` directly to pixi or conda."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 9,
+      "title": "Recorded skore mode is not re-asked",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Same as CASE_01.\n- `policy.skore_mode` is `local`.\n- `skore` imports.]\n\nWire `evaluate.py` for the baseline.",
+      "expected_output": "Behavioural response satisfying: - Use local mode; do not re-ask G-SKORE-MODE. - Pick `skore.evaluate` as the entry point. It must NOT: - Re-open local vs hub vs mlflow.",
+      "files": [],
+      "expectations": [
+        "Use local mode; do not re-ask G-SKORE-MODE.",
+        "Pick `skore.evaluate` as the entry point.",
+        "The response does NOT: Re-open local vs hub vs mlflow."
       ],
       "tools": false,
       "sandbox": [],

@@ -139,6 +139,22 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 8,
+      "title": "Missing skrub/sklearn goes to add-python-package",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Design note approved.\n- `import skrub` raises `ModuleNotFoundError`.]\n\nDeclare the baseline learner.",
+      "expected_output": "Behavioural response satisfying: - STOP and load `add-python-package` for `skrub` and `scikit-learn` (confirm). - Keep skrub DataOps as the graph; do not reopen vs Pipeline. It must NOT: - Substitute `sklearn.Pipeline` / `make_pipeline`. - Call `env add` from this skill.",
+      "files": [],
+      "expectations": [
+        "STOP and load `add-python-package` for `skrub` and `scikit-learn` (confirm).",
+        "Keep skrub DataOps as the graph; do not reopen vs Pipeline.",
+        "The response does NOT: Substitute `sklearn.Pipeline` / `make_pipeline`.",
+        "The response does NOT: Call `env add` from this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

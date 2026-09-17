@@ -13,17 +13,18 @@
   `true`.
 
 **Must do:**
-- Dispatch environment, workspace, then git setup in that order.
-- Keep the first environment turn to the manager bootstrap
-  (G-ENV-MGR + `init`), without the ML stack or the editable
-  install.
-- Ask for unresolved package, tabular, manager, and skore-mode
-  decisions before scaffold/install actions.
-- Name `setup-git` for the git step.
+- Emit the Pre-flight then load the child skills (do not stop
+  after listing boxes).
+- Load `setup-python-env`, then `setup-workspace`, then
+  `add-python-package` (editable only), then `setup-git`.
+- Leave manager, `env.managed`, and package-name questions to
+  those skills. Do not ask G-TABULAR or G-SKORE-MODE.
 
 **Must NOT do:**
 - Scaffold or ask for the package name before the environment
   manager turn.
+- Ask G-TABULAR or G-SKORE-MODE, or persist `tabular` /
+  `skore_mode`, during setup.
 - Run `pip install`.
 - Commit without asking.
 - Write a runnable baseline experiment.
@@ -44,13 +45,9 @@
 
 **Must do:**
 - Read `status` first and treat the manager as already resolved.
-- Dispatch `setup-workspace` next, because the editable install
-  needs `src/<pkg>/`.
-- Name `python -m skore_skills scaffold --package <pkg>` as the
-  workspace action even though a manifest already exists.
-- Schedule `add-python-package` / `env add --editable --execute`
-  for the editable install only after `has_src` is true. Do not
-  install sklearn/skrub/skore during setup.
+- Load `setup-workspace` next (`has_src` is false).
+- Schedule `add-python-package` for the editable install only
+  after `has_src` is true. Do not install sklearn/skrub/skore.
 - Finish with `setup-git`.
 
 **Must NOT do:**

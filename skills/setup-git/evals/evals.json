@@ -5,9 +5,10 @@
       "id": 1,
       "title": "First repository",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `.env` and raw data are present and must remain untracked.\n- `policy.git.autocommit` is `null` (never asked).]\n\nInitialize git here and make the first commit.",
-      "expected_output": "Behavioural response satisfying: - Name `git init`. - Name `python -m skore_skills git ignore-merge`. - Ask once whether later stages may autocommit (`on` vs `off`) and persist with `python -m skore_skills policy set git.autocommit`. It must NOT: - Stage `.env` or raw data. - Commit, push, or create a remote without confirmation. - Use `python -m skore_skills git end-turn` to create the first commit.",
+      "expected_output": "Behavioural response satisfying: - Emit the Pre-flight then run the commands (do not stop after listing boxes). - Name `git init`. - Name `python -m skore_skills git ignore-merge`. It must NOT: - Stage `.env` or raw data. - Commit, push, or create a remote without confirmation. - Use `python -m skore_skills git end-turn` to create the first commit.",
       "files": [],
       "expectations": [
+        "Emit the Pre-flight then run the commands (do not stop after listing boxes).",
         "Name `git init`.",
         "Name `python -m skore_skills git ignore-merge`.",
         "Ask once whether later stages may autocommit (`on` vs `off`) and persist with `python -m skore_skills policy set git.autocommit`.",

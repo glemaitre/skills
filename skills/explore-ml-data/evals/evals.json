@@ -16,6 +16,25 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "G-TABULAR before first EDA script",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists (`has_src`, `journal/JOURNAL.md`).\n- Raw data path is known.\n- `policy.tabular` is unset.\n- `choose-python-library` and `add-python-package` are installed.]\n\nExplore the dataset before we design a model.",
+      "expected_output": "Behavioural response satisfying: - Read `status.policy.tabular` and fire G-TABULAR (pandas vs polars, recommend pandas) via `choose-python-library` or ask here if that skill is missing. - Persist `policy set tabular` after confirmation. - Load `add-python-package` for the chosen frame library and `skrub` (confirm skrub is required). It must NOT: - Silent-default pandas and write `eda.py` first. - Install sklearn, skore, or pytest in this turn. - Call `env add` from this skill instead of `add-python-package`.",
+      "files": [],
+      "expectations": [
+        "Read `status.policy.tabular` and fire G-TABULAR (pandas vs polars, recommend pandas) via `choose-python-library` or ask here if that skill is missing.",
+        "Persist `policy set tabular` after confirmation.",
+        "Load `add-python-package` for the chosen frame library and `skrub` (confirm skrub is required).",
+        "Do not place `data/eda.py` before the gate resolves.",
+        "The response does NOT: Silent-default pandas and write `eda.py` first.",
+        "The response does NOT: Install sklearn, skore, or pytest in this turn.",
+        "The response does NOT: Call `env add` from this skill instead of `add-python-package`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

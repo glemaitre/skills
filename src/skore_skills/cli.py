@@ -246,6 +246,27 @@ def env_add(
         raise SystemExit(code)
 
 
+@env_group.command("add-skore")
+@click.option(
+    "--mode",
+    required=True,
+    type=click.Choice(["local", "hub", "mlflow"], case_sensitive=True),
+)
+@click.option(
+    "--execute",
+    is_flag=True,
+    help="Run the install command instead of printing it.",
+)
+def env_add_skore(mode: str, execute: bool) -> None:
+    """Print or run the manager-aware Skore install command."""
+    from skore_skills.env import add_skore
+
+    text, code = add_skore(Path.cwd(), mode, execute=execute)
+    click.echo(text, nl=False)
+    if code:
+        raise SystemExit(code)
+
+
 @env_group.command("sync")
 @click.option(
     "--execute",

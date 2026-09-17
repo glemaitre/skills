@@ -6,11 +6,14 @@ Do not invent manager argv. Print or run:
 - Install/sync: `python -m skore_skills env sync --execute`
 - Scope: `python -m skore_skills env route <pkg>` then
   `env add [--feature agent] --execute`
+- Skore: `python -m skore_skills env add-skore --mode <mode> --execute`
 - Editable `src/<pkg>/`: `python -m skore_skills env add --editable --execute`
 - Agent tools present: `python -m skore_skills env verify --execute`
 
 `env sync` / `env add` already encode pixi, uv, poetry, hatch, conda
 (`-n` from YAML), and pip-venv. Hatch add writes pyproject.
+`env add-skore` selects conda-forge `skore` for pixi/conda and
+PyPI requirements (including mode extras) for other managers.
 
 `env route` `scope`:
 

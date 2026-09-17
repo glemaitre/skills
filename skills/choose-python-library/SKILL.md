@@ -4,7 +4,8 @@ description: >
   Resolve a genuine choice between Python libraries for one job,
   then ask `add-python-package` to add the chosen dependency.
   Trigger for competing-library questions or an optional package not
-  already fixed by the project stack.
+  already fixed by the project stack — at first use (EDA tabular,
+  extras), never during workspace setup.
 ---
 
 # Choose Python Library
@@ -18,7 +19,8 @@ description: >
 4. After the user chooses, load `add-python-package` when
    `status.skills` reports it installed. If it is not installed,
    name the package and stop. Do not call `env add` from this
-   skill.
+   skill. Typical callers: `explore-ml-data` (pandas vs polars),
+   later extras (plotting, tuning). Not `setup-workspace`.
 5. Confirm symbols with `python -m skore_skills api get <dotted>`
    before writing calls.
 

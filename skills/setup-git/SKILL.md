@@ -8,6 +8,21 @@ description: >
 
 # Set Up Git
 
+## Pre-flight
+
+Tick, then immediately run the matching sequence step. Do not stop
+after listing the boxes.
+
+```
+- [ ] status (skip autocommit ask if already on/off)
+- [ ] git init if no .git
+- [ ] git ignore-merge (+ --keep if resolve-dotfiles)
+- [ ] git.autocommit ask if null
+- [ ] first commit only after user confirm
+```
+
+## Sequence
+
 1. Run `python -m skore_skills status`. If
    `policy.git.autocommit` is already `on` or `off`, do not ask
    that question again.

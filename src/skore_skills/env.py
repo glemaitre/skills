@@ -380,6 +380,25 @@ def install_argv(
     return commands[manager]
 
 
+def skore_requirements(manager: str, mode: str) -> list[str]:
+    """Return manager-aware requirements for a Skore project mode."""
+    if manager not in MANAGER_ORDER:
+        raise ValueError(f"unknown manager {manager!r}")
+    if mode not in {"local", "hub", "mlflow"}:
+        raise ValueError(f"unknown skore mode {mode!r}")
+    if manager in {"pixi", "conda"}:
+        packages = ["skore"]
+    else:
+        packages = {
+            "local": ["skore"],
+            "hub": ["skore[hub]"],
+            "mlflow": ["skore[mlflow]"],
+        }[mode]
+    if mode == "mlflow":
+        packages.append("mlflow>=3")
+    return packages
+
+
 def editable_argv(manager: str, package: str) -> list[str] | None:
     """Return the editable-install argv, or None if unsupported."""
     commands: dict[str, list[str]] = {
@@ -438,6 +457,23 @@ def route_package(package: str) -> dict[str, Any]:
     return {"scope": "ask", "feature": None, "message": None}
 
 
+def _toml_list_close(text: str, start: int) -> int:
+    """Return the closing bracket, ignoring brackets inside strings."""
+    quote: str | None = None
+    escaped = False
+    for index in range(start, len(text)):
+        char = text[index]
+        if escaped:
+            escaped = False
+        elif char == "\\" and quote == '"':
+            escaped = True
+        elif char in {'"', "'"}:
+            quote = None if quote == char else char if quote is None else quote
+        elif char == "]" and quote is None:
+            return index
+    return -1
+
+
 def _insert_into_deps_list(text: str, pkg: str, *, header: str) -> tuple[str, bool]:
     """Insert ``pkg`` into ``dependencies = [...]`` after ``header``."""
     start = text.find(header)
@@ -452,7 +488,7 @@ def _insert_into_deps_list(text: str, pkg: str, *, header: str) -> tuple[str, bo
         insert = f'\ndependencies = ["{pkg}"]'
         return text[:newline] + insert + text[newline:], True
     list_open = start + match.end()
-    list_close = text.find("]", list_open)
+    list_close = _toml_list_close(text, list_open)
     if list_close < 0:
         return text, False
     body = text[list_open:list_close]
@@ -526,6 +562,24 @@ def add_packages(
     if not execute:
         return rendered, 0
     return rendered, _run_argvs([argv], cwd=root)
+
+
+def add_skore(
+    root: Path,
+    mode: str,
+    *,
+    execute: bool = False,
+) -> tuple[str, int]:
+    """Print or run the manager-aware Skore install command."""
+    manager, error = _ready_manager(root)
+    if error is not None:
+        return error + "\n", 1
+    assert manager is not None
+    try:
+        packages = skore_requirements(manager, mode)
+    except ValueError as exc:
+        return str(exc) + "\n", 2
+    return add_packages(root, packages, execute=execute)
 
 
 def add_editable(root: Path, *, execute: bool = False) -> tuple[str, int]:

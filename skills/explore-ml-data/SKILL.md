@@ -30,13 +30,12 @@ description: >
   or when EDA is already recorded and no refresh was requested. Do
   not require another action skill to be installed.
 
-  HOW TO USE: run the Detection step (does `data/eda.md` + the JOURNAL
-  EDA section already exist?), emit the Pre-flight checklist as
-  visible text, read the Stop conditions, then place `data/eda.py`
-  from `templates/eda.py`, execute it via
-  `python -m skore_skills cells run`, read the
-  digest, and author `data/eda.md` + the JOURNAL EDA section. Always
-  resolve skrub / pandas / polars symbols via `python -m skore_skills api get`, never from
+  HOW TO USE: run Detection, then **G-TABULAR** (`status.policy.tabular`;
+  ask via `choose-python-library` if unset) and add pandas/polars +
+  skrub via `add-python-package` before placing `data/eda.py`. Emit
+  the Pre-flight checklist, then execute via
+  `python -m skore_skills cells run`. Always resolve skrub / pandas /
+  polars symbols via `python -m skore_skills api get`, never from
   memory.
 ---
 
@@ -149,6 +148,16 @@ The central rule. Surfaced as the first Stop condition below.
   do NOT fabricate EDA output with hand-written `print()`s. If the
   user declines the agent feature, **fall back to the skip path**
   (record `Status: skipped`) — never loop between run and install.
+- **G-TABULAR before `data/eda.py`.** Read `status.policy.tabular`.
+  If unset: load `choose-python-library` when installed (job:
+  dataframe I/O; pandas vs polars; **recommend pandas**). If that
+  skill is missing, ask the same two options here. Persist
+  `python -m skore_skills policy set tabular pandas` or `polars`.
+  Always confirm; do not silent-default. Then load
+  `add-python-package` for the chosen frame library **and** `skrub`
+  (enforced: `TableReport`). Confirm skrub: this skill requires it.
+  If tabular is already recorded, do not re-ask; still add missing
+  imports. Do not install sklearn, skore, or pytest here.
 - **Symbol from memory is forbidden.** Any `skrub` / `pandas` /
   `polars` symbol (`TableReport`, `TableReport.json`, `write_html`,
   `column_associations`, the tabular reader, …) must come from
@@ -184,7 +193,7 @@ The central rule. Surfaced as the first Stop condition below.
   (e.g. `data/raw/`, `data/*.parquet`) — default: don't. Then verify
   the deliverables are tracked (`git check-ignore data/eda.md` must
   return nothing). Never auto-edit `.gitignore` — that is
-  `organize-ml-workspace`'s to write; surface the patch and ask.
+  `setup-git` / `git ignore-merge`; surface the patch and ask.
 - **One project-level EDA.** A single `data/eda.py` covers the whole
   dataset; multi-table data gets one `TableReport` cell per table
   inside that one file (run the target/structure cells on the
@@ -229,9 +238,12 @@ Pre-flight (explore-ml-data):
       Evidence: AskUserQuestion id=<id>, answer=<run|skip>
                 | user free-text quote turn N
       If skip: JOURNAL §EDA records "Status: skipped — <date>"; STOP here.
-- [ ] Tabular library known (G-TABULAR): pandas | polars
-      Evidence: JOURNAL.md Status (Workspace decisions) | AskUserQuestion
-                via data-science-python-stack
+- [ ] G-TABULAR: pandas | polars | ask
+      Evidence: status.policy.tabular
+                | AskUserQuestion / choose-python-library this turn
+                | policy set tabular
+      Then add-python-package for that lib + skrub (confirm).
+      If skip G-EDA: n/a
 - [ ] Raw data located (may be outside data/): <paths / loader>
       Evidence: ls / Glob on the data location + the RAW load call placed
                 in data/eda.py | user-quoted path turn N
@@ -421,7 +433,7 @@ detail lives in `data/eda.md`. On the **skip** path, only the
 |---|---|
 | `iterate-ml-experiment` | Caller. § 0 fires G-EDA before the baseline note; the EDA findings seed the note's Method / Risks |
 | `audit-ml-pipeline` | Same `cells run` CLI and bare-expression discipline |
-| `organize-ml-workspace` | Workspace layout; `data/` is user-owned — this skill is the one exception that writes `data/eda.*` into it |
+| `setup-workspace` | Workspace layout; `data/` is user-owned — this skill is the one exception that writes `data/eda.*` into it |
 | `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |
 | `python -m skore_skills api get` | skrub / pandas / polars symbol lookups. Cache hits first |
 | `data-science-python-stack` | G-TABULAR; skrub `TableReport` is catalogued there |

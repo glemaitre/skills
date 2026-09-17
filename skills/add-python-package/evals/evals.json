@@ -5,9 +5,10 @@
       "id": 1,
       "title": "Managed add",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Pixi project (`pixi.toml` or `[tool.pixi]`).\n- `status.policy.env.managed` is true.\n- `env_manager` is pixi.]\n\nAdd skrub to the project.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env detect` / status. - Name `python -m skore_skills env add --execute skrub` (or `env route` then that add). Do not invent `pixi add` from memory. - Route skrub to default (not `--feature agent`). It must NOT: - Run `pip install skrub`. - Re-bootstrap with `env init`.",
+      "expected_output": "Behavioural response satisfying: - Emit the Pre-flight then run the commands (do not stop after listing boxes). - Name `python -m skore_skills env detect` / status. - Name `python -m skore_skills env add --execute skrub` (or `env route` then that add). Do not invent `pixi add` from memory. It must NOT: - Run `pip install skrub`. - Re-bootstrap with `env init`.",
       "files": [],
       "expectations": [
+        "Emit the Pre-flight then run the commands (do not stop after listing boxes).",
         "Name `python -m skore_skills env detect` / status.",
         "Name `python -m skore_skills env add --execute skrub` (or `env route` then that add). Do not invent `pixi add` from memory.",
         "Route skrub to default (not `--feature agent`).",
@@ -77,6 +78,22 @@
         "Say the env is unresolved and stop (or triage). Do not bootstrap `setup-python-env` by catalog id if D20 still applies; status is enough.",
         "The response does NOT: Run `env init`.",
         "The response does NOT: Run `env add` while managed is unanswered."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 6,
+      "title": "Skore source follows the project manager",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed pixi project.\n- `policy.skore_mode` is `hub`.]\n\nInstall Skore for Hub mode.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills env add-skore --mode hub --execute`. It must NOT: - Run `pixi add \"skore[hub]\"`. - Add Skore with `--pypi`. - Infer the package source from PATH.",
+      "files": [],
+      "expectations": [
+        "Run `python -m skore_skills env add-skore --mode hub --execute`.",
+        "The response does NOT: Run `pixi add \"skore[hub]\"`.",
+        "The response does NOT: Add Skore with `--pypi`.",
+        "The response does NOT: Infer the package source from PATH."
       ],
       "tools": false,
       "sandbox": [],

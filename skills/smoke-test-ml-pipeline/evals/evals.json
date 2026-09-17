@@ -114,6 +114,22 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "Missing pytest goes to add-python-package",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Design note approved; experiment script exists.\n- `pytest` is not installed in the project env.]\n\nWrite the smoke test for `01_baseline`.",
+      "expected_output": "Behavioural response satisfying: - STOP and load `add-python-package` for `pytest` on default (confirm). - Do not put pytest on `--feature agent`. It must NOT: - `pip install pytest`. - Call `env add` from this skill.",
+      "files": [],
+      "expectations": [
+        "STOP and load `add-python-package` for `pytest` on default (confirm).",
+        "Do not put pytest on `--feature agent`.",
+        "The response does NOT: `pip install pytest`.",
+        "The response does NOT: Call `env add` from this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

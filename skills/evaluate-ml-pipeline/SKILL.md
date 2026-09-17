@@ -25,14 +25,12 @@ description: >
   for hyperparameter search, final-model serving, or multi-run
   tracking. Do not require another action skill to be installed.
 
-  HOW TO USE: invoke before any evaluation call. **First, read the
-  "Stop conditions" block at the top of the body and emit the
-  Pre-flight checklist as visible text in your response — both are
-  mandatory before any evaluation code is written.** The structural
-  facts about the data (group keys, time ordering) should already be
-  encoded at the X marker via `split_kwargs` — if they aren't and you
-  can't tell from the data, report the missing pipeline fact and ask
-  the user. Confirm all symbols with
+  HOW TO USE: invoke before any evaluation call. **First, resolve
+  G-SKORE-MODE** (`status.policy.skore_mode`; ask local/hub/mlflow
+  if unset, persist, then `add-python-package` for the matching
+  skore extra). **Read the "Stop conditions" block and emit the
+  Pre-flight checklist as visible text** before any evaluation
+  code is written. Confirm all symbols with
   `python -m skore_skills api get`; don't guess names from memory.
 ---
 
@@ -44,10 +42,22 @@ read the report. The pipeline declaration is out of scope (see
 
 ## Stop conditions — read before anything else
 
+- **G-SKORE-MODE before `skore.evaluate`.** Read
+  `status.policy.skore_mode`. If unset: ask local (recommended) /
+  hub / mlflow. Persist `python -m skore_skills policy set
+  skore_mode <mode>`. Keep a recorded mode unless the user
+  migrates. Then load `add-python-package`, which runs
+  `python -m skore_skills env add-skore --mode <mode> --execute`.
+  That command selects conda-forge for pixi/conda and PyPI
+  requirements for other managers. Confirm the add; do not spell
+  `skore[...]` in this skill. See
+  `setup-workspace/references/g_skore_mode.md` and
+  `setup-python-env/references/skore_variant.md`.
+  If mode is already recorded, do not re-ask.
 - **Missing dependency.** If `import skore` raises in this project's
-  env, STOP. **Invoke `add-python-package`** to detect the manager
-  and produce the right install command (the project may not use
-  pixi); surface the command to the user and wait for confirmation.
+  env, STOP. Fire G-SKORE-MODE first if `policy.skore_mode` is
+  unset, then **invoke `add-python-package`**. Surface the command
+  and wait for confirmation.
   **Do not drop back to `cross_val_score`, `cross_validate`,
   `classification_report`, or hand-rolled metric prints** — that
   silently rewrites this skill out of the project. See
@@ -447,3 +457,8 @@ When an import is missing, load `add-python-package` if
 `status.skills.add-python-package` is true. That skill owns
 `env add` and the unmanaged ask. Do not run `env add` here.
 If the skill is not installed, name the package and stop.
+
+## References
+
+- `setup-workspace/references/g_skore_mode.md` (G-SKORE-MODE table;
+  this skill owns the gate)

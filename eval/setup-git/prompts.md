@@ -13,6 +13,8 @@
 - `policy.git.autocommit` is `null` (never asked).
 
 **Must do:**
+- Emit the Pre-flight then run the commands (do not stop after
+  listing boxes).
 - Name `git init`.
 - Name `python -m skore_skills git ignore-merge`.
 - Ask once whether later stages may autocommit (`on` vs `off`) and

@@ -25,17 +25,15 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
   `true`.
 
 **Must do:**
+- Emit the Pre-flight then run the commands (do not stop after
+  listing boxes).
 - Identify as a **fresh** layout (no detection signals matched).
 - Name **G-PKG-NAME** as the next gate — the `src/<pkg>/` import
   name goes to the user via `AskUserQuestion`, with the folder name
   as the default, and is not picked here.
-- Name **G-TABULAR** — pandas / polars pick via
-  `choose-python-library`.
-- Report the unresolved environment manager as a `status` fact
-  (`policy.env_manager` / `env_manager`) rather than asking
-  G-ENV-MGR here.
+- Do not ask G-ENV-MGR.
 - Name `python -m skore_skills scaffold --package <pkg>` as the
-  action after the gates resolve.
+  action after G-PKG-NAME.
 - Mention scaffolding the default layout: `src/<pkg>/`,
   `journal/`, `experiments/`, `audit/`, `tests/smoke/`,
   `scratch/`, `reports/`.
@@ -51,7 +49,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
   calls `build_learner` / `skore.evaluate` / `project.put`
   (uncommented). Enumerating the empty templated shell (imports,
   `# %%`, commented stubs, `<<PKG>>` placeholders) is allowed.
-- Default to pandas silently because "skore pulls it in".
+- Default to pandas, persist `tabular`, or load
+  `choose-python-library` (G-TABULAR belongs on EDA).
 - Run `git commit` in this skill or `git push`.
 
 ---
@@ -104,9 +103,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
   the tool and that default counts when `AskUserQuestion` cannot
   run this turn; a pasted payload is not a miss.
 - Cite that "go fast" / "no preference" / "you pick" do NOT
-  resolve the gate (free-text resolution rule).
-- Surface that the gate must pass before `pyproject.toml` /
-  `pixi init` / similar.
+  resolve the gate.
+- Surface that the name must pass before `scaffold`.
 
 **Must NOT do:**
 - Pick a name and proceed.
@@ -126,8 +124,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 **Assumed workspace state:**
 - Empty folder, fresh scaffold.
 - The config gates are already resolved and recorded: G-PKG-NAME =
-  `churnlab`, G-ENV-MGR = pixi, G-TABULAR = pandas, G-SKORE-MODE =
-  local. Nothing is left to ask before the layout goes down.
+  `churnlab`, G-ENV-MGR = pixi. Nothing is left to ask before the
+  layout goes down.
 
 **Tools:** yes
 
@@ -150,8 +148,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
   (Status, Data understanding, History, Backlog), not a placeholder.
 - Refuse to write `experiments/01_baseline.py` with a **runnable
   body** during the scaffold turn.
-- Cite the rule: "design note first, then code" /
-  `iterate-ml-experiment` § 3 owns experiment-script content.
+- Hand the experiment body to the model-loop skill; do not write
+  it here.
 - An empty or templated `experiments/01_baseline.py` shell
   (imports / `# %%` / commented stubs / `<pkg>` placeholders)
   counts as the Decision-flow drop. Do not require the words
@@ -178,20 +176,13 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
   experiment is `done` in JOURNAL.md.
 
 **Must do:**
-- Name `AskUserQuestion` as the mechanism for the choice, and state
-  its two options: new file (`NN_text_encoder_v2.py`) vs in-place
-  edit of `02_text_encoder.py`.
-- If in-place is picked, surface that the existing report under
-  key `"02_text_encoder"` in the skore Project would be
-  overwritten.
-- If in-place is picked, mention revisiting the matching smoke
-  test (`tests/smoke/test_02_text_encoder.py`).
+- Detect an **existing** layout.
+- Hand off to `iterate-ml-experiment` (or triage). Do not pick
+  new file vs in-place edit here.
 
 **Must NOT do:**
-- Silently pick "edit in place" or "create new file" — the rule
-  is hard: ask.
-- Touch the design note `journal/02_text_encoder.md` directly
-  (that's `iterate-ml-experiment`'s domain).
+- Silently pick "edit in place" or "create new file".
+- Touch the design note `journal/02_text_encoder.md` directly.
 
 ---
 
@@ -209,21 +200,10 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 
 **Must do:**
 - Refuse the scratch re-evaluate / re-put.
-- Cite the Stop condition that scratch is read-only against the
-  skore Project (verbatim title not required — "scratch read-only
-  contract" / no `evaluate`/`put` from a probe counts).
-- Recognise the **lookup-shape trap** — `project.get` is by **id**,
-  not by `key`. Propose `project.summarize()` to enumerate
-  `(key, id)` pairs then `project.get(id)`.
-- Mention the failure mode the rule blocks: a same-key `put`
-  overwrites or duplicates the report / pollutes `summarize()`.
+- Say evaluation and `project.put` are not this skill.
 
 **Must NOT do:**
 - Approve the scratch re-evaluate / re-put **this turn**.
-- Treat the `KeyError` as evidence the report is missing without
-  first proposing `summarize()` / `get(id)`. Mentioning a later,
-  gated recovery via `experiments/02_text_encoder.py` (new-vs-edit
-  ask) if `summarize()` is empty is allowed.
 
 ---
 
@@ -238,12 +218,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 
 **Must do:**
 - Refuse to run `pixi init`.
-- Cite that the manager is not this skill's gate and that pixi on
-  PATH is detection context, not permission.
-- Cite that **G-PKG-NAME must pass** before the layout goes down.
-- Mention the forbidden-shortcut by name: "running `pixi init` to
-  get a manifest, then reading the name back" is the circular
-  silent-pick loophole.
+- Cite that the manager is not this skill's gate.
+- Cite that **G-PKG-NAME must pass** before scaffold.
 
 **Must NOT do:**
 - Run `pixi init` / `uv init` / `poetry init` in this turn.
@@ -263,16 +239,13 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 - `pixi.toml` exists plus the `pyproject.toml` that `pixi init`
   wrote; no `src/`, no `experiments/`, no `journal/`.
 - `status` reports `env_manager: pixi`, `has_src: false`,
-  G-PKG-NAME `churnlab`, G-SKORE-MODE `local`, G-TABULAR `pandas`.
+  G-PKG-NAME `churnlab`.
 
 **Must do:**
 - Classify the root as **manager-only**: a scaffold target, not an
   existing layout to glue onto.
 - Name `python -m skore_skills scaffold --package churnlab`.
-- State that the existing `pyproject.toml` and `.gitignore` are
-  kept by the scaffold.
-- Report the editable install as the remaining step owned by the
-  environment turn.
+- State that the existing `pyproject.toml` is kept (no `--force`).
 - Return control to `setup-ml-project` at the end of the turn.
 
 **Must NOT do:**

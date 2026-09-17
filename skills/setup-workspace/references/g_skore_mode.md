@@ -1,13 +1,16 @@
-# Organize ML Workspace — G-SKORE-MODE in detail
+# G-SKORE-MODE in detail
 
-Full deep dive on the Skore Project mode gate. SKILL.md carries the
-compact gate definition; this reference is for the moment you need
-to actually fill the `<SKORE_PROJECT_INIT>` substitution or debug a
-hub-vs-local mismatch.
+Owned by **`evaluate-ml-pipeline`**. Ask and persist
+`policy.skore_mode` on first `skore.evaluate` / `Project` use, not
+during workspace setup.
 
-Cross-referenced from `SKILL.md` § Stop conditions and § Decision
-flow step 2a, and from `add-python-package` § Tier 1 install
-(skore variant), `audit-ml-pipeline` § Read-only contract.
+Full deep dive on the Skore Project mode gate. This reference is
+for filling the Project init form or debugging a hub-vs-local
+mismatch.
+
+Cross-referenced from `evaluate-ml-pipeline` (gate owner),
+`add-python-package` (skore extra), `audit-ml-pipeline` § Read-only
+contract.
 
 ## Project init forms — concrete side-by-side
 
@@ -75,13 +78,12 @@ Source: https://docs.skore.probabl.ai/stable/reference/api/skore.Project.html
 | `mode=` argument | `mode="local"` | `mode="hub"` | `mode="mlflow"` |
 | `workspace=` argument | **required**: `workspace=str(PROJECT_ROOT / "reports")` (on-disk dir) | **required**: `workspace="<hub-workspace>"` (the Hub workspace name) | **MUST be absent** — `tracking_uri=` is used instead |
 | `tracking_uri=` argument | not used | not used | **required**: the MLflow tracking server URI |
-| Install variant | `pixi add skore` | `pixi add "skore[hub]"` | `pixi add "skore[mlflow]" "mlflow>=3"` (pin required) |
+| Install command | `env add-skore --mode local --execute` | `env add-skore --mode hub --execute` | `env add-skore --mode mlflow --execute` (`mlflow>=3` required) |
 | Pre-condition | none | Skore Hub account + access to `<hub-workspace>` | reachable MLflow tracking server at `<uri>` |
 
 ## The gate — AskUserQuestion shape
 
-Fires at workspace scaffold, alongside G-PKG-NAME / G-TABULAR /
-G-ENV-MGR (per `SKILL.md` § Decision flow step 2a). Never silent,
+Fires at first evaluation, before `skore.evaluate`. Never silent,
 and **always presents all three options** (`local` / `hub` /
 `mlflow`) as selectable choices — even if the user has used skore
 in `local` mode in prior projects, **and even if the current folder
@@ -159,7 +161,7 @@ artifacts:
 | Downstream artifact | local-mode shape | hub-mode shape | mlflow-mode shape |
 |---|---|---|---|
 | `<SKORE_PROJECT_INIT>` in `experiments/NN_*.py` and `audit/NN_*.py` | `skore.Project(name="<project-name>", mode="local", workspace=str(PROJECT_ROOT / "reports"))` | `from skore import login; login(mode="hub"); skore.Project(name="<project-name>", mode="hub", workspace="<hub-workspace>")` | `skore.Project(name="<experiment-name>", mode="mlflow", tracking_uri="<mlflow-tracking-uri>")` |
-| Tier 1 skore install variant (via `add-python-package`) | `pixi add skore` (or equivalent) | `pixi add "skore[hub]"` (or equivalent) | `pixi add "skore[mlflow]" "mlflow>=3"` (or equivalent — the `mlflow>=3` pin is required) |
+| Skore install (via `add-python-package`) | `env add-skore --mode local --execute` | `env add-skore --mode hub --execute` | `env add-skore --mode mlflow --execute` (the `mlflow>=3` pin is encoded) |
 | `Workspace decisions` rows in `JOURNAL.md` | `skore mode: local` | `skore mode: hub` + `skore hub workspace: <name>` | `skore mode: mlflow` + `skore mlflow tracking uri: <uri>` |
 
 `name=` is a bare project name in **all three** modes — local uses it
@@ -205,8 +207,8 @@ Procedure:
    `Workspace decisions` row.
 3. Rewrite **every** `<SKORE_PROJECT_INIT>` block in `experiments/`
    AND `audit/`.
-4. Update the install variant via `add-python-package` (plain
-   `skore` ↔ `skore[hub]` ↔ `skore[mlflow]` + `mlflow>=3`).
+4. Update the install via `add-python-package` and
+   `env add-skore --mode <mode> --execute`.
 5. Document the switch in `JOURNAL.md` History as a horizontal
    divider (same shape as goal pivots — see `iterate-ml-experiment`
    § Maintenance modes).

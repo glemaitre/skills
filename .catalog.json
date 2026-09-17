@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "24d462f508caaabb65ff020a480217c197c9a33fc4f02c8a076b169dffe2ba6d",
+  "catalog_hash": "886e804e204d5d14e1b82835efc47a9edd670206b68bf9d49a163b8789fd0ce1",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "cd11596439d5c021f875e6797c14ed5285caf705c033ea367bd64c68ec439b12"
+      "hash": "b66719b7bb70b8d5916e17c498266197277a3c3b2792f8afd4f762e60b709f03"
     },
     {
       "id": "build-ml-pipeline",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "8946d2d258021ccd036979bef8e2e717a7b2de08d5db4ba02eefe66f06919541"
+      "hash": "7e1d1639bdd61860ded06704846ff0c10acd90c5d691856487de9282d9dfabd2"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b8f923597726a535f131e7cf2979e05633f2725f5a58261b9353982e7614b247"
+      "hash": "b9f1c2562ce69508557e2cb57efd5ea22494569df79d3fab067a8342e8836758"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
       "category": "orchestration",
       "subcategory": "test-strategies",
-      "hash": "23703992926f3dae9701ded2fad8445ec99131b3b4650b5c4be5f2d844cbdf0f"
+      "hash": "1f8c9648fdd294aa8f71bf9e8d0fd4058e16f81658c3e4e7b5b151704109751b"
     },
     {
       "id": "audit-ml-pipeline",
@@ -120,7 +120,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "83c9495020a93e4fce9c73faeb1af4c091b779b6e89a565431814e912da40d89"
+      "hash": "b910f53cb6de69efb0536fdfb7a4a86df3e4e8c380e458ba56d0ee260adbd3ec"
     },
     {
       "id": "setup-git",
@@ -129,7 +129,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "bfa9d66d29d3ff5eb069ac8fd42e9d7c9903528f21fe305ee93bd64439f1ec88"
+      "hash": "e14533774d3e1f790bdd04b977b1547c888943112c1b6ed1ed6baeab6c326423"
     },
     {
       "id": "persist-ml-git",
@@ -156,7 +156,7 @@
       "summary": "Resolve a library choice and add the selected dependency.",
       "category": "action",
       "subcategory": null,
-      "hash": "b0eb7e11603c61d4fdad55f9e6e6c6fc2202fccb406d4f64212652b6066ea136"
+      "hash": "e0dc6c312df6a05f9554fe9a5b48b60c5405ce13efd8cc08005f34ad6b1b59cf"
     },
     {
       "id": "add-python-package",
@@ -165,7 +165,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "e3e2e5e795bfb1c2ecc1aa17f2b2e41d49f6f9aa92636592bd3a04cffd0bb16e"
+      "hash": "e0dfc46ac63869dd199cc2a5fc8908cb0582fe0b7f6f6f0f56799c39edc09844"
     },
     {
       "id": "setup-workspace",
@@ -174,7 +174,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "2d8d477425a15d2bb1a3f711d9175f82194b4fd108ecfe2cc14c3c35a1c02aaf"
+      "hash": "73054bed8a12b11de49e3492fbcaea05d59ef514e7bc123d6ed1165fe07f506e"
     },
     {
       "id": "setup-python-env",
@@ -183,7 +183,7 @@
       "summary": "Detect the env manager, persist managed vs user-managed, and init two envs plus agent tools.",
       "category": "action",
       "subcategory": null,
-      "hash": "476ec5adde942098b1725178f45a960570bfb7056ffd0198a038d7aa480f07b4"
+      "hash": "de362d55be7162e3283de3be3872553e9df65ac37c312b9655b0cc126dcfd712"
     }
   ],
   "workflows": [

@@ -2,56 +2,53 @@
 name: setup-ml-project
 description: >
   Coordinate first-time ML project setup. Trigger when the user asks
-  to set up or bootstrap a complete ML workspace. Dispatch the
-  environment, workspace, and git actions in order; skip any of them
-  that is not installed; do not duplicate their work.
+  to set up or bootstrap a complete ML workspace. Dispatch
+  setup-python-env, setup-workspace, add-python-package (editable),
+  then setup-git; skip any that is not installed.
 ---
 
 # Set Up ML Project
 
-This meta skill owns ordering only. Run
-`python -m skore_skills status` first and read `skills`:
+Ordering only. Run `python -m skore_skills status` and read
+`skills`:
 
-- `false` — the action is not installed. Skip it, say so in one
-  line, and continue with the next step.
-- `true` — load it.
-- `null` — install state is unknown. Load it only if it is in this
-  session; if it is not there, skip it like `false`.
+- `true` — load that skill and follow it.
+- `false` or unknown and not in this session — skip in one line,
+  continue.
 
-Never reproduce a skipped skill's procedure from memory.
+Never run a skipped skill's steps from memory.
 
-1. `setup-python-env` — **bootstrap only**: resolve G-ENV-MGR,
-   persist it with `python -m skore_skills policy set env_manager
-   <manager>`, and run the manager's `init`. No ML stack, no
-   editable install yet.
-2. `setup-workspace` — detect/glue or scaffold after the package
-   and skore-mode gates. A manager manifest without `src/<pkg>/` is
-   still a scaffold target: `python -m skore_skills scaffold
-   --package <pkg>` keeps an existing `pyproject.toml`.
-3. After `has_src` is true, load `add-python-package` for
-   `python -m skore_skills env add --editable --execute` only. Do
-   **not** install the ML stack (sklearn/skrub/skore/pandas) during
-   setup. Workspace still asks G-TABULAR / G-SKORE-MODE and
-   persists them.
-4. `setup-git` — initialize version control with the user's
-   first-commit decision. Persist autocommit (`on`/`off`) once via
-   `policy set`. Later stages run
-   `python -m skore_skills git end-turn` then `persist-ml-git`.
+## Pre-flight
 
-Run `python -m skore_skills status` again after setup to surface
-missing pieces and persist policy facts. Stop when setup is a safe
-scaffold: load `triage-ml-task` when it is installed, otherwise
-report the remaining gaps and stop. Do not start EDA or a pipeline.
+Tick, then immediately run the matching sequence step. Do not stop
+after listing the boxes.
+
+```
+- [ ] status (read skills + has_src)
+- [ ] load setup-python-env | skip
+- [ ] load setup-workspace | skip
+- [ ] load add-python-package editable | skip until has_src
+- [ ] load setup-git | skip
+- [ ] status again; load triage-ml-task if installed
+```
+
+## Sequence
+
+1. `setup-python-env`
+2. `setup-workspace`
+3. `add-python-package` — editable install of `src/<pkg>/` only,
+   after `has_src` is true
+4. `setup-git`
+
+Then `status` again. Load `triage-ml-task` if it is installed,
+otherwise stop. Do not start EDA or a pipeline.
 
 ## Stop conditions
 
-- Never silently pick package name, tabular library, env manager, or
-  skore mode.
-- Never run `pip install` in a pixi project.
-- Never commit without asking.
-- Never run a skipped skill's steps yourself, and never fail the
-  whole setup because one action is missing.
-- Do not write pipeline or experiment bodies; setup stops at a safe
-  scaffold.
-
-This is a deliberately small dispatcher pending joint review.
+- Do not pick package name or env manager here; the loaded skills
+  ask those.
+- Do not ask tabular library or skore mode.
+- Do not install sklearn, skrub, skore, or pandas.
+- Do not write experiment or pipeline bodies.
+- Do not commit except by loading `setup-git`.
+- Do not abort setup because one skill is missing.
