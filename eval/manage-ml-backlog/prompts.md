@@ -38,7 +38,7 @@
 
 **Must NOT do:**
 - Silently pick `B1`.
-- Load `iterate-ml-experiment` as the session owner.
+- Invent a deleted iterate skill as the session owner.
 - Start `build-ml-pipeline`.
 
 ---
@@ -60,5 +60,5 @@
 
 **Must NOT do:**
 - Recreate the index shape from memory.
-- Load the deprecated `iterate-ml-experiment` skill.
+- Invent a deleted iterate skill.
 - Draft or implement an experiment in this turn.

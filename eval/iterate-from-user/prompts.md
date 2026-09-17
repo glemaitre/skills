@@ -172,7 +172,7 @@ violated.
 > pre-resolved.
 
 **Assumed workspace state:**
-- Parent (`iterate-ml-experiment`) already collected the URL via
+- Parent (`triage-ml-task`) already collected the URL via
   its sourcing-menu free-text handler.
 
 **Must do:**

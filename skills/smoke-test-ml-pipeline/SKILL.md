@@ -396,7 +396,7 @@ metric problem.
   predict time, so a lag column is silently NaN. Inspect
   `learner.skb.full_report()` and look for nodes whose value at
   predict time doesn't match what fit time saw.
-- **Failure blocks `done` status.** `iterate-ml-experiment` § 4
+- **Failure blocks `done` status.** `triage-ml-task` § 4
   refuses to flip an experiment to `done` until the matching
   smoke test passes. The CV report can land in the skore Project
   before the smoke test passes (CV is independent of predict-time
@@ -407,7 +407,7 @@ metric problem.
 
 - Run pytest. Test execution is the user's call (or CI's).
 - Write the design note or the experiment script. Those are
-  `iterate-ml-experiment` and `organize-ml-workspace` /
+  `triage-ml-task` and `organize-ml-workspace` /
   `build-ml-pipeline`.
 - Touch the skore Project. The smoke test does not call
   `project.put` — it's a pre-flight check, not a metric
@@ -415,14 +415,14 @@ metric problem.
 - Define what "good metrics" mean. The hard assertion is
   structural; the soft assertion is a sanity bound, not a
   performance target. Performance judgment is the user's, per
-  `iterate-ml-experiment`'s rule that the user judges results.
+  `triage-ml-task`'s rule that the user judges results.
 
 ## Companion skills
 
 - **`build-ml-pipeline`** — owns the X-marker placement rule
   the smoke test asserts. Smoke-test failure typically routes
   back here for a pipeline-shape fix.
-- **`iterate-ml-experiment`** — owns the iteration loop. Requires
+- **`triage-ml-task`** — owns the iteration loop. Requires
   the smoke test to pass before an experiment can flip to `done`.
 - **`evaluate-ml-pipeline`** — owns CV. The smoke test fills the
   predict-time-binding gap CV doesn't cover. The soft assertion's

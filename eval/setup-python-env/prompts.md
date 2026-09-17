@@ -121,3 +121,23 @@ violated.
 **Must NOT do:**
 - Silently `pixi add optuna` from this skill.
 - Re-run `env init`.
+
+---
+
+## CASE_06 — Verify missing agent tools, add skill absent
+
+**User prompt:**
+> Finish the Python environment setup.
+
+**Assumed workspace state:**
+- Managed pixi project after `env init` / `env sync`.
+- `env verify --execute` reports ruff missing.
+- `status.skills.add-python-package` is `false`.
+
+**Must do:**
+- Name `python -m skore_skills env verify --execute`.
+- Name ruff / ipython / ipykernel and stop.
+
+**Must NOT do:**
+- Invent `env add` for sklearn.
+- Invent the `add-python-package` procedure from memory.

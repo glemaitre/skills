@@ -9,12 +9,12 @@ description: >
   the agent reads the source, synthesizes its understanding of what
   to implement, and confirms with the user *before* returning the
   Proposal block. Hand the confirmed Proposal back to
-  `iterate-ml-experiment`, which writes it into
+  `manage-ml-backlog`, which writes it into
   `journal/NN_short_name.md` and seeks the user's design-note approval.
   Stops at "Proposal returned, user-confirmed"; never writes a
   design note, never authors acceptance criteria.
 
-  TRIGGER when: `iterate-ml-experiment` is picking a sourcing
+  TRIGGER when: `triage-ml-task` is picking a sourcing
   strategy and the user picks `user` from the menu; the user
   volunteers a concrete idea ("I want to try X"); the user pastes
   or links a scientific article, GitHub issue, spec file, or
@@ -41,7 +41,7 @@ description: >
 
 Source: the user — directly, or via something they've pointed at
 (article, issue, spec, repo). Output: a **user-confirmed** Proposal
-block, handed back to `iterate-ml-experiment`.
+block, handed back to `triage-ml-task`.
 
 ## Output contract (read this before the body)
 
@@ -66,7 +66,7 @@ have nothing in hand, the parent's menu re-presents itself.
 ## Stop conditions
 
 - **Don't write `journal/` files.** That belongs to
-  `iterate-ml-experiment`. This skill returns the Proposal as
+  `manage-ml-backlog`. This skill returns the Proposal as
   conversation text; the parent skill drafts the file.
 - **Don't infer source content from memory.** If the user
   references an article, an issue, or a file, fetch / read it.
@@ -141,7 +141,7 @@ text enumeration if it is genuinely unavailable in the current
 session.
 
 **Exception — pre-resolved entry point.** When
-`iterate-ml-experiment` dispatches here after free-text handling
+`triage-ml-task` dispatches here after free-text handling
 at the sourcing-menu level has already resolved the branch (the
 user typed a URL, an issue link, or a concrete idea directly
 into the sourcing AskUserQuestion), the parent passes the
@@ -258,7 +258,7 @@ The user picks `free-text` and types their idea directly.
 ## Confirm before returning
 
 In every branch, before handing the Proposal back to
-`iterate-ml-experiment`, the agent emits a short plain-text
+`triage-ml-task`, the agent emits a short plain-text
 synthesis to the user and waits for explicit approval:
 
 > "From <source>, I understand you'd like to **<one-line
@@ -300,14 +300,14 @@ Proposal (from: user via <article-link | resource-link | free-text>):
                     didn't answer>
 ```
 
-`iterate-ml-experiment` consumes this and drafts
+`manage-ml-backlog` consumes this and drafts
 `journal/NN_short_name.md`. **No `Success` field** — the skill
 deliberately does not author acceptance criteria; the user judges
 the result post-run.
 
 ## Companion skills
 
-- **`iterate-ml-experiment`** — the caller; owns the design notes.
+- **`triage-ml-task`** — the caller; owns the design notes.
 - **`iterate-from-skore`** — the only sibling strategy; sources
   the next experiment by mining the previous skore report into
   the Backlog.

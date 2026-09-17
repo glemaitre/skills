@@ -114,7 +114,7 @@ Defaults (override in `pixi.toml` or on the CLI):
     `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`
     (and, when they gain evals, `explore-ml-data`, `audit-ml-pipeline`)
   - big — `openrouter/deepseek/deepseek-v4.1-flash`:
-    `iterate-ml-experiment`, `build-ml-pipeline`
+    `build-ml-pipeline`
 - judge: `openrouter/deepseek/deepseek-v4.1-flash` (not tiered)
 - mode: `with` (SKILL.md as system prompt)
 - Must-do pass ratio: `0.7` (diagnostic metric only; Must-NOT is

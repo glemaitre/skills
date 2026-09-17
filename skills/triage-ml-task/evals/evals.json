@@ -5,7 +5,7 @@
       "id": 1,
       "title": "Ambiguous capability request",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.\n- No `.skore` file.\n- `status.skills` reports the usual entry skills `true`.]\n\nWhat can you help me with on this machine learning project?",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `evaluate-ml-pipeline`, `audit-ml-pipeline`, `manage-ml-backlog` if installed). One pick. - Do not treat the missing `.skore` as an empty project despite the existing scaffold. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill. - Treat `iterate-ml-experiment` as the session owner.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `evaluate-ml-pipeline`, `audit-ml-pipeline`, `manage-ml-backlog` if installed). One pick. - Do not treat the missing `.skore` as an empty project despite the existing scaffold. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill. - Invent a deleted iterate skill as the session owner.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
@@ -13,7 +13,7 @@
         "Do not treat the missing `.skore` as an empty project despite the existing scaffold.",
         "The response does NOT: Start designing the next experiment.",
         "The response does NOT: Claim to have loaded or executed every skill.",
-        "The response does NOT: Treat `iterate-ml-experiment` as the session owner.",
+        "The response does NOT: Invent a deleted iterate skill as the session owner.",
         "The response does NOT: Auto-load a stage skill without asking.",
         "The response does NOT: Ask only stay / go deeper / next stage without naming entry skills."
       ],
@@ -47,6 +47,54 @@
         "Skip in one line because `setup-git` is not installed.",
         "The response does NOT: Run `git init` or invent the `setup-git` procedure from memory.",
         "The response does NOT: Treat the missing skill as an error that aborts the session."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "Generic bootstrap",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder.\n- `status.skills.setup-ml-project` is `true`.\n- `status.skills.setup-python-env` is `true`.]\n\nBootstrap this project for me.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `setup-ml-project` without listing the catalog menu. It must NOT: - Load `setup-python-env` as the certain skill. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `setup-ml-project` without listing the catalog menu.",
+        "The response does NOT: Load `setup-python-env` as the certain skill.",
+        "The response does NOT: Ask which entry skill to run."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 5,
+      "title": "Certain env manager request",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder.\n- `status.skills.setup-python-env` is `true`.]\n\nGet pixi going for this folder.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `setup-python-env` without listing the catalog menu. It must NOT: - Load `setup-ml-project` as the certain skill. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `setup-python-env` without listing the catalog menu.",
+        "The response does NOT: Load `setup-ml-project` as the certain skill.",
+        "The response does NOT: Ask which entry skill to run."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 6,
+      "title": "Certain EDA request",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace with `data/` present.\n- `status.skills.explore-ml-data` is `true`.]\n\nExplore the data in data/.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `explore-ml-data` without listing the catalog menu. It must NOT: - Ask which entry skill to run. - Start EDA methodology in triage instead of loading the skill.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `explore-ml-data` without listing the catalog menu.",
+        "The response does NOT: Ask which entry skill to run.",
+        "The response does NOT: Start EDA methodology in triage instead of loading the skill."
       ],
       "tools": false,
       "sandbox": [],

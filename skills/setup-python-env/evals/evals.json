@@ -90,6 +90,22 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 6,
+      "title": "Verify missing agent tools, add skill absent",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed pixi project after `env init` / `env sync`.\n- `env verify --execute` reports ruff missing.\n- `status.skills.add-python-package` is `false`.]\n\nFinish the Python environment setup.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env verify --execute`. - Name ruff / ipython / ipykernel and stop. It must NOT: - Invent `env add` for sklearn. - Invent the `add-python-package` procedure from memory.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills env verify --execute`.",
+        "Name ruff / ipython / ipykernel and stop.",
+        "The response does NOT: Invent `env add` for sklearn.",
+        "The response does NOT: Invent the `add-python-package` procedure from memory."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

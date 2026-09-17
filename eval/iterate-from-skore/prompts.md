@@ -117,7 +117,7 @@ never calls `report.*` accessors.
 - Return **zero** Backlog candidate rows.
 - Summary states explicitly that the checks surface is clean; no
   actionable findings on this turn.
-- Hand back to `iterate-ml-experiment` so the parent re-presents the
+- Hand back to `triage-ml-task` so the parent re-presents the
   sourcing menu (user will likely pick `user`).
 
 **Must NOT do:**
@@ -238,7 +238,7 @@ never calls `report.*` accessors.
   this turn.
 - Emit SKD003 and SKD019 as conversation-text backlog rows (any
   heading is fine — candidates, a table, or a pasteable block).
-- Name `iterate-ml-experiment` as the owner of `JOURNAL.md` writes,
+- Name `manage-ml-backlog` as the owner of `JOURNAL.md` writes,
   or otherwise leave the rows as text for the parent.
 
 **Must NOT do:**

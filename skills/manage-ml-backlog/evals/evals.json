@@ -24,12 +24,12 @@
       "id": 2,
       "title": "Do not implement next experiment",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- One `done` History row and two Backlog rows `B1`, `B2`.]\n\nWhat should we try next?",
-      "expected_output": "Behavioural response satisfying: - Surface Backlog options and ask triage which lever to take. It must NOT: - Silently pick `B1`. - Load `iterate-ml-experiment` as the session owner. - Start `build-ml-pipeline`.",
+      "expected_output": "Behavioural response satisfying: - Surface Backlog options and ask triage which lever to take. It must NOT: - Silently pick `B1`. - Invent a deleted iterate skill as the session owner. - Start `build-ml-pipeline`.",
       "files": [],
       "expectations": [
         "Surface Backlog options and ask triage which lever to take.",
         "The response does NOT: Silently pick `B1`.",
-        "The response does NOT: Load `iterate-ml-experiment` as the session owner.",
+        "The response does NOT: Invent a deleted iterate skill as the session owner.",
         "The response does NOT: Start `build-ml-pipeline`."
       ],
       "tools": false,
@@ -40,14 +40,14 @@
       "id": 3,
       "title": "Missing journal index uses packaged shape",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/` exists but `journal/JOURNAL.md` is missing.]\n\nStart the experiment backlog for this workspace.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills scaffold --journal` as the initialization command. - State that the packaged index provides Status, Data understanding, History, and Backlog. - Return to triage after initialization. It must NOT: - Recreate the index shape from memory. - Load the deprecated `iterate-ml-experiment` skill. - Draft or implement an experiment in this turn.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills scaffold --journal` as the initialization command. - State that the packaged index provides Status, Data understanding, History, and Backlog. - Return to triage after initialization. It must NOT: - Recreate the index shape from memory. - Invent a deleted iterate skill. - Draft or implement an experiment in this turn.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills scaffold --journal` as the initialization command.",
         "State that the packaged index provides Status, Data understanding, History, and Backlog.",
         "Return to triage after initialization.",
         "The response does NOT: Recreate the index shape from memory.",
-        "The response does NOT: Load the deprecated `iterate-ml-experiment` skill.",
+        "The response does NOT: Invent a deleted iterate skill.",
         "The response does NOT: Draft or implement an experiment in this turn."
       ],
       "tools": false,

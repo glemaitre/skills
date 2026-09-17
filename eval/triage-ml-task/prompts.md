@@ -24,7 +24,7 @@
 **Must NOT do:**
 - Start designing the next experiment.
 - Claim to have loaded or executed every skill.
-- Treat `iterate-ml-experiment` as the session owner.
+- Invent a deleted iterate skill as the session owner.
 - Auto-load a stage skill without asking.
 - Ask only stay / go deeper / next stage without naming entry
   skills.
@@ -66,3 +66,61 @@
 **Must NOT do:**
 - Run `git init` or invent the `setup-git` procedure from memory.
 - Treat the missing skill as an error that aborts the session.
+
+---
+
+## CASE_04 — Generic bootstrap
+
+**User prompt:**
+> Bootstrap this project for me.
+
+**Assumed workspace state:**
+- Empty folder.
+- `status.skills.setup-ml-project` is `true`.
+- `status.skills.setup-python-env` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `setup-ml-project` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `setup-python-env` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_05 — Certain env manager request
+
+**User prompt:**
+> Get pixi going for this folder.
+
+**Assumed workspace state:**
+- Empty folder.
+- `status.skills.setup-python-env` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `setup-python-env` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `setup-ml-project` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_06 — Certain EDA request
+
+**User prompt:**
+> Explore the data in data/.
+
+**Assumed workspace state:**
+- Scaffolded workspace with `data/` present.
+- `status.skills.explore-ml-data` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `explore-ml-data` without listing the catalog menu.
+
+**Must NOT do:**
+- Ask which entry skill to run.
+- Start EDA methodology in triage instead of loading the skill.

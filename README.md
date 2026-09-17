@@ -132,7 +132,6 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 | Skill | Description |
 | --- | --- |
-| [iterate-ml-experiment](skills/iterate-ml-experiment/SKILL.md) | Deprecated one-release pointer to triage and backlog. |
 | [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md) | Record experiment outcomes and next-lever backlog rows. |
 | [iterate-from-skore](skills/iterate-from-skore/SKILL.md) | Use skore to run diagnostics and checks that can be reported and addressed in the next experiment. |
 | [iterate-from-user](skills/iterate-from-user/SKILL.md) | As a user, be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo). |

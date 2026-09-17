@@ -87,3 +87,47 @@
 - Invent the `setup-git` procedure from memory.
 - Treat the missing skill as an error that aborts setup.
 - Show a git checkbox.
+
+---
+
+## CASE_04 — User unchecks env
+
+**User prompt:**
+> Set up this empty folder for an ML project.
+
+**Assumed workspace state:**
+- Empty folder.
+- Every `skills` entry is `true`.
+- The user unchecks Python environment and keeps workspace, editable,
+  and git.
+
+**Must do:**
+- Ask the multi-select with every installed box preselected.
+- Skip `setup-python-env` in one line because the user unchecked it.
+- Load `setup-workspace` then git after layout exists; do not run
+  env init.
+
+**Must NOT do:**
+- Run `env init` anyway.
+- Invent the env manager procedure from memory.
+
+---
+
+## CASE_05 — Editable without workspace or src
+
+**User prompt:**
+> Set up this empty folder.
+
+**Assumed workspace state:**
+- Empty folder; `has_src` is false.
+- Every `skills` entry is `true`.
+- The user unchecks workspace and git, leaves editable checked,
+  unchecks env.
+
+**Must do:**
+- Stop in one line: editable needs `src/` or a selected workspace
+  skill. Do not scaffold from this meta.
+
+**Must NOT do:**
+- Run `python -m skore_skills scaffold`.
+- Run `env add --editable`.

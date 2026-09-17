@@ -38,3 +38,23 @@
 **Must NOT do:**
 - Run `git commit`.
 - Run `git push`.
+
+---
+
+## CASE_03 — Triage not installed
+
+**User prompt:**
+> Persist this EDA turn.
+
+**Assumed workspace state:**
+- `python -m skore_skills git end-turn --stage eda` already returned
+  `action: invoke`, `reason: persist`, autocommit `on`.
+- `status.skills.triage-ml-task` is `false`.
+
+**Must do:**
+- Run `git status` and `git commit -m`.
+- Stop after the commit because triage is not installed.
+
+**Must NOT do:**
+- Invent a triage procedure from memory.
+- Run `git push`.

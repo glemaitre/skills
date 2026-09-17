@@ -57,7 +57,6 @@ def test_scaffold_tree_and_no_placeholders(
         if path.is_file() and path.suffix in {".py", ".toml", ".md"}:
             text = path.read_text(encoding="utf-8")
             assert "<pkg>" not in text
-            assert "<SKORE_PROJECT_INIT>" not in text
     assert compileall.compile_dir(str(src), quiet=1)
 
 

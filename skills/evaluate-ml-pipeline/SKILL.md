@@ -92,7 +92,7 @@ read the report. The pipeline declaration is out of scope (see
   satisfied lookup, not a block.
 - **Splitter choice is data-driven, not default-driven
   (`G-CV-SPLITTER`).** This is the **G-CV-SPLITTER** gate — owned by
-  this skill, fired during `iterate-ml-experiment` § 3 (the build →
+  this skill, fired during `triage-ml-task` § 3 (the build →
   evaluate → test chain, **after** the design note is approved at
   G-DESIGN), before `src/<pkg>/evaluate.py` is written. The splitter
   is NOT pre-committed in the design note. Pick from the
@@ -117,7 +117,7 @@ read the report. The pipeline declaration is out of scope (see
   you produce a CV report and the pipeline has any such step,
   the matching `tests/smoke/test_NN_<short_name>.py` must also
   pass before the experiment can flip to `done` (enforced by
-  `iterate-ml-experiment` § 4).
+  `triage-ml-task` § 4).
 - **All Python execution goes to `scratch/`.** Every Python
   command — version checks, signature lookups, walking the skore
   report's metrics accessors, extracting per-fold values,
@@ -165,7 +165,7 @@ read the report. The pipeline declaration is out of scope (see
   mandatory `AskUserQuestion` in this stack —
   `add-python-package` § "Where does the package belong?",
   `data-science-python-stack` § Tier 2 (pandas vs polars),
-  `iterate-ml-experiment` § 2 (sourcing menu), `iterate-from-user`
+  `triage-ml-task` § 2 (sourcing menu), `iterate-from-user`
   § "The entry-point AskUserQuestion". When in doubt: the user's
   approval is the gate, not the harness's instruction text.
 
@@ -426,7 +426,7 @@ API CLI is only for the signature after the name.
   script puts the report; the audit file loads it via
   `project.summarize()` → `project.get(id)` and renders a
   markdown digest for the agent (no `evaluate`, no `put`).
-  Fires at `iterate-ml-experiment` § 4 record-outcome.
+  Fires at `manage-ml-backlog` § 4 record-outcome.
 - **`smoke-test-ml-pipeline`** — router for `tests/`. Owns layout and
   the stem pairing between an experiment and its smoke test.
 - **`add-python-package`** — detection + install commands for the

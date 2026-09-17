@@ -10,13 +10,13 @@ description: >
   summary` provides context for the human summary paragraph but
   does not drive Backlog rows on its own. Returns the enriched
   Backlog rows + a one-paragraph summary back to
-  `iterate-ml-experiment`, which writes the rows into `JOURNAL.md`
+  `manage-ml-backlog`, which writes the rows into `JOURNAL.md`
   and re-presents the sourcing menu so the user can promote a
   `B<N>` row. Stops at "Backlog enriched, summary returned"; never
   writes a per-experiment design note, never picks the "winning"
   finding — the user picks via `B<N>`.
 
-  TRIGGER when: `iterate-ml-experiment` is picking a sourcing
+  TRIGGER when: `triage-ml-task` is picking a sourcing
   strategy and the user picks `skore` from the menu; the user says
   "mine the report", "what does skore see?", "fill the backlog from
   the diagnostic"; the previous experiment has finished and the
@@ -46,7 +46,7 @@ description: >
 Source: the audit digest at `scratch/audit/<stem>/audit.md`,
 produced by `audit-ml-pipeline` at § 4 record-outcome.
 Output: a set of **Backlog-candidate rows** + a short human
-summary, handed back to `iterate-ml-experiment`. The parent skill
+summary, handed back to `manage-ml-backlog`. The parent skill
 writes the rows to `JOURNAL.md` Backlog and re-presents the
 sourcing menu so the user can promote one via `B<N>`.
 
@@ -201,7 +201,7 @@ Summary:
   checks. Dense, not chatty.>
 ```
 
-`iterate-ml-experiment` consumes this:
+`manage-ml-backlog` consumes this:
 1. Writes the candidate rows into `JOURNAL.md` Backlog with stable
    `B<N>` indices appended at the end.
 2. Surfaces the summary verbatim to the user.
@@ -211,7 +211,7 @@ Summary:
 
 ## Companion skills
 
-- **`iterate-ml-experiment`** — the caller; owns the design notes
+- **`manage-ml-backlog`** — the caller; owns the design notes
   (including `JOURNAL.md`).
 - **`audit-ml-pipeline`** — **the producer of the digest this
   skill reads**. The two skills share the same diagnostic surface

@@ -11,8 +11,9 @@ description: >
   (setup-python-env).
 
   HOW TO USE: read status.policy.env.managed, env detect, and
-  env route. If managed, env add --execute (or --editable). If
-  unmanaged, ask; default is the user handles it — do not wait.
+  env route. Classify this turn first (editable | add-skore |
+  named package). If managed, env add --execute (or --editable).
+  If unmanaged, ask; default is the user handles it — do not wait.
   Never --execute while managed is false.
 ---
 
@@ -29,7 +30,7 @@ after listing the boxes.
 ```
 - [ ] status + env detect
 - [ ] env.managed: null → stop | false → ask, no --execute | true → continue
-- [ ] this turn: editable | add-skore | env route then env add --execute
+- [ ] classify: editable | add-skore | env route then env add
 ```
 
 ## Sequence
@@ -38,16 +39,25 @@ after listing the boxes.
 2. If `policy.env.managed` is null: env is unresolved. Say so and
    stop. Do not bootstrap here. Do not load `setup-python-env` by
    catalog id unless the user asked for env setup.
-3. If `managed` is false: **do not** `--execute`. Ask with two
+3. Classify this turn **before** adding anything:
+
+   - **Editable** only if the user asked to install the workspace
+     package, or `setup-ml-project` selected that box. `has_src`
+     true is not enough.
+   - **Skore** if the package is Skore.
+   - **Named package** otherwise (`skrub`, pandas, …). Never
+     `--editable` for a named dependency.
+
+4. If `managed` is false: **do not** `--execute`. Ask with two
    options:
 
    1. **I will handle it** (default) — name the package(s) and
-      print-only `env add` (or `env add-skore --mode <mode>`).
-      Do not wait; return.
+      print-only `env add` (or `env add --editable`, or
+      `env add-skore --mode <mode>`). Do not wait; return.
    2. **Please install this now** — show the same command, wait
       until the user confirms it is done, then return.
 
-4. If this turn is the workspace package and `has_src` is true:
+5. If this turn is editable and `has_src` is true:
 
    ```bash
    python -m skore_skills env add --editable --execute
@@ -55,7 +65,7 @@ after listing the boxes.
 
    Never `pip install -e .` in a pixi project. If `has_src` is
    false, stop. Name `setup-workspace` only if it is installed.
-5. If the package is Skore, read the persisted `policy.skore_mode`
+6. If the package is Skore, read the persisted `policy.skore_mode`
    and run:
 
    ```bash
@@ -65,7 +75,7 @@ after listing the boxes.
    If the mode is unset, return to `evaluate-ml-pipeline`. Do not
    spell `skore[...]` or pick conda vs PyPI yourself. See
    `add-python-package/references/skore_variant.md`.
-6. Else `python -m skore_skills env route <pkg>`. Then:
+7. Else `python -m skore_skills env route <pkg>`. Then:
 
    - `scope` `default` → `env add --execute <pkg>`
    - `scope` `agent` → `env add --feature agent --execute <pkg>`

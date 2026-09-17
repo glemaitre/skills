@@ -52,7 +52,7 @@ reading the digest. Read-only against the skore Project.
 
 | Came here from… | After audit, next is… |
 |---|---|
-| `iterate-ml-experiment` § 4 record-outcome | → Read audit digest, fill Status block + JOURNAL row |
+| `manage-ml-backlog` § 4 record-outcome | → Read audit digest, fill Status block + JOURNAL row |
 | User free-text ("audit 02", "re-audit 04") | → Surface metrics to the user; no further dispatch |
 | Re-run of an existing experiment | → Re-execute the existing audit file; surface diff if metrics changed |
 
@@ -294,7 +294,7 @@ created if missing). For a pixi agent environment, prefix with
 ### Re-execution semantics
 
 - Re-running an experiment (overwriting `put()` under the same key)
-  → re-execute the matching audit file. `iterate-ml-experiment` § 4
+  → re-execute the matching audit file. `manage-ml-backlog` § 4
   fires this on every record-outcome.
 - Editing the audit file's source (adding a metric accessor) →
   re-execute. The digest is regenerable.
@@ -322,8 +322,8 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 
 | Caller | When |
 |---|---|
-| `iterate-ml-experiment` § 4 record-outcome | Automatic; dispatched FIRST (replaces scratch probes for metric extraction). Agent feature must be available |
-| `iterate-ml-experiment` § 0 (bootstrap) | After the first baseline run, dispatch here for `audit/01_baseline.py` |
+| `manage-ml-backlog` § 4 record-outcome | Automatic; dispatched FIRST (replaces scratch probes for metric extraction). Agent feature must be available |
+| `triage-ml-task` § 0 (bootstrap) | After the first baseline run, dispatch here for `audit/01_baseline.py` |
 | User free-text | "audit experiment 02", "show me what 03", "re-audit 04" — resolves directly |
 
 ### Calls into
@@ -355,7 +355,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 - Open or write the skore Project's reports (`evaluate-ml-pipeline`).
 - Install `ipython` (`add-python-package` owns).
 - Enrich the Backlog from the audit digest (`iterate-from-skore`).
-- Write or edit `journal/NN_*.md` (`iterate-ml-experiment`).
+- Write or edit `journal/NN_*.md` (`manage-ml-backlog`).
 - Run pytest / smoke tests (`smoke-test-ml-pipeline`).
 - Render commits or PRs.
 - Decide *which* metrics matter — the cells are filled per task,
@@ -365,7 +365,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 
 | Skill | Relationship |
 |---|---|
-| `iterate-ml-experiment` | Caller. § 4 dispatches here FIRST; the digest feeds the `JOURNAL.md` Status + History update |
+| `manage-ml-backlog` | Caller. § 4 dispatches here FIRST; the digest feeds the `JOURNAL.md` Status + History update |
 | `iterate-from-skore` | Downstream consumer of this skill's digest. `audit-ml-pipeline` opens the Project and renders the digest; `iterate-from-skore` parses the digest as text and drafts Backlog rows from each surfaced check. Never opens the Project itself |
 | `evaluate-ml-pipeline` | Producer side. `skore.evaluate` + `project.put` live only in `experiments/NN_*.py` |
 | `organize-ml-workspace` | Workspace layout; four-way stem pairing |

@@ -7,8 +7,9 @@ description: >
   `env.managed`, then `env init --manager`, `env sync --execute`,
   and `env verify --execute`. Does not add stage ML libraries.
 
-  TRIGGER when bootstrapping a Python project or when no
-  environment manager is recorded yet.
+  TRIGGER when the user asks for the env manager, pixi, uv, or a
+  Python environment, or when no environment manager is recorded
+  yet.
 
   SKIP adding later packages — load add-python-package.
   SKIP scaffolding src/ — that is setup-workspace.

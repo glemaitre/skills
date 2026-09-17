@@ -30,6 +30,9 @@ route and ask. Do not execute another skill's methodology.
    | add or install a named package | `add-python-package` |
    | EDA / explore the data | `explore-ml-data` |
    | evaluate / metrics / skore report | `evaluate-ml-pipeline` |
+   | audit a report or model | `audit-ml-pipeline` |
+   | build / model a pipeline | `model-ml-pipeline` |
+   | backlog / history / next lever | `manage-ml-backlog` |
    | set up / bootstrap this project (generic) | `setup-ml-project` |
 
 3. **Uncertain** (open session, “what can you do”, finished stage,
@@ -51,7 +54,7 @@ route and ask. Do not execute another skill's methodology.
 - Do not treat a missing `.skore` as an empty project when `src/`
   or `journal/` exist.
 - Do not invent a missing skill's steps from memory.
-- Do not treat iterate as the session owner.
+- Do not invent a deleted iterate skill as the session owner.
 
 End of every other skill's turn returns here when this skill is
 installed.

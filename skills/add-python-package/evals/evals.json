@@ -98,6 +98,38 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "Editable workspace package",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed pixi project.\n- `has_src` is true.\n- User asked for the workspace package (not a named dependency).]\n\nInstall the workspace package in editable mode.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env add --editable --execute`. It must NOT: - Run `pip install -e .`. - Run `env add --editable` for a named library such as skrub.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills env add --editable --execute`.",
+        "The response does NOT: Run `pip install -e .`.",
+        "The response does NOT: Run `env add --editable` for a named library such as skrub."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 8,
+      "title": "G-ENV-SCOPE ask",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed pixi project.\n- `env route optuna` returns `scope: ask`.]\n\nAdd optuna.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env route optuna`. - Ask G-ENV-SCOPE (default vs a named feature/group). - After the choice, `env add --execute` with the chosen `--feature` / `--group`. It must NOT: - Silently `pixi add optuna` from memory. - Put optuna on `--feature agent` without asking.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills env route optuna`.",
+        "Ask G-ENV-SCOPE (default vs a named feature/group).",
+        "After the choice, `env add --execute` with the chosen `--feature` / `--group`.",
+        "The response does NOT: Silently `pixi add optuna` from memory.",
+        "The response does NOT: Put optuna on `--feature agent` without asking."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

@@ -61,7 +61,7 @@ declaring the turn done.
 ## Where this sits in the loop
 
 EDA is a **bootstrap-time gate (G-EDA)** owned by this skill and
-fired by `iterate-ml-experiment` § 0 **before** the baseline design
+fired by `triage-ml-task` § 0 **before** the baseline design
 note. Ordering matters: the dataset facts (class balance, datetime /
 group columns, missingness, cardinality) are exactly what justifies
 the splitter (`G-CV-SPLITTER`), the metric default, and the learner
@@ -380,7 +380,7 @@ Link each `eda/eda_<table>.html` from the relevant section.
 
 ## JOURNAL § Data understanding (EDA)
 
-`iterate-ml-experiment`'s `JOURNAL.md` carries a top-level
+`manage-ml-backlog`'s `JOURNAL.md` carries a top-level
 `## Data understanding (EDA)` section (placed right after `##
 Status`). This skill owns its content:
 
@@ -403,7 +403,7 @@ detail lives in `eda/eda.md`. On the **skip** path, only the
 
 | Caller | When |
 |---|---|
-| `iterate-ml-experiment` § 0 bootstrap | Automatic; G-EDA fires **before** the baseline design note |
+| `triage-ml-task` § 0 bootstrap | Automatic; G-EDA fires **before** the baseline design note |
 | User free-text | "explore the data", "do an EDA", "profile the dataset" — resolves directly |
 
 ### Calls into
@@ -418,7 +418,7 @@ detail lives in `eda/eda.md`. On the **skip** path, only the
 ## What this skill does NOT do
 
 - Design, select, or evaluate a model (`build-ml-pipeline` /
-  `evaluate-ml-pipeline` / `iterate-ml-experiment`).
+  `evaluate-ml-pipeline` / `triage-ml-task`).
 - Pick the CV splitter or metric — it only surfaces the *evidence*
   for those picks.
 - Edit `src/<pkg>/` or the experiment / audit files.
@@ -431,7 +431,7 @@ detail lives in `eda/eda.md`. On the **skip** path, only the
 
 | Skill | Relationship |
 |---|---|
-| `iterate-ml-experiment` | Caller. § 0 fires G-EDA before the baseline note; the EDA findings seed the note's Method / Risks |
+| `triage-ml-task` | Caller. § 0 fires G-EDA before the baseline note; the EDA findings seed the note's Method / Risks |
 | `audit-ml-pipeline` | Same `cells run` CLI and bare-expression discipline |
 | `setup-workspace` | Workspace layout; `data/` is raw inputs; this skill writes `eda/` |
 | `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |

@@ -33,6 +33,22 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "Triage not installed",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `python -m skore_skills git end-turn --stage eda` already returned\n  `action: invoke`, `reason: persist`, autocommit `on`.\n- `status.skills.triage-ml-task` is `false`.]\n\nPersist this EDA turn.",
+      "expected_output": "Behavioural response satisfying: - Run `git status` and `git commit -m`. - Stop after the commit because triage is not installed. It must NOT: - Invent a triage procedure from memory. - Run `git push`.",
+      "files": [],
+      "expectations": [
+        "Run `git status` and `git commit -m`.",
+        "Stop after the commit because triage is not installed.",
+        "The response does NOT: Invent a triage procedure from memory.",
+        "The response does NOT: Run `git push`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

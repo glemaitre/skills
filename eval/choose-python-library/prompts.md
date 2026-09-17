@@ -22,3 +22,23 @@
 - Pick silently because the user said “you choose.”
 - Run `pip install`.
 - Run `python -m skore_skills env add` from this skill.
+
+---
+
+## CASE_02 — Add skill not installed
+
+**User prompt:**
+> Add either optuna or scikit-optimize for tuning.
+
+**Assumed workspace state:**
+- Pixi project; neither package is installed.
+- The stack does not fix one canonical tuning library.
+- `status.skills.add-python-package` is `false`.
+
+**Must do:**
+- Ask the user to choose.
+- After a choice, name the package and stop.
+
+**Must NOT do:**
+- Run `python -m skore_skills env add`.
+- Invent the `add-python-package` procedure from memory.

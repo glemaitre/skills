@@ -31,6 +31,3 @@ description: >
 - Do not run pip directly in a managed project.
 - Do not substitute black/isort for Ruff or sklearn Pipeline for
   skrub DataOps; those choices are already fixed.
-
-This action is intentionally small pending review of decision
-criteria.

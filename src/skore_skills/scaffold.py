@@ -49,13 +49,7 @@ def render_template(text: str, package: str, *, pyproject: bool = False) -> str:
     kebab = package.replace("_", "-")
     if pyproject:
         text = text.replace('name = "<pkg>"', f'name = "{kebab}"')
-    return (
-        text.replace("<pkg>", package)
-        .replace("<SKORE_PROJECT_INIT>", "")
-        .replace("<project-name>", kebab)
-        .replace("<experiment-key>", "01_baseline")
-        .replace("<short title>", "baseline")
-    )
+    return text.replace("<pkg>", package).replace("<project-name>", kebab)
 
 
 def layout_exists(root: Path) -> bool:

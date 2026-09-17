@@ -4,7 +4,7 @@ Three options for extending a shared `src/<pkg>/` module without
 breaking prior experiments. SKILL.md has the criterion + tripwires
 in prose; this file has the worked code per option.
 
-The hard rule (from `iterate-ml-experiment`'s Stop conditions):
+The hard rule (from `manage-ml-backlog`'s Stop conditions):
 every `done` row in `JOURNAL.md` History must remain runnable on
 `main` and produce the same result.
 
@@ -91,7 +91,7 @@ Document the split in the new experiment's design-note Risks.
 
 ## Cheap executable check
 
-`iterate-ml-experiment`'s § 3 smoke-test gate runs **all of
+`triage-ml-task`'s § 3 smoke-test gate runs **all of
 `tests/smoke/`**, not just the new experiment's test. If a prior
 smoke test goes red after your change, default behavior isn't
 preserving the prior experiment's shape — fix it before

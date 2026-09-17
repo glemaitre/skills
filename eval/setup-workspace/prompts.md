@@ -53,7 +53,7 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 
 ---
 
-## CASE_02 — Existing workspace, glue not rebuild
+## CASE_02 — Existing workspace, do not rebuild
 
 **User prompt:**
 > Help me add a new experiment to this project.
@@ -71,7 +71,7 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 **Must do:**
 - Detect the **existing layout** from the signals (pyproject.toml,
   `src/claim_predictor/`, `experiments/`, `journal/`).
-- Glue to existing folders / names — no renames, no relocates.
+- Do not scaffold again. Do not invent files. No rename.
 - Do not write a new experiment file here.
 - Keep `claim_predictor` as the package / import name (do not
   rename `src/` or the import).
@@ -231,7 +231,7 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 
 **Must do:**
 - Classify the root as **manager-only**: a scaffold target, not an
-  existing layout to glue onto.
+  existing layout.
 - Name `python -m skore_skills scaffold --package churnlab`.
 - State that the existing `pyproject.toml` is kept (no `--force`).
 - Return control to `setup-ml-project` at the end of the turn.

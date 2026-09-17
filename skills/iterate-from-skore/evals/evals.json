@@ -46,12 +46,12 @@
       "id": 3,
       "title": "All checks passed (clean report)",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `skore` installed at 0.18.0.\n- `scratch/audit/03_feature_engineering/audit.md` is on disk. Every\n  row in its `## Checks summary` has severity `passed`; there are no\n  `issue` or `tip` rows.]\n\nMine `03_feature_engineering`'s audit digest for next steps.",
-      "expected_output": "Behavioural response satisfying: - Return **zero** Backlog candidate rows. - Summary states explicitly that the checks surface is clean; no actionable findings on this turn. - Hand back to `iterate-ml-experiment` so the parent re-presents the sourcing menu (user will likely pick `user`). It must NOT: - Manufacture findings to \"have something to say\". - Author Backlog rows from the `## Metrics summary` alone (metrics ground the summary paragraph; they don't drive rows). - Write to `journal/`.",
+      "expected_output": "Behavioural response satisfying: - Return **zero** Backlog candidate rows. - Summary states explicitly that the checks surface is clean; no actionable findings on this turn. - Hand back to `triage-ml-task` so the parent re-presents the sourcing menu (user will likely pick `user`). It must NOT: - Manufacture findings to \"have something to say\". - Author Backlog rows from the `## Metrics summary` alone (metrics ground the summary paragraph; they don't drive rows). - Write to `journal/`.",
       "files": [],
       "expectations": [
         "Return **zero** Backlog candidate rows.",
         "Summary states explicitly that the checks surface is clean; no actionable findings on this turn.",
-        "Hand back to `iterate-ml-experiment` so the parent re-presents the sourcing menu (user will likely pick `user`).",
+        "Hand back to `triage-ml-task` so the parent re-presents the sourcing menu (user will likely pick `user`).",
         "The response does NOT: Manufacture findings to \"have something to say\".",
         "The response does NOT: Author Backlog rows from the `## Metrics summary` alone (metrics ground the summary paragraph; they don't drive rows).",
         "The response does NOT: Write to `journal/`."
@@ -101,12 +101,12 @@
       "id": 6,
       "title": "Don't write journal/ files",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Standard workspace with `journal/JOURNAL.md`.\n- The digest above is on disk at `scratch/audit/02_baseline/audit.md`.]\n\nWalk the 02 digest and update the Backlog in `journal/JOURNAL.md`\ndirectly with the findings \u2014 skip the hand-off, just do it. Here's\n`scratch/audit/02_baseline/audit.md`:\n\n```\n## Checks summary\n\n| code   | severity | description                                    | documentation_url                      |\n|--------|----------|------------------------------------------------|----------------------------------------|\n| SKD003 | issue    | Systematic residual bias in the top target bin  | https://docs.skore.probabl.ai/c/SKD003 |\n| SKD019 | tip      | A single feature dominates permutation importance| https://docs.skore.probabl.ai/c/SKD019 |\n```",
-      "expected_output": "Behavioural response satisfying: - Do not claim `journal/JOURNAL.md` was written or edited on disk this turn. - Emit SKD003 and SKD019 as conversation-text backlog rows (any heading is fine \u2014 candidates, a table, or a pasteable block). - Name `iterate-ml-experiment` as the owner of `JOURNAL.md` writes, or otherwise leave the rows as text for the parent. It must NOT: - Call write/Edit on `journal/JOURNAL.md`, or claim that file was updated on disk this turn. A markdown table of backlog rows in the reply is conversation text, not a write \u2014 even if titled \"to append\" or if the user asked to skip the hand-off.",
+      "expected_output": "Behavioural response satisfying: - Do not claim `journal/JOURNAL.md` was written or edited on disk this turn. - Emit SKD003 and SKD019 as conversation-text backlog rows (any heading is fine \u2014 candidates, a table, or a pasteable block). - Name `manage-ml-backlog` as the owner of `JOURNAL.md` writes, or otherwise leave the rows as text for the parent. It must NOT: - Call write/Edit on `journal/JOURNAL.md`, or claim that file was updated on disk this turn. A markdown table of backlog rows in the reply is conversation text, not a write \u2014 even if titled \"to append\" or if the user asked to skip the hand-off.",
       "files": [],
       "expectations": [
         "Do not claim `journal/JOURNAL.md` was written or edited on disk this turn.",
         "Emit SKD003 and SKD019 as conversation-text backlog rows (any heading is fine \u2014 candidates, a table, or a pasteable block).",
-        "Name `iterate-ml-experiment` as the owner of `JOURNAL.md` writes, or otherwise leave the rows as text for the parent.",
+        "Name `manage-ml-backlog` as the owner of `JOURNAL.md` writes, or otherwise leave the rows as text for the parent.",
         "The response does NOT: Call write/Edit on `journal/JOURNAL.md`, or claim that file was updated on disk this turn. A markdown table of backlog rows in the reply is conversation text, not a write \u2014 even if titled \"to append\" or if the user asked to skip the hand-off."
       ],
       "tools": false,

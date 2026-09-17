@@ -569,7 +569,7 @@ API CLI for the TargetEncoder signature.
 
 ## Reproducibility — extending without breaking prior experiments
 
-`iterate-ml-experiment` enforces a hard rule: every `done` row in
+`manage-ml-backlog` enforces a hard rule: every `done` row in
 `JOURNAL.md` History must stay runnable on `main` and produce the
 same result. When touching a shared module under `src/<pkg>/`,
 **default behavior must preserve prior experiments' shape**.
@@ -607,7 +607,7 @@ examples: → `references/reproducibility_mechanics.md`):
 
 ### Cheap executable check
 
-`iterate-ml-experiment` § 3's smoke-test gate runs **all** of
+`triage-ml-task` § 3's smoke-test gate runs **all** of
 `tests/smoke/`, not just the new one. A prior smoke test going
 red after a change = default behavior not preserved. Fix before
 declaring the new experiment ready.

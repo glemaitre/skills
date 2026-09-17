@@ -10,8 +10,8 @@ description: >
   SKIP pipeline, evaluation, EDA, and library choice.
 
   HOW TO USE: detect first. For a fresh or manager-only layout,
-  ask G-PKG-NAME, then scaffold. For an existing layout, glue
-  without renaming.
+  ask G-PKG-NAME, then scaffold. For an existing layout, stop
+  without scaffolding or inventing files.
 ---
 
 # Set Up Workspace
@@ -34,7 +34,7 @@ after listing the boxes.
 ```
 - [ ] Layout: fresh | manager-only | existing
 - [ ] G-PKG-NAME: ask if fresh/manager-only (unless src/<pkg>/ already matches)
-- [ ] scaffold --package <pkg> | glue (existing; no --force)
+- [ ] scaffold --package <pkg> | existing: no scaffold, no invent
 - [ ] dispatched → return | standalone → git end-turn --stage setup
 ```
 
@@ -52,8 +52,8 @@ after listing the boxes.
 
    The CLI writes the tree and each folder `README.md`. Do not
    recreate those files from memory.
-3. Existing: add only glue the user asked for. No rename, no
-   overwrite, no `--force`.
+3. Existing: do not scaffold again. Do not invent files. No
+   rename, no overwrite, no `--force`.
 4. If `setup-ml-project` dispatched this turn and is in this
    session, return to it; else stop. Standalone:
    `python -m skore_skills git end-turn --stage setup`. If JSON

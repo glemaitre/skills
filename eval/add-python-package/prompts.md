@@ -120,3 +120,43 @@
 - Run `pixi add "skore[hub]"`.
 - Add Skore with `--pypi`.
 - Infer the package source from PATH.
+
+---
+
+## CASE_07 — Editable workspace package
+
+**User prompt:**
+> Install the workspace package in editable mode.
+
+**Assumed workspace state:**
+- Managed pixi project.
+- `has_src` is true.
+- User asked for the workspace package (not a named dependency).
+
+**Must do:**
+- Name `python -m skore_skills env add --editable --execute`.
+
+**Must NOT do:**
+- Run `pip install -e .`.
+- Run `env add --editable` for a named library such as skrub.
+
+---
+
+## CASE_08 — G-ENV-SCOPE ask
+
+**User prompt:**
+> Add optuna.
+
+**Assumed workspace state:**
+- Managed pixi project.
+- `env route optuna` returns `scope: ask`.
+
+**Must do:**
+- Name `python -m skore_skills env route optuna`.
+- Ask G-ENV-SCOPE (default vs a named feature/group).
+- After the choice, `env add --execute` with the chosen
+  `--feature` / `--group`.
+
+**Must NOT do:**
+- Silently `pixi add optuna` from memory.
+- Put optuna on `--feature agent` without asking.

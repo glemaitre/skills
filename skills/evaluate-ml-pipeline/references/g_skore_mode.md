@@ -188,7 +188,7 @@ The hub-workspace row carries `n/a` unless mode is `hub`; the
 mlflow-tracking-uri row carries `n/a` unless mode is `mlflow`. On
 every later session, skills that need the mode read these rows first
 and skip re-asking — the standard `Workspace decisions` lookup
-pattern (see `iterate-ml-experiment` template § Status).
+pattern (see `triage-ml-task` template § Status).
 
 ## Switching mid-project
 
@@ -210,7 +210,7 @@ Procedure:
 4. Update the install via `add-python-package` and
    `env add-skore --mode <mode> --execute`.
 5. Document the switch in `JOURNAL.md` History as a horizontal
-   divider (same shape as goal pivots — see `iterate-ml-experiment`
+   divider (same shape as goal pivots — see `manage-ml-backlog`
    § Maintenance modes).
 
 ## Anatomy of the substitution

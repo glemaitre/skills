@@ -61,6 +61,38 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "User unchecks env",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder.\n- Every `skills` entry is `true`.\n- The user unchecks Python environment and keeps workspace, editable,\n  and git.]\n\nSet up this empty folder for an ML project.",
+      "expected_output": "Behavioural response satisfying: - Ask the multi-select with every installed box preselected. - Skip `setup-python-env` in one line because the user unchecked it. - Load `setup-workspace` then git after layout exists; do not run env init. It must NOT: - Run `env init` anyway. - Invent the env manager procedure from memory.",
+      "files": [],
+      "expectations": [
+        "Ask the multi-select with every installed box preselected.",
+        "Skip `setup-python-env` in one line because the user unchecked it.",
+        "Load `setup-workspace` then git after layout exists; do not run env init.",
+        "The response does NOT: Run `env init` anyway.",
+        "The response does NOT: Invent the env manager procedure from memory."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 5,
+      "title": "Editable without workspace or src",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder; `has_src` is false.\n- Every `skills` entry is `true`.\n- The user unchecks workspace and git, leaves editable checked,\n  unchecks env.]\n\nSet up this empty folder.",
+      "expected_output": "Behavioural response satisfying: - Stop in one line: editable needs `src/` or a selected workspace skill. Do not scaffold from this meta. It must NOT: - Run `python -m skore_skills scaffold`. - Run `env add --editable`.",
+      "files": [],
+      "expectations": [
+        "Stop in one line: editable needs `src/` or a selected workspace skill. Do not scaffold from this meta.",
+        "The response does NOT: Run `python -m skore_skills scaffold`.",
+        "The response does NOT: Run `env add --editable`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }
