@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "77f287107e3ee55214ed06413ba9368d58b2208ba39ce3dbb47efc642ac3c990",
+  "catalog_hash": "24d462f508caaabb65ff020a480217c197c9a33fc4f02c8a076b169dffe2ba6d",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -120,7 +120,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "904cb0efb2e8ac11e83a8dd20533f296842ebeac26632e11708ea805fc7a75bc"
+      "hash": "83c9495020a93e4fce9c73faeb1af4c091b779b6e89a565431814e912da40d89"
     },
     {
       "id": "setup-git",
@@ -165,7 +165,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "27913277d317daa5b91702ef6eb91cab71a339c4c675deef38973c347f6d6920"
+      "hash": "e3e2e5e795bfb1c2ecc1aa17f2b2e41d49f6f9aa92636592bd3a04cffd0bb16e"
     },
     {
       "id": "setup-workspace",
@@ -183,7 +183,7 @@
       "summary": "Detect the env manager, persist managed vs user-managed, and init two envs plus agent tools.",
       "category": "action",
       "subcategory": null,
-      "hash": "ab0b013bc14dd236be310b4c6cede40dbbe5bed76ca0ed5807b586e8deedc620"
+      "hash": "476ec5adde942098b1725178f45a960570bfb7056ffd0198a038d7aa480f07b4"
     }
   ],
   "workflows": [

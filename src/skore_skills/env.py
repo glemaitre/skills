@@ -4,21 +4,18 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
+from collections.abc import Sequence
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
 from skore_skills.policy import load_policy
 from skore_skills.style import RUFF_PYPROJECT_TABLE, ensure_ruff_in_pyproject
-from skore_skills.workspace import MANAGER_ORDER, manager_evidence
+from skore_skills.workspace import MANAGER_ORDER, manager_evidence, package_name
 
-HATCH_ADD_HINT = (
-    "hatch has no universal add command; edit pyproject.toml "
-    "[project] dependencies or [tool.hatch.envs.<env>.dependencies], "
-    "then `hatch run`"
-)
 NO_MANAGER = "no env manager detected; record one before installing packages"
 AMBIGUOUS = "multiple env managers are visible; do not pick automatically"
 UNMANAGED = "environment is user-managed (env.managed is false); do not install"
@@ -27,7 +24,17 @@ PIXI_TOML_PRESENT = (
 )
 INIT_EXISTS = "manager tables already present; pass --force to replace them"
 INIT_MISMATCH = "detected manager {detected!r} does not match --manager {wanted!r}"
+EDITABLE_UNSUPPORTED = (
+    "editable install is not supported for {manager}; do not pip install -e ."
+)
+NO_SRC = "has_src is false; scaffold before editable install"
+NO_PACKAGE = "no package name; scaffold src/ before editable install"
+SYNC_HINT = "python -m skore_skills env sync"
 AGENT_PACKAGES = ("ruff", "ipython", "ipykernel")
+_IMPORT_NAMES = {
+    "ipython": "IPython",
+    "scikit-learn": "sklearn",
+}
 
 _SKELETON = """\
 [build-system]
@@ -258,24 +265,112 @@ def forbidden_reason(package: str) -> str | None:
     return None
 
 
+def _package_key(package: str) -> str:
+    return package.strip().lower().split("[", 1)[0]
+
+
+def _unmanaged(root: Path) -> bool:
+    return load_policy(root).get("env", {}).get("managed") is False
+
+
+def _ready_manager(root: Path) -> tuple[str | None, str | None]:
+    """Return ``(manager, error)``. Error is set when add/sync/verify must stop."""
+    if _unmanaged(root):
+        return None, UNMANAGED
+    payload = detect(root)
+    if payload["ambiguous"]:
+        return None, AMBIGUOUS
+    manager = payload["env_manager"]
+    if manager in {None, "none"}:
+        return None, NO_MANAGER
+    return str(manager), None
+
+
+def _yaml_name(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("name:"):
+            return stripped.split(":", 1)[1].strip().strip("\"'")
+    return None
+
+
+def conda_env_name(root: Path, *, feature: str | None = None) -> str | None:
+    """Return the conda env name from YAML, or None if no yaml is present."""
+    default_path = root / "environment.yml"
+    agent_path = root / "environment-agent.yml"
+    if not default_path.is_file() and not agent_path.is_file():
+        return None
+    if feature:
+        return _yaml_name(agent_path) or "workspace-agent"
+    return _yaml_name(default_path) or "workspace"
+
+
+def _venv_bin(name: str) -> str:
+    if os.name == "nt":
+        exe = name if name.endswith(".exe") else f"{name}.exe"
+        return str(Path(".venv") / "Scripts" / exe)
+    return str(Path(".venv") / "bin" / name)
+
+
+def _render_argvs(argvs: list[list[str]]) -> str:
+    return " && ".join(" ".join(argv) for argv in argvs)
+
+
+def _run_argvs(argvs: list[list[str]], *, cwd: Path) -> int:
+    code = 0
+    for argv in argvs:
+        completed = subprocess.run(argv, check=False, cwd=cwd)
+        code = completed.returncode
+        if code:
+            return code
+    return code
+
+
+def sync_argv(manager: str) -> list[list[str]]:
+    """Return the bootstrap install/sync command(s) for ``manager``."""
+    commands: dict[str, list[list[str]]] = {
+        "pixi": [["pixi", "install", "-e", "agent"]],
+        "uv": [["uv", "sync", "--group", "agent"]],
+        "poetry": [["poetry", "install", "--with", "agent"]],
+        "hatch": [["hatch", "env", "create", "agent"]],
+        "conda": [["conda", "env", "create", "-f", "environment-agent.yml"]],
+        "pip-venv": [
+            ["python", "-m", "venv", ".venv"],
+            [_venv_bin("pip"), "install", "-r", "requirements.txt"],
+        ],
+    }
+    if manager not in commands:
+        raise ValueError(f"unknown manager {manager!r}")
+    return commands[manager]
+
+
 def install_argv(
     manager: str,
     packages: list[str],
     *,
     feature: str | None = None,
+    root: Path | None = None,
 ) -> list[str] | None:
-    """Return the manager-specific add command, or None for hatch."""
+    """Return the manager-specific add command, or None when hatch writes TOML."""
     extra: list[str] = []
     if feature:
         if manager == "pixi":
             extra = ["--feature", feature]
         elif manager in {"uv", "poetry"}:
             extra = ["--group", feature]
+    conda: list[str] = ["conda", "install"]
+    if root is not None:
+        env_name = conda_env_name(root, feature=feature)
+        if env_name is not None:
+            conda.extend(["-n", env_name])
+    conda.extend(["-c", "conda-forge", *packages])
     commands: dict[str, list[str]] = {
         "pixi": ["pixi", "add", *extra, *packages],
         "uv": ["uv", "add", *extra, *packages],
         "poetry": ["poetry", "add", *extra, *packages],
-        "conda": ["conda", "install", "-c", "conda-forge", *packages],
+        "conda": conda,
         "pip-venv": ["pip", "install", *packages],
     }
     if manager == "hatch":
@@ -285,8 +380,112 @@ def install_argv(
     return commands[manager]
 
 
-def _unmanaged(root: Path) -> bool:
-    return load_policy(root).get("env", {}).get("managed") is False
+def editable_argv(manager: str, package: str) -> list[str] | None:
+    """Return the editable-install argv, or None if unsupported."""
+    commands: dict[str, list[str]] = {
+        "pixi": ["pixi", "add", "--pypi", f"{package} @ ."],
+        "uv": ["uv", "add", "--editable", "."],
+        "poetry": ["poetry", "add", "--editable", "."],
+        "pip-venv": ["pip", "install", "-e", "."],
+    }
+    return commands.get(manager)
+
+
+def _import_name(package: str) -> str:
+    key = _package_key(package)
+    return _IMPORT_NAMES.get(key, key.replace("-", "_"))
+
+
+def verify_argv(manager: str, packages: Sequence[str], *, root: Path) -> list[str]:
+    """Return the agent-interpreter import check for ``packages``."""
+    snippet = "import " + ", ".join(_import_name(name) for name in packages)
+    if manager == "pixi":
+        return ["pixi", "run", "-e", "agent", "python", "-c", snippet]
+    if manager == "uv":
+        return ["uv", "run", "--group", "agent", "python", "-c", snippet]
+    if manager == "poetry":
+        return ["poetry", "run", "python", "-c", snippet]
+    if manager == "hatch":
+        return ["hatch", "run", "agent:python", "-c", snippet]
+    if manager == "conda":
+        env_name = conda_env_name(root, feature="agent") or "workspace-agent"
+        return ["conda", "run", "-n", env_name, "python", "-c", snippet]
+    if manager == "pip-venv":
+        return [_venv_bin("python"), "-c", snippet]
+    raise ValueError(f"unknown manager {manager!r}")
+
+
+def route_package(package: str) -> dict[str, Any]:
+    """Return default/agent/ask/refuse routing for ``package``."""
+    key = _package_key(package)
+    reason = forbidden_reason(key)
+    if reason is not None:
+        return {"scope": "refuse", "feature": None, "message": reason}
+    policy = load_stack_policy()
+    mandatory = {_package_key(name) for name in policy["mandatory"]}
+    if key in mandatory:
+        return {"scope": "agent", "feature": "agent", "message": None}
+    optional = {_package_key(name) for name in policy["optional"]}
+    if key in optional - mandatory:
+        return {"scope": "ask", "feature": None, "message": None}
+    stage = {_package_key(name) for name in policy["stage"]}
+    competing: set[str] = set()
+    for names in policy["competing"].values():
+        competing.update(_package_key(name) for name in names)
+    transitive = {_package_key(name) for name in policy["transitive"]}
+    if key in stage or key in competing or key in transitive:
+        return {"scope": "default", "feature": None, "message": None}
+    return {"scope": "ask", "feature": None, "message": None}
+
+
+def _insert_into_deps_list(text: str, pkg: str, *, header: str) -> tuple[str, bool]:
+    """Insert ``pkg`` into ``dependencies = [...]`` after ``header``."""
+    start = text.find(header)
+    if start < 0:
+        return text, False
+    search = text[start:]
+    match = re.search(r"dependencies\s*=\s*\[", search)
+    if match is None:
+        newline = text.find("\n", start)
+        if newline < 0:
+            newline = len(text)
+        insert = f'\ndependencies = ["{pkg}"]'
+        return text[:newline] + insert + text[newline:], True
+    list_open = start + match.end()
+    list_close = text.find("]", list_open)
+    if list_close < 0:
+        return text, False
+    body = text[list_open:list_close]
+    if re.search(rf'["\']{re.escape(pkg)}["\']', body):
+        return text, False
+    stripped = body.strip()
+    addition = f'"{pkg}"'
+    if not stripped:
+        new_body = addition
+    elif stripped.endswith(","):
+        new_body = f"{stripped} {addition}"
+    else:
+        new_body = f"{stripped}, {addition}"
+    return text[:list_open] + new_body + text[list_close:], True
+
+
+def _hatch_add(root: Path, packages: list[str], *, feature: str | None) -> str:
+    path = _ensure_pyproject(root)
+    text = path.read_text(encoding="utf-8")
+    if feature:
+        if "[tool.hatch.envs.agent]" not in text:
+            text = text.rstrip() + "\n" + _HATCH_ENV.strip() + "\n"
+        header = "[tool.hatch.envs.agent]"
+    else:
+        header = "[project]"
+    changed = False
+    for pkg in packages:
+        text, inserted = _insert_into_deps_list(text, pkg, header=header)
+        changed = changed or inserted
+    path.write_text(text, encoding="utf-8")
+    if changed:
+        return f"updated {path.name}\n"
+    return f"{path.name} already lists {', '.join(packages)}\n"
 
 
 def add_packages(
@@ -295,36 +494,105 @@ def add_packages(
     *,
     execute: bool = False,
     feature: str | None = None,
+    editable: bool = False,
 ) -> tuple[str, int]:
     """Build (or run) install commands for ``packages``.
 
     Default is print-only. Never emits ``pip install`` for pixi.
     """
+    if editable:
+        return add_editable(root, execute=execute)
     if not packages:
         return "need at least one package\n", 2
-    if _unmanaged(root):
-        return UNMANAGED + "\n", 1
+    manager, error = _ready_manager(root)
+    if error is not None:
+        return error + "\n", 1
     for name in packages:
         reason = forbidden_reason(name)
         if reason is not None:
             return reason + "\n", 1
-    payload = detect(root)
-    if payload["ambiguous"]:
-        return AMBIGUOUS + "\n", 1
-    manager = payload["env_manager"]
-    if manager in {None, "none"}:
-        return NO_MANAGER + "\n", 1
-    argv = install_argv(str(manager), packages, feature=feature)
+    assert manager is not None
+    if manager == "hatch":
+        text = _hatch_add(root, packages, feature=feature)
+        if not execute:
+            return text, 0
+        argvs = sync_argv("hatch")
+        rendered = text + _render_argvs(argvs) + "\n"
+        return rendered, _run_argvs(argvs, cwd=root)
+    argv = install_argv(manager, packages, feature=feature, root=root)
     if argv is None:
-        text = HATCH_ADD_HINT + "\n"
-        if execute:
-            return text + "refusing --execute for hatch (no add command)\n", 1
-        return text, 0
+        return "need at least one package\n", 2
     rendered = " ".join(argv) + "\n"
     if not execute:
         return rendered, 0
-    completed = subprocess.run(argv, check=False)
-    return rendered, completed.returncode
+    return rendered, _run_argvs([argv], cwd=root)
+
+
+def add_editable(root: Path, *, execute: bool = False) -> tuple[str, int]:
+    """Print or run the editable install for ``src/<pkg>/``."""
+    manager, error = _ready_manager(root)
+    if error is not None:
+        return error + "\n", 1
+    if not (root / "src").is_dir():
+        return NO_SRC + "\n", 1
+    name = package_name(root)
+    if not name:
+        return NO_PACKAGE + "\n", 1
+    assert manager is not None
+    argv = editable_argv(manager, name)
+    if argv is None:
+        return EDITABLE_UNSUPPORTED.format(manager=manager) + "\n", 1
+    rendered = " ".join(argv) + "\n"
+    if not execute:
+        return rendered, 0
+    return rendered, _run_argvs([argv], cwd=root)
+
+
+def sync_environment(root: Path, *, execute: bool = False) -> tuple[str, int]:
+    """Print or run the post-init install/sync command."""
+    manager, error = _ready_manager(root)
+    if error is not None:
+        return error + "\n", 1
+    assert manager is not None
+    argvs = sync_argv(manager)
+    rendered = _render_argvs(argvs) + "\n"
+    if not execute:
+        return rendered, 0
+    return rendered, _run_argvs(argvs, cwd=root)
+
+
+def verify_environment(
+    root: Path,
+    packages: list[str] | None = None,
+    *,
+    execute: bool = False,
+) -> tuple[dict[str, Any], int]:
+    """Print an agent-env import check. ``--execute`` runs it."""
+    names = list(packages) if packages else list(AGENT_PACKAGES)
+    manager, error = _ready_manager(root)
+    payload: dict[str, Any] = {
+        "ok": False,
+        "missing": names,
+        "argv": [],
+    }
+    if error is not None:
+        payload["error"] = error
+        return payload, 1
+    assert manager is not None
+    argv = verify_argv(manager, names, root=root)
+    payload["argv"] = argv
+    payload["ok"] = None
+    payload["missing"] = []
+    if not execute:
+        return payload, 0
+    code = _run_argvs([argv], cwd=root)
+    payload["ok"] = code == 0
+    payload["missing"] = [] if code == 0 else names
+    return payload, 0 if code == 0 else 1
+
+
+def _followup(follow: str) -> str:
+    return f"next: {follow}\nrun: {SYNC_HINT}\n"
 
 
 def _ensure_pyproject(root: Path) -> Path:
@@ -374,24 +642,24 @@ def init_environment(
         default.write_text(_CONDA_DEFAULT, encoding="utf-8")
         agent.write_text(_CONDA_AGENT, encoding="utf-8")
         written.extend(["environment.yml", "environment-agent.yml"])
-        follow = "conda env create -f environment-agent.yml"
-        return "wrote " + ", ".join(written) + f"\nnext: {follow}\n", 0
+        follow = _render_argvs(sync_argv("conda"))
+        return "wrote " + ", ".join(written) + "\n" + _followup(follow), 0
 
     path = _ensure_pyproject(root)
     if manager == "pixi":
         added = _append_if_missing(path, "[tool.pixi", _PIXI_TABLE, force=force)
-        follow = "pixi install -e agent"
+        follow = _render_argvs(sync_argv("pixi"))
     elif manager == "uv":
         added = _append_if_missing(path, "[tool.uv]", _UV_GROUPS, force=force)
-        follow = "uv sync --group agent"
+        follow = _render_argvs(sync_argv("uv"))
     elif manager == "poetry":
         added = _append_if_missing(path, "[tool.poetry]", _POETRY_GROUPS, force=force)
-        follow = "poetry install --with agent"
+        follow = _render_argvs(sync_argv("poetry"))
     elif manager == "hatch":
         added = _append_if_missing(
             path, "[tool.hatch.envs.agent]", _HATCH_ENV, force=force
         )
-        follow = "hatch env create agent"
+        follow = _render_argvs(sync_argv("hatch"))
     else:
         added = _append_if_missing(
             path, "[dependency-groups]", _PIP_GROUPS, force=force
@@ -400,7 +668,7 @@ def init_environment(
         if not req.is_file() or force:
             req.write_text("ruff\nipython\nipykernel\n", encoding="utf-8")
             added = True
-        follow = "python -m venv .venv && .venv/bin/pip install -r requirements.txt"
+        follow = _render_argvs(sync_argv("pip-venv"))
     if not added:
         return INIT_EXISTS + "\n", 1
-    return f"updated {path.name}\nnext: {follow}\n", 0
+    return f"updated {path.name}\n" + _followup(follow), 0

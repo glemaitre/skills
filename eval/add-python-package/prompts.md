@@ -14,8 +14,8 @@
 
 **Must do:**
 - Name `python -m skore_skills env detect` / status.
-- Name `python -m skore_skills env add skrub` and the printed
-  `pixi add skrub`.
+- Name `python -m skore_skills env add --execute skrub` (or
+  `env route` then that add). Do not invent `pixi add` from memory.
 - Route skrub to default (not `--feature agent`).
 
 **Must NOT do:**

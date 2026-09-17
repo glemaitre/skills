@@ -208,7 +208,7 @@ def env_detect() -> None:
 
 
 @env_group.command("add")
-@click.argument("packages", nargs=-1, required=True)
+@click.argument("packages", nargs=-1, required=False)
 @click.option(
     "--execute",
     is_flag=True,
@@ -220,14 +220,80 @@ def env_detect() -> None:
     "feature",
     help="Manager feature/group (pixi --feature, uv/poetry --group).",
 )
-def env_add(packages: tuple[str, ...], execute: bool, feature: str | None) -> None:
+@click.option(
+    "--editable",
+    is_flag=True,
+    help="Editable install of the workspace package (src/).",
+)
+def env_add(
+    packages: tuple[str, ...],
+    execute: bool,
+    feature: str | None,
+    editable: bool,
+) -> None:
     """Print (or run) the manager-specific add command."""
     from skore_skills.env import add_packages
 
     text, code = add_packages(
-        Path.cwd(), list(packages), execute=execute, feature=feature
+        Path.cwd(),
+        list(packages),
+        execute=execute,
+        feature=feature,
+        editable=editable,
     )
     click.echo(text, nl=False)
+    if code:
+        raise SystemExit(code)
+
+
+@env_group.command("sync")
+@click.option(
+    "--execute",
+    is_flag=True,
+    help="Run the sync command instead of printing it.",
+)
+def env_sync(execute: bool) -> None:
+    """Print (or run) the post-init install/sync command."""
+    from skore_skills.env import sync_environment
+
+    text, code = sync_environment(Path.cwd(), execute=execute)
+    click.echo(text, nl=False)
+    if code:
+        raise SystemExit(code)
+
+
+@env_group.command("route")
+@click.argument("package")
+def env_route(package: str) -> None:
+    """Print JSON scope for a package (default, agent, ask, or refuse)."""
+    import json
+
+    from skore_skills.env import route_package
+
+    payload = route_package(package)
+    if payload["scope"] == "refuse":
+        click.echo(payload["message"])
+        raise SystemExit(1)
+    click.echo(json.dumps(payload, indent=2))
+
+
+@env_group.command("verify")
+@click.argument("packages", nargs=-1, required=False)
+@click.option(
+    "--execute",
+    is_flag=True,
+    help="Run the import check instead of printing JSON only.",
+)
+def env_verify(packages: tuple[str, ...], execute: bool) -> None:
+    """Print (or run) an agent-env import check."""
+    import json
+
+    from skore_skills.env import verify_environment
+
+    payload, code = verify_environment(
+        Path.cwd(), list(packages) if packages else None, execute=execute
+    )
+    click.echo(json.dumps(payload, indent=2))
     if code:
         raise SystemExit(code)
 

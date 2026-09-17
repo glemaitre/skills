@@ -9,6 +9,7 @@ Harness editors may ship their own language servers; this stack
 does not install or configure them.
 
 Bootstrap writes the agent tables through
-`python -m skore_skills env init --manager <name>`. Later adds use
-`add-python-package` with `--feature agent` only for those three
-tools (or ruff if it was skipped).
+`python -m skore_skills env init --manager <name>`, then
+`env sync --execute` and `env verify --execute`. Later adds use
+`env route` and `add-python-package` with `--feature agent` only
+for those three tools (or ruff if it was skipped).

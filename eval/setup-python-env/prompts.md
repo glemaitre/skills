@@ -27,6 +27,9 @@ violated.
 - After the user picks a manager and managed=true, name
   `python -m skore_skills env init --manager <manager>` (not
   hand-edited TOML).
+- After init, name `python -m skore_skills env sync --execute`
+  (do not invent `pixi install` / `pixi init`).
+- Name `python -m skore_skills env verify --execute`.
 - Narrate default + agent and packages ruff, ipython, ipykernel.
 
 **Must NOT do:**
@@ -51,7 +54,7 @@ violated.
 - Name `env detect` and put `uv` first in the recommendation.
 - Still ask G-ENV-MGR (nothing is on disk yet).
 - After confirmation, `policy set env_manager` and
-  `env init --manager uv`.
+  `env init --manager uv`, then `env sync --execute`.
 
 **Must NOT do:**
 - Silently run `pixi init` because pixi is the static default.
@@ -73,10 +76,10 @@ violated.
 - Keep detecting so later skills know the manager if a manifest
   exists.
 - Name ruff / ipython / ipykernel as tools the user may want.
-- Stop without `env init`.
+- Stop without `env init` or `env sync`.
 
 **Must NOT do:**
-- Run `env init` or `env add`.
+- Run `env init`, `env sync`, or `env add`.
 - Wait for the user to install agent tools before returning.
 
 ---

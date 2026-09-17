@@ -48,9 +48,9 @@
   needs `src/<pkg>/`.
 - Name `python -m skore_skills scaffold --package <pkg>` as the
   workspace action even though a manifest already exists.
-- Schedule `add-python-package` for the editable install only
-  after `has_src` is true. Do not install sklearn/skrub/skore
-  during setup.
+- Schedule `add-python-package` / `env add --editable --execute`
+  for the editable install only after `has_src` is true. Do not
+  install sklearn/skrub/skore during setup.
 - Finish with `setup-git`.
 
 **Must NOT do:**

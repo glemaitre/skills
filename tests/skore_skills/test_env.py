@@ -65,7 +65,7 @@ def test_env_add_pixi_never_pip(monkeypatch: pytest.MonkeyPatch) -> None:
     [
         ("uv", "uv add pandas"),
         ("poetry", "poetry add pandas"),
-        ("conda", "conda install -c conda-forge pandas"),
+        ("conda", "conda install -n fixture-conda -c conda-forge pandas"),
         ("pip-venv", "pip install pandas"),
     ],
 )
@@ -79,16 +79,23 @@ def test_env_add_command_per_manager(
     assert result.output.strip() == expected
 
 
-def test_env_add_hatch_prints_edit_hint(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Hatch has no add command; print an edit hint and never pip."""
-    monkeypatch.chdir(FIXTURES / "hatch")
+def test_env_add_hatch_writes_pyproject(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hatch add inserts the package into pyproject.toml."""
+    (tmp_path / "hatch.toml").write_text("# hatch\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["env", "add", "pandas"])
     assert result.exit_code == 0, result.output
-    assert "edit pyproject.toml" in result.output
+    assert "updated pyproject.toml" in result.output
     assert "pip install" not in result.output
-    executed = CliRunner().invoke(cli, ["env", "add", "--execute", "pandas"])
-    assert executed.exit_code != 0
-    assert "pip install" not in executed.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"pandas"' in text
+    agent = CliRunner().invoke(cli, ["env", "add", "--feature", "agent", "optuna"])
+    assert agent.exit_code == 0, agent.output
+    agent_text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.hatch.envs.agent]" in agent_text
+    assert '"optuna"' in agent_text
 
 
 def test_env_add_forbidden_substitute(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -463,3 +470,200 @@ def test_env_agent_removed() -> None:
     assert result.exit_code != 0
     result_check = CliRunner().invoke(cli, ["env", "check"])
     assert result_check.exit_code != 0
+
+
+@pytest.mark.parametrize(
+    ("fixture", "expected"),
+    [
+        ("pixi", "pixi install -e agent"),
+        ("uv", "uv sync --group agent"),
+        ("poetry", "poetry install --with agent"),
+        ("hatch", "hatch env create agent"),
+        ("conda", "conda env create -f environment-agent.yml"),
+        (
+            "pip-venv",
+            "python -m venv .venv && .venv/bin/pip install -r requirements.txt",
+        ),
+    ],
+)
+def test_env_sync_print(
+    fixture: str, expected: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Print-only sync matches the post-init command table."""
+    monkeypatch.chdir(FIXTURES / fixture)
+    result = CliRunner().invoke(cli, ["env", "sync"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == expected
+
+
+def test_env_sync_refuses_unmanaged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Sync refuses when env.managed is false."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "sync"])
+    assert result.exit_code != 0
+    assert "user-managed" in result.output
+
+
+def test_env_sync_execute_runs_subprocess(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``env sync --execute`` runs the printed argv."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "sync", "--execute"])
+    assert result.exit_code == 0, result.output
+    assert seen == [["pixi", "install", "-e", "agent"]]
+
+
+@pytest.mark.parametrize(
+    ("package", "scope", "feature"),
+    [
+        ("ruff", "agent", "agent"),
+        ("skrub", "default", None),
+        ("pytest", "default", None),
+        ("optuna", "ask", None),
+        ("jupyterlab", "ask", None),
+        ("pandas", "default", None),
+    ],
+)
+def test_env_route_scopes(package: str, scope: str, feature: str | None) -> None:
+    """Stack policy maps packages onto default, agent, or ask."""
+    result = CliRunner().invoke(cli, ["env", "route", package])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["scope"] == scope
+    assert payload["feature"] == feature
+
+
+def test_env_route_forbidden() -> None:
+    """Forbidden substitutes are refused by ``env route``."""
+    result = CliRunner().invoke(cli, ["env", "route", "xgboost"])
+    assert result.exit_code != 0
+    assert "HistGradientBoosting" in result.output
+
+
+def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Editable pixi add uses ``--pypi pkg @ .``."""
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "demo-pkg"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "pixi add --pypi demo-pkg @ ."
+
+
+def test_env_add_editable_conda_refuses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Conda has no editable add; do not emit pip -e."""
+    (tmp_path / "environment.yml").write_text(
+        "name: workspace\ndependencies: []\n", encoding="utf-8"
+    )
+    (tmp_path / "src" / "pkg").mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "pkg"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable"])
+    assert result.exit_code != 0
+    assert "not supported" in result.output
+    assert not result.output.startswith("pip install")
+
+
+def test_env_add_editable_requires_src(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Editable add waits for ``src/``."""
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable"])
+    assert result.exit_code != 0
+    assert "has_src" in result.output
+
+
+def test_env_add_conda_feature_agent(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Agent-scope conda add targets the agent environment name."""
+    (tmp_path / "environment.yml").write_text(
+        "name: workspace\ndependencies: []\n", encoding="utf-8"
+    )
+    (tmp_path / "environment-agent.yml").write_text(
+        "name: workspace-agent\ndependencies: []\n", encoding="utf-8"
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--feature", "agent", "ruff"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == (
+        "conda install -n workspace-agent -c conda-forge ruff"
+    )
+
+
+def test_env_verify_print_pixi(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify prints a pixi agent import check without running it."""
+    monkeypatch.chdir(FIXTURES / "pixi")
+    result = CliRunner().invoke(cli, ["env", "verify"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["ok"] is None
+    assert payload["argv"][:4] == ["pixi", "run", "-e", "agent"]
+    assert "IPython" in payload["argv"][-1]
+
+
+def test_env_verify_execute_mocked(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``env verify --execute`` runs the printed argv."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "verify", "--execute"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["ok"] is True
+    assert seen == [payload["argv"]]
+
+
+def test_env_init_mentions_sync(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Init still prints next: and points at ``env sync``."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "pixi"])
+    assert result.exit_code == 0, result.output
+    assert "next: pixi install -e agent" in result.output
+    assert "run: python -m skore_skills env sync" in result.output

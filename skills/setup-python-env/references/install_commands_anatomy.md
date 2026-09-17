@@ -1,18 +1,20 @@
-# Install commands — by manager
+# Install commands
 
-Bootstrap writes files via `env init`. Later adds go through
-`python -m skore_skills env add [--feature|--group] <packages>`.
+Do not invent manager argv. Print or run:
 
-| Manager | Config | Bootstrap follow-up | Runtime add | Agent add |
-|---|---|---|---|---|
-| pixi | `[tool.pixi.*]` in pyproject | `pixi install -e agent` | `pixi add pkg` | `pixi add --feature agent pkg` |
-| uv | `[project]` + PEP 735 groups | `uv sync --group agent` | `uv add pkg` | `uv add --group agent pkg` |
-| poetry | PEP 621 + PEP 735 groups | `poetry install --with agent` | `poetry add pkg` | `poetry add --group agent pkg` |
-| hatch | `[project]` + `[tool.hatch.envs.agent]` | `hatch env create agent` | edit pyproject | edit `envs.agent` |
-| conda | `environment.yml` + `environment-agent.yml` | `conda env create -f environment-agent.yml` | `conda install -c conda-forge pkg` | same, in the agent env |
-| pip-venv | pyproject groups and/or `requirements.txt` | create `.venv` then pip | `pip install pkg` | same venv or agent extra |
+- Bootstrap files: `python -m skore_skills env init --manager <name>`
+- Install/sync: `python -m skore_skills env sync --execute`
+- Scope: `python -m skore_skills env route <pkg>` then
+  `env add [--feature agent] --execute`
+- Editable `src/<pkg>/`: `python -m skore_skills env add --editable --execute`
+- Agent tools present: `python -m skore_skills env verify --execute`
 
-Known routes for `add-python-package`: runtime → default; ruff /
-ipython / ipykernel → agent; pytest → default so `pixi run pytest`
-works without `-e agent`. Ambiguous extras (optuna, mlflow) ask
-G-ENV-SCOPE: default vs a new named feature.
+`env sync` / `env add` already encode pixi, uv, poetry, hatch, conda
+(`-n` from YAML), and pip-venv. Hatch add writes pyproject.
+
+`env route` `scope`:
+
+- `agent` — ruff, ipython, ipykernel (`--feature agent`)
+- `default` — stage and chosen runtime libraries (pytest on default)
+- `ask` — extras (optuna, mlflow, jupyterlab, …) → G-ENV-SCOPE
+- refuse — forbidden substitutes (CLI exit 1)

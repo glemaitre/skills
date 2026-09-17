@@ -28,10 +28,11 @@ Never reproduce a skipped skill's procedure from memory.
    and skore-mode gates. A manager manifest without `src/<pkg>/` is
    still a scaffold target: `python -m skore_skills scaffold
    --package <pkg>` keeps an existing `pyproject.toml`.
-3. After `has_src` is true, load `add-python-package` for the
-   editable install of `src/<pkg>/` only. Do **not** install the
-   ML stack (sklearn/skrub/skore/pandas) during setup. Workspace
-   still asks G-TABULAR / G-SKORE-MODE and persists them.
+3. After `has_src` is true, load `add-python-package` for
+   `python -m skore_skills env add --editable --execute` only. Do
+   **not** install the ML stack (sklearn/skrub/skore/pandas) during
+   setup. Workspace still asks G-TABULAR / G-SKORE-MODE and
+   persists them.
 4. `setup-git` — initialize version control with the user's
    first-commit decision. Persist autocommit (`on`/`off`) once via
    `policy set`. Later stages run

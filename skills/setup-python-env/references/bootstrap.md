@@ -18,10 +18,15 @@
    `python -m skore_skills env init --manager <manager>`. That
    command writes manager tables, the agent feature/group
    (ruff, ipython, ipykernel), and `[tool.ruff]` if missing.
-6. Do not create `src/`. Do not run `pixi init --format pyproject`
+6. Run `python -m skore_skills env sync --execute`, then
+   `python -m skore_skills env verify --execute`. Do not retype
+   `pixi install` / `uv sync`. Missing agent tools: `env route` +
+   `env add --feature agent --execute`, not a second `env init`.
+7. Do not create `src/`. Do not run `pixi init --format pyproject`
    if it would steal layout; `env init` writes `[tool.pixi]` itself
    and refuses when `pixi.toml` already exists.
-7. Editable install waits for `has_src`. Prefer `add-python-package`.
+8. Editable install waits for `has_src`. Prefer `add-python-package`
+   with `env add --editable --execute`.
 
 ## What bootstrap does not install
 

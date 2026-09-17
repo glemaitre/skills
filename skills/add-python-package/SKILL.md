@@ -10,10 +10,10 @@ description: >
   owns that). SKIP bootstrapping a missing manager
   (setup-python-env).
 
-  HOW TO USE: read status.policy.env.managed and env detect. If
-  managed, run the printed env add command. If unmanaged, ask;
-  default is the user handles it — do not wait. Never run env add
-  while managed is false.
+  HOW TO USE: read status.policy.env.managed, env detect, and
+  env route. If managed, env add --execute (or --editable). If
+  unmanaged, ask; default is the user handles it — do not wait.
+  Never --execute while managed is false.
 ---
 
 # Add Python Package
@@ -26,36 +26,33 @@ must not splice manager commands themselves.
 1. `python -m skore_skills status` and `env detect`.
 2. If `policy.env.managed` is null: env is unresolved. Say so and
    stop (or send the user to setup/triage). Do not bootstrap here.
-3. If `managed` is true: print-only
+3. If this turn is the workspace package and `has_src` is true:
 
    ```bash
-   python -m skore_skills env add [--feature agent] <packages>
+   python -m skore_skills env add --editable --execute
    ```
 
-   then run the printed command. Hatch: follow the edit hint; do
-   not invent `pip install`.
-4. If `managed` is false: **do not** run `env add` (the CLI also
-   refuses). Still ask with two options:
+   when `managed` is true. Never `pip install -e .` in a pixi
+   project. If `has_src` is false, stop and send the caller to
+   `setup-workspace`.
+4. Else `python -m skore_skills env route <pkg>`. Then:
 
-   1. **I will handle it** (default) — name the package(s) and the
-      manager-specific command (`env add` print-only is allowed as
-      a hint). Do not wait; return to the caller.
+   - `scope` `default` → `env add --execute <pkg>`
+   - `scope` `agent` → `env add --feature agent --execute <pkg>`
+   - `scope` `ask` → G-ENV-SCOPE, then `env add` with the chosen
+     `--feature` / `--group`
+   - refuse → stop; do not install
+
+   When `managed` is true, always pass `--execute`. Never paste
+   `pixi add` / `uv add` / `pip install` from memory.
+5. If `managed` is false: **do not** run `env add --execute` (the
+   CLI also refuses). Still ask with two options:
+
+   1. **I will handle it** (default) — name the package(s) and
+      print-only `env add` as a hint. Do not wait; return.
    2. **Please install this now** — show the same command, wait
       until the user confirms it is done, then return. Still do
-      not execute the install.
-
-## Routes
-
-- Runtime libraries (sklearn, skrub, skore, pandas, pytest, …) →
-  default (`env add pkg`). Pytest stays on default so
-  `pixi run pytest` works without `-e agent`.
-- ruff / ipython / ipykernel → `--feature agent` / `--group agent`.
-- Ambiguous extras (optuna, mlflow, …) → ask G-ENV-SCOPE: default
-  vs a new named feature.
-- Editable workspace package once `has_src` is true: pixi in
-  pyproject uses `[tool.pixi.pypi-dependencies] <pkg> = { path = ".", editable = true }`
-  (or `pixi add --pypi "<pkg> @ ."`). Never `pip install -e .` in a
-  pixi project.
+      not `--execute`.
 
 Forbidden substitutes stay in the CLI (`python-stack.json`).
 

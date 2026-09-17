@@ -4,8 +4,8 @@ description: >
   Bootstrap a Python environment manager and two named envs
   (default runtime, agent tools). Detect with
   `python -m skore_skills env detect`, persist manager and
-  `env.managed`, then run `env init --manager`. Does not add
-  stage ML libraries.
+  `env.managed`, then `env init --manager`, `env sync --execute`,
+  and `env verify --execute`. Does not add stage ML libraries.
 
   TRIGGER when bootstrapping a Python project or when no
   environment manager is recorded yet.
@@ -14,7 +14,8 @@ description: >
   SKIP non-Python tools.
 
   HOW TO USE: detect, ask managed vs user-managed, ask the
-  manager when needed, then `env init`. Narrate every choice.
+  manager when needed, then env init, env sync, env verify.
+  Narrate every choice.
 ---
 
 # Set Up Python Environment
@@ -39,11 +40,13 @@ Adding a later dependency is `add-python-package`, not this skill.
   manifest is the project manager. If `mismatch` is true, ask:
   recorded policy disagrees with the unique manifest.
 - **User opt-out.** If the user manages the env, persist
-  `env.managed` false and **stop**. Do not `env init` or `env add`.
-  Name ruff / ipython / ipykernel as tools they may want later.
+  `env.managed` false and **stop**. Do not `env init`, `env sync`,
+  or `env add`. Name ruff / ipython / ipykernel as tools they may
+  want later.
 - **Do not hand-edit manager TOML.** `env init` is the only writer
   of manager tables. Do not create `pixi.toml` when pixi can live in
-  pyproject. Do not create `src/`.
+  pyproject. Do not create `src/`. Do not invent `pixi install` or
+  `pixi init`; run `env sync`.
 - **A missing layout is a status fact.** When `has_src` is false,
   editable install is pending. Do not scaffold here.
 
@@ -54,6 +57,8 @@ Adding a later dependency is `add-python-package`, not this skill.
 - [ ] G-ENV-MGR: <manager> | ask
 - [ ] env.managed: true | false | ask (default true)
 - [ ] Command: python -m skore_skills env init --manager <name>
+- [ ] Command: python -m skore_skills env sync --execute
+- [ ] Command: python -m skore_skills env verify --execute
 - [ ] Narrated: default + agent; ruff, ipython, ipykernel
 ```
 
@@ -64,15 +69,18 @@ Adding a later dependency is `add-python-package`, not this skill.
    or `mismatch`.
 3. Ask whether **we** manage the env (default yes). Persist
    `python -m skore_skills policy set env.managed true` or `false`.
-4. If unmanaged: stop after detection. Do not init.
+4. If unmanaged: stop after detection. Do not init or sync.
 5. If managed: `policy set env_manager <manager>`, then
 
    ```bash
    python -m skore_skills env init --manager <manager>
+   python -m skore_skills env sync --execute
+   python -m skore_skills env verify --execute
    ```
 
-   Review the printed `next:` command (install/sync). Do not invent
-   TOML. No sklearn/skrub/skore/pandas/jupyterlab/pyright.
+   Do not invent TOML or manager argv. If verify reports missing
+   agent tools, `env route` + `env add --feature agent --execute`,
+   not a second `env init`. No sklearn/skrub/skore/pandas/jupyterlab/pyright.
 6. After workspace exists (`has_src`), editable install is
    `add-python-package` (or the dispatcher), not a second bootstrap
    mode here.
