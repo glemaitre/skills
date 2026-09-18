@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 import json
 from pathlib import Path
 from typing import Any
@@ -65,7 +66,11 @@ def test_env_add_pixi_never_pip(monkeypatch: pytest.MonkeyPatch) -> None:
     [
         ("uv", "uv add pandas"),
         ("poetry", "poetry add pandas"),
-        ("conda", "conda install -n fixture-conda -c conda-forge pandas"),
+        (
+            "conda",
+            "conda install -n fixture-conda -c conda-forge pandas"
+            " && conda install -n workspace-dev -c conda-forge pandas",
+        ),
         ("pip-venv", "pip install pandas"),
     ],
 )
@@ -95,6 +100,8 @@ def test_env_add_hatch_writes_pyproject(
     assert agent.exit_code == 0, agent.output
     agent_text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
     assert "[tool.hatch.envs.agent]" in agent_text
+    assert "[tool.hatch.envs.dev]" in agent_text
+    assert "extra-dependencies" in agent_text
     assert '"optuna"' in agent_text
 
 
@@ -377,6 +384,10 @@ def test_env_init_pixi_writes_agent_tables(
     assert "[tool.pixi" in text
     assert "ipykernel" in text
     assert "ipython" in text
+    assert "skore-skills" not in text
+    assert 'dev = { features = ["default", "agent"]' in text
+    assert 'agent = { features = ["agent"]' in text
+    assert 'default = { features = ["default"]' in text
     assert "[tool.ruff]" in text
     assert not (tmp_path / "pixi.toml").exists()
     assert not (tmp_path / "src").exists()
@@ -395,6 +406,37 @@ def test_env_init_uv_writes_dependency_groups(
     text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
     assert "[tool.uv]" in text
     assert "ipykernel" in text
+    assert "skore-skills" not in text
+
+
+def test_env_init_hatch_writes_dev_extra_dependencies(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hatch init keeps agent tools-only and extends default via ``dev``."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "hatch"])
+    assert result.exit_code == 0, result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.hatch.envs.agent]" in text
+    assert "[tool.hatch.envs.dev]" in text
+    assert "extra-dependencies" in text
+    assert "skore-skills" not in text
+
+
+@pytest.mark.parametrize("manager", ["poetry", "pip-venv"])
+def test_env_init_agent_tools_do_not_list_skore_skills(
+    manager: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Generated agent dependencies never own ``skore-skills``."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", manager])
+    assert result.exit_code == 0, result.output
+    pyproject = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    requirements = tmp_path / "requirements.txt"
+    generated = pyproject
+    if requirements.is_file():
+        generated += requirements.read_text(encoding="utf-8")
+    assert "skore-skills" not in generated
 
 
 def test_env_init_refuses_manager_mismatch(
@@ -445,6 +487,10 @@ def test_env_init_conda_writes_yaml(
     agent = (tmp_path / "environment-agent.yml").read_text(encoding="utf-8")
     assert "ipykernel" in agent
     assert "ipython" in agent
+    assert "skore-skills" not in agent
+    dev = (tmp_path / "environment-dev.yml").read_text(encoding="utf-8")
+    assert "name: workspace-dev" in dev
+    assert "skore-skills" not in dev
     second = CliRunner().invoke(cli, ["env", "init", "--manager", "conda"])
     assert second.exit_code != 0
 
@@ -475,11 +521,16 @@ def test_env_agent_removed() -> None:
 @pytest.mark.parametrize(
     ("fixture", "expected"),
     [
-        ("pixi", "pixi install -e agent"),
+        ("pixi", "pixi install -e dev"),
         ("uv", "uv sync --group agent"),
         ("poetry", "poetry install --with agent"),
-        ("hatch", "hatch env create agent"),
-        ("conda", "conda env create -f environment-agent.yml"),
+        ("hatch", "hatch env create dev"),
+        (
+            "conda",
+            "conda env create -f environment.yml"
+            " && conda env create -f environment-agent.yml"
+            " && conda env create -f environment-dev.yml",
+        ),
         (
             "pip-venv",
             "python -m venv .venv && .venv/bin/pip install -r requirements.txt",
@@ -532,13 +583,15 @@ def test_env_sync_execute_runs_subprocess(
     monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
     result = CliRunner().invoke(cli, ["env", "sync", "--execute"])
     assert result.exit_code == 0, result.output
-    assert seen == [["pixi", "install", "-e", "agent"]]
+    assert seen == [["pixi", "install", "-e", "dev"]]
 
 
 @pytest.mark.parametrize(
     ("package", "scope", "feature"),
     [
         ("ruff", "agent", "agent"),
+        ("skore", "default", None),
+        ("skore-skills", "ask", None),
         ("skrub", "default", None),
         ("pytest", "default", None),
         ("optuna", "ask", None),
@@ -563,7 +616,7 @@ def test_env_route_forbidden() -> None:
 
 
 def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Editable pixi add uses ``--pypi pkg @ .``."""
+    """Editable pixi add uses ``--pypi --editable pkg --path .``."""
     (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
     (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
     (tmp_path / "pyproject.toml").write_text(
@@ -573,7 +626,71 @@ def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["env", "add", "--editable"])
     assert result.exit_code == 0, result.output
-    assert result.output.strip() == "pixi add --pypi demo-pkg @ ."
+    assert result.output.strip() == "pixi add --pypi --editable demo-pkg --path ."
+
+
+def test_env_add_editable_pixi_execute(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``--execute`` runs the pixi editable argv, including ``--path``."""
+    from skore_skills import env as env_mod
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "demo-pkg"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable", "--execute"])
+    assert result.exit_code == 0, result.output
+    assert seen == [["pixi", "add", "--pypi", "--editable", "demo-pkg", "--path", "."]]
+
+
+@pytest.mark.parametrize(
+    ("files", "expected"),
+    [
+        ({"uv.lock": ""}, "uv add --editable ."),
+        ({"poetry.lock": ""}, "poetry add --editable ."),
+        (
+            {"requirements.txt": "click\n", ".venv": None},
+            "pip install -e .",
+        ),
+    ],
+)
+def test_env_add_editable_other_managers_print(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    files: dict[str, str | None],
+    expected: str,
+) -> None:
+    """uv, poetry, and pip-venv already emit an editable argv."""
+    for name, body in files.items():
+        path = tmp_path / name
+        if body is None:
+            path.mkdir()
+        else:
+            path.write_text(body, encoding="utf-8")
+    (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "demo-pkg"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == expected
 
 
 def test_env_add_editable_conda_refuses(
@@ -621,18 +738,75 @@ def test_env_add_conda_feature_agent(
     assert result.exit_code == 0, result.output
     assert result.output.strip() == (
         "conda install -n workspace-agent -c conda-forge ruff"
+        " && conda install -n workspace-dev -c conda-forge ruff"
     )
 
 
+def test_env_add_conda_execute_mirrors_default_into_dev(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Conda emulates composition by updating default and dev."""
+    from skore_skills import env as env_mod
+
+    (tmp_path / "environment.yml").write_text(
+        "name: workspace\ndependencies: []\n", encoding="utf-8"
+    )
+    (tmp_path / "environment-dev.yml").write_text(
+        "name: workspace-dev\ndependencies: []\n", encoding="utf-8"
+    )
+    monkeypatch.chdir(tmp_path)
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "add", "--execute", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert seen == [
+        ["conda", "install", "-n", "workspace", "-c", "conda-forge", "skrub"],
+        [
+            "conda",
+            "install",
+            "-n",
+            "workspace-dev",
+            "-c",
+            "conda-forge",
+            "skrub",
+        ],
+    ]
+
+
 def test_env_verify_print_pixi(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Verify prints a pixi agent import check without running it."""
+    """Verify checks bootstrap packages in composed ``dev``."""
     monkeypatch.chdir(FIXTURES / "pixi")
     result = CliRunner().invoke(cli, ["env", "verify"])
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
     assert payload["ok"] is None
-    assert payload["argv"][:4] == ["pixi", "run", "-e", "agent"]
+    assert payload["argv"][:5] == ["pixi", "run", "-e", "dev", "python"]
     assert "IPython" in payload["argv"][-1]
+    assert "skore" in payload["argv"][-1]
+    assert "skore_skills" in payload["argv"][-1]
+
+
+def test_agent_packages_exclude_transitive_skore_skills() -> None:
+    """Agent tools and bootstrap import verification are distinct lists."""
+    from skore_skills.env import AGENT_PACKAGES, BOOTSTRAP_PACKAGES
+
+    assert AGENT_PACKAGES == ("ruff", "ipython", "ipykernel")
+    assert BOOTSTRAP_PACKAGES == (
+        "skore",
+        "skore-skills",
+        "ruff",
+        "ipython",
+        "ipykernel",
+    )
 
 
 def test_env_verify_execute_mocked(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -665,7 +839,7 @@ def test_env_init_mentions_sync(
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["env", "init", "--manager", "pixi"])
     assert result.exit_code == 0, result.output
-    assert "next: pixi install -e agent" in result.output
+    assert "next: pixi install -e dev" in result.output
     assert "run: python -m skore_skills env sync" in result.output
 
 
@@ -683,12 +857,14 @@ def test_env_init_mentions_sync(
         (
             "conda",
             "hub",
-            "conda install -n fixture-conda -c conda-forge skore",
+            "conda install -n fixture-conda -c conda-forge skore"
+            " && conda install -n workspace-dev -c conda-forge skore",
         ),
         (
             "conda",
             "mlflow",
-            "conda install -n fixture-conda -c conda-forge skore mlflow>=3",
+            "conda install -n fixture-conda -c conda-forge skore mlflow>=3"
+            " && conda install -n workspace-dev -c conda-forge skore mlflow>=3",
         ),
     ],
 )
@@ -708,13 +884,16 @@ def test_env_add_skore_manager_mode_matrix(
 def test_env_add_skore_hatch_writes_pypi_requirement(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Hatch records the mode-specific PyPI requirement."""
+    """Hatch upgrades bootstrap Skore to the mode-specific requirement."""
     (tmp_path / "hatch.toml").write_text("# hatch\n", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
+    bootstrap = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "local"])
+    assert bootstrap.exit_code == 0, bootstrap.output
     result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "hub"])
     assert result.exit_code == 0, result.output
     text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
     assert '"skore[hub]"' in text
+    assert '"skore"' not in text
 
     second = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "hub"])
     assert second.exit_code == 0, second.output
@@ -789,3 +968,235 @@ def test_add_skore_rejects_invalid_mode_library(tmp_path: Path) -> None:
     text, code = add_skore(tmp_path, "remote")
     assert code == 2
     assert "unknown skore mode" in text
+
+
+@pytest.mark.parametrize(
+    ("manager", "expected"),
+    [
+        ("pixi", ["pixi", "run", "-e", "dev", "python"]),
+        ("uv", ["uv", "run", "--group", "agent", "python"]),
+        ("poetry", ["poetry", "run", "python"]),
+        ("hatch", ["hatch", "run", "dev:python"]),
+        ("conda", ["conda", "run", "-n", "workspace-dev", "python"]),
+        ("pip-venv", [".venv/bin/python"]),
+    ],
+)
+def test_dev_run_argv_per_manager(
+    manager: str, expected: list[str], tmp_path: Path
+) -> None:
+    """Composed-dev launcher matches the manager table."""
+    from skore_skills.env import dev_run_argv
+
+    if manager == "conda":
+        (tmp_path / "environment-dev.yml").write_text(
+            "name: workspace-dev\ndependencies: []\n", encoding="utf-8"
+        )
+    assert dev_run_argv(manager, root=tmp_path) == expected
+
+
+def test_dev_run_argv_unknown_manager(tmp_path: Path) -> None:
+    """Unknown managers are a programming error."""
+    from skore_skills.env import dev_run_argv
+
+    with pytest.raises(ValueError, match="unknown manager"):
+        dev_run_argv("pants", root=tmp_path)
+
+
+def test_api_get_reexecs_into_dev(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Library-touching commands re-enter the composed pixi ``dev`` env."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    seen: list[list[str]] = []
+    captured: dict[str, Any] = {}
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+        captured.update(kwargs)
+
+        class Result:
+            returncode = 0
+            stdout = "# card\n"
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["api", "get", "skrub.TableReport"])
+    assert result.exit_code == 0, result.output
+    assert seen == [
+        [
+            "pixi",
+            "run",
+            "-e",
+            "dev",
+            "python",
+            "-m",
+            "skore_skills",
+            "api",
+            "get",
+            "skrub.TableReport",
+        ]
+    ]
+    assert captured["env"][IN_DEV_ENV] == "1"
+    assert result.output == "# card\n"
+
+
+def test_style_reexecs_into_dev(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``style`` re-enters composed ``dev`` with the original flags."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["style", "--init"])
+    assert result.exit_code == 0, result.output
+    assert seen[0][:8] == [
+        "pixi",
+        "run",
+        "-e",
+        "dev",
+        "python",
+        "-m",
+        "skore_skills",
+        "style",
+    ]
+    assert "--init" in seen[0]
+
+
+def test_cells_run_reexecs_into_dev(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``cells run`` re-enters composed ``dev``."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV
+
+    src = tmp_path / "nb.py"
+    src.write_text("# %%\n1\n", encoding="utf-8")
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+            stdout = "# digest\n"
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["cells", "run", str(src)])
+    assert result.exit_code == 0, result.output
+    assert seen[0][:8] == [
+        "pixi",
+        "run",
+        "-e",
+        "dev",
+        "python",
+        "-m",
+        "skore_skills",
+        "cells",
+    ]
+    assert result.output == "# digest\n"
+
+
+def test_api_get_skips_reexec_when_already_in_dev(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``SKORE_SKILLS_IN_DEV`` prevents a second dispatch."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV, reexec_in_dev
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.setenv(IN_DEV_ENV, "1")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    assert reexec_in_dev(FIXTURES / "pixi", argv=["api", "get", "x"]) is None
+    assert seen == []
+
+
+def test_api_get_skips_reexec_when_unmanaged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """User-managed workspaces keep the running interpreter."""
+    from skore_skills.env import IN_DEV_ENV, reexec_in_dev
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    assert reexec_in_dev(tmp_path, argv=["api", "get", "x"]) is None
+
+
+def test_reexec_skips_when_no_manager(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """No env manager means the current interpreter stays in-process."""
+    from skore_skills.env import IN_DEV_ENV, reexec_in_dev
+
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    assert reexec_in_dev(tmp_path, argv=["api", "get", "x"]) is None
+
+
+def test_reexec_hints_when_skore_skills_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A missing wheel in ``dev`` points at ``env sync``."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV, MISSING_SKORE_SKILLS_HINT, reexec_in_dev
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        class Result:
+            returncode = 1
+            stdout = ""
+            stderr = "ModuleNotFoundError: No module named 'skore_skills'\n"
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    monkeypatch.setattr(env_mod.sys, "stdout", stdout)
+    monkeypatch.setattr(env_mod.sys, "stderr", stderr)
+    code = reexec_in_dev(FIXTURES / "pixi", argv=["api", "get", "x"])
+    assert code == 1
+    assert MISSING_SKORE_SKILLS_HINT in stderr.getvalue()
+    assert "env add-skore --mode local --execute" in stderr.getvalue()
+    assert "env sync" not in stderr.getvalue()

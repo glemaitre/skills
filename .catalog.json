@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "283f4700bc1a6a2717e76c56241338c86c2606d5b5748c5015fdb58cdad1a50f",
+  "catalog_hash": "14bc63cb36abbdabeb756f1764cd5a5c1973b174951c9d3ea65ea189c1293819",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "872dbfd7cc78ee54c7cc8e2700be07ffead4e49a9af53b32c7146c5c3009c760"
+      "hash": "c6d4f5c7d13d50421a5b510e58a75710bb8c1e56b2c2246504e0b8e5ca0707d5"
     },
     {
       "id": "build-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
       "category": "orchestration",
       "subcategory": "test-strategies",
-      "hash": "1e9067a39911b56d8559e30ac6b27de8c578402155fce9cb8a7c81e0fb6344ee"
+      "hash": "3ee29b34a235732e532a419db3a977e2dddd558948d70865ad96bb284ca862fb"
     },
     {
       "id": "audit-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "df8a62d96223f5491ec4d0e4b517b61e833e89a3791e48e884845bf18a179035"
+      "hash": "e46df7b06e27de770fee172306165c50ba9424e0b39829368194436bcb754d25"
     },
     {
       "id": "manage-ml-backlog",
@@ -111,7 +111,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "343c48d6189710a4719f3c40b1309035821b8495c5dcc9c65d72e3961e618b1b"
+      "hash": "0a27e259feea46735272f8f0be266acfa2853e4bfa676ce64fc2b1a4920c5621"
     },
     {
       "id": "setup-git",
@@ -156,7 +156,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "2392bfc7ad36bfdf15ae801e6c98ec606cc352095a559118415350270d560f1f"
+      "hash": "1964efdffaa1e0b3464611bf7e4a9fe530a79d35bbc231e199adc907e89156b1"
     },
     {
       "id": "setup-workspace",
@@ -174,7 +174,7 @@
       "summary": "Detect the env manager, persist managed vs user-managed, and init two envs plus agent tools.",
       "category": "action",
       "subcategory": null,
-      "hash": "021117bd57bafe03a9f51b9cc32d2efe2f41d6f422f35a8ce37d0857ba7608b2"
+      "hash": "f1312824eb3bb3b2c8c7302a2633c123a8f3ff7ae279831a022f837d1f434fa7"
     }
   ],
   "workflows": [

@@ -115,8 +115,8 @@ def test_infer_evaluate_then_audit(tmp_path: Path) -> None:
     """Smoke without audit is evaluate; reports present becomes audit."""
     (tmp_path / "src").mkdir()
     (tmp_path / "journal").mkdir()
-    (tmp_path / "data").mkdir()
-    (tmp_path / "data" / "eda.md").write_text("# eda\n", encoding="utf-8")
+    (tmp_path / "eda").mkdir()
+    (tmp_path / "eda" / "eda.md").write_text("# eda\n", encoding="utf-8")
     (tmp_path / "journal" / "01_baseline.md").write_text("# n\n", encoding="utf-8")
     smoke = tmp_path / "tests" / "smoke"
     smoke.mkdir(parents=True)

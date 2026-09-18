@@ -50,7 +50,9 @@
   (not only remaining work).
 - If the user keeps workspace + git: load `setup-workspace` then
   `setup-git`; schedule editable only after `has_src`. Do not
-  install sklearn/skrub/skore.
+  install sklearn or skrub. If env remains selected,
+  `setup-python-env` may install its required plain Skore; this
+  coordinator must not install or configure it directly.
 - Do not re-ask G-ENV-MGR in this meta.
 
 **Must NOT do:**

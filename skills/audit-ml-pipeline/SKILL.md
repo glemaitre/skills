@@ -187,8 +187,8 @@ Pre-flight (audit-ml-pipeline):
                 key == "<NN_short_name>" appears.
                 "Run finished, put() landed" is NOT sufficient.
 - [ ] Agent feature available:
-        `pixi run -e agent ipython -c "print(0)"` exit 0
-        `pixi run -e agent ipython --version` exit 0
+        `pixi run -e dev ipython -c "print(0)"` exit 0
+        `pixi run -e dev ipython --version` exit 0
       Evidence: tool output of each
                 | JOURNAL.md Status `agent feature: installed`
                 Missing → STOP, delegate to add-python-package agent tools (ruff / ipython / ipykernel)
@@ -208,7 +208,6 @@ Pre-flight (audit-ml-pipeline):
       Evidence: explicit grep / Read confirmation of the drafted file
 - [ ] Execution command shape confirmed:
         python -m skore_skills cells run audit/<stem>.py [scratch/audit/<stem>/audit.md]
-      (In a pixi agent env: `pixi run -e agent python -m skore_skills …`.)
       Evidence: command emitted in the response before running
 - [ ] Pre-flight re-emitted with evidence before final message.
       Evidence: this checklist appears in the end-of-turn summary.
@@ -287,8 +286,7 @@ python -m skore_skills cells run audit/<stem>.py
 
 The CLI streams the digest to stdout. Pass a second arg
 `scratch/audit/<stem>/audit.md` to also write to a file (parent
-created if missing). For a pixi agent environment, prefix with
-`pixi run -e agent`. Details:
+created if missing). Details:
 `python -m skore_skills cells run --help`.
 
 ### Re-execution semantics

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import click
@@ -10,6 +11,15 @@ from skore_skills import __version__
 from skore_skills.api import get_symbol, package_version
 from skore_skills.check import render_workspace_check
 from skore_skills.status import render_status
+
+
+def _reexec_library_command(argv: list[str]) -> None:
+    """Enter the composed project env for in-process library commands."""
+    from skore_skills.env import reexec_in_dev
+
+    code = reexec_in_dev(Path.cwd(), argv=argv)
+    if code is not None:
+        raise SystemExit(code)
 
 
 @click.group()
@@ -40,6 +50,10 @@ def cells_run(src: Path, dst: Path | None) -> None:
     """
     from skore_skills.cells import run
 
+    forwarded = ["cells", "run", os.fspath(src)]
+    if dst is not None:
+        forwarded.append(os.fspath(dst))
+    _reexec_library_command(forwarded)
     run(src, dst)
 
 
@@ -52,6 +66,7 @@ def api_group() -> None:
 @click.argument("symbol")
 def api_get(symbol: str) -> None:
     """Print a signature card and cache it under ``scratch/api/``."""
+    _reexec_library_command(["api", "get", symbol])
     try:
         click.echo(get_symbol(symbol), nl=False)
     except ImportError as exc:
@@ -64,6 +79,7 @@ def api_get(symbol: str) -> None:
 @click.argument("package")
 def api_version(package: str) -> None:
     """Print the installed version of ``PACKAGE``."""
+    _reexec_library_command(["api", "version", package])
     try:
         click.echo(package_version(package))
     except ImportError as exc:
@@ -168,6 +184,11 @@ def style_cmd(paths: tuple[Path, ...], initialize: bool) -> None:
     """
     from skore_skills.style import initialize_style, run_style
 
+    forwarded = ["style"]
+    if initialize:
+        forwarded.append("--init")
+    forwarded.extend(os.fspath(path) for path in paths)
+    _reexec_library_command(forwarded)
     if initialize:
         created = initialize_style(Path.cwd())
         click.echo(

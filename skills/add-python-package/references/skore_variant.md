@@ -1,14 +1,17 @@
 # Skore package source and mode
 
-Do not construct a Skore requirement in a skill. After
-G-SKORE-MODE is persisted, run:
+Environment bootstrap installs plain `skore` early so
+`skore_skills` is available as its mandatory dependency. Do not
+construct a Skore requirement in a skill. After G-SKORE-MODE is
+persisted, run:
 
 ```bash
 python -m skore_skills env add-skore --mode <local|hub|mlflow> --execute
 ```
 
 The CLI selects the package source from the manifest-detected
-manager:
+manager and upgrades the bootstrap installation when the selected
+mode needs Hub or MLflow dependencies:
 
 | Manager | local | hub | mlflow |
 |---|---|---|---|

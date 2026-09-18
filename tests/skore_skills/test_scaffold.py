@@ -97,6 +97,26 @@ def test_scaffold_on_manager_only_root(
     assert gitignore.read_text(encoding="utf-8") == "# pixi\n.pixi/\n"
 
 
+def test_scaffold_specializes_env_init_skeleton(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Env-init Hatch metadata is rewritten once G-PKG-NAME is known."""
+    from skore_skills.env import _PIXI_TABLE, _SKELETON
+
+    monkeypatch.chdir(tmp_path)
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text(_SKELETON.lstrip() + "\n" + _PIXI_TABLE.strip() + "\n")
+    result = CliRunner().invoke(cli, ["scaffold", "--package", "demo_pkg"])
+    assert result.exit_code == 0, result.output
+    text = pyproject.read_text(encoding="utf-8")
+    assert 'name = "demo-pkg"' in text
+    assert 'name = "workspace"' not in text
+    assert 'packages = ["src/demo_pkg"]' in text
+    assert 'packages = ["src"]' not in text
+    assert "[tool.pixi.workspace]" in text
+    assert "Workspace package for the demo_pkg ML experiments." in text
+
+
 def test_scaffold_keeps_existing_tool_pixi(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

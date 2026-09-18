@@ -52,6 +52,42 @@ def render_template(text: str, package: str, *, pyproject: bool = False) -> str:
     return text.replace("<pkg>", package).replace("<project-name>", kebab)
 
 
+ENV_SKELETON_NAME = 'name = "workspace"'
+ENV_SKELETON_DESCRIPTION = 'description = "ML experimentation workspace."'
+ENV_SKELETON_HATCH_PACKAGES = '[tool.hatch.build.targets.wheel]\npackages = ["src"]'
+
+
+def specialize_env_skeleton(path: Path, package: str) -> bool:
+    """Rewrite env-init Hatch metadata once the import name is known.
+
+    Only the generic ``env init`` skeleton is touched. Custom
+    manager-only ``pyproject.toml`` files stay as they are.
+    """
+    if not path.is_file():
+        return False
+    text = path.read_text(encoding="utf-8")
+    if (
+        ENV_SKELETON_NAME not in text
+        or ENV_SKELETON_DESCRIPTION not in text
+        or ENV_SKELETON_HATCH_PACKAGES not in text
+    ):
+        return False
+    kebab = package.replace("_", "-")
+    text = text.replace(ENV_SKELETON_NAME, f'name = "{kebab}"', 1)
+    text = text.replace(
+        ENV_SKELETON_DESCRIPTION,
+        f'description = "Workspace package for the {package} ML experiments."',
+        1,
+    )
+    text = text.replace(
+        ENV_SKELETON_HATCH_PACKAGES,
+        f'[tool.hatch.build.targets.wheel]\npackages = ["src/{package}"]',
+        1,
+    )
+    path.write_text(text, encoding="utf-8")
+    return True
+
+
 def layout_exists(root: Path) -> bool:
     """Return True if a scaffolded layout is already present.
 
@@ -127,6 +163,10 @@ def scaffold(root: Path, package: str, *, force: bool = False) -> list[Path]:
     from skore_skills.style import ensure_ruff_in_pyproject
 
     pyproject_path = root / "pyproject.toml"
+    if specialize_env_skeleton(pyproject_path, package):
+        rel = Path("pyproject.toml")
+        if rel not in written:
+            written.append(rel)
     if pyproject_path.is_file() and ensure_ruff_in_pyproject(pyproject_path):
         rel = Path("pyproject.toml")
         if rel not in written:

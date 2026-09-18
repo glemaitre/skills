@@ -84,7 +84,7 @@ def test_status_organized_fixture(
     _write(tmp_path / "journal" / "JOURNAL.md", "# placeholder\n")
     _write(tmp_path / "journal" / "01_baseline.md", "# note\n")
     (tmp_path / "tests").mkdir()
-    _write(tmp_path / "data" / "eda.md", "# eda\n")
+    _write(tmp_path / "eda" / "eda.md", "# eda\n")
     _write(tmp_path / "ruff.toml", 'target-version = "py311"\n')
     (tmp_path / ".git").mkdir()
     monkeypatch.chdir(tmp_path)
@@ -116,6 +116,14 @@ def test_status_organized_fixture(
     }
     assert skills
     assert all(value is False for value in skills.values())
+
+
+def test_status_eda_reads_eda_dir_not_data_dir(tmp_path: Path) -> None:
+    """The EDA deliverable lives in ``eda/``; ``data/eda.md`` is raw data."""
+    _write(tmp_path / "data" / "eda.md", "# stale\n")
+    assert snapshot(tmp_path)["eda"] == "missing"
+    _write(tmp_path / "eda" / "eda.md", "# eda\n")
+    assert snapshot(tmp_path)["eda"] == "present"
 
 
 def test_status_hatchling_build_is_not_hatch_env_manager(tmp_path: Path) -> None:

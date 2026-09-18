@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from collections.abc import Sequence
 from importlib.resources import files
 from pathlib import Path
@@ -31,6 +32,14 @@ NO_SRC = "has_src is false; scaffold before editable install"
 NO_PACKAGE = "no package name; scaffold src/ before editable install"
 SYNC_HINT = "python -m skore_skills env sync"
 AGENT_PACKAGES = ("ruff", "ipython", "ipykernel")
+BOOTSTRAP_PACKAGES = ("skore", "skore-skills", *AGENT_PACKAGES)
+IN_DEV_ENV = "SKORE_SKILLS_IN_DEV"
+MISSING_SKORE_SKILLS = "No module named 'skore_skills'"
+MISSING_SKORE_SKILLS_HINT = (
+    "skore-skills is supplied by skore but is missing from the project "
+    "dev environment.\n"
+    "run: python -m skore_skills env add-skore --mode local --execute\n"
+)
 _IMPORT_NAMES = {
     "ipython": "IPython",
     "scikit-learn": "sklearn",
@@ -64,7 +73,8 @@ ipykernel = "*"
 
 [tool.pixi.environments]
 default = { features = ["default"], solve-group = "default" }
-agent = { features = ["default", "agent"], solve-group = "default" }
+agent = { features = ["agent"], solve-group = "default" }
+dev = { features = ["default", "agent"], solve-group = "default" }
 """
 
 _UV_GROUPS = """
@@ -92,6 +102,9 @@ _HATCH_ENV = """
 
 [tool.hatch.envs.agent]
 dependencies = ["ruff", "ipython", "ipykernel"]
+
+[tool.hatch.envs.dev]
+extra-dependencies = ["ruff", "ipython", "ipykernel"]
 """
 
 _CONDA_DEFAULT = """\
@@ -104,6 +117,17 @@ dependencies:
 
 _CONDA_AGENT = """\
 name: workspace-agent
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+  - ruff
+  - ipython
+  - ipykernel
+"""
+
+_CONDA_DEV = """\
+name: workspace-dev
 channels:
   - conda-forge
 dependencies:
@@ -300,8 +324,15 @@ def conda_env_name(root: Path, *, feature: str | None = None) -> str | None:
     """Return the conda env name from YAML, or None if no yaml is present."""
     default_path = root / "environment.yml"
     agent_path = root / "environment-agent.yml"
-    if not default_path.is_file() and not agent_path.is_file():
+    dev_path = root / "environment-dev.yml"
+    if (
+        not default_path.is_file()
+        and not agent_path.is_file()
+        and not dev_path.is_file()
+    ):
         return None
+    if feature == "dev":
+        return _yaml_name(dev_path) or "workspace-dev"
     if feature:
         return _yaml_name(agent_path) or "workspace-agent"
     return _yaml_name(default_path) or "workspace"
@@ -331,11 +362,15 @@ def _run_argvs(argvs: list[list[str]], *, cwd: Path) -> int:
 def sync_argv(manager: str) -> list[list[str]]:
     """Return the bootstrap install/sync command(s) for ``manager``."""
     commands: dict[str, list[list[str]]] = {
-        "pixi": [["pixi", "install", "-e", "agent"]],
+        "pixi": [["pixi", "install", "-e", "dev"]],
         "uv": [["uv", "sync", "--group", "agent"]],
         "poetry": [["poetry", "install", "--with", "agent"]],
-        "hatch": [["hatch", "env", "create", "agent"]],
-        "conda": [["conda", "env", "create", "-f", "environment-agent.yml"]],
+        "hatch": [["hatch", "env", "create", "dev"]],
+        "conda": [
+            ["conda", "env", "create", "-f", "environment.yml"],
+            ["conda", "env", "create", "-f", "environment-agent.yml"],
+            ["conda", "env", "create", "-f", "environment-dev.yml"],
+        ],
         "pip-venv": [
             ["python", "-m", "venv", ".venv"],
             [_venv_bin("pip"), "install", "-r", "requirements.txt"],
@@ -402,7 +437,15 @@ def skore_requirements(manager: str, mode: str) -> list[str]:
 def editable_argv(manager: str, package: str) -> list[str] | None:
     """Return the editable-install argv, or None if unsupported."""
     commands: dict[str, list[str]] = {
-        "pixi": ["pixi", "add", "--pypi", f"{package} @ ."],
+        "pixi": [
+            "pixi",
+            "add",
+            "--pypi",
+            "--editable",
+            package,
+            "--path",
+            ".",
+        ],
         "uv": ["uv", "add", "--editable", "."],
         "poetry": ["poetry", "add", "--editable", "."],
         "pip-venv": ["pip", "install", "-e", "."],
@@ -415,23 +458,69 @@ def _import_name(package: str) -> str:
     return _IMPORT_NAMES.get(key, key.replace("-", "_"))
 
 
-def verify_argv(manager: str, packages: Sequence[str], *, root: Path) -> list[str]:
-    """Return the agent-interpreter import check for ``packages``."""
-    snippet = "import " + ", ".join(_import_name(name) for name in packages)
+def dev_run_argv(manager: str, *, root: Path) -> list[str]:
+    """Return argv that runs python in the composed env (default + agent)."""
     if manager == "pixi":
-        return ["pixi", "run", "-e", "agent", "python", "-c", snippet]
+        return ["pixi", "run", "-e", "dev", "python"]
     if manager == "uv":
-        return ["uv", "run", "--group", "agent", "python", "-c", snippet]
+        return ["uv", "run", "--group", "agent", "python"]
     if manager == "poetry":
-        return ["poetry", "run", "python", "-c", snippet]
+        return ["poetry", "run", "python"]
     if manager == "hatch":
-        return ["hatch", "run", "agent:python", "-c", snippet]
+        return ["hatch", "run", "dev:python"]
     if manager == "conda":
-        env_name = conda_env_name(root, feature="agent") or "workspace-agent"
-        return ["conda", "run", "-n", env_name, "python", "-c", snippet]
+        env_name = conda_env_name(root, feature="dev") or "workspace-dev"
+        return ["conda", "run", "-n", env_name, "python"]
     if manager == "pip-venv":
-        return [_venv_bin("python"), "-c", snippet]
+        return [_venv_bin("python")]
     raise ValueError(f"unknown manager {manager!r}")
+
+
+def verify_argv(manager: str, packages: Sequence[str], *, root: Path) -> list[str]:
+    """Return the composed-dev import check for ``packages``."""
+    snippet = "import " + ", ".join(_import_name(name) for name in packages)
+    return [*dev_run_argv(manager, root=root), "-c", snippet]
+
+
+def reexec_in_dev(root: Path, argv: Sequence[str] | None = None) -> int | None:
+    """Re-run this CLI in the composed dev env.
+
+    Returns the child exit code when a managed manager is present and
+    this process is not already inside that env. Returns ``None`` to
+    keep running in-process.
+    """
+    if os.environ.get(IN_DEV_ENV):
+        return None
+    if _unmanaged(root):
+        return None
+    payload = detect(root)
+    if payload["ambiguous"]:
+        return None
+    manager = payload["env_manager"]
+    if manager in {None, "none"}:
+        return None
+    rest = list(argv) if argv is not None else sys.argv[1:]
+    child = [
+        *dev_run_argv(str(manager), root=root),
+        "-m",
+        "skore_skills",
+        *rest,
+    ]
+    env = os.environ.copy()
+    env[IN_DEV_ENV] = "1"
+    completed = subprocess.run(
+        child,
+        check=False,
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    sys.stdout.write(completed.stdout)
+    sys.stderr.write(completed.stderr)
+    if completed.returncode and MISSING_SKORE_SKILLS in (completed.stderr or ""):
+        sys.stderr.write(MISSING_SKORE_SKILLS_HINT)
+    return completed.returncode
 
 
 def route_package(package: str) -> dict[str, Any]:
@@ -474,18 +563,20 @@ def _toml_list_close(text: str, start: int) -> int:
     return -1
 
 
-def _insert_into_deps_list(text: str, pkg: str, *, header: str) -> tuple[str, bool]:
-    """Insert ``pkg`` into ``dependencies = [...]`` after ``header``."""
+def _insert_into_deps_list(
+    text: str, pkg: str, *, header: str, key: str = "dependencies"
+) -> tuple[str, bool]:
+    """Insert ``pkg`` into ``key = [...]`` after ``header``."""
     start = text.find(header)
     if start < 0:
         return text, False
     search = text[start:]
-    match = re.search(r"dependencies\s*=\s*\[", search)
+    match = re.search(rf"{re.escape(key)}\s*=\s*\[", search)
     if match is None:
         newline = text.find("\n", start)
         if newline < 0:
             newline = len(text)
-        insert = f'\ndependencies = ["{pkg}"]'
+        insert = f'\n{key} = ["{pkg}"]'
         return text[:newline] + insert + text[newline:], True
     list_open = start + match.end()
     list_close = _toml_list_close(text, list_open)
@@ -505,17 +596,62 @@ def _insert_into_deps_list(text: str, pkg: str, *, header: str) -> tuple[str, bo
     return text[:list_open] + new_body + text[list_close:], True
 
 
+def _replace_hatch_skore_requirement(text: str, requirement: str) -> tuple[str, bool]:
+    """Replace an existing Skore requirement in ``[project]``."""
+    start = text.find("[project]")
+    if start < 0:
+        return text, False
+    match = re.search(r"dependencies\s*=\s*\[", text[start:])
+    if match is None:
+        return text, False
+    list_open = start + match.end()
+    list_close = _toml_list_close(text, list_open)
+    if list_close < 0:
+        return text, False
+    body = text[list_open:list_close]
+    pattern = r'(["\'])skore(?:\[[^"\']+\])?\1'
+    current = re.search(pattern, body)
+    if current is None:
+        return text, False
+    quoted = f'"{requirement}"'
+    if current.group(0) == quoted:
+        return text, False
+    body = re.sub(pattern, quoted, body, count=1)
+    return text[:list_open] + body + text[list_close:], True
+
+
 def _hatch_add(root: Path, packages: list[str], *, feature: str | None) -> str:
     path = _ensure_pyproject(root)
     text = path.read_text(encoding="utf-8")
     if feature:
         if "[tool.hatch.envs.agent]" not in text:
             text = text.rstrip() + "\n" + _HATCH_ENV.strip() + "\n"
-        header = "[tool.hatch.envs.agent]"
-    else:
-        header = "[project]"
+        elif "[tool.hatch.envs.dev]" not in text:
+            text = text.rstrip() + "\n[tool.hatch.envs.dev]\n"
+        changed = False
+        for pkg in packages:
+            text, inserted_agent = _insert_into_deps_list(
+                text, pkg, header="[tool.hatch.envs.agent]"
+            )
+            text, inserted_dev = _insert_into_deps_list(
+                text,
+                pkg,
+                header="[tool.hatch.envs.dev]",
+                key="extra-dependencies",
+            )
+            changed = changed or inserted_agent or inserted_dev
+        path.write_text(text, encoding="utf-8")
+        if changed:
+            return f"updated {path.name}\n"
+        return f"{path.name} already lists {', '.join(packages)}\n"
+    header = "[project]"
     changed = False
     for pkg in packages:
+        if _package_key(pkg) == "skore":
+            text, replaced = _replace_hatch_skore_requirement(text, pkg)
+            if replaced:
+                changed = True
+                continue
         text, inserted = _insert_into_deps_list(text, pkg, header=header)
         changed = changed or inserted
     path.write_text(text, encoding="utf-8")
@@ -558,10 +694,16 @@ def add_packages(
     argv = install_argv(manager, packages, feature=feature, root=root)
     if argv is None:
         return "need at least one package\n", 2
-    rendered = " ".join(argv) + "\n"
+    argvs = [argv]
+    if manager == "conda":
+        dev_argv = install_argv("conda", packages, feature="dev", root=root)
+        assert dev_argv is not None
+        if dev_argv != argv:
+            argvs.append(dev_argv)
+    rendered = _render_argvs(argvs) + "\n"
     if not execute:
         return rendered, 0
-    return rendered, _run_argvs([argv], cwd=root)
+    return rendered, _run_argvs(argvs, cwd=root)
 
 
 def add_skore(
@@ -621,8 +763,8 @@ def verify_environment(
     *,
     execute: bool = False,
 ) -> tuple[dict[str, Any], int]:
-    """Print an agent-env import check. ``--execute`` runs it."""
-    names = list(packages) if packages else list(AGENT_PACKAGES)
+    """Print a composed-dev import check. ``--execute`` runs it."""
+    names = list(packages) if packages else list(BOOTSTRAP_PACKAGES)
     manager, error = _ready_manager(root)
     payload: dict[str, Any] = {
         "ok": False,
@@ -691,11 +833,15 @@ def init_environment(
     if manager == "conda":
         default = root / "environment.yml"
         agent = root / "environment-agent.yml"
+        dev = root / "environment-dev.yml"
         if default.is_file() and not force:
             return INIT_EXISTS + "\n", 1
         default.write_text(_CONDA_DEFAULT, encoding="utf-8")
         agent.write_text(_CONDA_AGENT, encoding="utf-8")
-        written.extend(["environment.yml", "environment-agent.yml"])
+        dev.write_text(_CONDA_DEV, encoding="utf-8")
+        written.extend(
+            ["environment.yml", "environment-agent.yml", "environment-dev.yml"]
+        )
         follow = _render_argvs(sync_argv("conda"))
         return "wrote " + ", ".join(written) + "\n" + _followup(follow), 0
 

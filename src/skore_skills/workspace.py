@@ -173,7 +173,7 @@ def snapshot(root: Path) -> dict[str, Any]:
         "has_experiments": (root / "experiments").is_dir(),
         "has_journal": (root / "journal").is_dir(),
         "has_tests": (root / "tests").is_dir(),
-        "eda": "present" if (root / "data" / "eda.md").is_file() else "missing",
+        "eda": "present" if (root / "eda" / "eda.md").is_file() else "missing",
         "ruff_toml": ruff_is_configured(root),
         "git": (root / ".git").exists(),
         "last_history_stem": last_history_stem(root),

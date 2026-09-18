@@ -63,7 +63,8 @@ channel.
 - **Missing pytest.** If `pytest` is not importable in the project
   env, STOP. Load `add-python-package` for `pytest` on **default**
   (confirm; `env route` maps pytest off `--feature agent`). Do not
-  `pip install pytest` or put it on the agent env.
+  `pip install pytest` or put it on the agent feature (use the composed
+  `dev` env, default + agent).
 - **Symbol from memory is forbidden.** Any skrub /
   scikit-learn name you write in the smoke test must come from
   `python -m skore_skills api get <dotted>` or a matching cache

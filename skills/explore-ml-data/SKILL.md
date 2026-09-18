@@ -252,7 +252,7 @@ Pre-flight (explore-ml-data):
                 | AskUserQuestion id=<id> on ignoring specific inputs
                 | "n/a — no .gitignore yet"
 - [ ] Agent feature available (run path only):
-        `pixi run -e agent ipython -c "print(0)"` exit 0
+        `pixi run -e dev ipython -c "print(0)"` exit 0
       Evidence: tool output | JOURNAL.md Status `agent feature: installed`
                 Missing → STOP, delegate to add-python-package agent tools (ruff / ipython / ipykernel)
                 (decline → fall back to skip path)
@@ -269,7 +269,6 @@ Pre-flight (explore-ml-data):
       Evidence: Read templates/eda.py this turn before Write eda/eda.py
 - [ ] Execution command shape confirmed:
         python -m skore_skills cells run eda/eda.py [scratch/eda/eda.md]
-      (In a pixi agent env: `pixi run -e agent python -m skore_skills …`.)
       Evidence: command emitted before running
 - [ ] Deliverables written: eda/eda.md (prose + implications),
         eda/eda_<table>.html (≥1), JOURNAL §Data understanding
@@ -339,7 +338,6 @@ python -m skore_skills cells run eda/eda.py
 
 The CLI streams the digest to stdout. Pass a second arg
 `scratch/eda/eda.md` to also write the digest to a file.
-For a pixi agent environment, prefix with `pixi run -e agent`.
 
 **Prerequisites for the run path:** the workspace package must be
 importable (`from <pkg> import PROJECT_ROOT` — editable install done

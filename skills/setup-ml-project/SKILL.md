@@ -52,7 +52,9 @@ after listing the boxes.
 - Do not pick package name or env manager here; the loaded skills
   ask those.
 - Do not ask tabular library or skore mode.
-- Do not install sklearn, skrub, skore, or pandas.
+- Do not install sklearn, skrub, or pandas. The selected
+  `setup-python-env` skill installs plain `skore` during bootstrap;
+  do not install or configure Skore directly from this coordinator.
 - Do not write experiment or pipeline bodies.
 - Do not commit except by loading `setup-git`.
 - Do not abort setup because one skill is missing.

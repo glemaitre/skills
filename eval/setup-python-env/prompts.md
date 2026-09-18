@@ -5,7 +5,7 @@ violated.
 
 ---
 
-## CASE_01 — Bootstrap narrates two envs
+## CASE_01 — Bootstrap narrates three envs
 
 **User prompt:**
 > Start the setup: get the Python environment going.
@@ -31,11 +31,17 @@ violated.
   hand-edited TOML).
 - After init, name `python -m skore_skills env sync --execute`
   (do not invent `pixi install` / `pixi init`).
+- Install plain Skore immediately afterward with
+  `python -m skore_skills env add-skore --mode local --execute`.
+  Do not ask G-SKORE-MODE during bootstrap.
 - Name `python -m skore_skills env verify --execute`.
-- Narrate default + agent and packages ruff, ipython, ipykernel.
+- Narrate default, agent, and composed dev: plain skore belongs to
+  default and supplies skore-skills; ruff, ipython, and ipykernel
+  belong to agent.
 
 **Must NOT do:**
-- Install scikit-learn, skrub, skore, or pandas in this turn.
+- Install scikit-learn, skrub, or pandas in this turn.
+- Install `skore-skills` directly.
 - Run `pixi init` before the gates resolve.
 - Load `setup-workspace` or create `src/`.
 
@@ -55,7 +61,8 @@ violated.
 - Name `env detect` and put `uv` first in the recommendation.
 - Still ask G-ENV-MGR (nothing is on disk yet).
 - After confirmation, `policy set env_manager` and
-  `env init --manager uv`, then `env sync --execute`.
+  `env init --manager uv`, then `env sync --execute`, then
+  `env add-skore --mode local --execute`.
 
 **Must NOT do:**
 - Silently run `pixi init` because pixi is the static default.
@@ -76,7 +83,8 @@ violated.
 - Persist `python -m skore_skills policy set env.managed false`.
 - Keep detecting so later skills know the manager if a manifest
   exists.
-- Name ruff / ipython / ipykernel as tools the user may want.
+- Name ruff / ipython / ipykernel and plain skore as packages the
+  user may want.
 - Stop without `env init` or `env sync`.
 
 **Must NOT do:**
@@ -131,6 +139,7 @@ violated.
 
 **Assumed workspace state:**
 - Managed pixi project after `env init` / `env sync`.
+- Plain `skore` has been installed and supplies `skore_skills`.
 - `env verify --execute` reports ruff missing.
 - `status.skills.add-python-package` is `false`.
 
