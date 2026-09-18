@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "14bc63cb36abbdabeb756f1764cd5a5c1973b174951c9d3ea65ea189c1293819",
+  "catalog_hash": "d2c603e4af60bda681524f5f6c07f524582776dabafbd36157e55d7fbb3da5fc",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "3b5614598d0d280467602a75510b97ad692156a3ec9fd87704b4a584eaddd399"
+      "hash": "03b80d151eb0d90ecb0bca15751e82eb5785d145d73d4b9ca0921e83aed16534"
     },
     {
       "id": "iterate-from-skore",
@@ -75,7 +75,7 @@
       "summary": "As a user be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo).",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "355d3ec438820c838a7d155456c7cb35a06cc01db2572c15c584c3034d5ed756"
+      "hash": "f60d48b4dd65d2b69923c73a72f76fcbfe72adea1f50fb45005d45dab48755ed"
     },
     {
       "id": "organize-ml-workspace",
@@ -93,7 +93,7 @@
       "summary": "Opinionated one-library-per-job Python stack, organized into mandatory / user-choice / optional / transitive tiers.",
       "category": "reference",
       "subcategory": null,
-      "hash": "8d9ada1b7d974dc0f49f94cf900b0201b98fcfbff7044267f24a1f872d15ffc9"
+      "hash": "5143c7e6882c30fac73a1ddf57e8745573b56fb42816e1f503668798456919ce"
     },
     {
       "id": "triage-ml-task",
@@ -156,7 +156,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "1964efdffaa1e0b3464611bf7e4a9fe530a79d35bbc231e199adc907e89156b1"
+      "hash": "9b4db5fcc1989bd37137d0716fe1e9101e10e45b07229260cb16fc69e8bef6d4"
     },
     {
       "id": "setup-workspace",
@@ -165,7 +165,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "5eb0241226cf0787cb26c7850cb8c364407c5394baa7edbcb9fc7962bd2a1fbb"
+      "hash": "e98c8ee558a0298840a7d7ddb0f239835a59cdd804214d29a00900b804109c86"
     },
     {
       "id": "setup-python-env",

@@ -93,15 +93,18 @@ have nothing in hand, the parent's menu re-presents itself.
   confirm or amend the goal first?"* The parent's per-experiment
   design note should not silently redefine success while the Status
   block still reflects the old goal.
-- **New dependencies are gated, not assumed.** If the proposal
-  requires a library outside the project's existing env
-  (e.g. an article uses `lightgbm` / `pytorch` / `jax`), do **not**
-  silently include it in `Method outline` as a fait accompli. Flag
-  it as an open gap (`"this approach needs <library>; OK to add,
-  or should we adapt to the existing stack?"`) and defer the
-  resolution to `data-science-python-stack` + the user. Until the
-  user answers, the library name lives **only** under `Open gaps`
-  — never in `Method outline`.
+- **New dependencies are gated, not assumed.** If a source uses a
+  library outside the project's existing env and the user has
+  **not** confirmed adding it (e.g. an article uses `lightgbm` /
+  `pytorch` / `jax`), do **not** silently include it in
+  `Method outline`. Flag it as an open gap (`"this approach needs
+  <library>; OK to add?"`) and wait. Until the user answers, the
+  library name lives **only** under `Open gaps` — never in
+  `Method outline`.
+  If the user **already asked to add** a named library, put it in
+  `Method outline` and load `add-python-package` when that skill
+  is installed. Do not offer a stack substitute (HistGradientBoosting,
+  ruff, …) and do not `pixi add` / `env add` from this skill.
 - **Domain-specific assertions need user confirmation.** If the
   source asserts something the article / issue / spec alone can't
   establish for *our* dataset — e.g. "feature X is monotone in the

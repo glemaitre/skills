@@ -148,19 +148,16 @@ violated.
 - Current env has `sklearn`, `skrub`, `skore` but NOT `lightgbm`.
 
 **Must do:**
-- Refuse to silently include `lightgbm` in `Method outline`.
-- Flag `lightgbm` as an **open gap**: "this approach needs
-  `lightgbm`; OK to add, or should we adapt to the existing
-  stack?"
-- Defer the resolution to `data-science-python-stack` + the user
-  (one of: add the dep, swap for `HistGradientBoostingRegressor`,
-  pick a different model).
+- Treat `lightgbm` as confirmed by the user. Name it in
+  `Method outline` (or the Proposal).
+- Load `add-python-package` when installed (or name that skill).
+  Do not require a stack consultation that lists
+  HistGradientBoosting.
 
 **Must NOT do:**
-- Add `lightgbm` to the Proposal's `Method outline` as fait
-  accompli.
 - Run `pixi add lightgbm` in this turn.
-- Pre-empt the data-science-python-stack consultation.
+- Offer HistGradientBoosting (or another stack substitute) as a
+  required fork.
 
 ---
 

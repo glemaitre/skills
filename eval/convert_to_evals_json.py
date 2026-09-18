@@ -14,6 +14,7 @@ Mapping:
     Expect files          → evals[].expect_files (pytest glob checks)
     Expect reads          → evals[].expect_reads (tool-trace path checks)
     Expect cli            → evals[].expect_cli (run_skore_skills argv substrings)
+    Expect tools          → evals[].expect_tools (tool-trace names, e.g. AskUserQuestion)
 
 Usage:
     python3 eval/convert_to_evals_json.py                 # all skills with eval/<name>/prompts.md
@@ -32,7 +33,7 @@ REPO = Path(__file__).parent.parent.resolve()
 
 
 def parse_prompts_md(text: str) -> list[dict]:
-    """Return [{id, title, prompt, must_do, must_not, tools, sandbox, expect_files, expect_reads, expect_cli}]."""
+    """Return [{id, title, prompt, must_do, must_not, tools, sandbox, expect_*}]."""
     cases = []
     for block in text.split("\n---\n"):
         head = re.search(r"^## CASE_(\d+) — (.+)$", block, re.MULTILINE)
@@ -71,6 +72,10 @@ def parse_prompts_md(text: str) -> list[dict]:
             item.strip("`")
             for item in _extract_bullets(block, r"\*\*Expect cli:\*\*")
         ]
+        expect_tools = [
+            item.strip("`")
+            for item in _extract_bullets(block, r"\*\*Expect tools:\*\*")
+        ]
         must_do = _extract_bullets(block, r"\*\*Must do:?\*\*")
         must_not = _extract_bullets(block, r"\*\*Must NOT do:?\*\*")
 
@@ -84,6 +89,7 @@ def parse_prompts_md(text: str) -> list[dict]:
             "expect_files": expect_files,
             "expect_reads": expect_reads,
             "expect_cli": expect_cli,
+            "expect_tools": expect_tools,
             "must_do": must_do,
             "must_not": must_not,
         })
@@ -206,6 +212,8 @@ def to_evals_json(skill_name: str, cases: list[dict]) -> dict:
             rec["expect_reads"] = case["expect_reads"]
         if case.get("expect_cli"):
             rec["expect_cli"] = case["expect_cli"]
+        if case.get("expect_tools"):
+            rec["expect_tools"] = case["expect_tools"]
         evals.append(rec)
     return {"skill_name": skill_name, "evals": evals}
 

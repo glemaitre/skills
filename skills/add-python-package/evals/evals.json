@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "Managed add",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Pixi project (`pixi.toml` or `[tool.pixi]`).\n- `status.policy.env.managed` is true.\n- `env_manager` is pixi.]\n\nAdd skrub to the project.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Pixi project (`pixi.toml` or `[tool.pixi]`).\n- `status.policy.env.managed` is true.\n- `env_manager` is pixi.\n- `python -m skore_skills env route skrub` returns\n  `scope: default`.]\n\nAdd skrub to the project.",
       "expected_output": "Behavioural response satisfying: - Emit the Pre-flight then run the commands (do not stop after listing boxes). - Name `python -m skore_skills env detect` / status. - Name `python -m skore_skills env add --execute skrub` (or `env route` then that add). Do not invent `pixi add` from memory. It must NOT: - Run `pip install skrub`. - Re-bootstrap with `env init`.",
       "files": [],
       "expectations": [
@@ -39,7 +39,7 @@
     {
       "id": 3,
       "title": "Unmanaged: please install now",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.env.managed` is false.\n- User picks **Please install this now**.]\n\nInstall pytest, and wait until I say it is done.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.env.managed` is false.\n- User picks **Please install this now**.\n- `python -m skore_skills env route pytest` returns\n  `scope: default`.\n- pytest is a stage library (not agent).]\n\nInstall pytest, and wait until I say it is done.",
       "expected_output": "Behavioural response satisfying: - Show the manager command (pytest on default, not agent). - Wait for the user to confirm. - Still not execute `env add`. It must NOT: - Run `python -m skore_skills env add pytest --execute`. - Put pytest in `--feature agent`.",
       "files": [],
       "expectations": [
@@ -55,14 +55,14 @@
     },
     {
       "id": 4,
-      "title": "Forbidden substitute",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed pixi project.]\n\nAdd xgboost.",
-      "expected_output": "Behavioural response satisfying: - Refuse using the stack substitute (HistGradientBoosting). - Surface the CLI refusal if `env add xgboost` is printed. It must NOT: - Install xgboost.",
+      "title": "Named booster is added",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed pixi project.\n- `python -m skore_skills env route xgboost` returns\n  `scope: default`.]\n\nAdd xgboost.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env add --execute xgboost` (or `env route` then that add). It must NOT: - Refuse xgboost or swap it for HistGradientBoosting. - Run `pip install xgboost`.",
       "files": [],
       "expectations": [
-        "Refuse using the stack substitute (HistGradientBoosting).",
-        "Surface the CLI refusal if `env add xgboost` is printed.",
-        "The response does NOT: Install xgboost."
+        "Name `python -m skore_skills env add --execute xgboost` (or `env route` then that add).",
+        "The response does NOT: Refuse xgboost or swap it for HistGradientBoosting.",
+        "The response does NOT: Run `pip install xgboost`."
       ],
       "tools": false,
       "sandbox": [],

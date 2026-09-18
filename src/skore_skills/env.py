@@ -281,7 +281,7 @@ def detect(root: Path) -> dict[str, Any]:
 def forbidden_reason(package: str) -> str | None:
     """Return a refusal message if ``package`` is a known substitute."""
     policy = load_stack_policy()
-    substitutes = policy["forbidden_substitutes"]
+    substitutes = policy.get("forbidden_substitutes") or {}
     key = package.strip().lower().split("[", 1)[0]
     message = substitutes.get(key)
     if isinstance(message, str):
@@ -536,14 +536,7 @@ def route_package(package: str) -> dict[str, Any]:
     optional = {_package_key(name) for name in policy["optional"]}
     if key in optional - mandatory:
         return {"scope": "ask", "feature": None, "message": None}
-    stage = {_package_key(name) for name in policy["stage"]}
-    competing: set[str] = set()
-    for names in policy["competing"].values():
-        competing.update(_package_key(name) for name in names)
-    transitive = {_package_key(name) for name in policy["transitive"]}
-    if key in stage or key in competing or key in transitive:
-        return {"scope": "default", "feature": None, "message": None}
-    return {"scope": "ask", "feature": None, "message": None}
+    return {"scope": "default", "feature": None, "message": None}
 
 
 def _toml_list_close(text: str, start: int) -> int:

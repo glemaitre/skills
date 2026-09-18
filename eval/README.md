@@ -70,7 +70,9 @@ files / empty) separately from `must-do-weak`.
    `**Expect files:**` (globs relative to the temp root),
    `**Expect reads:**` (`read_file` paths the target must open),
    `**Expect cli:**` (argv substring of a `run_skore_skills` call,
-   e.g. `api get sklearn.model_selection.KFold`). Document
+   e.g. `api get sklearn.model_selection.KFold`),
+   `**Expect tools:**` (tool-trace names, e.g. `AskUserQuestion`).
+   Document
    `python -m skore_skills` until `skore skills run` ships; do not
    require the forwarder in evals yet.
 2. Regenerate the skill-creator schema file:

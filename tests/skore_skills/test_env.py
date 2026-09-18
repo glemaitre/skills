@@ -105,14 +105,17 @@ def test_env_add_hatch_writes_pyproject(
     assert '"optuna"' in agent_text
 
 
-def test_env_add_forbidden_substitute(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Known substitutes are refused using python-stack.json."""
+def test_env_add_named_package_not_substituted(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """User-named packages are added; no HistGradientBoosting swap."""
     monkeypatch.chdir(FIXTURES / "pixi")
     result = CliRunner().invoke(cli, ["env", "add", "xgboost"])
-    assert result.exit_code != 0
-    assert "HistGradientBoosting" in result.output
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "pixi add xgboost"
+    assert "HistGradientBoosting" not in result.output
     policy = load_stack_policy()
-    assert "xgboost" in policy["forbidden_substitutes"]
+    assert "forbidden_substitutes" not in policy
     assert "ruff" in policy["mandatory"]
 
 
@@ -591,12 +594,14 @@ def test_env_sync_execute_runs_subprocess(
     [
         ("ruff", "agent", "agent"),
         ("skore", "default", None),
-        ("skore-skills", "ask", None),
+        ("skore-skills", "default", None),
         ("skrub", "default", None),
         ("pytest", "default", None),
         ("optuna", "ask", None),
         ("jupyterlab", "ask", None),
         ("pandas", "default", None),
+        ("xgboost", "default", None),
+        ("black", "default", None),
     ],
 )
 def test_env_route_scopes(package: str, scope: str, feature: str | None) -> None:
@@ -608,11 +613,14 @@ def test_env_route_scopes(package: str, scope: str, feature: str | None) -> None
     assert payload["feature"] == feature
 
 
-def test_env_route_forbidden() -> None:
-    """Forbidden substitutes are refused by ``env route``."""
+def test_env_route_named_booster_is_default() -> None:
+    """Unknown named libraries route to default, not refuse."""
     result = CliRunner().invoke(cli, ["env", "route", "xgboost"])
-    assert result.exit_code != 0
-    assert "HistGradientBoosting" in result.output
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["scope"] == "default"
+    assert payload["feature"] is None
+    assert "HistGradientBoosting" not in result.output
 
 
 def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

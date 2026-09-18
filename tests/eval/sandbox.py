@@ -27,13 +27,15 @@ TOOLS_NOTE = (
     "directory (your cwd). If SKILL.md points at a relative "
     "`references/` path, that file is on disk here — open it with "
     "read_file before answering from memory. Use list_dir, read_file, "
-    "write_file, run_python, and run_skore_skills. run_python only "
-    "executes files under scratch/ — inline python -c is rejected. "
-    "run_skore_skills runs python -m skore_skills with the given argv "
-    "(cwd is this project root). When you are done, put the complete "
-    "deliverable in the assistant message (not only in a thinking "
-    "channel). The last message must be that deliverable, not another "
-    "tool call."
+    "write_file, run_python, run_skore_skills, and AskUserQuestion. "
+    "run_python only executes files under scratch/ — inline python -c "
+    "is rejected. run_skore_skills runs python -m skore_skills with "
+    "the given argv (cwd is this project root). AskUserQuestion asks "
+    "the user a structured question and does not return an answer "
+    "this turn — do not pick a default or continue past that gate. "
+    "When you are done, put the complete deliverable in the assistant "
+    "message (not only in a thinking channel). The last message must "
+    "be that deliverable, not another tool call."
 )
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
@@ -122,6 +124,50 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "AskUserQuestion",
+            "description": (
+                "Ask the user a structured multiple-choice question "
+                "(gates such as G-PKG-NAME). Does not return an answer; "
+                "stop until the user picks. Do not scaffold after calling."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "question": {"type": "string"},
+                                "prompt": {"type": "string"},
+                                "options": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {"type": "string"},
+                                            "label": {"type": "string"},
+                                        },
+                                        "required": ["label"],
+                                    },
+                                    "description": (
+                                        "Choices. Put the default (e.g. folder "
+                                        "name) first."
+                                    ),
+                                },
+                            },
+                            "required": ["options"],
+                        },
+                    },
+                    "allow_multiple": {"type": "boolean"},
+                },
+                "required": ["questions"],
+            },
+        },
+    },
 ]
 
 
@@ -185,6 +231,22 @@ def missing_cli(
         if not want:
             continue
         if not any(want in call for call in seen):
+            missing.append(pattern)
+    return missing
+
+
+def missing_tools(
+    tool_trace: list[dict[str, Any]] | None, patterns: list[str]
+) -> list[str]:
+    """Return expected tool names that never appeared in the trace."""
+    seen = {str(item.get("name") or "") for item in tool_trace or []}
+    seen_lower = {name.lower() for name in seen}
+    missing: list[str] = []
+    for pattern in patterns:
+        want = pattern.strip().strip("`")
+        if not want:
+            continue
+        if want not in seen and want.lower() not in seen_lower:
             missing.append(pattern)
     return missing
 
@@ -287,6 +349,11 @@ class Sandbox:
                 return self._run_python(str(arguments.get("path") or ""))
             if name == "run_skore_skills":
                 return self._run_skore_skills(arguments.get("args"))
+            if name == "AskUserQuestion":
+                return (
+                    "The user has not answered. Do not pick a default. "
+                    "Do not run scaffold."
+                )
             return f"unknown tool: {name}"
         except Exception as exc:  # noqa: BLE001 — surface tool errors to the model
             return f"error: {exc}"

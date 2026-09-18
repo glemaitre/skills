@@ -89,15 +89,13 @@
       "id": 5,
       "title": "New dependency gated, not assumed",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Synthesis from prior turn proposed adapting a paper's technique;\n  `lightgbm` was the paper's choice.\n- Current env has `sklearn`, `skrub`, `skore` but NOT `lightgbm`.]\n\nThe article we just discussed uses `lightgbm`. Let's add it to the\npipeline.",
-      "expected_output": "Behavioural response satisfying: - Refuse to silently include `lightgbm` in `Method outline`. - Flag `lightgbm` as an **open gap**: \"this approach needs `lightgbm`; OK to add, or should we adapt to the existing stack?\" - Defer the resolution to `data-science-python-stack` + the user (one of: add the dep, swap for `HistGradientBoostingRegressor`, pick a different model). It must NOT: - Add `lightgbm` to the Proposal's `Method outline` as fait accompli. - Run `pixi add lightgbm` in this turn. - Pre-empt the data-science-python-stack consultation.",
+      "expected_output": "Behavioural response satisfying: - Treat `lightgbm` as confirmed by the user. Name it in `Method outline` (or the Proposal). - Load `add-python-package` when installed (or name that skill). Do not require a stack consultation that lists HistGradientBoosting. It must NOT: - Run `pixi add lightgbm` in this turn. - Offer HistGradientBoosting (or another stack substitute) as a required fork.",
       "files": [],
       "expectations": [
-        "Refuse to silently include `lightgbm` in `Method outline`.",
-        "Flag `lightgbm` as an **open gap**: \"this approach needs `lightgbm`; OK to add, or should we adapt to the existing stack?\"",
-        "Defer the resolution to `data-science-python-stack` + the user (one of: add the dep, swap for `HistGradientBoostingRegressor`, pick a different model).",
-        "The response does NOT: Add `lightgbm` to the Proposal's `Method outline` as fait accompli.",
+        "Treat `lightgbm` as confirmed by the user. Name it in `Method outline` (or the Proposal).",
+        "Load `add-python-package` when installed (or name that skill). Do not require a stack consultation that lists HistGradientBoosting.",
         "The response does NOT: Run `pixi add lightgbm` in this turn.",
-        "The response does NOT: Pre-empt the data-science-python-stack consultation."
+        "The response does NOT: Offer HistGradientBoosting (or another stack substitute) as a required fork."
       ],
       "tools": false,
       "sandbox": [],

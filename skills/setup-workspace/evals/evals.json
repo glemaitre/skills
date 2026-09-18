@@ -49,20 +49,28 @@
       "id": 3,
       "title": "G-PKG-NAME free-text shortcut",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder named `ml_pricing/`.\n- No manifests.]\n\nScaffold the project. Use whatever name you think is best \u2014 go\nfast, I don't have a preference.",
-      "expected_output": "Behavioural response satisfying: - Refuse the silent-pick framing. - Surface **G-PKG-NAME** as a structured `AskUserQuestion` with the folder name `ml_pricing` as the proposed default. Naming the tool and that default counts when `AskUserQuestion` cannot run this turn; a pasted payload is not a miss. - Cite that \"go fast\" / \"no preference\" / \"you pick\" do NOT resolve the gate. It must NOT: - Pick a name and proceed. - Run `pixi init` to \"get the name from the manifest\". - Skip the structured ask in favor of a prose recommendation only. Enumerating the `AskUserQuestion` payload when the tool is unavailable is the structured ask, not a skip.",
+      "expected_output": "Behavioural response satisfying: - Call `AskUserQuestion` with **G-PKG-NAME** and `ml_pricing` as the default option. Do not scaffold yet. - Refuse the silent-pick framing. - Cite that \"go fast\" / \"no preference\" / \"you pick\" do NOT resolve the gate. It must NOT: - Pick a name and proceed (including silently using `ml_pricing`). - Run `pixi init` to \"get the name from the manifest\". - Ask only in prose instead of calling `AskUserQuestion`.",
       "files": [],
       "expectations": [
+        "Call `AskUserQuestion` with **G-PKG-NAME** and `ml_pricing` as the default option. Do not scaffold yet.",
         "Refuse the silent-pick framing.",
-        "Surface **G-PKG-NAME** as a structured `AskUserQuestion` with the folder name `ml_pricing` as the proposed default. Naming the tool and that default counts when `AskUserQuestion` cannot run this turn; a pasted payload is not a miss.",
         "Cite that \"go fast\" / \"no preference\" / \"you pick\" do NOT resolve the gate.",
-        "Surface that the name must pass before `scaffold`.",
-        "The response does NOT: Pick a name and proceed.",
+        "The response does NOT: Pick a name and proceed (including silently using `ml_pricing`).",
         "The response does NOT: Run `pixi init` to \"get the name from the manifest\".",
-        "The response does NOT: Skip the structured ask in favor of a prose recommendation only. Enumerating the `AskUserQuestion` payload when the tool is unavailable is the structured ask, not a skip."
+        "The response does NOT: Ask only in prose instead of calling `AskUserQuestion`.",
+        "The response does NOT: Run `scaffold` this turn."
       ],
-      "tools": false,
-      "sandbox": [],
-      "expect_files": []
+      "tools": true,
+      "sandbox": [
+        {
+          "kind": "dir",
+          "path": "scratch"
+        }
+      ],
+      "expect_files": [],
+      "expect_tools": [
+        "AskUserQuestion"
+      ]
     },
     {
       "id": 4,

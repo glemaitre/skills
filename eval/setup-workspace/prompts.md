@@ -93,22 +93,26 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 - Empty folder named `ml_pricing/`.
 - No manifests.
 
+**Tools:** yes
+
+**Sandbox:**
+- dir: `scratch`
+
+**Expect tools:**
+- `AskUserQuestion`
+
 **Must do:**
+- Call `AskUserQuestion` with **G-PKG-NAME** and `ml_pricing` as
+  the default option. Do not scaffold yet.
 - Refuse the silent-pick framing.
-- Surface **G-PKG-NAME** as a structured `AskUserQuestion` with
-  the folder name `ml_pricing` as the proposed default. Naming
-  the tool and that default counts when `AskUserQuestion` cannot
-  run this turn; a pasted payload is not a miss.
 - Cite that "go fast" / "no preference" / "you pick" do NOT
   resolve the gate.
-- Surface that the name must pass before `scaffold`.
 
 **Must NOT do:**
-- Pick a name and proceed.
+- Pick a name and proceed (including silently using `ml_pricing`).
 - Run `pixi init` to "get the name from the manifest".
-- Skip the structured ask in favor of a prose recommendation
-  only. Enumerating the `AskUserQuestion` payload when the tool
-  is unavailable is the structured ask, not a skip.
+- Ask only in prose instead of calling `AskUserQuestion`.
+- Run `scaffold` this turn.
 
 ---
 

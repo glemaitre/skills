@@ -11,6 +11,8 @@
 - Pixi project (`pixi.toml` or `[tool.pixi]`).
 - `status.policy.env.managed` is true.
 - `env_manager` is pixi.
+- `python -m skore_skills env route skrub` returns
+  `scope: default`.
 
 **Must do:**
 - Emit the Pre-flight then run the commands (do not stop after
@@ -55,6 +57,9 @@
 **Assumed workspace state:**
 - `policy.env.managed` is false.
 - User picks **Please install this now**.
+- `python -m skore_skills env route pytest` returns
+  `scope: default`.
+- pytest is a stage library (not agent).
 
 **Must do:**
 - Show the manager command (pytest on default, not agent).
@@ -67,20 +72,23 @@
 
 ---
 
-## CASE_04 — Forbidden substitute
+## CASE_04 — Named booster is added
 
 **User prompt:**
 > Add xgboost.
 
 **Assumed workspace state:**
 - Managed pixi project.
+- `python -m skore_skills env route xgboost` returns
+  `scope: default`.
 
 **Must do:**
-- Refuse using the stack substitute (HistGradientBoosting).
-- Surface the CLI refusal if `env add xgboost` is printed.
+- Name `python -m skore_skills env add --execute xgboost` (or
+  `env route` then that add).
 
 **Must NOT do:**
-- Install xgboost.
+- Refuse xgboost or swap it for HistGradientBoosting.
+- Run `pip install xgboost`.
 
 ---
 

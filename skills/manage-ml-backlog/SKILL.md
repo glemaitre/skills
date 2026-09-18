@@ -17,8 +17,14 @@ evaluate, or audit methodology.
 1. Run `python -m skore_skills status`. Require an approved stem
    and a report/audit digest when recording a done outcome.
 2. Read `journal/JOURNAL.md` History and Backlog. If the index is
-   missing, initialize the packaged shape with
-   `python -m skore_skills scaffold --journal`; do not invent it.
+   missing, run `python -m skore_skills scaffold --journal`. Do
+   not write or paste the file. The CLI writes four sections:
+   Status, Data understanding, History, and Backlog. If that
+   command cannot run this turn, name it and stop. After the file
+   exists, edit the existing History and Backlog tables (columns:
+   Stem, Intent, Status, Headline result, Design note; and #,
+   Item, Source). Stable `B<N>` indices. Do not renumber on
+   removal.
 3. If recording a run: copy the headline metric from the audit
    digest or the user's value. Do not invent numbers. Update the
    matching History row (`planned` → `done` only if smoke passed).
@@ -30,25 +36,15 @@ evaluate, or audit methodology.
    or stop. When a row is selected, the model stage can create its
    design-note shell with
    `python -m skore_skills scaffold --journal --stem <NN_short_name>`.
-   Do not draft it in this backlog turn.
-
-Use the existing table shapes in `journal/JOURNAL.md`:
-
-```text
-## History
-| Stem | Intent (one line) | Status | Headline result | Design note |
-
-## Backlog
-| # | Item | Source |
-```
-
-Stable `B<N>` indices. Do not renumber on removal.
+   Do not draft that template in this backlog turn.
 
 ## Stop conditions
 
 - Do not design or implement the next experiment in this turn.
 - Do not dispatch setup, model, or audit by skill id.
 - Do not invent metrics.
+- Do not paste a `JOURNAL.md` body or recreate the index from
+  memory.
 - Do not mark `done` while smoke is red.
 - G-DESIGN stays in the implement/evaluate skills, not here.
 

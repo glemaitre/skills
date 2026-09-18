@@ -57,6 +57,13 @@ after listing the boxes.
    2. **Please install this now** — show the same command, wait
       until the user confirms it is done, then return.
 
+   Show **exactly one** print-only command. Do not list
+   `--feature agent`, `--group`, `ask`, or refuse unless
+   `env route` JSON **this turn** returned that `scope`. If
+   route did not run, use the default-scope form
+   (`python -m skore_skills env add <pkg>` with no
+   `--feature`).
+
 5. If this turn is editable and `has_src` is true:
 
    ```bash
@@ -75,18 +82,21 @@ after listing the boxes.
    If the mode is unset, return to `evaluate-ml-pipeline`. Do not
    spell `skore[...]` or pick conda vs PyPI yourself. See
    `add-python-package/references/skore_variant.md`.
-7. Else `python -m skore_skills env route <pkg>`. Then:
+7. Else `python -m skore_skills env route <pkg>`. Use **only** the
+   `scope` returned **this turn**. Do not list other branches. Do
+   not guess `default`.
 
-   - `scope` `default` → `env add --execute <pkg>`
-   - `scope` `agent` → `env add --feature agent --execute <pkg>`
-   - `scope` `ask` → G-ENV-SCOPE, then `env add` with the chosen
+   - No JSON this turn → name `env route <pkg>` and stop. Do not
+     `env add --execute`.
+   - `refuse` → stop. Quote `message`. Do not install.
+   - `default` → `env add --execute <pkg>`
+   - `agent` → `env add --feature agent --execute <pkg>`
+   - `ask` → G-ENV-SCOPE, then `env add` with the chosen
      `--feature` / `--group`
-   - refuse → stop; do not install
 
-   Always pass `--execute`. Never paste `pixi add` / `uv add` /
-   `pip install` from memory.
-
-Forbidden substitutes stay in the CLI (`python-stack.json`).
+   When `managed` is true and `scope` is not `refuse`, pass
+   `--execute` on that one command. Never paste `pixi add` /
+   `uv add` / `pip install` from memory.
 
 Return when the import is available, when the user confirmed they
 installed it, or when they chose to handle it themselves.

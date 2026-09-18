@@ -10,8 +10,9 @@ description: >
   SKIP pipeline, evaluation, EDA, and library choice.
 
   HOW TO USE: detect first. For a fresh or manager-only layout,
-  ask G-PKG-NAME, then scaffold. For an existing layout, stop
-  without scaffolding or inventing files.
+  resolve G-PKG-NAME only via `AskUserQuestion`, then scaffold.
+  For an existing layout, stop without scaffolding or inventing
+  files.
 ---
 
 # Set Up Workspace
@@ -40,10 +41,12 @@ after listing the boxes.
 
 ## Sequence
 
-1. If fresh or manager-only, ask **G-PKG-NAME** (the `src/<pkg>/`
-   import name; folder name as default). “You pick” does not
-   resolve it. A matching `[project] name` + `src/<pkg>/` already
-   resolves it.
+1. If fresh or manager-only, resolve **G-PKG-NAME** only via the
+   `AskUserQuestion` tool (the `src/<pkg>/` import name; folder
+   name as the default option). “You pick” / “go fast” does not
+   resolve it. Do not confirm in prose instead of the tool. A
+   matching `[project] name` + `src/<pkg>/` already resolves it —
+   do not re-ask.
 2. Fresh / manager-only:
 
    ```bash

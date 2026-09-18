@@ -28,7 +28,13 @@ from tests.eval.harness import (
     visible_text,
     write_transcript,
 )
-from tests.eval.sandbox import TOOLS_NOTE, Sandbox, missing_cli, missing_reads
+from tests.eval.sandbox import (
+    TOOLS_NOTE,
+    Sandbox,
+    missing_cli,
+    missing_reads,
+    missing_tools,
+)
 from tests.eval.tiers import skill_tier
 
 
@@ -182,6 +188,7 @@ def test_skill_case(
     missing_files: list[str] = []
     missing_reads_list: list[str] = []
     missing_cli_list: list[str] = []
+    missing_tools_list: list[str] = []
     if eval_case.tools:
         with TemporaryDirectory(prefix="skill-eval-") as tmp:
             box = Sandbox(Path(tmp))
@@ -198,6 +205,9 @@ def test_skill_case(
             )
             missing_cli_list = missing_cli(
                 result.tool_trace, list(eval_case.expect_cli)
+            )
+            missing_tools_list = missing_tools(
+                result.tool_trace, list(eval_case.expect_tools)
             )
             payload["sandbox_tree"] = box.list_tree()
     else:
@@ -230,6 +240,7 @@ def test_skill_case(
             "missing_files": missing_files,
             "missing_reads": missing_reads_list,
             "missing_cli": missing_cli_list,
+            "missing_tools": missing_tools_list,
             "skipped": bool(skip_reason),
             "skip_reason": skip_reason,
         }
@@ -258,7 +269,12 @@ def test_skill_case(
         )
 
     if not eval_case.expectations:
-        passed = not missing_files and not missing_reads_list and not missing_cli_list
+        passed = (
+            not missing_files
+            and not missing_reads_list
+            and not missing_cli_list
+            and not missing_tools_list
+        )
         record_eval_result(mode=skill_mode, case=eval_case, passed=passed)
         payload["passed"] = passed
         payload["metrics"] = []
@@ -278,6 +294,10 @@ def test_skill_case(
                 extra_bits.append(
                     "Missing expected run_skore_skills argv: "
                     + ", ".join(missing_cli_list)
+                )
+            if missing_tools_list:
+                extra_bits.append(
+                    "Missing expected tools: " + ", ".join(missing_tools_list)
                 )
             pytest.fail(
                 format_eval_failure(
@@ -316,6 +336,7 @@ def test_skill_case(
         missing_files=missing_files,
         missing_reads=missing_reads_list,
         missing_cli=missing_cli_list,
+        missing_tools=missing_tools_list,
     )
     payload["passed"] = hard_pass
     payload["must_do_weak"] = must_do_weak
@@ -333,6 +354,10 @@ def test_skill_case(
     if missing_cli_list:
         extra_bits.append(
             "Missing expected run_skore_skills argv: " + ", ".join(missing_cli_list)
+        )
+    if missing_tools_list:
+        extra_bits.append(
+            "Missing expected tools: " + ", ".join(missing_tools_list)
         )
     extra = " ".join(extra_bits)
 
