@@ -10,6 +10,7 @@
 **Assumed workspace state:**
 - Existing scaffold with no specific task requested.
 - No `.skore` file.
+- `status.eda` is `missing`.
 - `status.skills` reports the usual entry skills `true`.
 
 **Must do:**
@@ -18,6 +19,8 @@
   (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
   `evaluate-ml-pipeline`, `audit-ml-pipeline`,
   `manage-ml-backlog` if installed). One pick.
+- Name `explore-ml-data` as the recommended next stage; do not
+  auto-load it.
 - Do not treat the missing `.skore` as an empty project despite
   the existing scaffold.
 
@@ -124,3 +127,46 @@
 **Must NOT do:**
 - Ask which entry skill to run.
 - Start EDA methodology in triage instead of loading the skill.
+
+---
+
+## CASE_07 — Model request while EDA is missing
+
+**User prompt:**
+> Build the first baseline model.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.eda` is `missing`.
+- `status.skills.explore-ml-data` is `true`.
+- `status.skills.model-ml-pipeline` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- AskUserQuestion: run EDA first (default) vs proceed to modeling
+  with user-supplied facts.
+- Do not invent dataset facts.
+
+**Must NOT do:**
+- Auto-load `model-ml-pipeline`.
+- Auto-load `explore-ml-data` without asking.
+
+---
+
+## CASE_08 — Model request after EDA is present
+
+**User prompt:**
+> Build the first baseline model.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.eda` is `present`.
+- `status.skills.model-ml-pipeline` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `model-ml-pipeline` without an EDA AskUserQuestion.
+
+**Must NOT do:**
+- Ask which entry skill to run.
+- Load `explore-ml-data` first.

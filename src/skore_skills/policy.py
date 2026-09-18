@@ -208,7 +208,7 @@ def infer_loop_stage(
         return str(recorded)
     if not snapshot.get("has_src") and not snapshot.get("has_journal"):
         return "setup"
-    if snapshot.get("eda") != "present":
+    if snapshot.get("eda") not in {"present", "skipped"}:
         return "eda"
     stem = policy.get("loop", {}).get("stem") or snapshot.get("last_history_stem")
     if not stem:

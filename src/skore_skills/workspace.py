@@ -5,6 +5,7 @@ Detection uses root manifests only. Ambient PATH managers are ignored.
 
 from __future__ import annotations
 
+import re
 import tomllib
 from pathlib import Path
 from typing import Any
@@ -146,6 +147,25 @@ def last_history_stem(root: Path) -> str | None:
     return notes[-1].stem
 
 
+_EDA_SECTION = re.compile(
+    r"^## Data understanding \(EDA\)\s*\n(.*?)(?=^## |\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+_EDA_SKIPPED = re.compile(r"(?im)^\s*-\s+\*\*Status:\*\*\s*skipped\b")
+
+
+def eda_state(root: Path) -> str:
+    """Return ``present``, ``skipped``, or ``missing`` for project EDA."""
+    if (root / "eda" / "eda.md").is_file():
+        return "present"
+    journal = root / "journal" / "JOURNAL.md"
+    if journal.is_file():
+        match = _EDA_SECTION.search(journal.read_text(encoding="utf-8"))
+        if match and _EDA_SKIPPED.search(match.group(1)):
+            return "skipped"
+    return "missing"
+
+
 def ruff_is_configured(root: Path) -> bool:
     """Return True if ``ruff.toml`` or ``[tool.ruff]`` is present."""
     if (root / "ruff.toml").is_file():
@@ -173,7 +193,7 @@ def snapshot(root: Path) -> dict[str, Any]:
         "has_experiments": (root / "experiments").is_dir(),
         "has_journal": (root / "journal").is_dir(),
         "has_tests": (root / "tests").is_dir(),
-        "eda": "present" if (root / "eda" / "eda.md").is_file() else "missing",
+        "eda": eda_state(root),
         "ruff_toml": ruff_is_configured(root),
         "git": (root / ".git").exists(),
         "last_history_stem": last_history_stem(root),

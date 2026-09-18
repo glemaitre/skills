@@ -126,6 +126,31 @@ def test_status_eda_reads_eda_dir_not_data_dir(tmp_path: Path) -> None:
     assert snapshot(tmp_path)["eda"] == "present"
 
 
+def test_status_eda_skipped_from_journal(tmp_path: Path) -> None:
+    """JOURNAL ``Status: skipped`` is ``eda: skipped`` and leaves the EDA stage."""
+    (tmp_path / "src").mkdir()
+    _write(
+        tmp_path / "journal" / "JOURNAL.md",
+        "## Data understanding (EDA)\n\n"
+        "- **Status:** skipped — 2026-09-18\n\n"
+        "## History\n",
+    )
+    payload = snapshot(tmp_path)
+    assert payload["eda"] == "skipped"
+    assert payload["loop_stage"] == "implement"
+
+
+def test_status_eda_present_overrides_journal_skipped(tmp_path: Path) -> None:
+    """``eda/eda.md`` wins when JOURNAL still says skipped."""
+    (tmp_path / "src").mkdir()
+    _write(
+        tmp_path / "journal" / "JOURNAL.md",
+        "## Data understanding (EDA)\n\n- **Status:** skipped — 2026-09-18\n",
+    )
+    _write(tmp_path / "eda" / "eda.md", "# eda\n")
+    assert snapshot(tmp_path)["eda"] == "present"
+
+
 def test_status_hatchling_build_is_not_hatch_env_manager(tmp_path: Path) -> None:
     """``[tool.hatch.build]`` alone is a build backend, not hatch envs."""
     _write(

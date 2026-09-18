@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "547db7055b4b7f76d3a41c4e5624d34060814f96d98dfebbaa130059bdd43d20",
+  "catalog_hash": "f9cac92ee60f7322f76bf8a88503b896470b73ce7966aa64a553f60f0295ef54",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "c6d4f5c7d13d50421a5b510e58a75710bb8c1e56b2c2246504e0b8e5ca0707d5"
+      "hash": "98bf37d4e30b09212847bcd19da25ed76ba4e5f7866ae62f038aff59012786ff"
     },
     {
       "id": "build-ml-pipeline",
@@ -102,7 +102,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "b798846ac740af61bdb85e017aa79df57727d752aba4ce394467f43a951b9cba"
+      "hash": "61e9008607e2fc87ede97fd648bb21963d8bd327118a9f74c648230d2009bd9d"
     },
     {
       "id": "setup-ml-project",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build, evaluation, and smoke testing.",
       "category": "meta",
       "subcategory": null,
-      "hash": "77118ffe192d27cd6d324ac8b61e024f37e84b5f3cb452924c25d6885ec95704"
+      "hash": "e0bea5b219364d8c778f3017539642c85fed6299d7b3856748c92edf66adb5f2"
     },
     {
       "id": "choose-python-library",

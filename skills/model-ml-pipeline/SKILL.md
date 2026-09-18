@@ -33,6 +33,8 @@ Before new library symbols are written, use
 - Do not replace skrub DataOps with bare sklearn Pipeline.
 - Do not persist a result as done while smoke tests fail.
 - Do not duplicate child-skill methodology in this dispatcher.
+- If `status.eda` is `missing`, continue with facts the user
+  stated; do not invent an EDA report.
 
 After build and smoke succeed, run
 `python -m skore_skills git end-turn --stage implement`. If JSON

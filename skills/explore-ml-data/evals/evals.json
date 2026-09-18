@@ -35,6 +35,73 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "Skip G-EDA",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists (`has_src`, `journal/JOURNAL.md`).\n- `status.eda` is `missing`.\n- No `eda/eda.md`.]\n\nSkip the EDA. I already know the data.",
+      "expected_output": "Behavioural response satisfying: - Record JOURNAL \u00a7 Data understanding `Status: skipped` with a date. - Stop without placing `eda/eda.py`. It must NOT: - Run `python -m skore_skills cells run`. - Write `eda/eda.py` or `eda/eda.md`. - Pick a package name or start modeling.",
+      "files": [],
+      "expectations": [
+        "Record JOURNAL \u00a7 Data understanding `Status: skipped` with a date.",
+        "Stop without placing `eda/eda.py`.",
+        "The response does NOT: Run `python -m skore_skills cells run`.",
+        "The response does NOT: Write `eda/eda.py` or `eda/eda.md`.",
+        "The response does NOT: Pick a package name or start modeling."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "EDA already present, no refresh",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `eda/eda.md` exists.\n- JOURNAL \u00a7 Data understanding records `Status: done`.\n- The user did not ask to re-run or refresh EDA.]\n\nExplore the dataset.",
+      "expected_output": "Behavioural response satisfying: - Detect EDA already recorded (`status.eda` present). - Stop without overwriting `eda/eda.py` or `eda/eda.md`. It must NOT: - Re-run `cells run` or rewrite the report. - Design a model in this skill.",
+      "files": [],
+      "expectations": [
+        "Detect EDA already recorded (`status.eda` present).",
+        "Stop without overwriting `eda/eda.py` or `eda/eda.md`.",
+        "The response does NOT: Re-run `cells run` or rewrite the report.",
+        "The response does NOT: Design a model in this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 5,
+      "title": "Human notebook vs agent scratch",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`. Skrub and IPython are\n  installed.\n- Raw data path is known.\n- User chose **run** for G-EDA.]\n\nExplore the dataset. Write the TableReport HTML next to the EDA\nscript.",
+      "expected_output": "Behavioural response satisfying: - Write `eda/eda_<table>.html` (not under `data/`). - End overview cells on `TableReport` (or the frame), not on a json/dict digest. - Embed or link that HTML from `eda/eda.md`. It must NOT: - Put unique-ratio / column-dict / `report.json()` cells in `eda/eda.py`. - Write HTML under `data/`. - Modify the user's raw data files.",
+      "files": [],
+      "expectations": [
+        "Write `eda/eda_<table>.html` (not under `data/`).",
+        "End overview cells on `TableReport` (or the frame), not on a json/dict digest.",
+        "Embed or link that HTML from `eda/eda.md`.",
+        "Put `TableReport.json()` under `scratch/eda/`, not in `eda.py`.",
+        "The response does NOT: Put unique-ratio / column-dict / `report.json()` cells in `eda/eda.py`.",
+        "The response does NOT: Write HTML under `data/`.",
+        "The response does NOT: Modify the user's raw data files."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 6,
+      "title": "Missing IPython delegates to add-python-package",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. User chose **run**.\n- `ipython` is not importable in the project env.\n- `add-python-package` is installed.]\n\nRun the EDA now.",
+      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `ipython` (`env route` agent scope). Do not place a fabricated digest. It must NOT: - Run `pixi add ipython` / `uv add ipython` from this skill. - Hand-write expected EDA output.",
+      "files": [],
+      "expectations": [
+        "Load `add-python-package` for `ipython` (`env route` agent scope). Do not place a fabricated digest.",
+        "The response does NOT: Run `pixi add ipython` / `uv add ipython` from this skill.",
+        "The response does NOT: Hand-write expected EDA output."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }
