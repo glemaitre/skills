@@ -56,8 +56,9 @@ read the report. The pipeline declaration is out of scope (see
   If mode is already recorded, do not re-ask.
 - **Missing dependency.** If `import skore` raises in this project's
   env, STOP. Fire G-SKORE-MODE first if `policy.skore_mode` is
-  unset, then **invoke `add-python-package`**. Surface the command
-  and wait for confirmation.
+  unset, then **invoke `add-python-package`**. Surface the manager
+  install line from that skill (or “install Skore with pixi/uv”),
+  not the wrapper. Wait for confirmation if the env is unmanaged.
   **Do not drop back to `cross_val_score`, `cross_validate`,
   `classification_report`, or hand-rolled metric prints** — that
   silently rewrites this skill out of the project. See

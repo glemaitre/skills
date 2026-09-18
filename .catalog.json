@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "d2c603e4af60bda681524f5f6c07f524582776dabafbd36157e55d7fbb3da5fc",
+  "catalog_hash": "547db7055b4b7f76d3a41c4e5624d34060814f96d98dfebbaa130059bdd43d20",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "a146ecfbeae2ef4dece836e7d4d5d640ff80fe8b0d0931bdd89daf6160aa049a"
+      "hash": "54553441013cf1e3f06d33af433f7de62a27c0121dd66276e4847b5423a8fda2"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "03b80d151eb0d90ecb0bca15751e82eb5785d145d73d4b9ca0921e83aed16534"
+      "hash": "2af5db202d195b6856f733c9974e752fda271db03a43eb7cf5a534503dc5f929"
     },
     {
       "id": "iterate-from-skore",
@@ -156,7 +156,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "9b4db5fcc1989bd37137d0716fe1e9101e10e45b07229260cb16fc69e8bef6d4"
+      "hash": "229d27a6672cd4ac8a63d4b7e9cea6dddfcd5bfddddd410856a9cb6b0c847e67"
     },
     {
       "id": "setup-workspace",
@@ -174,7 +174,7 @@
       "summary": "Detect the env manager, persist managed vs user-managed, and init two envs plus agent tools.",
       "category": "action",
       "subcategory": null,
-      "hash": "f1312824eb3bb3b2c8c7302a2633c123a8f3ff7ae279831a022f837d1f434fa7"
+      "hash": "d83ec4cde780623b1a157310855352c3481403d9bd32c3201418ef485f2f1bca"
     }
   ],
   "workflows": [

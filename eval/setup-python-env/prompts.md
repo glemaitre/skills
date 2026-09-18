@@ -36,8 +36,8 @@ violated.
   Do not ask G-SKORE-MODE during bootstrap.
 - Name `python -m skore_skills env verify --execute`.
 - Narrate default, agent, and composed dev: plain skore belongs to
-  default and supplies skore-skills; ruff, ipython, and ipykernel
-  belong to agent.
+  default; ruff, ipython, and ipykernel belong to agent. Do not
+  narrate `skore-skills` to the user.
 
 **Must NOT do:**
 - Install scikit-learn, skrub, or pandas in this turn.
@@ -124,7 +124,8 @@ violated.
 **Must do:**
 - Direct the turn to `add-python-package` (this skill is
   bootstrap-only).
-- Mention G-ENV-SCOPE lives there (default vs a named feature).
+- Mention G-ENV-SCOPE lives there (project runtime vs a named
+  optional extra).
 
 **Must NOT do:**
 - Silently `pixi add optuna` from this skill.

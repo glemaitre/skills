@@ -39,12 +39,13 @@
 
 **Must do:**
 - Ask with two options; default **I will handle it**.
-- Name the package and the manager command (`pixi add pandas` or
-  print-only `env add` as a hint).
+- Name the package and show the manager command (`pixi add pandas`).
 - Return without waiting after the default choice.
 
 **Must NOT do:**
-- Run `env add` or `pixi add` itself.
+- Pass `--execute` on `env add`.
+- Mention `python -m skore_skills` or `env add` in the user-facing
+  ask.
 - Treat unmanaged as silent skip without naming the package.
 
 ---
@@ -68,6 +69,7 @@
 
 **Must NOT do:**
 - Run `python -m skore_skills env add pytest --execute`.
+- Show `python -m skore_skills env add` in the user-facing ask.
 - Put pytest in `--feature agent`.
 
 ---
@@ -161,10 +163,12 @@
 
 **Must do:**
 - Name `python -m skore_skills env route optuna`.
-- Ask G-ENV-SCOPE (default vs a named feature/group).
-- After the choice, `env add --execute` with the chosen
+- Ask G-ENV-SCOPE in plain language (project runtime vs a named
+  optional extra / agent tools).
+- After the choice, `env add --execute` with the mapped
   `--feature` / `--group`.
 
 **Must NOT do:**
 - Silently `pixi add optuna` from memory.
+- Put `--feature` / `--group` in the question text.
 - Put optuna on `--feature agent` without asking.

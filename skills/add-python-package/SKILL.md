@@ -22,6 +22,14 @@ description: >
 The only skill that knows `python -m skore_skills env add`. Callers
 must not splice manager commands themselves.
 
+## User-facing language
+
+Run `python -m skore_skills …` yourself. In questions and replies,
+name the manager command from print-only stdout (`pixi add …`,
+`uv add …`, `pip install …`) or a plain-language intent. Never
+paste `python -m skore_skills`, `env add`, `env add-skore`, or
+`--feature` / `--group` as something the user should run or choose.
+
 ## Pre-flight
 
 Tick, then immediately run the matching sequence step. Do not stop
@@ -48,21 +56,21 @@ after listing the boxes.
    - **Named package** otherwise (`skrub`, pandas, …). Never
      `--editable` for a named dependency.
 
-4. If `managed` is false: **do not** `--execute`. Ask with two
-   options:
+4. If `managed` is false: **do not** `--execute`. Run print-only
+   `env add` (or `env add --editable`, or `env add-skore --mode
+   <mode>`) to obtain the manager line. Ask with two options:
 
    1. **I will handle it** (default) — name the package(s) and
-      print-only `env add` (or `env add --editable`, or
-      `env add-skore --mode <mode>`). Do not wait; return.
-   2. **Please install this now** — show the same command, wait
-      until the user confirms it is done, then return.
+      **show that stdout** (e.g. `pixi add pandas`). Do not wait;
+      return.
+   2. **Please install this now** — show the same manager line,
+      wait until the user confirms it is done, then return.
 
-   Show **exactly one** print-only command. Do not list
-   `--feature agent`, `--group`, `ask`, or refuse unless
-   `env route` JSON **this turn** returned that `scope`. If
-   route did not run, use the default-scope form
-   (`python -m skore_skills env add <pkg>` with no
-   `--feature`).
+   Show **exactly one** manager command. Do not list agent extras,
+   optional extras, `ask`, or refuse unless `env route` JSON
+   **this turn** returned that `scope`. If print-only did not run,
+   name the package and the manager in words. Do not invent a
+   wrapper command.
 
 5. If this turn is editable and `has_src` is true:
 
@@ -91,8 +99,9 @@ after listing the boxes.
    - `refuse` → stop. Quote `message`. Do not install.
    - `default` → `env add --execute <pkg>`
    - `agent` → `env add --feature agent --execute <pkg>`
-   - `ask` → G-ENV-SCOPE, then `env add` with the chosen
-     `--feature` / `--group`
+   - `ask` → G-ENV-SCOPE: ask project runtime vs a named optional
+     extra / agent tools. Map the answer to `--feature` / `--group`
+     privately, then `env add` with that flag.
 
    When `managed` is true and `scope` is not `refuse`, pass
    `--execute` on that one command. Never paste `pixi add` /

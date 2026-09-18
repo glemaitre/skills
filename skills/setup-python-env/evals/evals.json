@@ -16,7 +16,7 @@
         "After init, name `python -m skore_skills env sync --execute` (do not invent `pixi install` / `pixi init`).",
         "Install plain Skore immediately afterward with `python -m skore_skills env add-skore --mode local --execute`. Do not ask G-SKORE-MODE during bootstrap.",
         "Name `python -m skore_skills env verify --execute`.",
-        "Narrate default, agent, and composed dev: plain skore belongs to default and supplies skore-skills; ruff, ipython, and ipykernel belong to agent.",
+        "Narrate default, agent, and composed dev: plain skore belongs to default; ruff, ipython, and ipykernel belong to agent. Do not narrate `skore-skills` to the user.",
         "The response does NOT: Install scikit-learn, skrub, or pandas in this turn.",
         "The response does NOT: Install `skore-skills` directly.",
         "The response does NOT: Run `pixi init` before the gates resolve.",
@@ -81,11 +81,11 @@
       "id": 5,
       "title": "Ambiguous extras are not bootstrap",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- pixi project already bootstrapped; `env.managed` is true.]\n\nAdd optuna.",
-      "expected_output": "Behavioural response satisfying: - Direct the turn to `add-python-package` (this skill is bootstrap-only). - Mention G-ENV-SCOPE lives there (default vs a named feature). It must NOT: - Silently `pixi add optuna` from this skill. - Re-run `env init`.",
+      "expected_output": "Behavioural response satisfying: - Direct the turn to `add-python-package` (this skill is bootstrap-only). - Mention G-ENV-SCOPE lives there (project runtime vs a named optional extra). It must NOT: - Silently `pixi add optuna` from this skill. - Re-run `env init`.",
       "files": [],
       "expectations": [
         "Direct the turn to `add-python-package` (this skill is bootstrap-only).",
-        "Mention G-ENV-SCOPE lives there (default vs a named feature).",
+        "Mention G-ENV-SCOPE lives there (project runtime vs a named optional extra).",
         "The response does NOT: Silently `pixi add optuna` from this skill.",
         "The response does NOT: Re-run `env init`."
       ],

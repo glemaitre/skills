@@ -47,7 +47,8 @@ after listing the boxes.
    order. PATH is not permission. Do not `curl | sh`.
 3. Ask whether **we** manage the env (default yes). Persist
    `python -m skore_skills policy set env.managed true` or `false`.
-4. Unmanaged: stop. Name ruff / ipython / ipykernel / skore; do not init.
+4. Unmanaged: stop. Name ruff / ipython / ipykernel / skore; do
+   not init. Do not mention `skore-skills` to the user.
 5. Managed: `policy set env_manager <manager>`, then
 
    ```bash
@@ -70,6 +71,8 @@ after listing the boxes.
    ipykernel and stop.
 
 ## Three environments
+
+Agent context only; do not narrate `skore-skills` to the user.
 
 - **default** — project runtime; bootstrap installs plain `skore`,
   which supplies `skore-skills`.
