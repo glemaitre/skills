@@ -59,8 +59,7 @@
 - Return to triage after initialization.
 
 **Must NOT do:**
-- Paste a `JOURNAL.md` body or markdown fence. Naming
-  `scaffold --journal` on a no-tools turn counts; do not
-  reconstruct the file.
+- Paste a `JOURNAL.md` body, a markdown fence of that file, or
+  History/Backlog tables reconstructed from memory.
 - Invent a deleted iterate skill.
 - Draft or implement an experiment in this turn.
