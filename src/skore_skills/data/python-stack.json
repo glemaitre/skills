@@ -1,5 +1,5 @@
 {
-    "mandatory": [
+  "mandatory": [
     "ruff",
     "ipython",
     "ipykernel"
@@ -10,6 +10,12 @@
     "skore",
     "pytest"
   ],
+    "export": [
+        "jupytext",
+        "nbclient",
+        "nbconvert",
+        "mkdocs-material"
+    ],
   "competing": {
     "tabular": ["pandas", "polars"],
     "deep_learning_framework": ["pytorch", "keras"],
@@ -20,7 +26,6 @@
   "optional": [
     "jupyterlab",
     "ipykernel",
-    "jupytext",
     "pytorch",
     "keras",
     "skorch",

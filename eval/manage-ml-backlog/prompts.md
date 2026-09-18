@@ -63,3 +63,27 @@
   History/Backlog tables reconstructed from memory.
 - Invent a deleted iterate skill.
 - Draft or implement an experiment in this turn.
+
+---
+
+## CASE_04 — Site on rebuilds after backlog
+
+**User prompt:**
+> The 01_baseline run finished. Record it.
+
+**Assumed workspace state:**
+- Audit digest exists with a headline ROC-AUC.
+- Smoke tests passed.
+- History row for `01_baseline` is `running`.
+- `policy.site` is true.
+- `export-ml-site` is installed.
+
+**Must do:**
+- Copy the headline result into the History row.
+- Name `python -m skore_skills site build` before git end-turn.
+- Name `python -m skore_skills git end-turn --stage backlog`.
+
+**Must NOT do:**
+- Fail the backlog turn if site build errors.
+- Run `notebook convert`.
+- Run `git commit` in this skill or `git push`.

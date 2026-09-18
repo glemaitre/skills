@@ -4,12 +4,12 @@
     {
       "id": 1,
       "title": "Ambiguous capability request",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.\n- No `.skore` file.\n- `status.eda` is `missing`.\n- `status.skills` reports the usual entry skills `true`.]\n\nWhat can you help me with on this machine learning project?",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `evaluate-ml-pipeline`, `audit-ml-pipeline`, `manage-ml-backlog` if installed). One pick. - Name `explore-ml-data` as the recommended next stage; do not auto-load it. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill. - Invent a deleted iterate skill as the session owner.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.\n- No `.skore` file.\n- `status.data_analysis` is `missing`.\n- `status.skills` reports the usual entry skills `true`.]\n\nWhat can you help me with on this machine learning project?",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `evaluate-ml-pipeline`, `audit-ml-pipeline`, `manage-ml-backlog`, `export-ml-project` if installed). One pick. - Name `explore-ml-data` as the recommended next stage; do not auto-load it. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill. - Invent a deleted iterate skill as the session owner.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `evaluate-ml-pipeline`, `audit-ml-pipeline`, `manage-ml-backlog` if installed). One pick.",
+        "AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `evaluate-ml-pipeline`, `audit-ml-pipeline`, `manage-ml-backlog`, `export-ml-project` if installed). One pick.",
         "Name `explore-ml-data` as the recommended next stage; do not auto-load it.",
         "Do not treat the missing `.skore` as an empty project despite the existing scaffold.",
         "The response does NOT: Start designing the next experiment.",
@@ -89,13 +89,13 @@
       "id": 6,
       "title": "Certain EDA request",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace with `data/` present.\n- `status.skills.explore-ml-data` is `true`.]\n\nExplore the data in data/.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `explore-ml-data` without listing the catalog menu. It must NOT: - Ask which entry skill to run. - Start EDA methodology in triage instead of loading the skill.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `explore-ml-data` without listing the catalog menu. It must NOT: - Ask which entry skill to run. - Start exploratory data analysis methodology in triage instead of loading the skill.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
         "Load `explore-ml-data` without listing the catalog menu.",
         "The response does NOT: Ask which entry skill to run.",
-        "The response does NOT: Start EDA methodology in triage instead of loading the skill."
+        "The response does NOT: Start exploratory data analysis methodology in triage instead of loading the skill."
       ],
       "tools": false,
       "sandbox": [],
@@ -104,12 +104,12 @@
     {
       "id": 7,
       "title": "Model request while EDA is missing",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.eda` is `missing`.\n- `status.skills.explore-ml-data` is `true`.\n- `status.skills.model-ml-pipeline` is `true`.]\n\nBuild the first baseline model.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion: run EDA first (default) vs proceed to modeling with user-supplied facts. - Do not invent dataset facts. It must NOT: - Auto-load `model-ml-pipeline`. - Auto-load `explore-ml-data` without asking.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.data_analysis` is `missing`.\n- `status.skills.explore-ml-data` is `true`.\n- `status.skills.model-ml-pipeline` is `true`.]\n\nBuild the first baseline model.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion: run exploratory data analysis first (default) vs proceed to modeling with user-supplied facts. - Do not invent dataset facts. It must NOT: - Auto-load `model-ml-pipeline`. - Auto-load `explore-ml-data` without asking.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "AskUserQuestion: run EDA first (default) vs proceed to modeling with user-supplied facts.",
+        "AskUserQuestion: run exploratory data analysis first (default) vs proceed to modeling with user-supplied facts.",
         "Do not invent dataset facts.",
         "The response does NOT: Auto-load `model-ml-pipeline`.",
         "The response does NOT: Auto-load `explore-ml-data` without asking."
@@ -121,14 +121,79 @@
     {
       "id": 8,
       "title": "Model request after EDA is present",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.eda` is `present`.\n- `status.skills.model-ml-pipeline` is `true`.]\n\nBuild the first baseline model.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `model-ml-pipeline` without an EDA AskUserQuestion. It must NOT: - Ask which entry skill to run. - Load `explore-ml-data` first.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.data_analysis` is `present`.\n- `status.skills.model-ml-pipeline` is `true`.]\n\nBuild the first baseline model.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `model-ml-pipeline` without an exploratory data analysis AskUserQuestion. It must NOT: - Ask which entry skill to run. - Load `explore-ml-data` first.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "Load `model-ml-pipeline` without an EDA AskUserQuestion.",
+        "Load `model-ml-pipeline` without an exploratory data analysis AskUserQuestion.",
         "The response does NOT: Ask which entry skill to run.",
         "The response does NOT: Load `explore-ml-data` first."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 9,
+      "title": "Certain notebook request",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.skills.export-ml-notebook` is `true`.]\n\nGive me an executed ipynb of the EDA.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `export-ml-notebook` without listing the catalog menu. It must NOT: - Load `export-ml-project` as the certain skill. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `export-ml-notebook` without listing the catalog menu.",
+        "The response does NOT: Load `export-ml-project` as the certain skill.",
+        "The response does NOT: Ask which entry skill to run."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 10,
+      "title": "Certain website request",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.skills.export-ml-site` is `true`.]\n\nBuild the MkDocs documentation site.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `export-ml-site` without listing the catalog menu. It must NOT: - Load `export-ml-project` as the certain skill. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `export-ml-site` without listing the catalog menu.",
+        "The response does NOT: Load `export-ml-project` as the certain skill.",
+        "The response does NOT: Ask which entry skill to run."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 11,
+      "title": "Generic export",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.skills.export-ml-project` is `true`.]\n\nExport the project.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `export-ml-project` without listing the catalog menu. It must NOT: - Load `export-ml-notebook` as the certain skill. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `export-ml-project` without listing the catalog menu.",
+        "The response does NOT: Load `export-ml-notebook` as the certain skill.",
+        "The response does NOT: Ask which entry skill to run."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 12,
+      "title": "Certain HTML notebook request",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.skills.export-ml-notebook` is `true`.]\n\nGive me an HTML notebook of the EDA.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `export-ml-notebook` without listing the catalog menu. It must NOT: - Load `export-ml-project` as the certain skill. - Load `export-ml-site` as the certain skill. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `export-ml-notebook` without listing the catalog menu.",
+        "The response does NOT: Load `export-ml-project` as the certain skill.",
+        "The response does NOT: Load `export-ml-site` as the certain skill.",
+        "The response does NOT: Ask which entry skill to run."
       ],
       "tools": false,
       "sandbox": [],

@@ -17,7 +17,14 @@ LEGACY_POLICY_FILENAME = ".skore-workspace.json"
 WORKSPACE_KEY = "workspace"
 
 AUTOCOMMIT_VALUES = ("off", "on")
-LOOP_STAGES = ("setup", "eda", "implement", "evaluate", "audit", "backlog")
+LOOP_STAGES = (
+    "setup",
+    "data_analysis",
+    "implement",
+    "evaluate",
+    "audit",
+    "backlog",
+)
 
 POLICY_SET_KEYS = (
     "env_manager",
@@ -25,16 +32,29 @@ POLICY_SET_KEYS = (
     "package",
     "tabular",
     "skore_mode",
+    "notebooks",
+    "site",
     "git.autocommit",
     "loop.stage",
     "loop.stem",
 )
 
 _POLICY_FLAT_KEYS = frozenset(
-    {"env_manager", "env", "package", "tabular", "skore_mode", "git", "loop"}
+    {
+        "env_manager",
+        "env",
+        "package",
+        "tabular",
+        "skore_mode",
+        "notebooks",
+        "site",
+        "git",
+        "loop",
+    }
 )
 MANAGED_TRUE = ("true", "on", "yes")
 MANAGED_FALSE = ("false", "off", "no")
+BOOL_KEYS = frozenset({"notebooks", "site"})
 
 
 def empty_policy() -> dict[str, Any]:
@@ -44,6 +64,8 @@ def empty_policy() -> dict[str, Any]:
         "package": None,
         "tabular": None,
         "skore_mode": None,
+        "notebooks": None,
+        "site": None,
         "env": {"managed": None},
         "git": {"autocommit": None},
         "loop": {"stage": None, "stem": None},
@@ -59,7 +81,14 @@ def _merge_loaded(raw: Any) -> dict[str, Any]:
     data = empty_policy()
     if not isinstance(raw, dict):
         return data
-    for key in ("env_manager", "package", "tabular", "skore_mode"):
+    for key in (
+        "env_manager",
+        "package",
+        "tabular",
+        "skore_mode",
+        "notebooks",
+        "site",
+    ):
         if key in raw:
             data[key] = raw[key]
     env = raw.get("env")
@@ -186,6 +215,14 @@ def set_policy_value(root: Path, key: str, value: str) -> dict[str, Any]:
             parsed = False
         else:
             raise ValueError("env.managed must be true or false")
+    if key in BOOL_KEYS and parsed is not None:
+        lowered = str(parsed).lower()
+        if lowered in MANAGED_TRUE:
+            parsed = True
+        elif lowered in MANAGED_FALSE:
+            parsed = False
+        else:
+            raise ValueError(f"{key} must be true or false")
     policy = load_policy(root)
     if key.startswith("git."):
         policy["git"][key.split(".", 1)[1]] = parsed
@@ -208,8 +245,8 @@ def infer_loop_stage(
         return str(recorded)
     if not snapshot.get("has_src") and not snapshot.get("has_journal"):
         return "setup"
-    if snapshot.get("eda") not in {"present", "skipped"}:
-        return "eda"
+    if snapshot.get("data_analysis") not in {"present", "skipped"}:
+        return "data_analysis"
     stem = policy.get("loop", {}).get("stem") or snapshot.get("last_history_stem")
     if not stem:
         return "implement"

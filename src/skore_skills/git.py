@@ -16,7 +16,7 @@ from typing import Any
 from skore_skills.policy import load_policy
 from skore_skills.scaffold import template_root
 
-END_TURN_STAGES = ("setup", "eda", "implement", "evaluate", "backlog")
+END_TURN_STAGES = ("setup", "data_analysis", "implement", "evaluate", "backlog")
 PERSIST_SKILL = "persist-ml-git"
 
 KEEP_EXCEPTIONS = frozenset({".gitignore", ".gitattributes"})

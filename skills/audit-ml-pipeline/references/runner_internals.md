@@ -6,7 +6,7 @@ from SKILL.md § "Execution contract". Prefer `--help` and the
 package docstring; this note is leftover IPython / Agg detail.
 
 The CLI is a **generic** jupytext cell runner in `skore_skills.cells`,
-shared with `explore-ml-data` (which executes `eda/eda.py` the same
+shared with `explore-ml-data` (which executes `data_analysis/data_analysis.py` the same
 way). It is content-agnostic — it knows nothing about skore reports
 or TableReports. Keep it that way: any change must serve both
 callers, never hard-code audit-specific behaviour.

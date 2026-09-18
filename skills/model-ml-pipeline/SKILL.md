@@ -33,10 +33,16 @@ Before new library symbols are written, use
 - Do not replace skrub DataOps with bare sklearn Pipeline.
 - Do not persist a result as done while smoke tests fail.
 - Do not duplicate child-skill methodology in this dispatcher.
-- If `status.eda` is `missing`, continue with facts the user
-  stated; do not invent an EDA report.
+- If `status.data_analysis` is `missing`, continue with facts the user
+  stated; do not invent an exploratory data analysis report.
 
-After build and smoke succeed, run
+After build and smoke succeed, if `policy.site` is true,
+`export-ml-site` is installed, run
+`python -m skore_skills site build`. Do not run
+`notebook convert`. Skip in one line otherwise.
+Name a build error; do not fail the model turn.
+
+Then run
 `python -m skore_skills git end-turn --stage implement`. If JSON
 `action` is `invoke`, load `persist-ml-git` and follow it. Then
 load `triage-ml-task`. Do not run `git commit` in this skill.

@@ -10,7 +10,7 @@
 **Assumed workspace state:**
 - Existing scaffold with no specific task requested.
 - No `.skore` file.
-- `status.eda` is `missing`.
+- `status.data_analysis` is `missing`.
 - `status.skills` reports the usual entry skills `true`.
 
 **Must do:**
@@ -18,7 +18,7 @@
 - AskUserQuestion listing installed entry skills
   (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
   `evaluate-ml-pipeline`, `audit-ml-pipeline`,
-  `manage-ml-backlog` if installed). One pick.
+  `manage-ml-backlog`, `export-ml-project` if installed). One pick.
 - Name `explore-ml-data` as the recommended next stage; do not
   auto-load it.
 - Do not treat the missing `.skore` as an empty project despite
@@ -126,7 +126,7 @@
 
 **Must NOT do:**
 - Ask which entry skill to run.
-- Start EDA methodology in triage instead of loading the skill.
+- Start exploratory data analysis methodology in triage instead of loading the skill.
 
 ---
 
@@ -137,13 +137,13 @@
 
 **Assumed workspace state:**
 - Scaffolded workspace.
-- `status.eda` is `missing`.
+- `status.data_analysis` is `missing`.
 - `status.skills.explore-ml-data` is `true`.
 - `status.skills.model-ml-pipeline` is `true`.
 
 **Must do:**
 - Name `python -m skore_skills status`.
-- AskUserQuestion: run EDA first (default) vs proceed to modeling
+- AskUserQuestion: run exploratory data analysis first (default) vs proceed to modeling
   with user-supplied facts.
 - Do not invent dataset facts.
 
@@ -160,13 +160,90 @@
 
 **Assumed workspace state:**
 - Scaffolded workspace.
-- `status.eda` is `present`.
+- `status.data_analysis` is `present`.
 - `status.skills.model-ml-pipeline` is `true`.
 
 **Must do:**
 - Name `python -m skore_skills status`.
-- Load `model-ml-pipeline` without an EDA AskUserQuestion.
+- Load `model-ml-pipeline` without an exploratory data analysis AskUserQuestion.
 
 **Must NOT do:**
 - Ask which entry skill to run.
 - Load `explore-ml-data` first.
+
+---
+
+## CASE_09 — Certain notebook request
+
+**User prompt:**
+> Give me an executed ipynb of the EDA.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.export-ml-notebook` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `export-ml-notebook` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `export-ml-project` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_10 — Certain website request
+
+**User prompt:**
+> Build the MkDocs documentation site.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.export-ml-site` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `export-ml-site` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `export-ml-project` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_11 — Generic export
+
+**User prompt:**
+> Export the project.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.export-ml-project` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `export-ml-project` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `export-ml-notebook` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_12 — Certain HTML notebook request
+
+**User prompt:**
+> Give me an HTML notebook of the EDA.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.export-ml-notebook` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `export-ml-notebook` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `export-ml-project` as the certain skill.
+- Load `export-ml-site` as the certain skill.
+- Ask which entry skill to run.

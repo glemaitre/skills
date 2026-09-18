@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "f9cac92ee60f7322f76bf8a88503b896470b73ce7966aa64a553f60f0295ef54",
+  "catalog_hash": "890f2320b71d527869f4683fb6b858d352c8abef1c9615ce6d8ab23f80060225",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "98bf37d4e30b09212847bcd19da25ed76ba4e5f7866ae62f038aff59012786ff"
+      "hash": "b362d5e48650da81f379ba843eb740ff93b773a458199112dfe2600adbb5aae3"
     },
     {
       "id": "build-ml-pipeline",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "fa08f7d54eef4290832ab74daf2544d1e79e427ac88b7bdb50b8ec6a998061c0"
+      "hash": "58c96a1808533859367ae47d265015d6ef6f0f099e21387c133020190514a46c"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "54553441013cf1e3f06d33af433f7de62a27c0121dd66276e4847b5423a8fda2"
+      "hash": "803953df4742de38be8e3675a3aae612d28d7ff9564510e7ceca208b4e391ccb"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "e46df7b06e27de770fee172306165c50ba9424e0b39829368194436bcb754d25"
+      "hash": "d77940a1bb1cd03966c0d451ca5b176889881334ff5c77f82afa337079103c4d"
     },
     {
       "id": "manage-ml-backlog",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "2af5db202d195b6856f733c9974e752fda271db03a43eb7cf5a534503dc5f929"
+      "hash": "93452f822d33b05368da2891c49f3da343bdb85fff0c177aa6b8baa52049fa53"
     },
     {
       "id": "iterate-from-skore",
@@ -102,7 +102,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "61e9008607e2fc87ede97fd648bb21963d8bd327118a9f74c648230d2009bd9d"
+      "hash": "f79196cd00531fd9169ac225fea6f668fc3b1a53dc84ae0f89872f1c823c54ea"
     },
     {
       "id": "setup-ml-project",
@@ -111,7 +111,7 @@
       "summary": "Coordinate workspace, environment, and git setup.",
       "category": "meta",
       "subcategory": null,
-      "hash": "0a27e259feea46735272f8f0be266acfa2853e4bfa676ce64fc2b1a4920c5621"
+      "hash": "7810e3670e8af4b1e576fa20db7a821ce3eccc12ae0aa1d1e692713cf926cd68"
     },
     {
       "id": "setup-git",
@@ -129,7 +129,7 @@
       "summary": "Commit the current loop stage with the real git CLI when the end-turn hook says invoke.",
       "category": "action",
       "subcategory": null,
-      "hash": "9d00269eb9017e4147dab4938b96988b63d47b5a2b5b55de7df50bc566278ffe"
+      "hash": "5901b54a57e0a64ce49b4d48c63c39729c0c27d6d73673f0be6ceda71474e940"
     },
     {
       "id": "model-ml-pipeline",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build, evaluation, and smoke testing.",
       "category": "meta",
       "subcategory": null,
-      "hash": "e0bea5b219364d8c778f3017539642c85fed6299d7b3856748c92edf66adb5f2"
+      "hash": "d39e74e234bc9c11369b51e7f7520cc58cc275e7bbf71a76c3fba47bd3e42299"
     },
     {
       "id": "choose-python-library",
@@ -147,7 +147,7 @@
       "summary": "Resolve a library choice and add the selected dependency.",
       "category": "action",
       "subcategory": null,
-      "hash": "59dbc464b8592df78b43fcc3d2c1f105198d223dbd610c220e6adb3f9fdb5700"
+      "hash": "c7a101bc50d52494cdcd1ebd8330f5892441361972d9771e82768909e37ff4b1"
     },
     {
       "id": "add-python-package",
@@ -165,7 +165,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "e98c8ee558a0298840a7d7ddb0f239835a59cdd804214d29a00900b804109c86"
+      "hash": "90d4d91c7ea270bd97101b2b13cb7de34dc0158eaecf2daa1930c63b3745405b"
     },
     {
       "id": "setup-python-env",
@@ -175,6 +175,33 @@
       "category": "action",
       "subcategory": null,
       "hash": "d83ec4cde780623b1a157310855352c3481403d9bd32c3201418ef485f2f1bca"
+    },
+    {
+      "id": "export-ml-notebook",
+      "path": "skills/export-ml-notebook",
+      "title": "Export ML Notebook",
+      "summary": "Convert a jupytext percent file into an executed notebook.",
+      "category": "tooling",
+      "subcategory": "code-quality",
+      "hash": "7db4d9764170d03f3a27d9d84547b01ca099e13b0fe050cadd003a5aa63b0db7"
+    },
+    {
+      "id": "export-ml-site",
+      "path": "skills/export-ml-site",
+      "title": "Export ML Site",
+      "summary": "Initialize and build an offline MkDocs documentation site from workspace markdown.",
+      "category": "tooling",
+      "subcategory": "project-setup",
+      "hash": "fc08964a15f540760f048bf30535cc6edd736df59186bc2db5545410767ecc1d"
+    },
+    {
+      "id": "export-ml-project",
+      "path": "skills/export-ml-project",
+      "title": "Export ML Project",
+      "summary": "Coordinate executed notebooks and an offline MkDocs documentation site.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "1bbed3bdd7e7484284459dec58c51995ceee154cdc311e73f5633233eea26e24"
     }
   ],
   "workflows": [
@@ -188,11 +215,14 @@
         "setup-python-env",
         "setup-git",
         "persist-ml-git",
-        "add-python-package"
+        "add-python-package",
+        "export-ml-project",
+        "export-ml-notebook",
+        "export-ml-site"
       ]
     },
     {
-      "id": "eda",
+      "id": "data_analysis",
       "title": "Explore ML Data",
       "summary": "Install the data exploration workflow.",
       "includes": [
@@ -200,6 +230,17 @@
         "choose-python-library",
         "add-python-package",
         "persist-ml-git"
+      ]
+    },
+    {
+      "id": "export",
+      "title": "Export Notebooks and Site",
+      "summary": "Convert percent notebooks and build an offline MkDocs documentation site.",
+      "includes": [
+        "export-ml-project",
+        "export-ml-notebook",
+        "export-ml-site",
+        "add-python-package"
       ]
     },
     {
@@ -226,7 +267,8 @@
         "iterate-from-user",
         "audit-ml-pipeline",
         "add-python-package",
-        "persist-ml-git"
+        "persist-ml-git",
+        "export-ml-project"
       ]
     },
     {
@@ -250,7 +292,10 @@
         "triage-ml-task",
         "manage-ml-backlog",
         "iterate-from-skore",
-        "iterate-from-user"
+        "iterate-from-user",
+        "export-ml-project",
+        "export-ml-notebook",
+        "export-ml-site"
       ]
     }
   ]

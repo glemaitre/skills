@@ -1,0 +1,38 @@
+{
+  "skill_name": "export-ml-project",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Ask then load children",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.notebooks` is false.\n- `policy.site` is true.\n- `export-ml-notebook` and `export-ml-site` are installed.]\n\nExport the project.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion `allow_multiple`: notebooks **not** preselected, site preselected. - Load `export-ml-site` if site stays checked. It must NOT: - Run `git end-turn`. - Invent `mkdocs` steps instead of loading the child.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "AskUserQuestion `allow_multiple`: notebooks **not** preselected, site preselected.",
+        "Load `export-ml-site` if site stays checked.",
+        "The response does NOT: Run `git end-turn`.",
+        "The response does NOT: Invent `mkdocs` steps instead of loading the child."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "Missing child skips",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- User checks both boxes.\n- `status.skills.export-ml-notebook` is `false`.\n- `status.skills.export-ml-site` is `true`.]\n\nExport notebooks and the site.",
+      "expected_output": "Behavioural response satisfying: - Skip notebooks in one line because `export-ml-notebook` is not installed. - Load `export-ml-site`. It must NOT: - Invent `notebook convert` from memory. - Treat the missing skill as an error that aborts export.",
+      "files": [],
+      "expectations": [
+        "Skip notebooks in one line because `export-ml-notebook` is not installed.",
+        "Load `export-ml-site`.",
+        "The response does NOT: Invent `notebook convert` from memory.",
+        "The response does NOT: Treat the missing skill as an error that aborts export."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

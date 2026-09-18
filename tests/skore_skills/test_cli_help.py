@@ -18,6 +18,8 @@ def test_help_exits_zero() -> None:
     assert result.exit_code == 0
     assert "Deterministic helpers" in result.output
     assert "python -m skore_skills" in result.output
+    assert "notebook" in result.output
+    assert "site" in result.output
 
 
 def test_version_matches_package() -> None:

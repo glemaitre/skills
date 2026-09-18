@@ -4,11 +4,11 @@
     {
       "id": 1,
       "title": "End of turn uses git hook",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `eda/eda.md` was just written.]\n\nEDA is done. Close the turn.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills git end-turn --stage eda`. - If that command returns `invoke`, load `persist-ml-git`. It must NOT: - Run `git commit` in this skill. - Run `git push`.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.]\n\nEDA is done. Close the turn.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills git end-turn --stage data_analysis`. - If that command returns `invoke`, load `persist-ml-git`. It must NOT: - Run `git commit` in this skill. - Run `git push`.",
       "files": [],
       "expectations": [
-        "Name `python -m skore_skills git end-turn --stage eda`.",
+        "Name `python -m skore_skills git end-turn --stage data_analysis`.",
         "If that command returns `invoke`, load `persist-ml-git`.",
         "The response does NOT: Run `git commit` in this skill.",
         "The response does NOT: Run `git push`."
@@ -21,14 +21,14 @@
       "id": 2,
       "title": "G-TABULAR before first EDA script",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists (`has_src`, `journal/JOURNAL.md`).\n- Raw data path is known.\n- `policy.tabular` is unset.\n- `choose-python-library` and `add-python-package` are installed.]\n\nExplore the dataset before we design a model.",
-      "expected_output": "Behavioural response satisfying: - Read `status.policy.tabular` and fire G-TABULAR (pandas vs polars, recommend pandas) via `choose-python-library` or ask here if that skill is missing. - Persist `policy set tabular` after confirmation. - Load `add-python-package` for the chosen frame library and `skrub` (confirm skrub is required). It must NOT: - Silent-default pandas and write `eda.py` first. - Install sklearn, skore, or pytest in this turn. - Call `env add` from this skill instead of `add-python-package`.",
+      "expected_output": "Behavioural response satisfying: - Read `status.policy.tabular` and fire G-TABULAR (pandas vs polars, recommend pandas) via `choose-python-library` or ask here if that skill is missing. - Persist `policy set tabular` after confirmation. - Load `add-python-package` for the chosen frame library and `skrub` (confirm skrub is required). It must NOT: - Silent-default pandas and write `data_analysis.py` first. - Install sklearn, skore, or pytest in this turn. - Call `env add` from this skill instead of `add-python-package`.",
       "files": [],
       "expectations": [
         "Read `status.policy.tabular` and fire G-TABULAR (pandas vs polars, recommend pandas) via `choose-python-library` or ask here if that skill is missing.",
         "Persist `policy set tabular` after confirmation.",
         "Load `add-python-package` for the chosen frame library and `skrub` (confirm skrub is required).",
-        "Do not place `eda/eda.py` before the gate resolves.",
-        "The response does NOT: Silent-default pandas and write `eda.py` first.",
+        "Do not place `data_analysis/data_analysis.py` before the gate resolves.",
+        "The response does NOT: Silent-default pandas and write `data_analysis.py` first.",
         "The response does NOT: Install sklearn, skore, or pytest in this turn.",
         "The response does NOT: Call `env add` from this skill instead of `add-python-package`."
       ],
@@ -38,16 +38,17 @@
     },
     {
       "id": 3,
-      "title": "Skip G-EDA",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists (`has_src`, `journal/JOURNAL.md`).\n- `status.eda` is `missing`.\n- No `eda/eda.md`.]\n\nSkip the EDA. I already know the data.",
-      "expected_output": "Behavioural response satisfying: - Record JOURNAL \u00a7 Data understanding `Status: skipped` with a date. - Stop without placing `eda/eda.py`. It must NOT: - Run `python -m skore_skills cells run`. - Write `eda/eda.py` or `eda/eda.md`. - Pick a package name or start modeling.",
+      "title": "Skip G-DATA-ANALYSIS",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists (`has_src`, `journal/JOURNAL.md`).\n- `status.data_analysis` is `missing`.\n- No `data_analysis/data_analysis.md`.]\n\nSkip the EDA. I already know the data.",
+      "expected_output": "Behavioural response satisfying: - Record JOURNAL \u00a7 Data understanding `Status: skipped` with a date. - Stop without placing `data_analysis/data_analysis.py`. It must NOT: - Run `python -m skore_skills cells run`. - Write `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`. - Pick a package name or start modeling.",
       "files": [],
       "expectations": [
         "Record JOURNAL \u00a7 Data understanding `Status: skipped` with a date.",
-        "Stop without placing `eda/eda.py`.",
+        "Stop without placing `data_analysis/data_analysis.py`.",
         "The response does NOT: Run `python -m skore_skills cells run`.",
-        "The response does NOT: Write `eda/eda.py` or `eda/eda.md`.",
-        "The response does NOT: Pick a package name or start modeling."
+        "The response does NOT: Write `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`.",
+        "The response does NOT: Pick a package name or start modeling.",
+        "The response does NOT: Run `python -m skore_skills site build`."
       ],
       "tools": false,
       "sandbox": [],
@@ -56,12 +57,12 @@
     {
       "id": 4,
       "title": "EDA already present, no refresh",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `eda/eda.md` exists.\n- JOURNAL \u00a7 Data understanding records `Status: done`.\n- The user did not ask to re-run or refresh EDA.]\n\nExplore the dataset.",
-      "expected_output": "Behavioural response satisfying: - Detect EDA already recorded (`status.eda` present). - Stop without overwriting `eda/eda.py` or `eda/eda.md`. It must NOT: - Re-run `cells run` or rewrite the report. - Design a model in this skill.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` exists.\n- JOURNAL \u00a7 Data understanding records `Status: done`.\n- The user did not ask to re-run or refresh EDA.]\n\nExplore the dataset.",
+      "expected_output": "Behavioural response satisfying: - Detect exploratory data analysis already recorded (`status.data_analysis` present). - Stop without overwriting `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`. It must NOT: - Re-run `cells run` or rewrite the report. - Design a model in this skill.",
       "files": [],
       "expectations": [
-        "Detect EDA already recorded (`status.eda` present).",
-        "Stop without overwriting `eda/eda.py` or `eda/eda.md`.",
+        "Detect exploratory data analysis already recorded (`status.data_analysis` present).",
+        "Stop without overwriting `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`.",
         "The response does NOT: Re-run `cells run` or rewrite the report.",
         "The response does NOT: Design a model in this skill."
       ],
@@ -72,15 +73,15 @@
     {
       "id": 5,
       "title": "Human notebook vs agent scratch",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`. Skrub and IPython are\n  installed.\n- Raw data path is known.\n- User chose **run** for G-EDA.]\n\nExplore the dataset. Write the TableReport HTML next to the EDA\nscript.",
-      "expected_output": "Behavioural response satisfying: - Write `eda/eda_<table>.html` (not under `data/`). - End overview cells on `TableReport` (or the frame), not on a json/dict digest. - Embed or link that HTML from `eda/eda.md`. It must NOT: - Put unique-ratio / column-dict / `report.json()` cells in `eda/eda.py`. - Write HTML under `data/`. - Modify the user's raw data files.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`. Skrub and IPython are\n  installed.\n- Raw data path is known.\n- User chose **run** for G-DATA-ANALYSIS.]\n\nExplore the dataset. Write the TableReport HTML next to the EDA\nscript.",
+      "expected_output": "Behavioural response satisfying: - Write `data_analysis/data_analysis_<table>.html` (not under `data/`). - End overview cells on `TableReport` (or the frame), not on a json/dict digest. - Embed or link that HTML from `data_analysis/data_analysis.md`. It must NOT: - Put unique-ratio / column-dict / `report.json()` cells in `data_analysis/data_analysis.py`. - Write HTML under `data/`. - Modify the user's raw data files.",
       "files": [],
       "expectations": [
-        "Write `eda/eda_<table>.html` (not under `data/`).",
+        "Write `data_analysis/data_analysis_<table>.html` (not under `data/`).",
         "End overview cells on `TableReport` (or the frame), not on a json/dict digest.",
-        "Embed or link that HTML from `eda/eda.md`.",
-        "Put `TableReport.json()` under `scratch/eda/`, not in `eda.py`.",
-        "The response does NOT: Put unique-ratio / column-dict / `report.json()` cells in `eda/eda.py`.",
+        "Embed or link that HTML from `data_analysis/data_analysis.md`.",
+        "Put `TableReport.json()` under `scratch/data_analysis/`, not in `data_analysis.py`.",
+        "The response does NOT: Put unique-ratio / column-dict / `report.json()` cells in `data_analysis/data_analysis.py`.",
         "The response does NOT: Write HTML under `data/`.",
         "The response does NOT: Modify the user's raw data files."
       ],
@@ -92,12 +93,44 @@
       "id": 6,
       "title": "Missing IPython delegates to add-python-package",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. User chose **run**.\n- `ipython` is not importable in the project env.\n- `add-python-package` is installed.]\n\nRun the EDA now.",
-      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `ipython` (`env route` agent scope). Do not place a fabricated digest. It must NOT: - Run `pixi add ipython` / `uv add ipython` from this skill. - Hand-write expected EDA output.",
+      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `ipython` (`env route` agent scope). Do not place a fabricated digest. It must NOT: - Run `pixi add ipython` / `uv add ipython` from this skill. - Hand-write expected exploratory data analysis output.",
       "files": [],
       "expectations": [
         "Load `add-python-package` for `ipython` (`env route` agent scope). Do not place a fabricated digest.",
         "The response does NOT: Run `pixi add ipython` / `uv add ipython` from this skill.",
-        "The response does NOT: Hand-write expected EDA output."
+        "The response does NOT: Hand-write expected exploratory data analysis output."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "Site on rebuilds after EDA",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nEDA is done. Close the turn.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills site build` before git end-turn. - Name `python -m skore_skills git end-turn --stage data_analysis`. It must NOT: - Fail the data-analysis turn if site build errors; name the error. - Run `notebook convert`. - Run `git commit` in this skill.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills site build` before git end-turn.",
+        "Name `python -m skore_skills git end-turn --stage data_analysis`.",
+        "The response does NOT: Fail the data-analysis turn if site build errors; name the error.",
+        "The response does NOT: Run `notebook convert`.",
+        "The response does NOT: Run `git commit` in this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 8,
+      "title": "Site off skips rebuild",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- `policy.site` is false.]\n\nEDA is done. Close the turn.",
+      "expected_output": "Behavioural response satisfying: - Skip site build in one line. - Name `python -m skore_skills git end-turn --stage data_analysis`. It must NOT: - Run `python -m skore_skills site build`.",
+      "files": [],
+      "expectations": [
+        "Skip site build in one line.",
+        "Name `python -m skore_skills git end-turn --stage data_analysis`.",
+        "The response does NOT: Run `python -m skore_skills site build`."
       ],
       "tools": false,
       "sandbox": [],

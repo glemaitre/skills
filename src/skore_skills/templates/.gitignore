@@ -12,7 +12,8 @@ dist/
 
 # data artifacts — you own the data/ layout (raw inputs).
 # Do NOT ignore the whole data/ folder if you want samples committed.
-# EDA deliverables live in eda/ (eda.py, eda.md, eda_*.html) and
+# Exploratory data analysis lives in data_analysis/
+# (data_analysis.py, data_analysis.md, data_analysis_*.html) and
 # should stay tracked. To keep large/local-only raw INPUTS out of git,
 # ignore specific input paths only, e.g.:
 # data/raw/
@@ -33,6 +34,13 @@ mlartifacts/
 
 # jupytext source-of-truth is .py; never commit .ipynb
 *.ipynb
+
+# notebook viewers rebuilt by notebook convert --html
+*.nb.html
+
+# MkDocs output (derived; open html/index.html locally)
+_build/
+html/
 
 # generated figures (uncomment if you regenerate from scripts)
 # figures/

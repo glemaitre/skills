@@ -61,6 +61,21 @@ def test_policy_set_rejects_invalid_managed(tmp_path: Path) -> None:
         set_policy_value(tmp_path, "env.managed", "maybe")
 
 
+def test_policy_set_notebooks_and_site(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``notebooks`` and ``site`` persist as booleans."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["policy", "set", "notebooks", "true"])
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output)["notebooks"] is True
+    again = CliRunner().invoke(cli, ["policy", "set", "site", "off"])
+    assert again.exit_code == 0, again.output
+    assert json.loads(again.output)["site"] is False
+    with pytest.raises(ValueError, match="true or false"):
+        set_policy_value(tmp_path, "site", "maybe")
+
+
 def test_policy_set_rejects_invalid_autocommit(tmp_path: Path) -> None:
     """Autocommit accepts only ``off`` or ``on``."""
     with pytest.raises(ValueError, match="off or on"):
@@ -115,8 +130,10 @@ def test_infer_evaluate_then_audit(tmp_path: Path) -> None:
     """Smoke without audit is evaluate; reports present becomes audit."""
     (tmp_path / "src").mkdir()
     (tmp_path / "journal").mkdir()
-    (tmp_path / "eda").mkdir()
-    (tmp_path / "eda" / "eda.md").write_text("# eda\n", encoding="utf-8")
+    (tmp_path / "data_analysis").mkdir()
+    (tmp_path / "data_analysis" / "data_analysis.md").write_text(
+        "# eda\n", encoding="utf-8"
+    )
     (tmp_path / "journal" / "01_baseline.md").write_text("# n\n", encoding="utf-8")
     smoke = tmp_path / "tests" / "smoke"
     smoke.mkdir(parents=True)

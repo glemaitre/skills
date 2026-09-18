@@ -30,7 +30,7 @@ description: >
   approved design, or data contract: explain the missing fact and
   ask the user to run the setup/model pack or ask triage. This
   action does not cover fitting, CV, metrics, persistence, inference,
-  pure EDA, or abstract library choice. Do not require another
+  pure exploratory data analysis, or abstract library choice. Do not require another
   action skill to be installed.
 
   HOW TO USE: consult before the first declarative line and on
@@ -292,7 +292,7 @@ Pre-flight (build-ml-pipeline):
       Evidence: scratch/<ts>_check_tier1.py + `pixi run python …` output.
                 **Inline `python -c` is NOT evidence.**
 - [ ] Tabular library identified: pandas | polars
-      Evidence: JOURNAL.md Status (Workspace decisions) | user quote
+      Evidence: `status.policy.tabular` | user quote
                 | "n/a — pandas already in loader signature"
 - [ ] API confirmed for skrub symbols this turn
       Evidence: python -m skore_skills api get <dotted>

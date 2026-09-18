@@ -57,6 +57,80 @@ def cells_run(src: Path, dst: Path | None) -> None:
     run(src, dst)
 
 
+@cli.group("notebook")
+def notebook_group() -> None:
+    """Convert percent-format ``# %%`` files into executed notebooks."""
+
+
+@notebook_group.command("convert")
+@click.argument("src", type=click.Path(dir_okay=False, path_type=Path))
+@click.option(
+    "--out",
+    type=click.Path(dir_okay=False, path_type=Path),
+    help="Destination .ipynb (default: same stem next to SRC).",
+)
+@click.option(
+    "--html",
+    is_flag=True,
+    help="Also write <stem>.nb.html next to SRC.",
+)
+def notebook_convert(src: Path, out: Path | None, html: bool) -> None:
+    """Execute SRC with nbclient and write an .ipynb with outputs."""
+    from skore_skills.notebook import convert
+
+    forwarded = ["notebook", "convert", os.fspath(src)]
+    if out is not None:
+        forwarded.extend(["--out", os.fspath(out)])
+    if html:
+        forwarded.append("--html")
+    _reexec_library_command(forwarded)
+    try:
+        dest = convert(src, out, html=html)
+    except (ImportError, FileNotFoundError, OSError) as exc:
+        raise click.ClickException(str(exc)) from exc
+    except Exception as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(str(dest))
+
+
+@cli.group("site")
+def site_group() -> None:
+    """Initialize and build an offline MkDocs documentation site."""
+
+
+@site_group.command("init")
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Accepted for compatibility; init only updates .gitignore.",
+)
+def site_init(force: bool) -> None:
+    """Ignore _build/ and html/. Does not write a user mkdocs.yml."""
+    from skore_skills.site import init_site
+
+    forwarded = ["site", "init"]
+    if force:
+        forwarded.append("--force")
+    _reexec_library_command(forwarded)
+    try:
+        dest = init_site(Path.cwd(), force=force)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(str(dest))
+
+
+@site_group.command("build")
+def site_build() -> None:
+    """Package Markdown and existing companions into ``html/``."""
+    from skore_skills.site import build_site
+
+    _reexec_library_command(["site", "build"])
+    try:
+        click.echo(build_site(Path.cwd()))
+    except (ValueError, FileNotFoundError, RuntimeError) as exc:
+        raise click.ClickException(str(exc)) from exc
+
+
 @cli.group("api")
 def api_group() -> None:
     """Look up public symbols in the running interpreter."""
@@ -179,7 +253,7 @@ def scaffold_cmd(
 def style_cmd(paths: tuple[Path, ...], initialize: bool) -> None:
     """Run ruff check --fix then format on defaults or PATHS.
 
-    Default globs: ``src/``, ``experiments/``, ``audit/``, ``eda/``,
+    Default globs: ``src/``, ``experiments/``, ``audit/``, ``data_analysis/``,
     top-level ``*.py``. ``--init`` without PATHS only writes ``[tool.ruff]``.
     """
     from skore_skills.style import initialize_style, run_style
@@ -415,7 +489,7 @@ def git_ignore_merge_cmd(keep_paths: tuple[str, ...]) -> None:
     "--stage",
     required=True,
     type=click.Choice(
-        ["setup", "eda", "implement", "evaluate", "backlog"],
+        ["setup", "data_analysis", "implement", "evaluate", "backlog"],
         case_sensitive=True,
     ),
     help="Loop stage that just finished.",

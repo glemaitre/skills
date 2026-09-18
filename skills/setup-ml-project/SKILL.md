@@ -45,13 +45,13 @@ after listing the boxes.
 5. Editable checked, `has_src` false, and workspace not selected
    → one-line stop. Do not scaffold from this meta.
 6. `status` again. Load `triage-ml-task` if installed, else stop.
-   Do not start EDA or a pipeline.
+   Do not start exploratory data analysis or a pipeline.
 
 ## Stop conditions
 
 - Do not pick package name or env manager here; the loaded skills
   ask those.
-- Do not ask tabular library or skore mode.
+- Do not ask tabular library, skore mode, notebooks, or site.
 - Do not install sklearn, skrub, or pandas. The selected
   `setup-python-env` skill installs plain `skore` during bootstrap;
   do not install or configure Skore directly from this coordinator.
@@ -59,3 +59,5 @@ after listing the boxes.
 - Do not commit except by loading `setup-git`.
 - Do not abort setup because one skill is missing.
 - Do not invent a missing skill's procedure.
+- Do not `pixi add` / `uv add` from this coordinator;
+  `add-python-package` owns install.

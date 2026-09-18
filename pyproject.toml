@@ -100,4 +100,8 @@ module = [
     "matplotlib",
     "pandas",
     "IPython.*",
+    "jupytext",
+    "nbclient",
+    "nbformat",
+    "nbconvert",
 ]

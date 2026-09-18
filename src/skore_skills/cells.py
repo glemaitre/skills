@@ -13,7 +13,7 @@ skore reports, TableReports, or what the cells do. It parses cells,
 executes them in one shared namespace, and renders each cell's source
 + stdout + last-expression ``repr`` + errors. Callers decide what the
 cells contain (see ``audit-ml-pipeline`` § "Audit file contract" and
-``explore-ml-data`` § "EDA file contract").
+``explore-ml-data`` § "exploratory data analysis file contract").
 
 Why IPython, not plain Python
 -----------------------------

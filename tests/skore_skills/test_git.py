@@ -42,7 +42,7 @@ def test_end_turn_no_repo_skips(
     """Missing ``.git`` skips without nagging."""
     monkeypatch.chdir(tmp_path)
     set_policy_value(tmp_path, "git.autocommit", "on")
-    result = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "eda"])
+    result = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "data_analysis"])
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
     assert payload["action"] == "skip"
@@ -112,7 +112,7 @@ def test_end_turn_ambiguous_invokes_resolve(
     set_policy_value(tmp_path, "git.autocommit", "on")
     _write(tmp_path / "src" / "pkg" / "data.py")
     _write(tmp_path / ".python-version", "3.12\n")
-    result = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "eda"])
+    result = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "data_analysis"])
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
     assert payload["action"] == "invoke"
@@ -146,6 +146,8 @@ def test_ignore_merge_additive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     text = (tmp_path / ".gitignore").read_text(encoding="utf-8")
     assert "custom-keep/" in text
     assert "scratch/" in text
+    assert "_build/" in text
+    assert "html/" in text
     assert ".*" in text
     payload = json.loads(result.output)
     assert payload["action"] == "ready"

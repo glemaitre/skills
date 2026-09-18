@@ -9,7 +9,8 @@ description: >
 
 # Manage ML Backlog
 
-Replace iterate-as-cadence. Do not own setup, EDA, build, smoke,
+Replace iterate-as-cadence. Do not own setup, exploratory data
+analysis, build, smoke,
 evaluate, or audit methodology.
 
 ## Procedure
@@ -49,6 +50,12 @@ evaluate, or audit methodology.
 - G-DESIGN stays in the implement/evaluate skills, not here.
 
 ## End of turn
+
+If `policy.site` is true, `export-ml-site` is installed, run
+`python -m skore_skills site build`. Do not run
+`notebook convert`. Skip
+in one line otherwise. Name a build error; do not fail the
+backlog turn.
 
 Run `python -m skore_skills git end-turn --stage backlog`. If JSON
 `action` is `invoke`, load `persist-ml-git` and follow it. Then

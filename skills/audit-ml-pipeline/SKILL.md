@@ -26,7 +26,7 @@ description: >
   STOP when `python -m skore_skills status` shows no approved design,
   experiment report, or agent feature. Explain the missing fact and
   ask the user to run the setup/model pack or ask triage. Also stop
-  when the request concerns raw-data EDA or sourcing a future
+  when the request concerns raw-data exploration or sourcing a future
   experiment. Do not require another action skill to be installed.
 
   HOW TO USE: confirm the four-way stem pairing exists (`journal/NN_*.md`
@@ -227,7 +227,7 @@ Template: `templates/audit.py`.
 | `<NN>_<short_name>` | The experiment stem (e.g. `02_target_transform`) |
 | `<SKORE_PROJECT_INIT>` | The full Project init block (including any preceding `skore.login(...)` call for hub mode), copied **byte-identical** from `experiments/<stem>.py` |
 | `<project-name>` | The `name=` argument from `experiments/<stem>.py` (read it; don't invent) |
-| `<hub-workspace>` | Hub-mode only. From `JOURNAL.md` Status `Workspace decisions` `skore hub workspace:` row |
+| `<hub-workspace>` | Hub-mode only. Copy from the `workspace=` argument in `experiments/<stem>.py` |
 
 `<SKORE_PROJECT_INIT>` and `<project-name>` are the most error-prone
 substitutions: the audit must open the same Project the experiment

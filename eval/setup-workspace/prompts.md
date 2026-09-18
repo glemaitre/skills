@@ -7,7 +7,7 @@ For each case the model gets:
 - The case's `User prompt`, prefixed with the workspace-state block.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
+violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 
 ---
 
@@ -35,20 +35,25 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 - Name `python -m skore_skills scaffold --package <pkg>` as the
   action after G-PKG-NAME.
 - Mention scaffolding the default layout: `src/<pkg>/`,
-  `journal/`, `experiments/`, `eda/`, `data/`, `audit/`,
+  `journal/`, `experiments/`, `data_analysis/`, `data/`, `audit/`,
   `tests/smoke/`, `scratch/`, `reports/`, each with `README.md`.
+- After scaffold, AskUserQuestion executed notebooks +
+  documentation site (`allow_multiple`, both **unchecked** by
+  default). Persist `false` when left unchecked.
 - Name `python -m skore_skills git end-turn --stage setup` at the
   end of this standalone turn.
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
+- Skip persisting `notebooks` / `site` after the gate.
 - Ask G-ENV-MGR or pick an environment manager in this skill.
 - Run `pixi init` / `uv init` / `poetry init` on the user's behalf.
 - Pick a package name silently from the folder name.
 - Write a runnable `experiments/01_baseline.py`. Scaffold does not
   create that file.
 - Default to pandas, persist `tabular`, or load
-  `choose-python-library` (G-TABULAR belongs on EDA).
+  `choose-python-library` (G-TABULAR belongs on exploratory data
+  analysis).
 - Run `git commit` in this skill or `git push`.
 
 ---
@@ -80,6 +85,7 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 - Recreate / overwrite any existing folder.
 - Auto-write `experiments/02_*.py` before the design note is
   approved.
+- Ask the executed-notebooks / documentation-site gate.
 
 ---
 
@@ -135,7 +141,7 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 
 **Expect files:**
 - `src/churnlab/pipeline.py`
-- `eda/README.md`
+- `data_analysis/README.md`
 - `experiments/README.md`
 - `journal/JOURNAL.md`
 - `pyproject.toml`
@@ -238,6 +244,8 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
   existing layout.
 - Name `python -m skore_skills scaffold --package churnlab`.
 - State that the existing `pyproject.toml` is kept (no `--force`).
+- After scaffold, AskUserQuestion notebooks + site (both off by
+  default) unless those flags are already set.
 - Return control to `setup-ml-project` at the end of the turn.
 
 **Must NOT do:**
@@ -245,4 +253,57 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT in any transcript.
 - Treat the manifest as an existing layout and refuse to scaffold.
 - Run `python -m skore_skills git end-turn`, load `persist-ml-git`,
   or load `triage-ml-task` from this dispatched turn.
-- Run the editable install or `env add` here.
+- Run the editable install here.
+
+---
+
+## CASE_09 — Yes executed notebooks after scaffold
+
+**User prompt:**
+> Set up a fresh ML workspace in this folder.
+
+**Assumed workspace state:**
+- Empty folder. Fresh layout.
+- `policy.notebooks` and `policy.site` are `null`.
+- `add-python-package` is installed.
+- After G-PKG-NAME and scaffold, the user checks **Executed
+  notebooks** and leaves the site off.
+
+**Must do:**
+- AskUserQuestion notebooks + site with both off by default,
+  after scaffold.
+- Persist `policy set notebooks true` and `policy set site false`.
+- Load `add-python-package` for `jupytext` and `nbclient`.
+- Name `env add` with the agent feature (do not leave `env route`
+  as ask).
+
+**Must NOT do:**
+- Leave `jupytext` as `env route` ask / optional extra.
+- Run `pixi add` / `uv add` from this skill.
+- Run `notebook convert` during setup.
+- Ask the gate before scaffold.
+
+---
+
+## CASE_10 — Yes documentation site after scaffold
+
+**User prompt:**
+> Set up a fresh ML workspace in this folder.
+
+**Assumed workspace state:**
+- Empty folder. Fresh layout.
+- `policy.notebooks` and `policy.site` are `null`.
+- `add-python-package` is installed.
+- After G-PKG-NAME and scaffold, the user checks **Documentation
+  site** and leaves notebooks off.
+
+**Must do:**
+- Persist `policy set site true` and `notebooks false`.
+- Load `add-python-package` for `mkdocs-material` (agent).
+- Name `python -m skore_skills site init`.
+
+**Must NOT do:**
+- Run `pixi add mkdocs-material` from this skill.
+- Load `add-python-package` for `nbconvert` for the site gate.
+- Skip init after the user opted into the site.
+- Ask the gate on an existing layout.

@@ -8,9 +8,9 @@
 > Persist this EDA turn.
 
 **Assumed workspace state:**
-- `python -m skore_skills git end-turn --stage eda` already returned
+- `python -m skore_skills git end-turn --stage data_analysis` already returned
   `action: invoke`, `reason: persist`, autocommit `on`.
-- Dirty paths include `eda/eda.py` and `eda/eda.md`.
+- Dirty paths include `data_analysis/data_analysis.py` and `data_analysis/data_analysis.md`.
 
 **Must do:**
 - Run `git status`.
@@ -47,7 +47,7 @@
 > Persist this EDA turn.
 
 **Assumed workspace state:**
-- `python -m skore_skills git end-turn --stage eda` already returned
+- `python -m skore_skills git end-turn --stage data_analysis` already returned
   `action: invoke`, `reason: persist`, autocommit `on`.
 - `status.skills.triage-ml-task` is `false`.
 

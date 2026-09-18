@@ -85,7 +85,7 @@ Two possibilities:
 
 1. **Different hub workspace.** The audit is opening a different hub
    workspace than the experiment wrote to. Verify the
-   `<hub-workspace>` part of the name matches `Workspace decisions`.
+   `<hub-workspace>` part of the name matches `experiments/<stem>.py`.
 2. **No read access.** The user's credentials don't have read access
    to the workspace they wrote to (rare). Surface the access issue
    to the user; do not silently fall back to local mode.

@@ -30,6 +30,9 @@ SKILL_TIER: dict[str, str] = {
     "explore-ml-data": "medium",
     "audit-ml-pipeline": "medium",
     "build-ml-pipeline": "big",
+    "export-ml-notebook": "medium",
+    "export-ml-site": "medium",
+    "export-ml-project": "medium",
 }
 
 

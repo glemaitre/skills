@@ -1,5 +1,5 @@
 # %% [markdown]
-# # EDA: <project / dataset name>
+# # Exploratory data analysis: <project / dataset name>
 #
 # Overview of <dataset> before choosing a learner and splitter.
 
@@ -18,5 +18,7 @@ RAW
 
 # %%
 report = skrub.TableReport(RAW, title="<table>", verbose=0)
-report.write_html(PROJECT_ROOT / "eda" / "eda_<table>.html")
+report.write_html(
+    PROJECT_ROOT / "data_analysis" / "data_analysis_<table>.html"
+)
 report

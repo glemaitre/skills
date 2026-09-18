@@ -68,8 +68,10 @@ def test_style_default_globs_skip_vendored(
     (tmp_path / "node_modules" / "pkg.py").write_text("x=1\n", encoding="utf-8")
     (tmp_path / "src" / "mod.py").write_text("x=1\n", encoding="utf-8")
     (tmp_path / "top.py").write_text("x=1\n", encoding="utf-8")
-    (tmp_path / "eda").mkdir()
-    (tmp_path / "eda" / "eda.py").write_text("x=1\n", encoding="utf-8")
+    (tmp_path / "data_analysis").mkdir()
+    (tmp_path / "data_analysis" / "data_analysis.py").write_text(
+        "x=1\n", encoding="utf-8"
+    )
     (tmp_path / "audit").mkdir()
     monkeypatch.chdir(tmp_path)
 
@@ -93,7 +95,7 @@ def test_style_default_globs_skip_vendored(
     assert str(tmp_path / "src") in check_argv
     assert str(tmp_path / "experiments") in check_argv
     assert str(tmp_path / "audit") in check_argv
-    assert str(tmp_path / "eda") in check_argv
+    assert str(tmp_path / "data_analysis") in check_argv
     assert str(tmp_path / "top.py") in check_argv
     assert "node_modules" in joined  # exclude flag
     assert str(tmp_path / "node_modules") not in check_argv

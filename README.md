@@ -62,7 +62,7 @@ companion:
 
 ```bash
 skore skills install setup  # workspace, environment, stack, style
-skore skills install eda    # data exploration
+skore skills install data_analysis  # data exploration
 skore skills install model  # build, evaluate, test, smoke
 skore skills install loop   # triage, backlog, audit, sourcing
 ```

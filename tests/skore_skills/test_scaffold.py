@@ -25,12 +25,12 @@ def test_scaffold_tree_and_no_placeholders(
     assert (src / "pipeline.py").is_file()
     assert (src / "evaluate.py").is_file()
     assert not (tmp_path / "experiments" / "01_baseline.py").exists()
-    assert not (tmp_path / "data" / "eda.py").exists()
+    assert not (tmp_path / "data" / "data_analysis.py").exists()
     for rel in (
         "src/README.md",
         "experiments/README.md",
         "journal/README.md",
-        "eda/README.md",
+        "data_analysis/README.md",
         "data/README.md",
         "audit/README.md",
         "tests/smoke/README.md",
@@ -49,9 +49,12 @@ def test_scaffold_tree_and_no_placeholders(
     journal = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
     assert "## History" in journal
     assert "## Backlog" in journal
-    assert "[eda/eda.md]" in journal
+    assert "[data_analysis/data_analysis.md]" in journal
+    assert "Workspace decisions" not in journal
+    assert "| Project / dataset |" in journal
+    assert "| Variable | Value |" in journal
     assert "[tool.ruff]" in pyproject
-    assert '"eda/**"' in pyproject
+    assert '"data_analysis/**"' in pyproject
     assert 'name = "demo-pkg"' in pyproject
     for path in tmp_path.rglob("*"):
         if path.is_file() and path.suffix in {".py", ".toml", ".md"}:

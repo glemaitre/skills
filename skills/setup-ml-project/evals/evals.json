@@ -17,7 +17,8 @@
         "The response does NOT: Commit without asking.",
         "The response does NOT: Write a runnable baseline experiment.",
         "The response does NOT: Run `git push`.",
-        "The response does NOT: Leave a setup box unchecked because the folder is empty."
+        "The response does NOT: Leave a setup box unchecked because the folder is empty.",
+        "The response does NOT: Ask executed notebooks or documentation site in this meta."
       ],
       "tools": false,
       "sandbox": [],

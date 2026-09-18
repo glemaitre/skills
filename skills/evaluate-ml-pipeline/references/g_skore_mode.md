@@ -162,7 +162,7 @@ artifacts:
 |---|---|---|---|
 | `<SKORE_PROJECT_INIT>` in `experiments/NN_*.py` and `audit/NN_*.py` | `skore.Project(name="<project-name>", mode="local", workspace=str(PROJECT_ROOT / "reports"))` | `from skore import login; login(mode="hub"); skore.Project(name="<project-name>", mode="hub", workspace="<hub-workspace>")` | `skore.Project(name="<experiment-name>", mode="mlflow", tracking_uri="<mlflow-tracking-uri>")` |
 | Skore install (via `add-python-package`) | `env add-skore --mode local --execute` | `env add-skore --mode hub --execute` | `env add-skore --mode mlflow --execute` (the `mlflow>=3` pin is encoded) |
-| `Workspace decisions` rows in `JOURNAL.md` | `skore mode: local` | `skore mode: hub` + `skore hub workspace: <name>` | `skore mode: mlflow` + `skore mlflow tracking uri: <uri>` |
+| `policy.skore_mode` (`.skore`) | `local` | `hub` | `mlflow` |
 
 `name=` is a bare project name in **all three** modes — local uses it
 directly, hub uses it as the Hub project name, mlflow uses it as the
@@ -173,22 +173,13 @@ hub (the Hub workspace identifier `str`), while mlflow takes
 one word" differences; the substitution marker exists precisely
 because the companion kwarg changes.
 
-## Persistence in `Workspace decisions`
+## Persistence
 
-Three rows (only the one matching the chosen mode carries a value;
-the other follow-up row is `n/a`):
-
-```
-- skore mode: <local | hub | mlflow> — recorded: <YYYY-MM-DD>
-- skore hub workspace: <hub-workspace-name | n/a> — recorded: <YYYY-MM-DD>
-- skore mlflow tracking uri: <mlflow-tracking-uri | n/a> — recorded: <YYYY-MM-DD>
-```
-
-The hub-workspace row carries `n/a` unless mode is `hub`; the
-mlflow-tracking-uri row carries `n/a` unless mode is `mlflow`. On
-every later session, skills that need the mode read these rows first
-and skip re-asking — the standard `Workspace decisions` lookup
-pattern (see `triage-ml-task` template § Status).
+Record the mode with `python -m skore_skills policy set
+skore_mode <local | hub | mlflow>`. Hub workspace names and MLflow
+tracking URIs live in the experiment's `<SKORE_PROJECT_INIT>`
+block, not in JOURNAL. On later sessions, read
+`status.policy.skore_mode` and skip re-asking.
 
 ## Switching mid-project
 
@@ -203,8 +194,8 @@ Procedure:
    "Existing reports under <prior mode> will become inaccessible
    from this workspace. Proceed anyway? (y / n / migrate manually
    first)".
-2. Only on explicit user confirmation, update the
-   `Workspace decisions` row.
+2. Only on explicit user confirmation, run
+   `python -m skore_skills policy set skore_mode <mode>`.
 3. Rewrite **every** `<SKORE_PROJECT_INIT>` block in `experiments/`
    AND `audit/`.
 4. Update the install via `add-python-package` and

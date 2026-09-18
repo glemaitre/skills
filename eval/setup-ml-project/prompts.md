@@ -30,6 +30,7 @@
 - Write a runnable baseline experiment.
 - Run `git push`.
 - Leave a setup box unchecked because the folder is empty.
+- Ask executed notebooks or documentation site in this meta.
 
 ---
 

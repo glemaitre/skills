@@ -14,6 +14,8 @@ Lifecycle:
 The four content sections (Question, Motivation, Method, Risks) are
 fixed once approved; only the Status block changes afterwards. There
 is no "Success criteria" section — judge the result once it is in.
+When `experiments/<NN>_<short_name>.nb.html` has been exported, site
+build attaches it as an HTML viewer on this page.
 -->
 
 ## Question / hypothesis

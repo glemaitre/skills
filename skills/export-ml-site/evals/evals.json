@@ -1,0 +1,71 @@
+{
+  "skill_name": "export-ml-site",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Init then build",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.site` is true.\n- `mkdocs-material` is installed.\n- The workspace is scaffolded.]\n\nBuild the documentation website.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills site init`. - Name `python -m skore_skills site build`. - Name `html/index.html` as the file to open. It must NOT: - Run `notebook convert`. - Run `git commit`. - Load `add-python-package` for `jupytext` or `nbclient`.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills site init`.",
+        "Name `python -m skore_skills site build`.",
+        "Name `html/index.html` as the file to open.",
+        "The response does NOT: Run `notebook convert`.",
+        "The response does NOT: Run `git commit`.",
+        "The response does NOT: Load `add-python-package` for `jupytext` or `nbclient`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "Later turns only build",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.site` is true.\n- `site init` already ran.]\n\nRebuild the site.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills site build`. - Do not run `site init` again. - Name `html/index.html` as the file to open. It must NOT: - AskUserQuestion for the site gate again. - Run `notebook convert`. - Run `git end-turn`.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills site build`.",
+        "Do not run `site init` again.",
+        "Name `html/index.html` as the file to open.",
+        "The response does NOT: AskUserQuestion for the site gate again.",
+        "The response does NOT: Run `notebook convert`.",
+        "The response does NOT: Run `git end-turn`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "Gate off",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.site` is false.]\n\nBuild the MkDocs site.",
+      "expected_output": "Behavioural response satisfying: - Say the documentation-site gate is off and offer to turn it on. It must NOT: - Run `site init` or `site build` while the flag is false.",
+      "files": [],
+      "expectations": [
+        "Say the documentation-site gate is off and offer to turn it on.",
+        "The response does NOT: Run `site init` or `site build` while the flag is false."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "Null gate installs mkdocs only",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.site` is null.\n- `add-python-package` is installed.]\n\nBuild the documentation website.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion documentation site (default off). - If the user says yes: persist `site true`, load `add-python-package` for `mkdocs-material`, then init and build. It must NOT: - Install `jupytext`, `nbclient`, or `nbconvert` for the site gate. - Convert while only turning the site on.",
+      "files": [],
+      "expectations": [
+        "AskUserQuestion documentation site (default off).",
+        "If the user says yes: persist `site true`, load `add-python-package` for `mkdocs-material`, then init and build.",
+        "The response does NOT: Install `jupytext`, `nbclient`, or `nbconvert` for the site gate.",
+        "The response does NOT: Convert while only turning the site on."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

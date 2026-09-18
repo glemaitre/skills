@@ -4,8 +4,9 @@ description: >
   Resolve a genuine choice between Python libraries for one job,
   then ask `add-python-package` to add the chosen dependency.
   Trigger for competing-library questions or an optional package not
-  already fixed by the project stack — at first use (EDA tabular,
-  extras), never during workspace setup.
+  already fixed by the project stack — at first use (tabular
+  exploration, pipeline, or eval extras), never during workspace
+  setup.
 ---
 
 # Choose Python Library

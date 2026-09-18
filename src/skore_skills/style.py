@@ -8,7 +8,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 SKIP_DIR_NAMES = (".pixi", ".venv", "venv", "node_modules")
-DEFAULT_DIRS = ("src", "experiments", "audit", "eda")
+DEFAULT_DIRS = ("src", "experiments", "audit", "data_analysis")
 RUFF_MISSING = (
     "ruff is not installed in this interpreter. "
     "Install it with the project env manager "
@@ -25,7 +25,7 @@ select = ["E", "F", "W", "I", "B", "UP", "D"]
 [tool.ruff.lint.per-file-ignores]
 "experiments/**" = ["E402", "B018", "D100", "D103"]
 "audit/**" = ["E402", "B018", "D100", "D103"]
-"eda/**" = ["E402", "B018", "D100", "D103"]
+"data_analysis/**" = ["E402", "B018", "D100", "D103"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

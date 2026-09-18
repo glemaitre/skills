@@ -533,6 +533,9 @@ def route_package(package: str) -> dict[str, Any]:
     mandatory = {_package_key(name) for name in policy["mandatory"]}
     if key in mandatory:
         return {"scope": "agent", "feature": "agent", "message": None}
+    export = {_package_key(name) for name in policy.get("export") or []}
+    if key in export:
+        return {"scope": "agent", "feature": "agent", "message": None}
     optional = {_package_key(name) for name in policy["optional"]}
     if key in optional - mandatory:
         return {"scope": "ask", "feature": None, "message": None}

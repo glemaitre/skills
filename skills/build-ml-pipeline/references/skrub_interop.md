@@ -112,9 +112,9 @@ digest, and `iterate-from-skore` mines that digest for Backlog
 candidates).
 
 The Project init form depends on the workspace's `skore mode:`
-decision (recorded in `JOURNAL.md` Status `Workspace decisions`;
-gate owned by `organize-ml-workspace` § "G-SKORE-MODE"). Three
-forms; pick the one matching the workspace:
+decision (`status.policy.skore_mode`; gate owned by
+`evaluate-ml-pipeline` § "G-SKORE-MODE"). Three forms; pick the one
+matching the workspace:
 
 ```python
 # local mode

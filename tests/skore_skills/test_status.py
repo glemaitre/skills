@@ -52,7 +52,7 @@ def test_status_empty_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     assert payload["env_manager"] == "none"
     assert payload["has_src"] is False
     assert payload["package"] is None
-    assert payload["eda"] == "missing"
+    assert payload["data_analysis"] == "missing"
     assert payload["git"] is False
     assert payload["last_history_stem"] is None
     assert payload["loop_stage"] == "setup"
@@ -84,7 +84,7 @@ def test_status_organized_fixture(
     _write(tmp_path / "journal" / "JOURNAL.md", "# placeholder\n")
     _write(tmp_path / "journal" / "01_baseline.md", "# note\n")
     (tmp_path / "tests").mkdir()
-    _write(tmp_path / "eda" / "eda.md", "# eda\n")
+    _write(tmp_path / "data_analysis" / "data_analysis.md", "# eda\n")
     _write(tmp_path / "ruff.toml", 'target-version = "py311"\n')
     (tmp_path / ".git").mkdir()
     monkeypatch.chdir(tmp_path)
@@ -99,7 +99,7 @@ def test_status_organized_fixture(
         "has_experiments": True,
         "has_journal": True,
         "has_tests": True,
-        "eda": "present",
+        "data_analysis": "present",
         "ruff_toml": True,
         "git": True,
         "last_history_stem": "01_baseline",
@@ -108,6 +108,8 @@ def test_status_organized_fixture(
             "package": None,
             "tabular": None,
             "skore_mode": None,
+            "notebooks": None,
+            "site": None,
             "env": {"managed": None},
             "git": {"autocommit": None},
             "loop": {"stage": None, "stem": None},
@@ -118,37 +120,44 @@ def test_status_organized_fixture(
     assert all(value is False for value in skills.values())
 
 
-def test_status_eda_reads_eda_dir_not_data_dir(tmp_path: Path) -> None:
-    """The EDA deliverable lives in ``eda/``; ``data/eda.md`` is raw data."""
-    _write(tmp_path / "data" / "eda.md", "# stale\n")
-    assert snapshot(tmp_path)["eda"] == "missing"
-    _write(tmp_path / "eda" / "eda.md", "# eda\n")
-    assert snapshot(tmp_path)["eda"] == "present"
+def test_status_data_analysis_reads_data_analysis_dir_not_data_dir(
+    tmp_path: Path,
+) -> None:
+    """The report lives in ``data_analysis/``; ``data/`` is raw data."""
+    _write(tmp_path / "data" / "data_analysis.md", "# stale\n")
+    assert snapshot(tmp_path)["data_analysis"] == "missing"
+    _write(tmp_path / "data_analysis" / "data_analysis.md", "# report\n")
+    assert snapshot(tmp_path)["data_analysis"] == "present"
 
 
-def test_status_eda_skipped_from_journal(tmp_path: Path) -> None:
-    """JOURNAL ``Status: skipped`` is ``eda: skipped`` and leaves the EDA stage."""
+def test_status_data_analysis_skipped_from_journal(tmp_path: Path) -> None:
+    """JOURNAL Status skipped is ``data_analysis: skipped``."""
     (tmp_path / "src").mkdir()
     _write(
         tmp_path / "journal" / "JOURNAL.md",
-        "## Data understanding (EDA)\n\n"
-        "- **Status:** skipped — 2026-09-18\n\n"
+        "## Data understanding\n\n"
+        "| Variable | Value |\n"
+        "|---|---|\n"
+        "| Status | skipped — 2026-09-18 |\n\n"
         "## History\n",
     )
     payload = snapshot(tmp_path)
-    assert payload["eda"] == "skipped"
+    assert payload["data_analysis"] == "skipped"
     assert payload["loop_stage"] == "implement"
 
 
-def test_status_eda_present_overrides_journal_skipped(tmp_path: Path) -> None:
-    """``eda/eda.md`` wins when JOURNAL still says skipped."""
+def test_status_data_analysis_present_overrides_journal_skipped(tmp_path: Path) -> None:
+    """``data_analysis/data_analysis.md`` wins when JOURNAL still says skipped."""
     (tmp_path / "src").mkdir()
     _write(
         tmp_path / "journal" / "JOURNAL.md",
-        "## Data understanding (EDA)\n\n- **Status:** skipped — 2026-09-18\n",
+        "## Data understanding\n\n"
+        "| Variable | Value |\n"
+        "|---|---|\n"
+        "| Status | skipped — 2026-09-18 |\n",
     )
-    _write(tmp_path / "eda" / "eda.md", "# eda\n")
-    assert snapshot(tmp_path)["eda"] == "present"
+    _write(tmp_path / "data_analysis" / "data_analysis.md", "# report\n")
+    assert snapshot(tmp_path)["data_analysis"] == "present"
 
 
 def test_status_hatchling_build_is_not_hatch_env_manager(tmp_path: Path) -> None:
