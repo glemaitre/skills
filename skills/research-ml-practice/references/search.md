@@ -1,8 +1,57 @@
 # Search angles, corroboration, output
 
-## Query angles
+Two modes. Survey proposes concerns from literature. Depth
+ranks actions for one named concern.
 
-Fill from intake. Run 1, 3, and 5 first; add 2 and 4 if thin.
+## Survey
+
+No named concern. Context from JOURNAL / dtypes / target /
+domain is fine. Do **not** use EDA Open questions as queries
+or as the concern list.
+
+Run in parallel (distinct angles, not paraphrases). Bake in
+domain and task when known:
+
+1. Practice: `tabular machine learning [domain] [task] EDA best practices`
+2. Pitfalls: `[domain] [task] leakage pitfalls common mistakes`
+3. What to check: `what to check EDA [domain] tabular machine learning`
+
+Add theory/papers only if that pass is thin. Fetch primary
+pages.
+
+Write `scratch/research/survey-<slug>.md`. **No** ranked
+`measure` / `declare` action table.
+
+```markdown
+## Survey: <domain / task in one line>
+
+### Context
+- Stage: data_analysis | model
+- Modality / domain: ...
+- Target / model family: ... (or not yet specified)
+
+### What is happening
+Plain language, 2–4 sentences (literature landscape, not a
+lecture on this table’s Open questions).
+
+### Proposed concerns
+| Concern | Why it may apply | Source |
+|---|---|---|
+| ... | ... | ... |
+
+### Confidence
+HIGH | MEDIUM | LOW — one sentence why.
+
+### Sources
+Inline citations for every factual claim.
+```
+
+Return the path. The caller asks which concerns to deepen.
+
+## Depth
+
+Need a specific concern. Run 1, 3, and 5 first; add 2 and 4
+if thin.
 
 1. Practice: `EDA OR machine learning [domain] [concern] best practices`
 2. Theory: `[concern] statistical [modality]`
@@ -11,6 +60,7 @@ Fill from intake. Run 1, 3, and 5 first; add 2 and 4 if thin.
 5. Pitfalls: `[concern] mistakes pitfalls leakage [domain]`
 
 Queries must be distinct angles, not paraphrases of one string.
+If a domain is known, bake it into the queries.
 
 ## Corroboration
 
@@ -24,7 +74,8 @@ Queries must be distinct angles, not paraphrases of one string.
 
 ## Lanes
 
-Every candidate row gets one lane. Callers distill; do not guess.
+Depth notes only. Every candidate row gets one lane. Callers
+distill; do not guess.
 
 | Lane | Meaning |
 |---|---|
@@ -33,7 +84,7 @@ Every candidate row gets one lane. Callers distill; do not guess.
 | `evaluate` | Splitter, metric, calibration — not EDA cells, not fit |
 | `confirm` | Domain or user judgment only |
 
-## Output template
+## Depth output template
 
 Write this file under `scratch/research/<slug>.md`. The caller
 summarizes it; do not paste it wholesale into chat.

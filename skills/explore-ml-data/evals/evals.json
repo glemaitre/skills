@@ -183,7 +183,7 @@
         "Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing).",
         "Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py` for **regression only**.",
         "Use seaborn figure-level plots (`displot` / `relplot`); save PNGs and leave figures as cell output.",
-        "After `data_analysis.md`, AskUserQuestion keep exploring vs close (**Close** preselected).",
+        "After `data_analysis.md`, AskUserQuestion keep exploring vs close (neither option recommended or preselected).",
         "The response does NOT: Re-plot TableReport univariate histograms or the association matrix in extra cells.",
         "The response does NOT: Install sklearn, skore, pytest, or plotly on the default path.",
         "The response does NOT: Train/test split the raw table.",
@@ -232,10 +232,10 @@
       "id": 14,
       "title": "Close after default pass keeps sklearn off",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Default notebook, extras.json, and `data_analysis.md` are on\n  disk.\n- User picks **Close** on keep-exploring vs close.]\n\nExplore the dataset. Target is MedHouseVal.",
-      "expected_output": "Behavioural response satisfying: - AskUserQuestion keep exploring vs close (**Close** preselected). - Name `python -m skore_skills git end-turn --stage data_analysis` after Close. It must NOT: - Load `add-python-package` for sklearn / scipy / statsmodels. - Leave modelling implications empty of duplicate/target/leakage findings.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion keep exploring vs close (neither option recommended or preselected). - Name `python -m skore_skills git end-turn --stage data_analysis` after Close. It must NOT: - Load `add-python-package` for sklearn / scipy / statsmodels. - Leave modelling implications empty of duplicate/target/leakage findings.",
       "files": [],
       "expectations": [
-        "AskUserQuestion keep exploring vs close (**Close** preselected).",
+        "AskUserQuestion keep exploring vs close (neither option recommended or preselected).",
         "Name `python -m skore_skills git end-turn --stage data_analysis` after Close.",
         "The response does NOT: Load `add-python-package` for sklearn / scipy / statsmodels.",
         "The response does NOT: Leave modelling implications empty of duplicate/target/leakage findings."
@@ -248,10 +248,10 @@
       "id": 15,
       "title": "Keep exploring does not end the turn",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- User picks **Keep exploring the data**.]\n\nExplore the dataset. Target is MedHouseVal.",
-      "expected_output": "Behavioural response satisfying: - AskUserQuestion extras / research this concern / describe what to plot. - Stay in `explore-ml-data`. It must NOT: - Name `python -m skore_skills git end-turn`. - Invent a domain-specific checklist skill or `references/domains/`. - Run `python -m skore_skills site build` on keep exploring.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion extras / named concern / open research (survey first) / describe what to plot. None recommended. - Stay in `explore-ml-data`. It must NOT: - Name `python -m skore_skills git end-turn`. - Invent a domain-specific checklist skill or `references/domains/`. - Run `python -m skore_skills site build` on keep exploring.",
       "files": [],
       "expectations": [
-        "AskUserQuestion extras / research this concern / describe what to plot.",
+        "AskUserQuestion extras / named concern / open research (survey first) / describe what to plot. None recommended.",
         "Stay in `explore-ml-data`.",
         "The response does NOT: Name `python -m skore_skills git end-turn`.",
         "The response does NOT: Invent a domain-specific checklist skill or `references/domains/`.",
@@ -284,11 +284,11 @@
       "id": 17,
       "title": "Research skill missing is a one-line skip",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- EDA markdown exists. User picked Keep exploring, then Research\n  this concern.\n- `status.skills.research-ml-practice` is false or absent.]\n\nIs 0.97 correlation with the target leakage?",
-      "expected_output": "Behavioural response satisfying: - One-line skip that `research-ml-practice` is not installed. - Stay in the keep-exploring menu (re-ask extras / research / describe what to plot, or keep vs close). It must NOT: - Invent papers or leakage thresholds from memory. - Run `git end-turn` in this keep-exploring pass.",
+      "expected_output": "Behavioural response satisfying: - One-line skip that `research-ml-practice` is not installed. - Stay in the keep-exploring menu (re-ask extras / named concern / open research / describe what to plot, or keep vs close). It must NOT: - Invent papers or leakage thresholds from memory. - Run `git end-turn` in this keep-exploring pass.",
       "files": [],
       "expectations": [
         "One-line skip that `research-ml-practice` is not installed.",
-        "Stay in the keep-exploring menu (re-ask extras / research / describe what to plot, or keep vs close).",
+        "Stay in the keep-exploring menu (re-ask extras / named concern / open research / describe what to plot, or keep vs close).",
         "The response does NOT: Invent papers or leakage thresholds from memory.",
         "The response does NOT: Run `git end-turn` in this keep-exploring pass."
       ],
@@ -300,11 +300,11 @@
       "id": 18,
       "title": "Leakage question while EDA is already done",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` exists.\n- JOURNAL \u00a7 Data understanding records `Status: done`.\n- `status.data_analysis` is present.\n- The user did not pick Keep exploring first.\n- `status.skills.research-ml-practice` is true.]\n\nIs 0.97 correlation with the target leakage?",
-      "expected_output": "Behavioural response satisfying: - Skip G-DATA-ANALYSIS; do not overwrite `data_analysis/data_analysis.py`. - Load `research-ml-practice` (Keep exploring \u00a7 research). - Summarize the scratch note in chat. It must NOT: - Stop as CASE_04 (EDA already recorded, no refresh). - Run `git end-turn` in this pass. - Re-run `cells run` or rewrite the default notebook.",
+      "expected_output": "Behavioural response satisfying: - Skip G-DATA-ANALYSIS; do not overwrite `data_analysis/data_analysis.py`. - Load `research-ml-practice` (Keep exploring \u00a7 named concern). - Summarize the scratch note in chat. It must NOT: - Stop as CASE_04 (EDA already recorded, no refresh). - Run `git end-turn` in this pass. - Re-run `cells run` or rewrite the default notebook.",
       "files": [],
       "expectations": [
         "Skip G-DATA-ANALYSIS; do not overwrite `data_analysis/data_analysis.py`.",
-        "Load `research-ml-practice` (Keep exploring \u00a7 research).",
+        "Load `research-ml-practice` (Keep exploring \u00a7 named concern).",
         "Summarize the scratch note in chat.",
         "The response does NOT: Stop as CASE_04 (EDA already recorded, no refresh).",
         "The response does NOT: Run `git end-turn` in this pass.",
@@ -325,6 +325,25 @@
         "Omit `templates/target_regression.py` and `templates/target_classification.py`.",
         "The response does NOT: Write `if TARGET is None` / `if TASK` branches for unused tasks.",
         "The response does NOT: Call `plt.close`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 20,
+      "title": "Open research surveys before a concern board",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` exists with Open questions.\n- User picked **Keep exploring**, then **Open research**.\n- `status.skills.research-ml-practice` is true.]\n\nKeep exploring. Survey the literature for this table.",
+      "expected_output": "Behavioural response satisfying: - Load `research-ml-practice` with mode survey (no named concern). - Read `scratch/research/survey-<slug>.md`. - AskUserQuestion `allow_multiple` (unchecked) on **only** that note\u2019s proposed concerns. It must NOT: - Build the concern board from Open questions before the survey. - Write a ranked `measure` / `declare` action table in the survey note. - Run `git end-turn` in this pass.",
+      "files": [],
+      "expectations": [
+        "Load `research-ml-practice` with mode survey (no named concern).",
+        "Read `scratch/research/survey-<slug>.md`.",
+        "AskUserQuestion `allow_multiple` (unchecked) on **only** that note\u2019s proposed concerns.",
+        "The response does NOT: Build the concern board from Open questions before the survey.",
+        "The response does NOT: Write a ranked `measure` / `declare` action table in the survey note.",
+        "The response does NOT: Run `git end-turn` in this pass.",
+        "The response does NOT: Name `Close` as recommended on keep vs close."
       ],
       "tools": false,
       "sandbox": [],

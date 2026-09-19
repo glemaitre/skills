@@ -252,7 +252,7 @@
 - Use seaborn figure-level plots (`displot` / `relplot`); save
   PNGs and leave figures as cell output.
 - After `data_analysis.md`, AskUserQuestion keep exploring vs
-  close (**Close** preselected).
+  close (neither option recommended or preselected).
 
 **Must NOT do:**
 - Re-plot TableReport univariate histograms or the association
@@ -320,7 +320,8 @@
 - User picks **Close** on keep-exploring vs close.
 
 **Must do:**
-- AskUserQuestion keep exploring vs close (**Close** preselected).
+- AskUserQuestion keep exploring vs close (neither option
+  recommended or preselected).
 - Name `python -m skore_skills git end-turn --stage data_analysis`
   after Close.
 
@@ -341,8 +342,8 @@
 - User picks **Keep exploring the data**.
 
 **Must do:**
-- AskUserQuestion extras / research this concern / describe what
-  to plot.
+- AskUserQuestion extras / named concern / open research
+  (survey first) / describe what to plot. None recommended.
 - Stay in `explore-ml-data`.
 
 **Must NOT do:**
@@ -389,8 +390,9 @@
 
 **Must do:**
 - One-line skip that `research-ml-practice` is not installed.
-- Stay in the keep-exploring menu (re-ask extras / research /
-  describe what to plot, or keep vs close).
+- Stay in the keep-exploring menu (re-ask extras / named
+  concern / open research / describe what to plot, or keep vs
+  close).
 
 **Must NOT do:**
 - Invent papers or leakage thresholds from memory.
@@ -413,7 +415,7 @@
 **Must do:**
 - Skip G-DATA-ANALYSIS; do not overwrite
   `data_analysis/data_analysis.py`.
-- Load `research-ml-practice` (Keep exploring § research).
+- Load `research-ml-practice` (Keep exploring § named concern).
 - Summarize the scratch note in chat.
 
 **Must NOT do:**
@@ -442,3 +444,30 @@
 - Write `if TARGET is None` / `if TASK` branches for unused
   tasks.
 - Call `plt.close`.
+
+---
+
+## CASE_20 — Open research surveys before a concern board
+
+**User prompt:**
+> Keep exploring. Survey the literature for this table.
+
+**Assumed workspace state:**
+- `data_analysis/data_analysis.md` exists with Open questions.
+- User picked **Keep exploring**, then **Open research**.
+- `status.skills.research-ml-practice` is true.
+
+**Must do:**
+- Load `research-ml-practice` with mode survey (no named
+  concern).
+- Read `scratch/research/survey-<slug>.md`.
+- AskUserQuestion `allow_multiple` (unchecked) on **only**
+  that note’s proposed concerns.
+
+**Must NOT do:**
+- Build the concern board from Open questions before the
+  survey.
+- Write a ranked `measure` / `declare` action table in the
+  survey note.
+- Run `git end-turn` in this pass.
+- Name `Close` as recommended on keep vs close.
