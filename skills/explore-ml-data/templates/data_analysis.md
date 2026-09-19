@@ -26,8 +26,10 @@ balance/skew, feature-vs-target, leakage flags, any extra the user
 picked) into *candidate* modelling choices (splitter, metric,
 leakage risk). The owning gates make the picks.
 Embed any saved figure next to the implication it supports —
-`![<caption>](<name>.png)`, a sibling of this file, never a bare
-link. Glance stays TableReport-only.
+`![<caption>](<name>.png)` or
+`<iframe src="<slug>.html" width="100%" height="640"></iframe>`
+(Plotly HTML, same pattern as TableReport). A sibling of this
+file, never a bare link. Glance stays TableReport-only.
 
 ## Open questions
 

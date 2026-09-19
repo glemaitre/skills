@@ -20,7 +20,6 @@
     "tabular": ["pandas", "polars"],
     "deep_learning_framework": ["pytorch", "keras"],
     "sklearn_dl_wrapper": ["skorch", "keras"],
-    "plotting": ["matplotlib", "seaborn", "plotly"],
     "serving": ["mlflow", "fastapi"]
   },
   "optional": [

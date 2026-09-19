@@ -42,3 +42,21 @@
 **Must NOT do:**
 - Run `python -m skore_skills env add`.
 - Invent the `add-python-package` procedure from memory.
+
+---
+
+## CASE_03 — Plotting is not a competing ask
+
+**User prompt:**
+> Which plotting library should I use, matplotlib or seaborn?
+
+**Assumed workspace state:**
+- `plot-ml-figure` is installed (`status.skills` true).
+
+**Must do:**
+- Load `plot-ml-figure` rather than asking matplotlib vs seaborn
+  vs plotly.
+
+**Must NOT do:**
+- Present the competing plotting set as a user choice.
+- Run `pip install`.

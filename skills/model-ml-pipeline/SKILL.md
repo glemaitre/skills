@@ -36,8 +36,9 @@ Before new library symbols are written, use
 - If `status.data_analysis` is `missing`, continue with facts the user
   stated; do not invent an exploratory data analysis report.
 - Literature-backed feature-engineering or learner-family
-  questions: load `research-ml-practice` if installed; do not
-  invent papers from memory.
+  questions: load `build-ml-pipeline` (it loads
+  `research-ml-practice` if installed). Do not distill research
+  here; do not invent papers from memory.
 
 After build and smoke succeed, if `policy.notebooks` is true,
 `export-ml-notebook` is installed, run

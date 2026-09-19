@@ -29,6 +29,7 @@ SKILL_TIER: dict[str, str] = {
     "iterate-from-user": "medium",
     "explore-ml-data": "medium",
     "research-ml-practice": "medium",
+    "plot-ml-figure": "medium",
     "audit-ml-pipeline": "medium",
     "build-ml-pipeline": "big",
     "export-ml-notebook": "medium",

@@ -436,6 +436,11 @@ API CLI is only for the signature after the name.
   `import skore` fires, or whenever any other dependency is missing
   from the env. Don't infer the manager or hand-craft the install
   command — that skill owns it.
+- **`plot-ml-figure`** — load if installed before any custom
+  figure cell that skore does not already plot. Do not hand-roll
+  ROC/PR in matplotlib. Save PNG (or HTML) and leave the figure
+  visible in a notebook; never `plt.close` there. Missing skill →
+  one-line skip.
 - **`python -m skore_skills style`** — **must be invoked** after writing or
   editing `src/<pkg>/evaluate.py` (and, if a custom splitter is
   authored, the module that holds it). Running `pixi run ruff

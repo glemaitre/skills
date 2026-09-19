@@ -2,7 +2,8 @@
 
 Reuse the same load as data_analysis/data_analysis.py. Writes
 TableReport.json (plot_distributions=False) and extras.json
-(duplicates, target, correlations, leakage flags, png paths).
+(duplicates, target, correlations, leakage flags, png and html
+paths).
 """
 
 import json
@@ -32,7 +33,13 @@ out.mkdir(parents=True, exist_ok=True)
 
 n_dup = int(FRAME.duplicated().sum())
 n_rows = int(len(FRAME))
-pngs = sorted(p.name for p in (PROJECT_ROOT / "data_analysis").glob("*.png"))
+analysis = PROJECT_ROOT / "data_analysis"
+pngs = sorted(p.name for p in analysis.glob("*.png"))
+htmls = sorted(
+    p.name
+    for p in analysis.glob("*.html")
+    if p.name != "data_analysis_<table>.html" and not p.name.endswith(".nb.html")
+)
 
 extras: dict = {
     "n_rows": n_rows,
@@ -45,6 +52,7 @@ extras: dict = {
     "feature_target_corr": [],
     "leakage_flags": [],
     "pngs": pngs,
+    "htmls": htmls,
 }
 
 if TARGET is not None and TARGET in FRAME.columns:

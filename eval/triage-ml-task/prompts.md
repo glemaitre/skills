@@ -250,19 +250,44 @@
 
 ---
 
-## CASE_13 — Certain research request
+## CASE_13 — Certain leakage question routes to explore
 
 **User prompt:**
 > Research whether 0.97 correlation with the target is leakage.
 
 **Assumed workspace state:**
 - Scaffolded workspace.
-- `status.skills.research-ml-practice` is `true`.
+- The question is about the table (`data_analysis` may be
+  `present` or `missing`).
+- `status.skills.explore-ml-data` is `true`.
 
 **Must do:**
 - Name `python -m skore_skills status`.
-- Load `research-ml-practice` without listing the catalog menu.
+- Load `explore-ml-data` without listing the catalog menu.
 
 **Must NOT do:**
+- Load `research-ml-practice` as the certain skill.
 - Put `research-ml-practice` on the uncertain entry board.
+- Ask which entry skill to run.
+
+---
+
+## CASE_14 — Certain research during modeling routes to model
+
+**User prompt:**
+> Research whether target encoding is the right transform for
+> this high-cardinality column.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- An approved design note exists; modeling is in progress.
+- `status.skills.model-ml-pipeline` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `model-ml-pipeline` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `research-ml-practice` as the certain skill.
+- Load `explore-ml-data` as the certain skill.
 - Ask which entry skill to run.

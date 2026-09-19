@@ -21,6 +21,8 @@
 - Replace skrub DataOps with a bare sklearn Pipeline.
 - Mark the experiment done while smoke tests fail.
 - Run `git commit` in this skill or `git push`.
+- Distill `scratch/research/` here instead of loading
+  `build-ml-pipeline`.
 
 ---
 

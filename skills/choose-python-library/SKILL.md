@@ -21,7 +21,9 @@ description: >
    `status.skills` reports it installed. If it is not installed,
    name the package and stop. Do not call `env add` from this
    skill. Typical callers: `explore-ml-data` (pandas vs polars),
-   later extras (plotting, tuning). Not `setup-workspace`.
+   later extras (tuning). Not `setup-workspace`. Plotting jobs:
+   load `plot-ml-figure` if installed; do not present matplotlib
+   vs seaborn vs plotly.
 5. Confirm symbols with `python -m skore_skills api get <dotted>`
    before writing calls.
 
@@ -32,3 +34,5 @@ description: >
 - Do not run pip directly in a managed project.
 - Do not substitute black/isort for Ruff or sklearn Pipeline for
   skrub DataOps; those choices are already fixed.
+- Do not present matplotlib vs seaborn vs plotly; that job is
+  `plot-ml-figure`.

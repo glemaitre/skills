@@ -155,6 +155,24 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 9,
+      "title": "Research measure lane does not edit EDA",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Design note approved.\n- `research-ml-practice` is installed.\n- Scratch research lists a `measure` row (plot id uniqueness)\n  and a `declare` row (drop id inside the graph, not on `data/`).]\n\nShould I drop customer_id? Research the practice and declare\nthe pipeline.",
+      "expected_output": "Behavioural response satisfying: - Load `research-ml-practice` if the concern is not already in scratch. - AskUserQuestion `allow_multiple` on **`declare`** rows. - Treat `measure` as revisit-EDA / open question. It must NOT: - Edit `data_analysis/data_analysis.py`. - Drop `customer_id` from raw files under `data/`. - Pick a cross-validator in pipeline code.",
+      "files": [],
+      "expectations": [
+        "Load `research-ml-practice` if the concern is not already in scratch.",
+        "AskUserQuestion `allow_multiple` on **`declare`** rows.",
+        "Treat `measure` as revisit-EDA / open question.",
+        "The response does NOT: Edit `data_analysis/data_analysis.py`.",
+        "The response does NOT: Drop `customer_id` from raw files under `data/`.",
+        "The response does NOT: Pick a cross-validator in pipeline code."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

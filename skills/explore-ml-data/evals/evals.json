@@ -58,13 +58,14 @@
       "id": 4,
       "title": "EDA already present, no refresh",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` exists.\n- JOURNAL \u00a7 Data understanding records `Status: done`.\n- The user did not ask to re-run or refresh EDA.]\n\nExplore the dataset.",
-      "expected_output": "Behavioural response satisfying: - Detect exploratory data analysis already recorded (`status.data_analysis` present). - Stop without overwriting `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`. It must NOT: - Re-run `cells run` or rewrite the report. - Design a model in this skill.",
+      "expected_output": "Behavioural response satisfying: - Detect exploratory data analysis already recorded (`status.data_analysis` present). - Stop without overwriting `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`. It must NOT: - Re-run `cells run` or rewrite the report. - Design a model in this skill. - Treat a methodology concern (\u201cis this leakage\u201d) as this stop (see CASE_18).",
       "files": [],
       "expectations": [
         "Detect exploratory data analysis already recorded (`status.data_analysis` present).",
         "Stop without overwriting `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`.",
         "The response does NOT: Re-run `cells run` or rewrite the report.",
-        "The response does NOT: Design a model in this skill."
+        "The response does NOT: Design a model in this skill.",
+        "The response does NOT: Treat a methodology concern (\u201cis this leakage\u201d) as this stop (see CASE_18)."
       ],
       "tools": false,
       "sandbox": [],
@@ -175,16 +176,20 @@
       "id": 11,
       "title": "Default run adds ML-gap cells",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- `add-python-package` is installed.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available.]\n\nExplore the California housing CSV. Target is MedHouseVal.",
-      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing). - Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py`. - After `data_analysis.md`, AskUserQuestion keep exploring vs close (**Close** preselected). It must NOT: - Re-plot TableReport univariate histograms or the association matrix in extra cells. - Install sklearn, skore, or pytest on the default path. - Train/test split the raw table.",
+      "expected_output": "Behavioural response satisfying: - Load `plot-ml-figure` if installed before writing figure cells. - Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing). - Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py` for **regression only**. It must NOT: - Re-plot TableReport univariate histograms or the association matrix in extra cells. - Install sklearn, skore, pytest, or plotly on the default path. - Train/test split the raw table.",
       "files": [],
       "expectations": [
+        "Load `plot-ml-figure` if installed before writing figure cells.",
         "Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing).",
-        "Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py`.",
+        "Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py` for **regression only**.",
+        "Use seaborn figure-level plots (`displot` / `relplot`); save PNGs and leave figures as cell output.",
         "After `data_analysis.md`, AskUserQuestion keep exploring vs close (**Close** preselected).",
         "The response does NOT: Re-plot TableReport univariate histograms or the association matrix in extra cells.",
-        "The response does NOT: Install sklearn, skore, or pytest on the default path.",
+        "The response does NOT: Install sklearn, skore, pytest, or plotly on the default path.",
         "The response does NOT: Train/test split the raw table.",
-        "The response does NOT: Run `git end-turn` before the user picks Close."
+        "The response does NOT: Run `git end-turn` before the user picks Close.",
+        "The response does NOT: Leave classification / no-target branches (`if TASK`, `if TARGET is None`) in the notebook.",
+        "The response does NOT: Call `plt.close` or `import matplotlib.pyplot` for these figures."
       ],
       "tools": false,
       "sandbox": [],
@@ -194,12 +199,13 @@
       "id": 12,
       "title": "Unspecified target asks, does not guess",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. User chose **run**.\n- JOURNAL Goal does not name a column.\n- Column names are `A`, `B`, `C`.]\n\nExplore the dataset.",
-      "expected_output": "Behavioural response satisfying: - AskUserQuestion for the target (column list plus \"no target yet\") before writing target-aware cells. It must NOT: - Guess a target column silently. - Skip the duplicate-row cell when the user picks \"no target yet\".",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion for the target (column list plus \"no target yet\") before writing target-aware cells. It must NOT: - Guess a target column silently. - Skip the duplicate-row cell when the user picks \"no target yet\". - Write target-distribution / bivariate / leakage cells when the user picks \"no target yet\".",
       "files": [],
       "expectations": [
         "AskUserQuestion for the target (column list plus \"no target yet\") before writing target-aware cells.",
         "The response does NOT: Guess a target column silently.",
-        "The response does NOT: Skip the duplicate-row cell when the user picks \"no target yet\"."
+        "The response does NOT: Skip the duplicate-row cell when the user picks \"no target yet\".",
+        "The response does NOT: Write target-distribution / bivariate / leakage cells when the user picks \"no target yet\"."
       ],
       "tools": false,
       "sandbox": [],
@@ -259,14 +265,16 @@
       "id": 16,
       "title": "Keep exploring then research",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- EDA markdown exists. User picked Keep exploring, then Research\n  this concern.\n- `status.skills.research-ml-practice` is true.]\n\nIs 0.97 correlation with the target leakage?",
-      "expected_output": "Behavioural response satisfying: - Load `research-ml-practice`. - After it returns, copy confirmed candidates into `data_analysis.md` even if the `.py` did not change. It must NOT: - Drop the correlated column from the raw data. - Run `git end-turn` in this keep-exploring pass. - Append a research-recommended plot cell without user confirmation.",
+      "expected_output": "Behavioural response satisfying: - Load `research-ml-practice`. - Summarize the scratch note in chat (what is happening + why it matters here). - AskUserQuestion `allow_multiple` on `measure` rows only. It must NOT: - Drop the correlated column from the raw data. - Run `git end-turn` in this keep-exploring pass. - Copy literature into modelling implications as if it were measured.",
       "files": [],
       "expectations": [
         "Load `research-ml-practice`.",
-        "After it returns, copy confirmed candidates into `data_analysis.md` even if the `.py` did not change.",
+        "Summarize the scratch note in chat (what is happening + why it matters here).",
+        "AskUserQuestion `allow_multiple` on `measure` rows only.",
         "The response does NOT: Drop the correlated column from the raw data.",
         "The response does NOT: Run `git end-turn` in this keep-exploring pass.",
-        "The response does NOT: Append a research-recommended plot cell without user confirmation."
+        "The response does NOT: Copy literature into modelling implications as if it were measured.",
+        "The response does NOT: Append a `declare` or `evaluate` row as an EDA cell."
       ],
       "tools": false,
       "sandbox": [],
@@ -283,6 +291,40 @@
         "Stay in the keep-exploring menu (re-ask extras / research / describe what to plot, or keep vs close).",
         "The response does NOT: Invent papers or leakage thresholds from memory.",
         "The response does NOT: Run `git end-turn` in this keep-exploring pass."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 18,
+      "title": "Leakage question while EDA is already done",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` exists.\n- JOURNAL \u00a7 Data understanding records `Status: done`.\n- `status.data_analysis` is present.\n- The user did not pick Keep exploring first.\n- `status.skills.research-ml-practice` is true.]\n\nIs 0.97 correlation with the target leakage?",
+      "expected_output": "Behavioural response satisfying: - Skip G-DATA-ANALYSIS; do not overwrite `data_analysis/data_analysis.py`. - Load `research-ml-practice` (Keep exploring \u00a7 research). - Summarize the scratch note in chat. It must NOT: - Stop as CASE_04 (EDA already recorded, no refresh). - Run `git end-turn` in this pass. - Re-run `cells run` or rewrite the default notebook.",
+      "files": [],
+      "expectations": [
+        "Skip G-DATA-ANALYSIS; do not overwrite `data_analysis/data_analysis.py`.",
+        "Load `research-ml-practice` (Keep exploring \u00a7 research).",
+        "Summarize the scratch note in chat.",
+        "The response does NOT: Stop as CASE_04 (EDA already recorded, no refresh).",
+        "The response does NOT: Run `git end-turn` in this pass.",
+        "The response does NOT: Re-run `cells run` or rewrite the default notebook."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 19,
+      "title": "No target omits target-aware cells",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. User chose **run**.\n- User picked **no target yet** on the target AskUserQuestion.\n- `plot-ml-figure` is installed.]\n\nExplore the dataset.",
+      "expected_output": "Behavioural response satisfying: - Write TableReport and duplicate-row cells. - Omit `templates/target_regression.py` and `templates/target_classification.py`. It must NOT: - Write `if TARGET is None` / `if TASK` branches for unused tasks. - Call `plt.close`.",
+      "files": [],
+      "expectations": [
+        "Write TableReport and duplicate-row cells.",
+        "Omit `templates/target_regression.py` and `templates/target_classification.py`.",
+        "The response does NOT: Write `if TARGET is None` / `if TASK` branches for unused tasks.",
+        "The response does NOT: Call `plt.close`."
       ],
       "tools": false,
       "sandbox": [],

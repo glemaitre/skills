@@ -276,7 +276,11 @@ The contract is deliberately narrow: checks (with their doc URLs)
 accessors (residuals, confusion matrices, feature importances,
 calibration plots, …) unless the user asks for one explicitly —
 the actionable mitigations come from the check pages, not from
-deeper inspection here.
+deeper inspection here. If the user explicitly asks for a custom
+figure that is not a skore check plot, load `plot-ml-figure` if
+installed **before writing the cell**; never replace a skore
+check plot. Save PNG (or HTML) and leave the figure visible;
+never `plt.close` in the audit notebook.
 
 ## Execution contract — one command
 

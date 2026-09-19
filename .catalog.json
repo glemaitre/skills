@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "9bfa87b80642d1dd3311af089d88c3d83d02d10476cd2b18bf3fb837ec214d78",
+  "catalog_hash": "b98db1868be86a85bded0d3bf8112040d84ab1a15fd1be621fd0d74fd0482465",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "6cd8ca81c23cd0b48f93315a44784bfad70fc6098eed9a2569e35e28753337bb"
+      "hash": "357ee0ba84b17aaba785daf6750f69f15088269f06b4bfa7ce8cb1f4bb38527f"
     },
     {
       "id": "build-ml-pipeline",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "f702b7c82b9cb081e12d69bbc5dc46490ab501d500ead94e5e5ed0ccdb60f097"
+      "hash": "6f673bd97cf5eebf99145cea0078dcead23cd4d3b0d27064573adbdf4724af7d"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "803953df4742de38be8e3675a3aae612d28d7ff9564510e7ceca208b4e391ccb"
+      "hash": "70bfded90f9fec444bfdcb79c738d99041f0097b16f29230a96bfad578d45811"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "30f45e46eee67c886dbd7cf8ddfabb251cd570c36a986681f076245fea43e98c"
+      "hash": "63dfff2f7763b6ab77be6359c597ddd127525c7d5ba75a400208b9a596d9c70f"
     },
     {
       "id": "manage-ml-backlog",
@@ -102,7 +102,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "c9aaddfc29b37a8244634a0a964a0ce0453e4803301d0a38ccf77510ee396ac7"
+      "hash": "40d71bf937e2524b9932e34304102e39fdbf9bf2c69da4234ce2af53c8ada371"
     },
     {
       "id": "setup-ml-project",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build, evaluation, and smoke testing.",
       "category": "meta",
       "subcategory": null,
-      "hash": "3e9e9d8f17eb2c46a14423cb0c73dd3ccff6a6080c788864a25783c4077087dd"
+      "hash": "c5d66aed19a77afe6d438a52d2073ea19f71e686a9f1633bff6b6c642ff3135a"
     },
     {
       "id": "choose-python-library",
@@ -147,7 +147,16 @@
       "summary": "Resolve a library choice and add the selected dependency.",
       "category": "action",
       "subcategory": null,
-      "hash": "c7a101bc50d52494cdcd1ebd8330f5892441361972d9771e82768909e37ff4b1"
+      "hash": "7adb928dd4d35fe72c83ceb8be9c758c269d9b5777ca33104329dd3ec7abefec"
+    },
+    {
+      "id": "plot-ml-figure",
+      "path": "skills/plot-ml-figure",
+      "title": "Plot ML Figure",
+      "summary": "Pick pandas, seaborn, plotly, or matplotlib before writing figure code.",
+      "category": "action",
+      "subcategory": null,
+      "hash": "1fa26235fcea0d4dcf5d5c93352c0fcb0d643f482144749f96c6dee716cbdb45"
     },
     {
       "id": "research-ml-practice",
@@ -156,7 +165,7 @@
       "summary": "Literature research for an ML methodology concern.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "ba1a5f06e9e9940e570fce0064e3b9564994aaa829588fc8c696a75f293686f4"
+      "hash": "e8eefa333efa4f92efc9105c5a4791055ae18be3f6e0bcc690dc2b5d288cec2c"
     },
     {
       "id": "add-python-package",
@@ -238,6 +247,7 @@
         "explore-ml-data",
         "choose-python-library",
         "research-ml-practice",
+        "plot-ml-figure",
         "add-python-package",
         "persist-ml-git"
       ]
@@ -263,6 +273,7 @@
         "evaluate-ml-pipeline",
         "smoke-test-ml-pipeline",
         "research-ml-practice",
+        "plot-ml-figure",
         "add-python-package",
         "persist-ml-git"
       ]
@@ -278,6 +289,7 @@
         "iterate-from-user",
         "audit-ml-pipeline",
         "research-ml-practice",
+        "plot-ml-figure",
         "add-python-package",
         "persist-ml-git",
         "export-ml-project"
@@ -296,6 +308,7 @@
         "model-ml-pipeline",
         "choose-python-library",
         "research-ml-practice",
+        "plot-ml-figure",
         "add-python-package",
         "explore-ml-data",
         "build-ml-pipeline",

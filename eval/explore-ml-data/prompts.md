@@ -87,6 +87,8 @@
 **Must NOT do:**
 - Re-run `cells run` or rewrite the report.
 - Design a model in this skill.
+- Treat a methodology concern (“is this leakage”) as this stop
+  (see CASE_18).
 
 ---
 
@@ -241,19 +243,27 @@
 - IPython is available.
 
 **Must do:**
+- Load `plot-ml-figure` if installed before writing figure cells.
 - Load `add-python-package` for `matplotlib` and `seaborn` (and
   skrub / pandas if missing).
 - Write duplicate, target-distribution, bivariate-vs-target, and
-  leakage cells in `data_analysis/data_analysis.py`.
+  leakage cells in `data_analysis/data_analysis.py` for
+  **regression only**.
+- Use seaborn figure-level plots (`displot` / `relplot`); save
+  PNGs and leave figures as cell output.
 - After `data_analysis.md`, AskUserQuestion keep exploring vs
   close (**Close** preselected).
 
 **Must NOT do:**
 - Re-plot TableReport univariate histograms or the association
   matrix in extra cells.
-- Install sklearn, skore, or pytest on the default path.
+- Install sklearn, skore, pytest, or plotly on the default path.
 - Train/test split the raw table.
 - Run `git end-turn` before the user picks Close.
+- Leave classification / no-target branches (`if TASK`,
+  `if TARGET is None`) in the notebook.
+- Call `plt.close` or `import matplotlib.pyplot` for these
+  figures.
 
 ---
 
@@ -274,6 +284,8 @@
 **Must NOT do:**
 - Guess a target column silently.
 - Skip the duplicate-row cell when the user picks "no target yet".
+- Write target-distribution / bivariate / leakage cells when the
+  user picks "no target yet".
 
 ---
 
@@ -352,14 +364,16 @@
 
 **Must do:**
 - Load `research-ml-practice`.
-- After it returns, copy confirmed candidates into
-  `data_analysis.md` even if the `.py` did not change.
+- Summarize the scratch note in chat (what is happening + why
+  it matters here).
+- AskUserQuestion `allow_multiple` on `measure` rows only.
 
 **Must NOT do:**
 - Drop the correlated column from the raw data.
 - Run `git end-turn` in this keep-exploring pass.
-- Append a research-recommended plot cell without user
-  confirmation.
+- Copy literature into modelling implications as if it were
+  measured.
+- Append a `declare` or `evaluate` row as an EDA cell.
 
 ---
 
@@ -381,3 +395,50 @@
 **Must NOT do:**
 - Invent papers or leakage thresholds from memory.
 - Run `git end-turn` in this keep-exploring pass.
+
+---
+
+## CASE_18 — Leakage question while EDA is already done
+
+**User prompt:**
+> Is 0.97 correlation with the target leakage?
+
+**Assumed workspace state:**
+- `data_analysis/data_analysis.md` exists.
+- JOURNAL § Data understanding records `Status: done`.
+- `status.data_analysis` is present.
+- The user did not pick Keep exploring first.
+- `status.skills.research-ml-practice` is true.
+
+**Must do:**
+- Skip G-DATA-ANALYSIS; do not overwrite
+  `data_analysis/data_analysis.py`.
+- Load `research-ml-practice` (Keep exploring § research).
+- Summarize the scratch note in chat.
+
+**Must NOT do:**
+- Stop as CASE_04 (EDA already recorded, no refresh).
+- Run `git end-turn` in this pass.
+- Re-run `cells run` or rewrite the default notebook.
+
+---
+
+## CASE_19 — No target omits target-aware cells
+
+**User prompt:**
+> Explore the dataset.
+
+**Assumed workspace state:**
+- Scaffold exists. User chose **run**.
+- User picked **no target yet** on the target AskUserQuestion.
+- `plot-ml-figure` is installed.
+
+**Must do:**
+- Write TableReport and duplicate-row cells.
+- Omit `templates/target_regression.py` and
+  `templates/target_classification.py`.
+
+**Must NOT do:**
+- Write `if TARGET is None` / `if TASK` branches for unused
+  tasks.
+- Call `plt.close`.

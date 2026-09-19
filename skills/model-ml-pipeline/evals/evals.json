@@ -14,7 +14,8 @@
         "If that command returns `invoke`, load `persist-ml-git`.",
         "The response does NOT: Replace skrub DataOps with a bare sklearn Pipeline.",
         "The response does NOT: Mark the experiment done while smoke tests fail.",
-        "The response does NOT: Run `git commit` in this skill or `git push`."
+        "The response does NOT: Run `git commit` in this skill or `git push`.",
+        "The response does NOT: Distill `scratch/research/` here instead of loading `build-ml-pipeline`."
       ],
       "tools": false,
       "sandbox": [],

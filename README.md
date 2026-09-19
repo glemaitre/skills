@@ -117,6 +117,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [setup-git](skills/setup-git/SKILL.md) | Initialize safe version control for an ML workspace. |
 | [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Coordinate build, evaluation, and smoke testing. |
 | [choose-python-library](skills/choose-python-library/SKILL.md) | Resolve a library choice and add the selected dependency. |
+| [plot-ml-figure](skills/plot-ml-figure/SKILL.md) | Pick pandas, seaborn, plotly, or matplotlib before writing figure code. |
 
 ### ML pipeline lifecycle
 
@@ -149,6 +150,7 @@ reinstall the setup pack.
 | [setup-python-env](skills/setup-python-env/SKILL.md) | Bootstrap the env manager and agent tools (ruff, ipython, ipykernel). |
 | [add-python-package](skills/add-python-package/SKILL.md) | Add a dependency, or ask the user when they manage the env. |
 | [choose-python-library](skills/choose-python-library/SKILL.md) | Select optional libraries without reopening fixed stack choices. |
+| [plot-ml-figure](skills/plot-ml-figure/SKILL.md) | Pick pandas, seaborn, plotly, or matplotlib before writing figure code. |
 
 ### API references
 

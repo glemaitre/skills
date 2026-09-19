@@ -32,13 +32,18 @@
 **Must do:**
 - Run distinct-angle searches (practice, implementation,
   pitfalls at least).
-- Produce ranked candidates with confidence and sources.
+- Tag each candidate with a lane (`measure` / `declare` /
+  `evaluate` / `confirm`).
 - Write `scratch/research/<slug>.md`.
+- Return the path and a one- or two-sentence finding to the
+  caller.
 
 **Must NOT do:**
 - Re-ask domain and concern.
 - Drop the correlated column.
 - Run `pixi add` / `uv add`.
+- Write `data_analysis.md` or the design note.
+- Paste the full scratch note into chat.
 
 ---
 
@@ -58,3 +63,4 @@
 - Modify raw data files.
 - Pick the final learner.
 - `git end-turn` or `git commit`.
+- Write `data_analysis.md`.

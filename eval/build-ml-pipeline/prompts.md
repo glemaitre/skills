@@ -14,7 +14,7 @@ so the target can `read_file` the history-dependent JOIN example
 (the same file `SKILL.md` points at). Other cases stay single-turn.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. Overall: ≥ 7/8 cases pass and no Must NOT violated.
+violated. Overall: ≥ 8/9 cases pass and no Must NOT violated.
 
 ---
 
@@ -269,3 +269,28 @@ violated. Overall: ≥ 7/8 cases pass and no Must NOT violated.
 **Must NOT do:**
 - Substitute `sklearn.Pipeline` / `make_pipeline`.
 - Call `env add` from this skill.
+
+---
+
+## CASE_09 — Research measure lane does not edit EDA
+
+**User prompt:**
+> Should I drop customer_id? Research the practice and declare
+> the pipeline.
+
+**Assumed workspace state:**
+- Design note approved.
+- `research-ml-practice` is installed.
+- Scratch research lists a `measure` row (plot id uniqueness)
+  and a `declare` row (drop id inside the graph, not on `data/`).
+
+**Must do:**
+- Load `research-ml-practice` if the concern is not already in
+  scratch.
+- AskUserQuestion `allow_multiple` on **`declare`** rows.
+- Treat `measure` as revisit-EDA / open question.
+
+**Must NOT do:**
+- Edit `data_analysis/data_analysis.py`.
+- Drop `customer_id` from raw files under `data/`.
+- Pick a cross-validator in pipeline code.

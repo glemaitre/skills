@@ -651,9 +651,22 @@ catalogue with code: → `references/common_patterns.md`.
 | `smoke-test-ml-pipeline` | Executable proof of Rule 2's early-mark. Smoke failure → route back here; fix the topology, don't loosen the assertion |
 | `smoke-test-ml-pipeline` | Router for `tests/`. Smoke test pairs 1:1 with the experiment script |
 | `add-python-package` | Detection + install commands. Invoke when `import skrub` raises |
-| `research-ml-practice` | Literature for a FE / transform / leakage concern; candidates only |
+| `research-ml-practice` | Literature worker. Load if installed on a FE / transform / leakage concern; distill below. Missing → one-line skip |
 | `python -m skore_skills style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct `pixi run ruff check` drops the NumPyDoc convention |
 
+## Literature distillation
+
+On a FE / transform / leakage concern, load `research-ml-practice`
+if installed; pass the concern and stage `model`. Summarize
+`scratch/research/<slug>.md` in chat; do not dump the note.
+**AskUserQuestion** `allow_multiple` on **`declare`** rows that
+do not violate stop conditions (no fit, no mutate `data/`, no
+silent learner). Picks: `.skb.apply` / `apply_func` after design
+approval, `api get`, `style`, record in the design note — not
+`data_analysis.md`. `measure` → revisit EDA / open question; do
+not edit `data_analysis.py`. `evaluate` → name
+`evaluate-ml-pipeline`; do not invent CV. `confirm` → ask the
+user.
 
 ## Need a package?
 

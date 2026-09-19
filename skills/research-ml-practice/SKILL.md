@@ -3,40 +3,42 @@ name: research-ml-practice
 description: >
   Literature and web research for an ML methodology concern
   (EDA interpretation, leakage, transforms, feature engineering,
-  learner family). Trigger when the user asks to research a
-  practice question, or when explore-ml-data / model-ml-pipeline /
+  learner family). Trigger when explore-ml-data or
   build-ml-pipeline load this skill. Not for routine profiling or
-  a single API signature — use `api get` for symbols.
+  a single API signature — use `api get` for symbols. Not a
+  session owner — callers distill and write project files.
 
   HOW TO USE: skip intake fields the caller already supplied.
   Search distinct angles in parallel, read primary sources, write
-  ranked candidates with confidence and citations. Never mutate
-  raw data or pick the final learner.
+  `scratch/research/<slug>.md` with lane-tagged candidates.
+  Return the path plus one or two sentences to the caller. Never
+  mutate raw data, pick the final learner, or write
+  `data_analysis.md` / the design note.
 ---
 
 # Research ML Practice
 
-Worker skill. Callers own the stage turn. Do not `git end-turn`.
+Worker skill. Callers own the stage turn and the user-facing
+summary. Do not `git end-turn`.
 
 ## Sequence
 
 1. **Intake.** Need a specific concern. Infer modality from
-   dtypes / JOURNAL when obvious; use a stated domain if the
-   caller already named one. Ask only missing gaps (concern plus
-   at most two follow-ups). Do not start search with an empty
-   concern.
+   dtypes / JOURNAL when obvious; use a stated domain and stage
+   (`data_analysis` | `model`) if the caller named them. Ask only
+   missing gaps (concern plus at most two follow-ups). Do not
+   start search with an empty concern.
 2. Classify: lookup / breadth / depth / synthesis. Details:
    `references/search.md`.
 3. Run 3–5 **distinct-angle** web searches in parallel (practice,
    implementation, pitfalls; add theory/papers if the first pass
    is thin). If a domain is known, bake it into the queries.
    Fetch primary pages for any modelling claim — not snippets.
-4. Write `scratch/research/<slug>.md` (gitignored notes), then a
-   user-facing write-up in the chat using the output template in
-   `references/search.md`.
-5. Return to the caller. Confirmed candidates they accept go into
-   `data_analysis.md` open questions (EDA) or the design note
-   (modeling). Do not write `data/`.
+4. Write `scratch/research/<slug>.md` using the template in
+   `references/search.md` (lanes on every candidate). Gitignored.
+5. Return to the caller: scratch path and a one- or two-sentence
+   finding. Do not dump the full note in chat. Do not write
+   `data_analysis.md`, the design note, or `data/`.
 
 ## Stop conditions
 

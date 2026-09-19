@@ -201,14 +201,32 @@
     },
     {
       "id": 13,
-      "title": "Certain research request",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.skills.research-ml-practice` is `true`.]\n\nResearch whether 0.97 correlation with the target is leakage.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `research-ml-practice` without listing the catalog menu. It must NOT: - Put `research-ml-practice` on the uncertain entry board. - Ask which entry skill to run.",
+      "title": "Certain leakage question routes to explore",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- The question is about the table (`data_analysis` may be\n  `present` or `missing`).\n- `status.skills.explore-ml-data` is `true`.]\n\nResearch whether 0.97 correlation with the target is leakage.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `explore-ml-data` without listing the catalog menu. It must NOT: - Load `research-ml-practice` as the certain skill. - Put `research-ml-practice` on the uncertain entry board. - Ask which entry skill to run.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "Load `research-ml-practice` without listing the catalog menu.",
+        "Load `explore-ml-data` without listing the catalog menu.",
+        "The response does NOT: Load `research-ml-practice` as the certain skill.",
         "The response does NOT: Put `research-ml-practice` on the uncertain entry board.",
+        "The response does NOT: Ask which entry skill to run."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 14,
+      "title": "Certain research during modeling routes to model",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- An approved design note exists; modeling is in progress.\n- `status.skills.model-ml-pipeline` is `true`.]\n\nResearch whether target encoding is the right transform for\nthis high-cardinality column.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `model-ml-pipeline` without listing the catalog menu. It must NOT: - Load `research-ml-practice` as the certain skill. - Load `explore-ml-data` as the certain skill. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `model-ml-pipeline` without listing the catalog menu.",
+        "The response does NOT: Load `research-ml-practice` as the certain skill.",
+        "The response does NOT: Load `explore-ml-data` as the certain skill.",
         "The response does NOT: Ask which entry skill to run."
       ],
       "tools": false,

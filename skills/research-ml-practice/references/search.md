@@ -22,12 +22,27 @@ Queries must be distinct angles, not paraphrases of one string.
 | API / code pattern | Official docs only is enough |
 | Sources disagree | State both; do not pick a side silently |
 
+## Lanes
+
+Every candidate row gets one lane. Callers distill; do not guess.
+
+| Lane | Meaning |
+|---|---|
+| `measure` | Observation on the raw frame (plot, test, table) |
+| `declare` | Pipeline structure (transform, encoder, join, leakage guard) |
+| `evaluate` | Splitter, metric, calibration — not EDA cells, not fit |
+| `confirm` | Domain or user judgment only |
+
 ## Output template
+
+Write this file under `scratch/research/<slug>.md`. The caller
+summarizes it; do not paste it wholesale into chat.
 
 ```markdown
 ## Research: <concern in one line>
 
 ### Context
+- Stage: data_analysis | model
 - Modality / domain: ...
 - Target / model family: ... (or not yet specified)
 
@@ -38,9 +53,9 @@ Plain language, 2–4 sentences.
 Consequence for this task, not a generic lecture.
 
 ### Ranked candidates
-| Priority | Action | When | Trade-off |
-|---|---|---|---|
-| 1 | ... | ... | ... |
+| Priority | Lane | Action | When | Trade-off |
+|---|---|---|---|---|
+| 1 | measure \| declare \| evaluate \| confirm | ... | ... | ... |
 
 ### Risks
 - ...
@@ -53,4 +68,6 @@ Inline citations for every factual claim.
 ```
 
 Optional code snippet: minimal, placeholders, does not write raw
-files.
+files. Do not paste a matplotlib wall; callers write real cells
+(and load `plot-ml-figure` if installed). Callers run `api get`
+before real symbols.

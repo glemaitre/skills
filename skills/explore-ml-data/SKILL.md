@@ -17,17 +17,22 @@ description: >
   - A new or changed data source needs (re-)understanding.
   - The user asks to add analysis to an already-recorded EDA
     (refresh: edit the `.py`, re-run, overwrite the `.md`).
+  - A methodology concern on the table (“is this leakage”,
+    “research this”) while EDA is already recorded.
 
   STOP when `python -m skore_skills status` shows no scaffold or no
   data: explain and send the user to setup or triage. Also stop when
   the request is not raw-data exploration, or when exploratory data
-  analysis is already recorded and no refresh was requested.
+  analysis is already recorded and no refresh and no methodology
+  concern was requested.
 
   HOW TO USE: G-TABULAR then add pandas/polars + skrub + matplotlib
   + seaborn via `add-python-package`. Infer or ask the target.
-  Copy `templates/data_analysis.py`, `cells run`, copy
-  `templates/facts.py` to scratch, author `data_analysis.md`,
-  then ask keep-exploring vs close. Resolve symbols via `api get`.
+  Load `plot-ml-figure` if installed, copy
+  `templates/data_analysis.py` if it fits then edit (only the
+  live path), `cells run`, copy `templates/facts.py` to scratch,
+  author `data_analysis.md`, then ask keep-exploring vs close.
+  Resolve symbols via `api get`.
 ---
 
 # Explore ML Data
@@ -44,9 +49,10 @@ them, and a JOURNAL index row.
 | `data_analysis/data_analysis.py` | Human notebook — TableReport + ML-gap cells |
 | `data_analysis/data_analysis_<table>.html` | Human — TableReport page, embedded from `data_analysis.md` |
 | `data_analysis/*.png` | Human — figures for implications, never glance |
+| `data_analysis/<slug>.html` | Human — Plotly (or other) HTML, iframe in implications |
 | `data_analysis/data_analysis.md` | Human + later modelling — TableReport iframes, implications |
 | `scratch/data_analysis/<table>.json` | Agent — `TableReport.json()`; gitignored |
-| `scratch/data_analysis/extras.json` | Agent — duplicates, target, leakage, png paths |
+| `scratch/data_analysis/extras.json` | Agent — duplicates, target, leakage, png and html paths |
 | JOURNAL § Data understanding | Index: status, 2–4 line summary, link |
 
 TableReport owns dtypes, missingness, univariate distributions,
@@ -61,10 +67,10 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 
 | You came here for… | → next |
 |---|---|
-| Triage sent you here before modeling | → return findings; they inform the baseline |
-| User free-text ("explore the data") | → surface findings; then keep-exploring vs close |
+| First EDA (triage or free-text) | → write md; then keep-exploring vs close |
 | Keep exploring | → extras, research, or free-text; no end-turn yet |
-| Close this stage | → convert / site / git end-turn / `triage-ml-task` |
+| Close this stage | → convert / site / git end-turn / `triage-ml-task` if installed |
+| Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § research |
 | Changed data source or "also plot X" | → overwrite `data_analysis/data_analysis.*`, refresh JOURNAL |
 
 ## Stop conditions
@@ -108,26 +114,35 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 - [ ] G-TABULAR + add frame lib + skrub + matplotlib + seaborn
 - [ ] Target: inferred | AskUserQuestion | none
 - [ ] IPython available or add-python-package
-- [ ] Place data_analysis/data_analysis.py from
-      templates/data_analysis.py; cells run
+- [ ] Load plot-ml-figure if installed; place
+      data_analysis/data_analysis.py from the template (edit to
+      the live path); cells run
 - [ ] scratch/data_analysis/facts.py → <table>.json + extras.json
 - [ ] Author data_analysis.md + JOURNAL
 - [ ] AskUserQuestion keep exploring vs close (skip if user
       already closed the turn)
 ```
 
-Tick, then run the matching step. Re-emit with evidence at end of turn.
+Tick, then run the matching step. Re-emit the checklist with
+evidence. End of turn only after Close.
 
 ## Procedure (run path)
 
 1. Resolve `<TARGET>` / `<TASK>` (`classification` | `regression`
-   | `none`). Copy `templates/data_analysis.py` →
-   `data_analysis/data_analysis.py`. Substitute `<pkg>`,
-   `<LOAD_RAW_DATA>`, `<table>`, `<TARGET>`, `<TASK>`,
-   `<OTHER_FRAME>` (`None` unless a second table is already on
-   disk). Keep the datetime block's output (empty frame is fine
-   when no datetime columns). Markdown is about **this** analysis.
-   `python -m skore_skills style` after the write.
+   | `none`) first. Copy `templates/data_analysis.py` if it fits,
+   then **edit** — do not paste unused branches. Substitute
+   `<pkg>`, `<LOAD_RAW_DATA>`, `<table>`. Append
+   `templates/target_regression.py` **or**
+   `templates/target_classification.py` (set `TARGET` / `TASK` in
+   the load cell). No target → neither snippet, no `TARGET` /
+   `TASK` lines. Datetime columns → `templates/datetime.py` (drop
+   the relplot cell if there is no numeric target). A second table
+   on disk → `templates/drift.py` with `<OTHER_FRAME>`. Generated
+   notebook must not contain `if TARGET`, `if TASK`,
+   `OTHER = None`, empty datetime loops, or “skip this cell”.
+   Load `plot-ml-figure` if installed **before** writing figure
+   cells (including this first write). Markdown is about **this**
+   analysis. `python -m skore_skills style` after the write.
 2. `python -m skore_skills cells run
    data_analysis/data_analysis.py` — writes HTML and PNGs. A
    useless TableReport `repr` in the digest is expected.
@@ -138,8 +153,10 @@ Tick, then run the matching step. Re-emit with evidence at end of turn.
    `templates/data_analysis.md`: glance (one iframe per table and
    nothing else), modelling implications (include
    feature-engineering *candidates*), open questions. Reports
-   and figures are embedded, not linked; `![](<name>.png)` sits
-   beside the implication it supports, never in the glance.
+   and figures are embedded, not linked; `![](<name>.png)` or an
+   HTML iframe (`<iframe src="<slug>.html" …>`) sits beside the
+   implication it supports, never in the glance. Glance stays
+   TableReport-only.
    Ground claims in both JSON files and the HTML. Do not invent
    columns.
 5. JOURNAL § Data understanding table: Status `done — <date>`,
@@ -150,31 +167,54 @@ Tick, then run the matching step. Re-emit with evidence at end of turn.
    skip.
 6. **Keep exploring vs close** — unless the user already closed
    the turn (“EDA is done”, “close the turn”): **AskUserQuestion**
-   one pick, **Close** preselected.
+   one pick, **Close** preselected. After the first md, always
+   ask (including when triage sent you here). Close → End of turn.
 
-   - Keep exploring the data — no convert, no site build, no
-     `git end-turn`. Then **AskUserQuestion** one pick: more extra
-     analyses (`references/extra_analyses.md`); research this
-     concern; I’ll describe what to plot. Research: load
-     `research-ml-practice` if installed (ask the concern if the
-     user did not name one); else one-line skip and stay on this
-     menu. Do not invent literature. After extras or a confirmed
-     plot, refresh facts/md. After research, copy confirmed
-     candidates into implications / open questions even if the
-     `.py` is unchanged. If research recommends a cell, append it
-     only after the user confirms. Then re-ask keep vs close. Do
-     not invent domain checklists.
-   - Close this stage and pick the next action — End of turn
-     below.
-
-   If the original prompt already named extras (e.g. PCA), include
-   those cells in step 1 and do not re-ask that extra.
+If the original prompt already named extras (e.g. PCA), include
+those cells in step 1 and do not re-ask that extra.
 
 Import failures → `add-python-package`, do not work around.
 
 Refresh (already `done`, user asks for more plots): edit the
 `.py`, re-run steps 2–5, then step 6. Do not re-ask
 G-DATA-ANALYSIS.
+
+Methodology concern while `status.data_analysis` is present
+(leakage / “research this”): skip G-DATA-ANALYSIS; do not
+overwrite the notebook; go to **Keep exploring** § research.
+
+Always load `plot-ml-figure` if installed before writing or
+rewriting figure cells. The template is not a license to skip
+the plotting worker. Missing skill → one-line skip and still
+follow that tree (seaborn statistical, pandas simple chart,
+matplotlib last). Never `plt.close` in notebook cells: save PNG
+then leave the figure/grid as the cell output.
+
+## Keep exploring
+
+No convert, no site build, no `git end-turn`.
+
+1. **AskUserQuestion** one pick: more extra analyses; research
+   this concern; I’ll describe what to plot.
+2. **Extras** — `references/extra_analyses.md` (its own
+   `allow_multiple` board). Load `plot-ml-figure` if installed
+   before figure cells.
+3. **Research** — load `research-ml-practice` if installed (pass
+   the concern and stage `data_analysis`; ask the concern if
+   unnamed); else one-line skip and return to step 1. Do not
+   invent literature. Read `scratch/research/<slug>.md`.
+   Summarize in chat; do not dump the note. **AskUserQuestion**
+   `allow_multiple` (unchecked): only **`measure`** rows not
+   already in the notebook (e.g. “Spearman of feature vs
+   target”). Map onto extra_analyses when a recipe exists;
+   else a custom cell. `declare` / `evaluate` / `confirm` stay
+   off this board → Open questions as advice, not findings.
+4. **Free-text plot** — load `plot-ml-figure` if installed;
+   append cells.
+5. Picks that change the `.py`: `style`, `cells run`, refresh
+   facts, rewrite `data_analysis.md` from JSON/PNGs/HTML
+   (implications from **results**). Then re-ask keep vs close
+   (step 6). Do not invent domain checklists.
 
 ## Dispatch
 
@@ -184,8 +224,9 @@ missing) and user free-text.
 
 Calls: `add-python-package`, `api get`, `choose-python-library` /
 stack for G-TABULAR, `research-ml-practice` if installed when the
-user wants literature on a concern, `style` after
-`data_analysis.py`.
+user wants literature on a concern, `plot-ml-figure` if installed
+before **any** figure cells (default notebook, extras, free-text,
+research-`measure`), `style` after `data_analysis.py`.
 
 Need a package? Load `add-python-package` if installed; else name
 it and stop. Do not `env add` here.

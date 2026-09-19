@@ -7,7 +7,9 @@ extras after the default pass. Then AskUserQuestion
 were **not** already in the user prompt. Picks:
 `add-python-package` for the extra lib (agent), append the matching
 cells, `style`, re-run `cells run`, refresh `facts.py`, then write
-`data_analysis.md`.
+`data_analysis.md`. PNG unless the user asked for hover. Load
+`plot-ml-figure` if installed before figure cells. Save the PNG
+and leave the figure visible; never `plt.close`.
 
 Do not train/test split. Do not drop or rewrite raw rows.
 
@@ -17,17 +19,18 @@ Lib: seaborn (already on the run path).
 
 A few 2-way views among the bivariate column list, or
 `sns.pairplot` on at most 6 numeric columns (target + top
-associates). Save `interactions.png`. Last expression: the column
-list used.
+associates). Save `interactions.png` and leave the pairplot
+visible. Last expression: the grid (or the column list used).
 
 ## 2D projection (PCA)
 
 Lib: scikit-learn. UMAP only if the user insists (`umap-learn`).
 
 Numeric columns, median-impute in the cell for the plot only — do
-not write an imputed table. `PCA(n_components=2)`, scatter colored
-by target if set. Save `pca.png`. Do not use PCA as a model
-preprocessor here.
+not write an imputed table. `PCA(n_components=2)`, then
+`sns.relplot` of the two components colored by target if set.
+Save `pca.png` and leave the figure visible. Do not use PCA as a
+model preprocessor here.
 
 ## Hypothesis tests
 
