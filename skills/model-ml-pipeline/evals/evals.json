@@ -39,15 +39,33 @@
     {
       "id": 3,
       "title": "Site on rebuilds after implement",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Matching approved design note and experiment shell exist.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nThe baseline design is approved. Implement and test the model.",
-      "expected_output": "Behavioural response satisfying: - Dispatch build, evaluate, then smoke-test in that order. - Name `python -m skore_skills site build` after smoke, before git end-turn. - Name `python -m skore_skills git end-turn --stage implement`. It must NOT: - Fail the model turn if site build errors; name the error. - Run `notebook convert`. - Run `git commit` in this skill or `git push`.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Matching approved design note and experiment shell exist.\n- `policy.site` is true. `policy.notebooks` is false.\n- `export-ml-site` is installed.]\n\nThe baseline design is approved. Implement and test the model.",
+      "expected_output": "Behavioural response satisfying: - Dispatch build, evaluate, then smoke-test in that order. - Name `python -m skore_skills site build` after smoke, before git end-turn. - Name `python -m skore_skills git end-turn --stage implement`. It must NOT: - Fail the model turn if site build errors; name the error. - Run `notebook convert` while the notebooks gate is off. - Run `git commit` in this skill or `git push`.",
       "files": [],
       "expectations": [
         "Dispatch build, evaluate, then smoke-test in that order.",
         "Name `python -m skore_skills site build` after smoke, before git end-turn.",
         "Name `python -m skore_skills git end-turn --stage implement`.",
         "The response does NOT: Fail the model turn if site build errors; name the error.",
-        "The response does NOT: Run `notebook convert`.",
+        "The response does NOT: Run `notebook convert` while the notebooks gate is off.",
+        "The response does NOT: Run `git commit` in this skill or `git push`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "Notebooks on converts the experiment script",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved design note and experiment shell exist with stem\n  `01_baseline`.\n- `policy.notebooks` is true. `policy.site` is true.\n- `export-ml-notebook` and `export-ml-site` are installed.\n- `jupytext`, `nbclient`, and `nbconvert` are installed.]\n\nThe baseline design is approved. Implement and test the model.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills notebook convert experiments/01_baseline.py --html` after smoke, before site build. - Name `python -m skore_skills site build` before git end-turn. - Name `python -m skore_skills git end-turn --stage implement`. It must NOT: - Fail the model turn if convert errors; name the error. - Run `cells run` as a substitute for convert. - Run `git commit` in this skill or `git push`.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills notebook convert experiments/01_baseline.py --html` after smoke, before site build.",
+        "Name `python -m skore_skills site build` before git end-turn.",
+        "Name `python -m skore_skills git end-turn --stage implement`.",
+        "The response does NOT: Fail the model turn if convert errors; name the error.",
+        "The response does NOT: Run `cells run` as a substitute for convert.",
         "The response does NOT: Run `git commit` in this skill or `git push`."
       ],
       "tools": false,

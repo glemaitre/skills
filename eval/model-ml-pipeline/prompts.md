@@ -53,7 +53,7 @@
 
 **Assumed workspace state:**
 - Matching approved design note and experiment shell exist.
-- `policy.site` is true.
+- `policy.site` is true. `policy.notebooks` is false.
 - `export-ml-site` is installed.
 
 **Must do:**
@@ -64,5 +64,31 @@
 
 **Must NOT do:**
 - Fail the model turn if site build errors; name the error.
-- Run `notebook convert`.
+- Run `notebook convert` while the notebooks gate is off.
+- Run `git commit` in this skill or `git push`.
+
+---
+
+## CASE_04 — Notebooks on converts the experiment script
+
+**User prompt:**
+> The baseline design is approved. Implement and test the model.
+
+**Assumed workspace state:**
+- Approved design note and experiment shell exist with stem
+  `01_baseline`.
+- `policy.notebooks` is true. `policy.site` is true.
+- `export-ml-notebook` and `export-ml-site` are installed.
+- `jupytext`, `nbclient`, and `nbconvert` are installed.
+
+**Must do:**
+- Name `python -m skore_skills notebook convert
+  experiments/01_baseline.py --html` after smoke, before site
+  build.
+- Name `python -m skore_skills site build` before git end-turn.
+- Name `python -m skore_skills git end-turn --stage implement`.
+
+**Must NOT do:**
+- Fail the model turn if convert errors; name the error.
+- Run `cells run` as a substitute for convert.
 - Run `git commit` in this skill or `git push`.

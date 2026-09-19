@@ -118,9 +118,7 @@ def test_notebook_convert_execute_error(
     """Kernel failures surface as a Click error."""
     src = tmp_path / "data_analysis.py"
     src.write_text("# %%\n1\n", encoding="utf-8")
-    monkeypatch.setattr(
-        notebook_mod, "jupytext", SimpleNamespace(read=lambda path: {})
-    )
+    monkeypatch.setattr(notebook_mod, "jupytext", SimpleNamespace(read=lambda path: {}))
 
     class FakeClient:
         def __init__(
@@ -180,9 +178,7 @@ def test_notebook_convert_uses_script_dir(
     assert resources["metadata"]["path"] == str(src.parent.resolve())
 
 
-def test_notebook_convert_html(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_notebook_convert_html(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """``--html`` writes ``<stem>.nb.html`` next to the source."""
     src = tmp_path / "data_analysis.py"
     src.write_text("# %%\n1\n", encoding="utf-8")
@@ -211,8 +207,9 @@ def test_notebook_convert_html(
     monkeypatch.setattr(
         notebook_mod,
         "to_html",
-        lambda ipynb, dest: dest.write_text("<html>nb</html>", encoding="utf-8")
-        or dest,
+        lambda ipynb, dest: (
+            dest.write_text("<html>nb</html>", encoding="utf-8") or dest
+        ),
     )
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["notebook", "convert", str(src), "--html"])
@@ -298,9 +295,7 @@ def test_notebook_to_html_writes_self_contained_page(
     assert dest.read_text(encoding="utf-8") == "<html>notebook</html>"
     assert seen == {
         "template_name": "lab",
-        "template_file": str(
-            notebook_mod.TEMPLATE_DIR / "skore_notebook.html.j2"
-        ),
+        "template_file": str(notebook_mod.TEMPLATE_DIR / "skore_notebook.html.j2"),
         "path": str(src),
         "embed_images": True,
     }

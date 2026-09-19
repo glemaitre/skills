@@ -15,7 +15,7 @@
 **Must do:**
 - Name `python -m skore_skills site init`.
 - Name `python -m skore_skills site build`.
-- Name `html/index.html` as the file to open.
+- Name `<package>.html` at the workspace root (`status.package`) as the file to open.
 
 **Must NOT do:**
 - Run `notebook convert`.
@@ -36,7 +36,7 @@
 **Must do:**
 - Name `python -m skore_skills site build`.
 - Do not run `site init` again.
-- Name `html/index.html` as the file to open.
+- Name `<package>.html` at the workspace root (`status.package`) as the file to open.
 
 **Must NOT do:**
 - AskUserQuestion for the site gate again.

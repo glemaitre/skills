@@ -38,6 +38,7 @@ route and ask. Do not execute another skill's methodology.
    | website / mkdocs / documentation site | `export-ml-site` |
    | export (generic) | `export-ml-project` |
    | set up / bootstrap this project (generic) | `setup-ml-project` |
+   | research a practice / literature / “is this leakage” | `research-ml-practice` |
 
    **Modeling while `status.data_analysis` is `missing`:** if the certain
    skill is `model-ml-pipeline` (or the user asked to build the
@@ -60,7 +61,8 @@ route and ask. Do not execute another skill's methodology.
    recommended next stage (`loop_stage: data_analysis`). Do not auto-load it.
 
    Do not put internals on this board (`build-ml-pipeline`,
-   `choose-python-library`, stack refs) unless step 2 is certain.
+   `choose-python-library`, `research-ml-practice`, stack refs)
+   unless step 2 is certain.
 
 ## Stop conditions
 

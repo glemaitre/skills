@@ -651,6 +651,7 @@ catalogue with code: → `references/common_patterns.md`.
 | `smoke-test-ml-pipeline` | Executable proof of Rule 2's early-mark. Smoke failure → route back here; fix the topology, don't loosen the assertion |
 | `smoke-test-ml-pipeline` | Router for `tests/`. Smoke test pairs 1:1 with the experiment script |
 | `add-python-package` | Detection + install commands. Invoke when `import skrub` raises |
+| `research-ml-practice` | Literature for a FE / transform / leakage concern; candidates only |
 | `python -m skore_skills style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct `pixi run ruff check` drops the NumPyDoc convention |
 
 

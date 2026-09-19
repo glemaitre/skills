@@ -190,6 +190,7 @@
         "The response does NOT: Leave `jupytext` as `env route` ask / optional extra.",
         "The response does NOT: Run `pixi add` / `uv add` from this skill.",
         "The response does NOT: Run `notebook convert` during setup.",
+        "The response does NOT: Install `nbconvert` while the site gate is off.",
         "The response does NOT: Ask the gate before scaffold."
       ],
       "tools": false,
@@ -210,6 +211,24 @@
         "The response does NOT: Load `add-python-package` for `nbconvert` for the site gate.",
         "The response does NOT: Skip init after the user opted into the site.",
         "The response does NOT: Ask the gate on an existing layout."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 11,
+      "title": "Both gates on install the HTML toolchain",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder. Fresh layout.\n- `policy.notebooks` and `policy.site` are `null`.\n- `add-python-package` is installed.\n- After G-PKG-NAME and scaffold, the user checks **both** boxes.]\n\nSet up a fresh ML workspace in this folder.",
+      "expected_output": "Behavioural response satisfying: - Persist `policy set notebooks true` and `policy set site true`. - Load `add-python-package` for `jupytext`, `nbclient`, and `nbconvert` (agent) \u2014 stage turns write the notebook viewer with `--html`. - Name `python -m skore_skills site init`. It must NOT: - Run `notebook convert` during setup. - Run `pixi add` / `uv add` from this skill. - Leave either flag `null`.",
+      "files": [],
+      "expectations": [
+        "Persist `policy set notebooks true` and `policy set site true`.",
+        "Load `add-python-package` for `jupytext`, `nbclient`, and `nbconvert` (agent) \u2014 stage turns write the notebook viewer with `--html`.",
+        "Name `python -m skore_skills site init`.",
+        "The response does NOT: Run `notebook convert` during setup.",
+        "The response does NOT: Run `pixi add` / `uv add` from this skill.",
+        "The response does NOT: Leave either flag `null`."
       ],
       "tools": false,
       "sandbox": [],

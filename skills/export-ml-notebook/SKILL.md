@@ -14,6 +14,11 @@ Source of truth stays the `# %%` `.py`. This skill only writes
 derived `.ipynb` (and optional `.nb.html`). Do not rewrite the
 `.py` from the notebook. `cells run` is not a substitute.
 
+While `policy.notebooks` is true, `explore-ml-data`,
+`model-ml-pipeline`, and `audit-ml-pipeline` already convert the
+percent file they wrote that turn. This skill owns on-demand
+conversions, other sources, and the gate itself.
+
 ## Sequence
 
 1. `python -m skore_skills status`. Read `policy.notebooks` and

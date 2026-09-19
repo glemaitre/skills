@@ -5,9 +5,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-MISSING = (
-    "jupytext and nbclient are required; add them with add-python-package"
-)
+MISSING = "jupytext and nbclient are required; add them with add-python-package"
 MISSING_NBCONVERT = "nbconvert is required; add it with add-python-package"
 TEMPLATE_DIR = Path(__file__).with_name("site_assets")
 

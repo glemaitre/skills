@@ -38,7 +38,7 @@ mlartifacts/
 # notebook viewers rebuilt by notebook convert --html
 *.nb.html
 
-# MkDocs output (derived; open html/index.html locally)
+# MkDocs output (derived; site build adds <package>.html at the root)
 _build/
 html/
 

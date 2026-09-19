@@ -13,11 +13,27 @@ from skore_skills.cli import cli
 from skore_skills.policy import empty_policy, save_policy
 
 
-def _scaffold(tmp_path: Path) -> None:
+def _scaffold(tmp_path: Path, *, package: str = "claim_predictor") -> None:
     (tmp_path / "journal").mkdir()
     (tmp_path / "journal" / "JOURNAL.md").write_text(
         "# JOURNAL\n\n[report](../data_analysis/data_analysis.md)\n", encoding="utf-8"
     )
+    (tmp_path / "pyproject.toml").write_text(
+        f'[project]\nname = "{package}"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+
+
+def test_site_title_uses_package_then_folder(tmp_path: Path) -> None:
+    """Site title prefers ``[project].name``, then ``src/``, then the folder."""
+    (tmp_path / "src").mkdir()
+    assert site_mod.site_title(tmp_path) == tmp_path.name
+    (tmp_path / "src" / "churnlab").mkdir()
+    assert site_mod.site_title(tmp_path) == "churnlab"
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "claim_predictor"\n', encoding="utf-8"
+    )
+    assert site_mod.site_title(tmp_path) == "claim_predictor"
 
 
 def _ok_mkdocs(tmp_path: Path):
@@ -46,6 +62,7 @@ def test_site_init_writes_gitignore(
     text = (tmp_path / ".gitignore").read_text(encoding="utf-8")
     assert "_build/" in text
     assert "html/" in text
+    assert "claim_predictor.html" in text
     assert not (tmp_path / "mkdocs.yml").exists()
 
 
@@ -77,7 +94,9 @@ def test_site_build_runs_mkdocs(
     """Build stages docs then invokes mkdocs with the generated config."""
     _scaffold(tmp_path)
     (tmp_path / "data_analysis").mkdir()
-    (tmp_path / "data_analysis" / "data_analysis.md").write_text("# eda\n", encoding="utf-8")
+    (tmp_path / "data_analysis" / "data_analysis.md").write_text(
+        "# eda\n", encoding="utf-8"
+    )
     (tmp_path / "mkdocs.yml").write_text("hand-written\n", encoding="utf-8")
     seen: list[list[str]] = []
 
@@ -89,11 +108,10 @@ def test_site_build_runs_mkdocs(
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["site", "build"])
     assert result.exit_code == 0, result.output
-    assert seen == [
-        ["mkdocs", "build", "--config-file", "_build/mkdocs.yml"]
-    ]
+    assert seen == [["mkdocs", "build", "--config-file", "_build/mkdocs.yml"]]
     assert (tmp_path / "mkdocs.yml").read_text(encoding="utf-8") == "hand-written\n"
     generated = (tmp_path / "_build" / "mkdocs.yml").read_text(encoding="utf-8")
+    assert 'site_name: "claim_predictor"' in generated
     assert "index.md" in generated
     assert "Home: index.md" in generated
     assert "font: false" in generated
@@ -120,7 +138,13 @@ def test_site_build_runs_mkdocs(
     assert "](data_analysis.md)" in journal
     index = tmp_path / "html" / "index.html"
     assert index.is_file()
-    assert str(index) in result.output
+    launcher = tmp_path / "claim_predictor.html"
+    assert launcher.is_file()
+    assert "url=html/index.html" in launcher.read_text(encoding="utf-8")
+    assert str(launcher) in result.output
+    assert "claim_predictor.html" in (tmp_path / ".gitignore").read_text(
+        encoding="utf-8"
+    )
 
 
 def test_site_build_groups_experiments_and_writes_top_nav(
@@ -129,7 +153,9 @@ def test_site_build_groups_experiments_and_writes_top_nav(
     """Experiments form one ordered dropdown in desktop and mobile nav."""
     _scaffold(tmp_path)
     (tmp_path / "data_analysis").mkdir()
-    (tmp_path / "data_analysis" / "data_analysis.md").write_text("# eda\n", encoding="utf-8")
+    (tmp_path / "data_analysis" / "data_analysis.md").write_text(
+        "# eda\n", encoding="utf-8"
+    )
     for name in ("01_baseline.md", "02_tuning.md"):
         (tmp_path / "journal" / name).write_text(f"# {name}\n", encoding="utf-8")
     monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
@@ -148,7 +174,7 @@ def test_site_build_groups_experiments_and_writes_top_nav(
     payload = script.removeprefix("window.__SKORE_NAV__ = ").removesuffix(";\n")
     assert json.loads(payload) == [
         {"label": "Home", "href": "index.html"},
-        {"label": "exploratory data analysis", "href": "data_analysis.html"},
+        {"label": "Exploratory data analysis", "href": "data_analysis.html"},
         {
             "label": "Experiments",
             "children": [
@@ -167,6 +193,7 @@ def test_site_theme_has_trainhard_layout_contract() -> None:
     assert "--skore-toc-width: 256px" in css
     assert "--skore-toc-rail-width: var(--numbers-48)" in css
     assert "font-size: 18px" in css
+    assert (".md-typeset table:not([class]) {\n  font-size: inherit;\n") in css
     assert "max-height: calc(5 * var(--numbers-40))" in css
     assert "grid-template-columns: var(--skore-toc-width)" in css
     assert ".md-sidebar--secondary .md-nav__title {\n    display: none;" in css
@@ -226,7 +253,10 @@ def test_site_theme_flattens_and_numbers_contents() -> None:
         "    display: flex;\n"
         "    justify-content: center;"
     ) in css
-    assert "body.skore-toc-collapsed .skore-toc-footer {\n    padding: var(--numbers-6) 0;" in css
+    assert (
+        "body.skore-toc-collapsed .skore-toc-footer {\n    padding: var(--numbers-6) 0;"
+        in css
+    )
     assert 'label.className = "skore-toc-label"' in javascript
     assert "link.title = label.textContent" in javascript
 
@@ -264,9 +294,7 @@ def test_site_build_mkdocs_missing(
     assert "mkdocs-material" in result.output
 
 
-def test_site_build_nonzero(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_site_build_nonzero(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Non-zero mkdocs build is reported."""
     (tmp_path / "src").mkdir()
 
@@ -275,9 +303,7 @@ def test_site_build_nonzero(
         stdout = ""
         stderr = "nav error\n"
 
-    monkeypatch.setattr(
-        site_mod.subprocess, "run", lambda *args, **kwargs: Result()
-    )
+    monkeypatch.setattr(site_mod.subprocess, "run", lambda *args, **kwargs: Result())
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["site", "build"])
     assert result.exit_code != 0
@@ -359,13 +385,12 @@ def test_site_build_missing_index(
         stdout = ""
         stderr = ""
 
-    monkeypatch.setattr(
-        site_mod.subprocess, "run", lambda *args, **kwargs: Result()
-    )
+    monkeypatch.setattr(site_mod.subprocess, "run", lambda *args, **kwargs: Result())
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["site", "build"])
     assert result.exit_code != 0
     assert "index.html" in result.output
+    assert not (tmp_path / f"{tmp_path.name}.html").exists()
 
 
 def test_site_build_does_not_convert(
@@ -374,8 +399,12 @@ def test_site_build_does_not_convert(
     """Site build never executes paired scripts, even if notebooks are on."""
     _scaffold(tmp_path)
     (tmp_path / "data_analysis").mkdir()
-    (tmp_path / "data_analysis" / "data_analysis.md").write_text("# eda\n", encoding="utf-8")
-    (tmp_path / "data_analysis" / "data_analysis.py").write_text("# %%\n1\n", encoding="utf-8")
+    (tmp_path / "data_analysis" / "data_analysis.md").write_text(
+        "# eda\n", encoding="utf-8"
+    )
+    (tmp_path / "data_analysis" / "data_analysis.py").write_text(
+        "# %%\n1\n", encoding="utf-8"
+    )
     policy = empty_policy()
     policy["notebooks"] = True
     save_policy(tmp_path, policy)
@@ -391,7 +420,9 @@ def test_site_build_does_not_convert(
     result = CliRunner().invoke(cli, ["site", "build"])
     assert result.exit_code == 0, result.output
     assert called == []
-    staged = (tmp_path / "_build" / "docs" / "data_analysis.md").read_text(encoding="utf-8")
+    staged = (tmp_path / "_build" / "docs" / "data_analysis.md").read_text(
+        encoding="utf-8"
+    )
     assert "## Notebook" not in staged
     assert not (tmp_path / "_build" / "docs" / "data_analysis.py").exists()
     assert not (tmp_path / "_build" / "docs" / "data_analysis.nb.html").exists()
@@ -403,7 +434,9 @@ def test_site_build_embeds_notebook_in_report(
     """data_analysis.nb.html becomes a viewer in data_analysis.md, not a nav page."""
     _scaffold(tmp_path)
     (tmp_path / "data_analysis").mkdir()
-    (tmp_path / "data_analysis" / "data_analysis.md").write_text("# report\n", encoding="utf-8")
+    (tmp_path / "data_analysis" / "data_analysis.md").write_text(
+        "# report\n", encoding="utf-8"
+    )
     (tmp_path / "data_analysis" / "data_analysis.nb.html").write_text(
         "<html>notebook</html>\n", encoding="utf-8"
     )
@@ -421,7 +454,7 @@ def test_site_build_embeds_notebook_in_report(
     assert "data-skore-fullscreen" in staged
     assert "Open separately" in staged
     nav = (tmp_path / "_build" / "mkdocs.yml").read_text(encoding="utf-8")
-    assert "exploratory data analysis notebook" not in nav
+    assert "Exploratory data analysis notebook" not in nav
 
 
 def test_site_build_pairs_experiment_notebook(
@@ -458,13 +491,17 @@ def test_site_build_embeds_assets(
         "- Views: [spatial](plot.png) - [again](plot.png)\n",
         encoding="utf-8",
     )
-    (tmp_path / "data_analysis" / "data_analysis_adult.html").write_text("<html></html>\n", encoding="utf-8")
+    (tmp_path / "data_analysis" / "data_analysis_adult.html").write_text(
+        "<html></html>\n", encoding="utf-8"
+    )
     (tmp_path / "data_analysis" / "plot.png").write_bytes(b"png")
     monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["site", "build"])
     assert result.exit_code == 0, result.output
-    staged = (tmp_path / "_build" / "docs" / "data_analysis.md").read_text(encoding="utf-8")
+    staged = (tmp_path / "_build" / "docs" / "data_analysis.md").read_text(
+        encoding="utf-8"
+    )
     assert "![spatial](plot.png)" in staged
     assert "![again](plot.png)" in staged
     assert staged.count('<iframe src="data_analysis_adult.html"') == 1
@@ -487,7 +524,9 @@ def test_site_build_keeps_authored_iframe(
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["site", "build"])
     assert result.exit_code == 0, result.output
-    staged = (tmp_path / "_build" / "docs" / "data_analysis.md").read_text(encoding="utf-8")
+    staged = (tmp_path / "_build" / "docs" / "data_analysis.md").read_text(
+        encoding="utf-8"
+    )
     assert staged.count('src="data_analysis_adult.html"') == 1
     assert 'class="skore-embed"' in staged
 
@@ -498,14 +537,16 @@ def test_site_build_stub_index_in_nav(
     """When JOURNAL is missing, stub index.md is listed in nav."""
     (tmp_path / "src").mkdir()
     (tmp_path / "data_analysis").mkdir()
-    (tmp_path / "data_analysis" / "data_analysis.md").write_text("# eda\n", encoding="utf-8")
+    (tmp_path / "data_analysis" / "data_analysis.md").write_text(
+        "# eda\n", encoding="utf-8"
+    )
     monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["site", "build"])
     assert result.exit_code == 0, result.output
     nav = (tmp_path / "_build" / "mkdocs.yml").read_text(encoding="utf-8")
     assert "Home: index.md" in nav
-    assert "exploratory data analysis: data_analysis.md" in nav
+    assert "Exploratory data analysis: data_analysis.md" in nav
     assert (tmp_path / "_build" / "docs" / "index.md").is_file()
 
 

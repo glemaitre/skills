@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "890f2320b71d527869f4683fb6b858d352c8abef1c9615ce6d8ab23f80060225",
+  "catalog_hash": "9bfa87b80642d1dd3311af089d88c3d83d02d10476cd2b18bf3fb837ec214d78",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b362d5e48650da81f379ba843eb740ff93b773a458199112dfe2600adbb5aae3"
+      "hash": "6cd8ca81c23cd0b48f93315a44784bfad70fc6098eed9a2569e35e28753337bb"
     },
     {
       "id": "build-ml-pipeline",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "58c96a1808533859367ae47d265015d6ef6f0f099e21387c133020190514a46c"
+      "hash": "f702b7c82b9cb081e12d69bbc5dc46490ab501d500ead94e5e5ed0ccdb60f097"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "d77940a1bb1cd03966c0d451ca5b176889881334ff5c77f82afa337079103c4d"
+      "hash": "30f45e46eee67c886dbd7cf8ddfabb251cd570c36a986681f076245fea43e98c"
     },
     {
       "id": "manage-ml-backlog",
@@ -102,7 +102,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "f79196cd00531fd9169ac225fea6f668fc3b1a53dc84ae0f89872f1c823c54ea"
+      "hash": "c9aaddfc29b37a8244634a0a964a0ce0453e4803301d0a38ccf77510ee396ac7"
     },
     {
       "id": "setup-ml-project",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build, evaluation, and smoke testing.",
       "category": "meta",
       "subcategory": null,
-      "hash": "d39e74e234bc9c11369b51e7f7520cc58cc275e7bbf71a76c3fba47bd3e42299"
+      "hash": "3e9e9d8f17eb2c46a14423cb0c73dd3ccff6a6080c788864a25783c4077087dd"
     },
     {
       "id": "choose-python-library",
@@ -148,6 +148,15 @@
       "category": "action",
       "subcategory": null,
       "hash": "c7a101bc50d52494cdcd1ebd8330f5892441361972d9771e82768909e37ff4b1"
+    },
+    {
+      "id": "research-ml-practice",
+      "path": "skills/research-ml-practice",
+      "title": "Research ML Practice",
+      "summary": "Literature research for an ML methodology concern.",
+      "category": "methodology",
+      "subcategory": null,
+      "hash": "ba1a5f06e9e9940e570fce0064e3b9564994aaa829588fc8c696a75f293686f4"
     },
     {
       "id": "add-python-package",
@@ -165,7 +174,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "90d4d91c7ea270bd97101b2b13cb7de34dc0158eaecf2daa1930c63b3745405b"
+      "hash": "59cbe20d1d08eac7fea0d09ddfebc65433cf91eeb737f44641fb43b56bc2cc04"
     },
     {
       "id": "setup-python-env",
@@ -183,7 +192,7 @@
       "summary": "Convert a jupytext percent file into an executed notebook.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "7db4d9764170d03f3a27d9d84547b01ca099e13b0fe050cadd003a5aa63b0db7"
+      "hash": "bef3ccc00dc50cd33ffdd29ee82740fd5d54ccaa45678da21f36446b21310b8b"
     },
     {
       "id": "export-ml-site",
@@ -192,7 +201,7 @@
       "summary": "Initialize and build an offline MkDocs documentation site from workspace markdown.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "fc08964a15f540760f048bf30535cc6edd736df59186bc2db5545410767ecc1d"
+      "hash": "1a31e1c2d5d9379497c41702daa40d2cfa5dd1292dc66a7eb8081dc6ae370c47"
     },
     {
       "id": "export-ml-project",
@@ -201,7 +210,7 @@
       "summary": "Coordinate executed notebooks and an offline MkDocs documentation site.",
       "category": "meta",
       "subcategory": null,
-      "hash": "1bbed3bdd7e7484284459dec58c51995ceee154cdc311e73f5633233eea26e24"
+      "hash": "975d3275a9d949eab263dce5fd354d94753ef5dccd0f42aca0668e2ffd8d8946"
     }
   ],
   "workflows": [
@@ -228,6 +237,7 @@
       "includes": [
         "explore-ml-data",
         "choose-python-library",
+        "research-ml-practice",
         "add-python-package",
         "persist-ml-git"
       ]
@@ -252,6 +262,7 @@
         "build-ml-pipeline",
         "evaluate-ml-pipeline",
         "smoke-test-ml-pipeline",
+        "research-ml-practice",
         "add-python-package",
         "persist-ml-git"
       ]
@@ -266,6 +277,7 @@
         "iterate-from-skore",
         "iterate-from-user",
         "audit-ml-pipeline",
+        "research-ml-practice",
         "add-python-package",
         "persist-ml-git",
         "export-ml-project"
@@ -283,6 +295,7 @@
         "persist-ml-git",
         "model-ml-pipeline",
         "choose-python-library",
+        "research-ml-practice",
         "add-python-package",
         "explore-ml-data",
         "build-ml-pipeline",

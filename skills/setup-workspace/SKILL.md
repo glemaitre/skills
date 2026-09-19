@@ -78,8 +78,10 @@ after listing the boxes.
    Same turn after persist:
 
    - notebooks true → load `add-python-package` for `jupytext`
-     and `nbclient` (both `env route` **agent**). Do not leave
-     them as `ask`. Do not convert.
+     and `nbclient` (both `env route` **agent**), plus
+     `nbconvert` when site is also true — stage turns write the
+     notebook viewer with `--html`. Do not leave them as `ask`.
+     Do not convert.
    - site true → load `add-python-package` for `mkdocs-material`
      (agent), then `python -m skore_skills site init`.
 
@@ -95,8 +97,8 @@ after listing the boxes.
 - Do not ask env manager, tabular library, or skore mode.
 - Do not run `pixi init` / `uv init`.
 - Do not env-bootstrap or editable-install. Export toolchain
-  (`jupytext`, `nbclient`, `mkdocs-material`) only via
-  `add-python-package` after the notebooks/site gate. Never
+  (`jupytext`, `nbclient`, `nbconvert`, `mkdocs-material`) only
+  via `add-python-package` after the notebooks/site gate. Never
   `pixi add` / `uv add` from this skill.
 - Do not write experiment or exploratory data analysis bodies.
 - Never `git commit` here.

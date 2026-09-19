@@ -21,8 +21,10 @@ Ordering only. Children own convert and site commands.
      true
    - Documentation site — preselected iff `policy.site` is true
 
-3. Persist each box (`true` / `false`). JOURNAL
-   workspace-decisions `notebooks` / `site` `on|off`.
+3. Persist each box this turn: checked →
+   `python -m skore_skills policy set notebooks true` (or `site`);
+   unchecked → `false`. Do not leave them `null`. Do not write
+   notebooks or site into JOURNAL; policy is the record.
 4. Load checked children if `skills` is true; missing skill →
    one-line skip:
 

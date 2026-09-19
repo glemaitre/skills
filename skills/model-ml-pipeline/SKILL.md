@@ -35,11 +35,20 @@ Before new library symbols are written, use
 - Do not duplicate child-skill methodology in this dispatcher.
 - If `status.data_analysis` is `missing`, continue with facts the user
   stated; do not invent an exploratory data analysis report.
+- Literature-backed feature-engineering or learner-family
+  questions: load `research-ml-practice` if installed; do not
+  invent papers from memory.
 
-After build and smoke succeed, if `policy.site` is true,
-`export-ml-site` is installed, run
-`python -m skore_skills site build`. Do not run
-`notebook convert`. Skip in one line otherwise.
+After build and smoke succeed, if `policy.notebooks` is true,
+`export-ml-notebook` is installed, run
+`python -m skore_skills notebook convert experiments/<stem>.py`,
+with `--html` when `policy.site` is also true. Convert re-executes
+the script; say so when it is slow. Missing jupytext / nbclient /
+nbconvert → one-line skip naming `add-python-package`; do not fail
+the turn.
+
+Then, if `policy.site` is true, `export-ml-site` is installed, run
+`python -m skore_skills site build`. Skip in one line otherwise.
 Name a build error; do not fail the model turn.
 
 Then run

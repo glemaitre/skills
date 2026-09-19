@@ -198,6 +198,22 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 13,
+      "title": "Certain research request",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.skills.research-ml-practice` is `true`.]\n\nResearch whether 0.97 correlation with the target is leakage.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `research-ml-practice` without listing the catalog menu. It must NOT: - Put `research-ml-practice` on the uncertain entry board. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `research-ml-practice` without listing the catalog menu.",
+        "The response does NOT: Put `research-ml-practice` on the uncertain entry board.",
+        "The response does NOT: Ask which entry skill to run."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

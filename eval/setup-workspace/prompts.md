@@ -281,6 +281,7 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 - Leave `jupytext` as `env route` ask / optional extra.
 - Run `pixi add` / `uv add` from this skill.
 - Run `notebook convert` during setup.
+- Install `nbconvert` while the site gate is off.
 - Ask the gate before scaffold.
 
 ---
@@ -307,3 +308,28 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 - Load `add-python-package` for `nbconvert` for the site gate.
 - Skip init after the user opted into the site.
 - Ask the gate on an existing layout.
+
+---
+
+## CASE_11 — Both gates on install the HTML toolchain
+
+**User prompt:**
+> Set up a fresh ML workspace in this folder.
+
+**Assumed workspace state:**
+- Empty folder. Fresh layout.
+- `policy.notebooks` and `policy.site` are `null`.
+- `add-python-package` is installed.
+- After G-PKG-NAME and scaffold, the user checks **both** boxes.
+
+**Must do:**
+- Persist `policy set notebooks true` and `policy set site true`.
+- Load `add-python-package` for `jupytext`, `nbclient`, and
+  `nbconvert` (agent) — stage turns write the notebook viewer
+  with `--html`.
+- Name `python -m skore_skills site init`.
+
+**Must NOT do:**
+- Run `notebook convert` during setup.
+- Run `pixi add` / `uv add` from this skill.
+- Leave either flag `null`.

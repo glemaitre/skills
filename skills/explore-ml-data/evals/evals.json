@@ -21,12 +21,12 @@
       "id": 2,
       "title": "G-TABULAR before first EDA script",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists (`has_src`, `journal/JOURNAL.md`).\n- Raw data path is known.\n- `policy.tabular` is unset.\n- `choose-python-library` and `add-python-package` are installed.]\n\nExplore the dataset before we design a model.",
-      "expected_output": "Behavioural response satisfying: - Read `status.policy.tabular` and fire G-TABULAR (pandas vs polars, recommend pandas) via `choose-python-library` or ask here if that skill is missing. - Persist `policy set tabular` after confirmation. - Load `add-python-package` for the chosen frame library and `skrub` (confirm skrub is required). It must NOT: - Silent-default pandas and write `data_analysis.py` first. - Install sklearn, skore, or pytest in this turn. - Call `env add` from this skill instead of `add-python-package`.",
+      "expected_output": "Behavioural response satisfying: - Read `status.policy.tabular` and fire G-TABULAR (pandas vs polars, recommend pandas) via `choose-python-library` or ask here if that skill is missing. - Persist `policy set tabular` after confirmation. - Load `add-python-package` for the chosen frame library, `skrub`, `matplotlib`, and `seaborn`. It must NOT: - Silent-default pandas and write `data_analysis.py` first. - Install sklearn, skore, or pytest in this turn. - Call `env add` from this skill instead of `add-python-package`.",
       "files": [],
       "expectations": [
         "Read `status.policy.tabular` and fire G-TABULAR (pandas vs polars, recommend pandas) via `choose-python-library` or ask here if that skill is missing.",
         "Persist `policy set tabular` after confirmation.",
-        "Load `add-python-package` for the chosen frame library and `skrub` (confirm skrub is required).",
+        "Load `add-python-package` for the chosen frame library, `skrub`, `matplotlib`, and `seaborn`.",
         "Do not place `data_analysis/data_analysis.py` before the gate resolves.",
         "The response does NOT: Silent-default pandas and write `data_analysis.py` first.",
         "The response does NOT: Install sklearn, skore, or pytest in this turn.",
@@ -73,17 +73,19 @@
     {
       "id": 5,
       "title": "Human notebook vs agent scratch",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`. Skrub and IPython are\n  installed.\n- Raw data path is known.\n- User chose **run** for G-DATA-ANALYSIS.]\n\nExplore the dataset. Write the TableReport HTML next to the EDA\nscript.",
-      "expected_output": "Behavioural response satisfying: - Write `data_analysis/data_analysis_<table>.html` (not under `data/`). - End overview cells on `TableReport` (or the frame), not on a json/dict digest. - Embed or link that HTML from `data_analysis/data_analysis.md`. It must NOT: - Put unique-ratio / column-dict / `report.json()` cells in `data_analysis/data_analysis.py`. - Write HTML under `data/`. - Modify the user's raw data files.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`. Skrub, IPython,\n  matplotlib, and seaborn are installed.\n- JOURNAL names target `MedHouseVal` (regression).\n- Raw data path is known.\n- User chose **run** for G-DATA-ANALYSIS.]\n\nExplore the dataset. Write the TableReport HTML next to the EDA\nscript.",
+      "expected_output": "Behavioural response satisfying: - Write `data_analysis/data_analysis_<table>.html` (not under `data/`). - End overview cells on `TableReport` (or the frame), not on a json/dict digest. - Include duplicate, target-distribution, bivariate-vs-target, and leakage cells (not TableReport dtypes/histograms/associations). It must NOT: - Put unique-ratio / column-dict / `report.json()` cells in `data_analysis/data_analysis.py`. - Write HTML under `data/`. - Modify the user's raw data files.",
       "files": [],
       "expectations": [
         "Write `data_analysis/data_analysis_<table>.html` (not under `data/`).",
         "End overview cells on `TableReport` (or the frame), not on a json/dict digest.",
+        "Include duplicate, target-distribution, bivariate-vs-target, and leakage cells (not TableReport dtypes/histograms/associations).",
         "Embed or link that HTML from `data_analysis/data_analysis.md`.",
-        "Put `TableReport.json()` under `scratch/data_analysis/`, not in `data_analysis.py`.",
+        "Put `TableReport.json()` under `scratch/data_analysis/<table>.json` and extras under `scratch/data_analysis/extras.json`.",
         "The response does NOT: Put unique-ratio / column-dict / `report.json()` cells in `data_analysis/data_analysis.py`.",
         "The response does NOT: Write HTML under `data/`.",
-        "The response does NOT: Modify the user's raw data files."
+        "The response does NOT: Modify the user's raw data files.",
+        "The response does NOT: Train/test split or install sklearn unless extras were requested."
       ],
       "tools": false,
       "sandbox": [],
@@ -106,15 +108,16 @@
     },
     {
       "id": 7,
-      "title": "Site on rebuilds after EDA",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nEDA is done. Close the turn.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills site build` before git end-turn. - Name `python -m skore_skills git end-turn --stage data_analysis`. It must NOT: - Fail the data-analysis turn if site build errors; name the error. - Run `notebook convert`. - Run `git commit` in this skill.",
+      "title": "Notebook and site on after EDA",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- `policy.notebooks` is true. `policy.site` is true.\n- `export-ml-notebook` and `export-ml-site` are installed.\n- `jupytext`, `nbclient`, and `nbconvert` are installed.]\n\nEDA is done. Close the turn.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills notebook convert data_analysis/data_analysis.py --html` before site build. - Name `python -m skore_skills site build` before git end-turn. - Name `python -m skore_skills git end-turn --stage data_analysis`. It must NOT: - Fail the data-analysis turn if site build errors; name the error. - Run `cells run` as a substitute for convert. - Run `git commit` in this skill.",
       "files": [],
       "expectations": [
+        "Name `python -m skore_skills notebook convert data_analysis/data_analysis.py --html` before site build.",
         "Name `python -m skore_skills site build` before git end-turn.",
         "Name `python -m skore_skills git end-turn --stage data_analysis`.",
         "The response does NOT: Fail the data-analysis turn if site build errors; name the error.",
-        "The response does NOT: Run `notebook convert`.",
+        "The response does NOT: Run `cells run` as a substitute for convert.",
         "The response does NOT: Run `git commit` in this skill."
       ],
       "tools": false,
@@ -131,6 +134,155 @@
         "Skip site build in one line.",
         "Name `python -m skore_skills git end-turn --stage data_analysis`.",
         "The response does NOT: Run `python -m skore_skills site build`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 9,
+      "title": "Notebooks on, site off converts without HTML",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- `policy.notebooks` is true. `policy.site` is false.\n- `export-ml-notebook` is installed.\n- `jupytext` and `nbclient` are installed.]\n\nEDA is done. Close the turn.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills notebook convert data_analysis/data_analysis.py`. - Name `python -m skore_skills git end-turn --stage data_analysis`. It must NOT: - Pass `--html` when the site gate is off. - Run `python -m skore_skills site build`.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills notebook convert data_analysis/data_analysis.py`.",
+        "Name `python -m skore_skills git end-turn --stage data_analysis`.",
+        "The response does NOT: Pass `--html` when the site gate is off.",
+        "The response does NOT: Run `python -m skore_skills site build`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 10,
+      "title": "Missing convert toolchain skips in one line",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- `policy.notebooks` is true. `policy.site` is false.\n- `export-ml-notebook` is installed.\n- `jupytext` and `nbclient` are not importable; `notebook convert`\n  fails with that ImportError.]\n\nEDA is done. Close the turn.",
+      "expected_output": "Behavioural response satisfying: - Skip the convert in one line, naming `add-python-package` for `jupytext` and `nbclient`. - Name `python -m skore_skills git end-turn --stage data_analysis`. It must NOT: - Fail the data-analysis turn because convert failed. - Run `pixi add` / `uv add` from this skill.",
+      "files": [],
+      "expectations": [
+        "Skip the convert in one line, naming `add-python-package` for `jupytext` and `nbclient`.",
+        "Name `python -m skore_skills git end-turn --stage data_analysis`.",
+        "The response does NOT: Fail the data-analysis turn because convert failed.",
+        "The response does NOT: Run `pixi add` / `uv add` from this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 11,
+      "title": "Default run adds ML-gap cells",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- `add-python-package` is installed.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available.]\n\nExplore the California housing CSV. Target is MedHouseVal.",
+      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing). - Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py`. - After `data_analysis.md`, AskUserQuestion keep exploring vs close (**Close** preselected). It must NOT: - Re-plot TableReport univariate histograms or the association matrix in extra cells. - Install sklearn, skore, or pytest on the default path. - Train/test split the raw table.",
+      "files": [],
+      "expectations": [
+        "Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing).",
+        "Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py`.",
+        "After `data_analysis.md`, AskUserQuestion keep exploring vs close (**Close** preselected).",
+        "The response does NOT: Re-plot TableReport univariate histograms or the association matrix in extra cells.",
+        "The response does NOT: Install sklearn, skore, or pytest on the default path.",
+        "The response does NOT: Train/test split the raw table.",
+        "The response does NOT: Run `git end-turn` before the user picks Close."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 12,
+      "title": "Unspecified target asks, does not guess",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. User chose **run**.\n- JOURNAL Goal does not name a column.\n- Column names are `A`, `B`, `C`.]\n\nExplore the dataset.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion for the target (column list plus \"no target yet\") before writing target-aware cells. It must NOT: - Guess a target column silently. - Skip the duplicate-row cell when the user picks \"no target yet\".",
+      "files": [],
+      "expectations": [
+        "AskUserQuestion for the target (column list plus \"no target yet\") before writing target-aware cells.",
+        "The response does NOT: Guess a target column silently.",
+        "The response does NOT: Skip the duplicate-row cell when the user picks \"no target yet\"."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 13,
+      "title": "Prompt already asked for PCA",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. User chose **run**. Target is known.\n- `add-python-package` is installed.]\n\nExplore the data and add a PCA plot of the numeric columns.",
+      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `scikit-learn`. - Append a PCA cell from `references/extra_analyses.md`. - Do not re-ask PCA on the extras board. It must NOT: - Treat PCA as a pipeline preprocessor in this skill. - Run `pixi add scikit-learn` from this skill.",
+      "files": [],
+      "expectations": [
+        "Load `add-python-package` for `scikit-learn`.",
+        "Append a PCA cell from `references/extra_analyses.md`.",
+        "Do not re-ask PCA on the extras board.",
+        "The response does NOT: Treat PCA as a pipeline preprocessor in this skill.",
+        "The response does NOT: Run `pixi add scikit-learn` from this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 14,
+      "title": "Close after default pass keeps sklearn off",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Default notebook, extras.json, and `data_analysis.md` are on\n  disk.\n- User picks **Close** on keep-exploring vs close.]\n\nExplore the dataset. Target is MedHouseVal.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion keep exploring vs close (**Close** preselected). - Name `python -m skore_skills git end-turn --stage data_analysis` after Close. It must NOT: - Load `add-python-package` for sklearn / scipy / statsmodels. - Leave modelling implications empty of duplicate/target/leakage findings.",
+      "files": [],
+      "expectations": [
+        "AskUserQuestion keep exploring vs close (**Close** preselected).",
+        "Name `python -m skore_skills git end-turn --stage data_analysis` after Close.",
+        "The response does NOT: Load `add-python-package` for sklearn / scipy / statsmodels.",
+        "The response does NOT: Leave modelling implications empty of duplicate/target/leakage findings."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 15,
+      "title": "Keep exploring does not end the turn",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- User picks **Keep exploring the data**.]\n\nExplore the dataset. Target is MedHouseVal.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion extras / research this concern / describe what to plot. - Stay in `explore-ml-data`. It must NOT: - Name `python -m skore_skills git end-turn`. - Invent a domain-specific checklist skill or `references/domains/`. - Run `python -m skore_skills site build` on keep exploring.",
+      "files": [],
+      "expectations": [
+        "AskUserQuestion extras / research this concern / describe what to plot.",
+        "Stay in `explore-ml-data`.",
+        "The response does NOT: Name `python -m skore_skills git end-turn`.",
+        "The response does NOT: Invent a domain-specific checklist skill or `references/domains/`.",
+        "The response does NOT: Run `python -m skore_skills site build` on keep exploring."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 16,
+      "title": "Keep exploring then research",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- EDA markdown exists. User picked Keep exploring, then Research\n  this concern.\n- `status.skills.research-ml-practice` is true.]\n\nIs 0.97 correlation with the target leakage?",
+      "expected_output": "Behavioural response satisfying: - Load `research-ml-practice`. - After it returns, copy confirmed candidates into `data_analysis.md` even if the `.py` did not change. It must NOT: - Drop the correlated column from the raw data. - Run `git end-turn` in this keep-exploring pass. - Append a research-recommended plot cell without user confirmation.",
+      "files": [],
+      "expectations": [
+        "Load `research-ml-practice`.",
+        "After it returns, copy confirmed candidates into `data_analysis.md` even if the `.py` did not change.",
+        "The response does NOT: Drop the correlated column from the raw data.",
+        "The response does NOT: Run `git end-turn` in this keep-exploring pass.",
+        "The response does NOT: Append a research-recommended plot cell without user confirmation."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 17,
+      "title": "Research skill missing is a one-line skip",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- EDA markdown exists. User picked Keep exploring, then Research\n  this concern.\n- `status.skills.research-ml-practice` is false or absent.]\n\nIs 0.97 correlation with the target leakage?",
+      "expected_output": "Behavioural response satisfying: - One-line skip that `research-ml-practice` is not installed. - Stay in the keep-exploring menu (re-ask extras / research / describe what to plot, or keep vs close). It must NOT: - Invent papers or leakage thresholds from memory. - Run `git end-turn` in this keep-exploring pass.",
+      "files": [],
+      "expectations": [
+        "One-line skip that `research-ml-practice` is not installed.",
+        "Stay in the keep-exploring menu (re-ask extras / research / describe what to plot, or keep vs close).",
+        "The response does NOT: Invent papers or leakage thresholds from memory.",
+        "The response does NOT: Run `git end-turn` in this keep-exploring pass."
       ],
       "tools": false,
       "sandbox": [],

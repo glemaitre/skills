@@ -289,6 +289,15 @@ The CLI streams the digest to stdout. Pass a second arg
 created if missing). Details:
 `python -m skore_skills cells run --help`.
 
+### Executed notebook
+
+If `policy.notebooks` is true and `export-ml-notebook` is
+installed, run `python -m skore_skills notebook convert
+audit/<stem>.py` after the digest. No `--html` — the site has no
+audit page, so the viewer would have nothing to embed. Missing
+jupytext / nbclient → one-line skip naming `add-python-package`;
+do not fail the audit, do not `pixi add`.
+
 ### Re-execution semantics
 
 - Re-running an experiment (overwriting `put()` under the same key)

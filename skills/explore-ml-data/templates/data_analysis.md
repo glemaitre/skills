@@ -1,6 +1,7 @@
 <!--
-Written from scratch/data_analysis/<table>.json and the TableReport
-HTML. Ground every claim in those artifacts. Modelling implications
+Written from scratch/data_analysis/<table>.json,
+scratch/data_analysis/extras.json, and the TableReport HTML.
+Ground every claim in those artifacts. Modelling implications
 are candidates, not decisions.
 -->
 
@@ -20,12 +21,16 @@ do not restate them as bullets, and do not put figures here.
 
 ## Modelling implications
 
-Translate what the report shows into *candidate* modelling choices
-(splitter, metric, leakage risk). The owning gates make the picks.
+Translate TableReport **and** extras (duplicates, target
+balance/skew, feature-vs-target, leakage flags, any extra the user
+picked) into *candidate* modelling choices (splitter, metric,
+leakage risk). The owning gates make the picks.
 Embed any saved figure next to the implication it supports —
 `![<caption>](<name>.png)`, a sibling of this file, never a bare
-link.
+link. Glance stays TableReport-only.
 
 ## Open questions
 
-Domain ambiguities for the user to confirm before modelling.
+Domain ambiguities for the user to confirm before modelling
+(why duplicates exist, whether a near-perfect correlate is leakage,
+capped target, extra analyses they declined).

@@ -247,3 +247,22 @@
 - Load `export-ml-project` as the certain skill.
 - Load `export-ml-site` as the certain skill.
 - Ask which entry skill to run.
+
+---
+
+## CASE_13 — Certain research request
+
+**User prompt:**
+> Research whether 0.97 correlation with the target is leakage.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.research-ml-practice` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `research-ml-practice` without listing the catalog menu.
+
+**Must NOT do:**
+- Put `research-ml-practice` on the uncertain entry board.
+- Ask which entry skill to run.
