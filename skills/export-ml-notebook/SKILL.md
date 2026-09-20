@@ -36,6 +36,12 @@ conversions, other sources, and the gate itself.
    python -m skore_skills notebook convert data_analysis/data_analysis.py
    ```
 
+   Convert injects `%matplotlib inline` for the kernel run so
+   seaborn / matplotlib last expressions emit `image/png`, then
+   strips that setup cell from the written notebook. Do not put
+   `%matplotlib inline` in the `.py` (`style` / ruff would reject
+   it).
+
    If the user wants the executed notebook on the site, load
    `add-python-package` for `nbconvert` (agent) and pass `--html`
    (writes a self-contained `<stem>.nb.html` next to the `.py`).

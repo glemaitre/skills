@@ -70,7 +70,7 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 | First EDA (triage or free-text) | → write md; then keep-exploring vs close |
 | Keep exploring | → standard extras, research extras, or free-text; no end-turn yet |
 | Close this stage | → convert / site / git end-turn / `triage-ml-task` if installed |
-| Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § research (named concern) |
+| Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § research extra analysis (named concern skips the canned survey) |
 | Changed data source or "also plot X" | → overwrite `data_analysis/data_analysis.*`, refresh JOURNAL |
 
 ## Stop conditions
@@ -144,7 +144,7 @@ evidence. End of turn only after Close.
    cells (including this first write). Markdown is about **this**
    analysis. `python -m skore_skills style` after the write.
 2. `python -m skore_skills cells run
-   data_analysis/data_analysis.py` — writes HTML and ONGs. A
+   data_analysis/data_analysis.py` — writes HTML and PNGs. A
    useless TableReport `repr` in the digest is expected.
 3. Copy `templates/facts.py` → `scratch/data_analysis/facts.py`
    with the same load and target; run it; read

@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "90e25f14ae5ada9eb94b0a38903b064559c1f5b5c7d0097eca6fe183e8223b0d",
+  "catalog_hash": "9039e91979b2eb73ec4a3de94855a79fca6540a430f2cde54b462704a60b895f",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "0268aa13fe2e15cdfb15aaef8fdf5e634b7770d6ef5371416eeabf2bc5d7b442"
+      "hash": "76c2739f2f84bbf3fe349f2f748dceb788cc3adf6f5ce8b34e2dc126eda005a4"
     },
     {
       "id": "build-ml-pipeline",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "6f673bd97cf5eebf99145cea0078dcead23cd4d3b0d27064573adbdf4724af7d"
+      "hash": "1d29d05229ff37efbafd30c20b94b442034364239374d2fcff44b7226eb6f4ea"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -201,7 +201,7 @@
       "summary": "Convert a jupytext percent file into an executed notebook.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "bef3ccc00dc50cd33ffdd29ee82740fd5d54ccaa45678da21f36446b21310b8b"
+      "hash": "9ff4949bb1f8a8d796fd5ce9283c98cade12fa85253ccd191b0d7e6468e479fe"
     },
     {
       "id": "export-ml-site",

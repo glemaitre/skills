@@ -253,7 +253,7 @@
   leakage cells in `data_analysis/data_analysis.py` for
   **regression only**.
 - Use seaborn figure-level plots (`displot` / `relplot`); save
-  ONGs and leave figures as cell output. Feature-vs-target is
+  PNGs and leave figures as cell output. Feature-vs-target is
   one faceted `relplot` (`bivariate_grid.png`), last expression
   `g`.
 - After `data_analysis.md`, AskUserQuestion keep exploring vs
@@ -423,8 +423,8 @@
 **Must do:**
 - Skip G-DATA-ANALYSIS; do not overwrite
   `data_analysis/data_analysis.py`.
-- Load `research-ml-practice` (Keep exploring § research,
-  named concern — skip the canned extra-analysis survey).
+- Load `research-ml-practice` (Keep exploring § research extra
+  analysis; named concern — skip the canned extra-analysis survey).
 - Summarize the scratch note in chat.
 
 **Must NOT do:**

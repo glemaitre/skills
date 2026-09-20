@@ -657,7 +657,9 @@ catalogue with code: → `references/common_patterns.md`.
 ## Literature distillation
 
 On a FE / transform / leakage concern, load `research-ml-practice`
-if installed; pass the concern and stage `model`. Summarize
+if installed; pass the concern and stage `model`. Abstract the
+**problem class** (domain, task, phenomenon) — do not pass
+`fetch_california_housing` or the table’s proper name. Summarize
 `scratch/research/<slug>.md` in chat; do not dump the note.
 **AskUserQuestion** `allow_multiple` on **`declare`** rows that
 do not violate stop conditions (no fit, no mutate `data/`, no
