@@ -49,6 +49,9 @@ g
 ```
 
 Do not `import matplotlib.pyplot` for these. Do not `plt.close`.
+One figure-level call as the last expression. Facet with `col=` /
+`col_wrap` instead of a `for` over columns — a bare `g` inside a
+loop is not displayed.
 
 ## pandas `DataFrame.plot`
 

@@ -11,6 +11,26 @@ from click.testing import CliRunner
 from skore_skills import notebook as notebook_mod
 from skore_skills.cli import cli
 
+INLINE = "%matplotlib inline"
+
+
+def _stub_nbformat(write=None) -> SimpleNamespace:
+    """nbformat stand-in with ``v4.new_code_cell`` for the inline setup."""
+
+    def _write(nb: object, dest: object) -> None:
+        Path(dest).write_text("nb", encoding="utf-8")
+
+    return SimpleNamespace(
+        write=write or _write,
+        v4=SimpleNamespace(
+            new_code_cell=lambda source: {
+                "cell_type": "code",
+                "source": source,
+                "outputs": [],
+            }
+        ),
+    )
+
 
 def test_notebook_convert_writes_outputs(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -26,9 +46,7 @@ def test_notebook_convert_writes_outputs(
     monkeypatch.setattr(
         notebook_mod,
         "nbformat",
-        SimpleNamespace(
-            write=lambda nb, dest: Path(dest).write_text("nb", encoding="utf-8")
-        ),
+        _stub_nbformat(),
     )
 
     class FakeClient:
@@ -39,7 +57,8 @@ def test_notebook_convert_writes_outputs(
             self.resources = kwargs.get("resources")
 
         def execute(self) -> object:
-            payload["cells"][0]["outputs"] = [{"output_type": "execute_result"}]
+            assert payload["cells"][0]["source"] == INLINE
+            payload["cells"][1]["outputs"] = [{"output_type": "execute_result"}]
             return self.notebook
 
     monkeypatch.setattr(notebook_mod, "NotebookClient", FakeClient)
@@ -48,7 +67,40 @@ def test_notebook_convert_writes_outputs(
     assert result.exit_code == 0, result.output
     dest = tmp_path / "data_analysis.ipynb"
     assert dest.is_file()
+    assert len(payload["cells"]) == 1
     assert payload["cells"][0]["outputs"]
+
+
+def test_notebook_convert_strips_inline_setup(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Execute sees ``%matplotlib inline``; the written notebook does not."""
+    src = tmp_path / "data_analysis.py"
+    src.write_text("# %%\n1 + 1\n", encoding="utf-8")
+    payload = {"cells": [{"cell_type": "code", "source": "1 + 1", "outputs": []}]}
+    seen: list[str] = []
+
+    monkeypatch.setattr(
+        notebook_mod, "jupytext", SimpleNamespace(read=lambda path: payload)
+    )
+    monkeypatch.setattr(notebook_mod, "nbformat", _stub_nbformat())
+
+    class FakeClient:
+        def __init__(
+            self, notebook: object, timeout: int, kernel_name: str, **kwargs: object
+        ) -> None:
+            cells = notebook["cells"]
+            seen.append(cells[0]["source"])
+
+        def execute(self) -> object:
+            return None
+
+    monkeypatch.setattr(notebook_mod, "NotebookClient", FakeClient)
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["notebook", "convert", str(src)])
+    assert result.exit_code == 0, result.output
+    assert seen == [INLINE]
+    assert [c.get("source") for c in payload["cells"]] == ["1 + 1"]
 
 
 def test_notebook_convert_missing_src(
@@ -89,7 +141,7 @@ def test_notebook_convert_out_path(
     monkeypatch.setattr(
         notebook_mod,
         "nbformat",
-        SimpleNamespace(
+        _stub_nbformat(
             write=lambda nb, path: Path(path).write_text("nb", encoding="utf-8")
         ),
     )
@@ -118,7 +170,9 @@ def test_notebook_convert_execute_error(
     """Kernel failures surface as a Click error."""
     src = tmp_path / "data_analysis.py"
     src.write_text("# %%\n1\n", encoding="utf-8")
-    monkeypatch.setattr(notebook_mod, "jupytext", SimpleNamespace(read=lambda path: {}))
+    monkeypatch.setattr(
+        notebook_mod, "jupytext", SimpleNamespace(read=lambda path: {"cells": []})
+    )
 
     class FakeClient:
         def __init__(
@@ -131,7 +185,7 @@ def test_notebook_convert_execute_error(
 
     monkeypatch.setattr(notebook_mod, "NotebookClient", FakeClient)
     monkeypatch.setattr(
-        notebook_mod, "nbformat", SimpleNamespace(write=lambda *_a: None)
+        notebook_mod, "nbformat", _stub_nbformat(write=lambda *_a: None)
     )
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["notebook", "convert", str(src)])
@@ -154,9 +208,7 @@ def test_notebook_convert_uses_script_dir(
     monkeypatch.setattr(
         notebook_mod,
         "nbformat",
-        SimpleNamespace(
-            write=lambda nb, dest: Path(dest).write_text("nb", encoding="utf-8")
-        ),
+        _stub_nbformat(),
     )
 
     class FakeClient:
@@ -189,9 +241,7 @@ def test_notebook_convert_html(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.setattr(
         notebook_mod,
         "nbformat",
-        SimpleNamespace(
-            write=lambda nb, dest: Path(dest).write_text("nb", encoding="utf-8")
-        ),
+        _stub_nbformat(),
     )
 
     class FakeClient:
@@ -233,9 +283,7 @@ def test_notebook_convert_html_import_error(
     monkeypatch.setattr(
         notebook_mod,
         "nbformat",
-        SimpleNamespace(
-            write=lambda nb, dest: Path(dest).write_text("nb", encoding="utf-8")
-        ),
+        _stub_nbformat(),
     )
 
     class FakeClient:

@@ -25,11 +25,15 @@ Translate TableReport **and** extras (duplicates, target
 balance/skew, feature-vs-target, leakage flags, any extra the user
 picked) into *candidate* modelling choices (splitter, metric,
 leakage risk). The owning gates make the picks.
-Embed any saved figure next to the implication it supports —
+Every path in extras `pngs` and `htmls` is embedded here —
 `![<caption>](<name>.png)` or
 `<iframe src="<slug>.html" width="100%" height="640"></iframe>`
 (Plotly HTML, same pattern as TableReport). A sibling of this
-file, never a bare link. Glance stays TableReport-only.
+file, never a bare link. Each embed sits beside a sentence that
+cites numbers from `scratch/data_analysis/<table>.json` /
+`extras.json` (or a summary table from the notebook). If a figure
+earns no such sentence, do not save it. Glance stays
+TableReport-only.
 
 ## Open questions
 

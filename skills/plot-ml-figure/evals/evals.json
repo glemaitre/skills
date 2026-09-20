@@ -13,7 +13,8 @@
         "The response does NOT: Write a long matplotlib `bar`/`bxp` loop for the same plot.",
         "The response does NOT: Use plotly for this PNG.",
         "The response does NOT: Load `choose-python-library` for matplotlib vs seaborn vs plotly.",
-        "The response does NOT: Call `plt.close`."
+        "The response does NOT: Call `plt.close`.",
+        "The response does NOT: Loop over columns with a trailing `g`."
       ],
       "tools": false,
       "sandbox": [],

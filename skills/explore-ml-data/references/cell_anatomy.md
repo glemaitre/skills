@@ -27,7 +27,9 @@ notebook. Load `plot-ml-figure` before figure cells. Save each
 PNG, then leave the figure/grid as the cell output — never
 `plt.close`. Prefer seaborn figure-level (`displot`, `relplot`,
 `catplot`, `pairplot`); do not `import matplotlib.pyplot` on the
-normal path.
+normal path. One figure-level call per cell as the last
+expression; facet with `col=` / `col_wrap` instead of looping.
+A bare name inside a `for` loop is not displayed.
 
 `python -m skore_skills cells run` captures `repr()`, so a last-line
 `TableReport` looks empty in the digest. That is expected. Do not
@@ -48,9 +50,13 @@ from a **plotting** TableReport — do not dump that report to JSON.
 
 Author `data_analysis/data_analysis.md` from both JSON files plus
 the HTML. The glance section is one iframe per table and nothing
-else — no bullets restating the report. Figures:
-`![](<name>.png)` or `<iframe src="<slug>.html">` beside the
-implication they support, never in the glance.
+else — no bullets restating the report. Every path in
+`extras["pngs"]` and `extras["htmls"]` is embedded in Modelling
+implications (`![](<name>.png)` or `<iframe src="<slug>.html">`)
+beside a sentence that cites numbers from those JSON files (or a
+summary table from the notebook). If a figure earns no such
+sentence, do not save it — no orphan files under `data_analysis/`.
+Glance stays TableReport-only.
 
 Extra cells after the user picks extras: `references/extra_analyses.md`.
 

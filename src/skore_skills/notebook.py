@@ -8,6 +8,7 @@ from pathlib import Path
 MISSING = "jupytext and nbclient are required; add them with add-python-package"
 MISSING_NBCONVERT = "nbconvert is required; add it with add-python-package"
 TEMPLATE_DIR = Path(__file__).with_name("site_assets")
+INLINE_SETUP = "%matplotlib inline"
 
 try:
     import jupytext
@@ -21,6 +22,10 @@ except ImportError:  # pragma: no cover - exercised by hiding modules in tests
 
 def convert(src: Path, out: Path | None = None, *, html: bool = False) -> Path:
     """Read a percent-format ``.py``, execute it, and write ``.ipynb``.
+
+    Injects ``%matplotlib inline`` for the kernel run so seaborn /
+    matplotlib last expressions emit ``image/png``, then strips that
+    setup cell so it is not in the written notebook.
 
     Parameters
     ----------
@@ -54,6 +59,8 @@ def convert(src: Path, out: Path | None = None, *, html: bool = False) -> Path:
     dest = src.with_suffix(".ipynb") if out is None else out
     dest.parent.mkdir(parents=True, exist_ok=True)
     notebook = jupytext.read(src)
+    cells = notebook.cells if hasattr(notebook, "cells") else notebook["cells"]
+    cells.insert(0, nbformat.v4.new_code_cell(INLINE_SETUP))
     client = NotebookClient(
         notebook,
         timeout=600,
@@ -61,6 +68,7 @@ def convert(src: Path, out: Path | None = None, *, html: bool = False) -> Path:
         resources={"metadata": {"path": os.fspath(src.parent.resolve())}},
     )
     client.execute()
+    del cells[0]
     nbformat.write(notebook, dest)
     if html:
         to_html(dest, src.with_name(f"{src.stem}.nb.html"))

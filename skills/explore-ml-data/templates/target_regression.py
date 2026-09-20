@@ -33,12 +33,26 @@ else:
 pd.Series(bivariate_cols, name="bivariate_columns")
 
 # %%
-for name in bivariate_cols:
-    if not pd.api.types.is_numeric_dtype(FRAME[name]):
-        continue
-    g = sns.relplot(data=FRAME, x=name, y=TARGET, alpha=0.4)
-    g.savefig(OUT / f"bivariate_{name}.png", bbox_inches="tight")
-    g
+numeric_bivariate = [
+    c for c in bivariate_cols if pd.api.types.is_numeric_dtype(FRAME[c])
+]
+long = FRAME.melt(
+    id_vars=[TARGET],
+    value_vars=numeric_bivariate,
+    var_name="feature",
+    value_name="value",
+)
+g = sns.relplot(
+    data=long,
+    x="value",
+    y=TARGET,
+    col="feature",
+    col_wrap=4,
+    alpha=0.4,
+    facet_kws={"sharex": False},
+)
+g.savefig(OUT / "bivariate_grid.png", bbox_inches="tight")
+g
 
 # %% [markdown]
 # ## Leakage candidates

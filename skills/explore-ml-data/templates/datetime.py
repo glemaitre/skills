@@ -21,7 +21,19 @@ for col in datetime_cols:
 pd.DataFrame(datetime_summary)
 
 # %%
-for col in datetime_cols:
-    g = sns.relplot(data=FRAME, x=col, y=TARGET, alpha=0.3)
-    g.savefig(OUT / f"target_vs_{col}.png", bbox_inches="tight")
-    g
+long = FRAME.melt(
+    id_vars=[TARGET],
+    value_vars=datetime_cols,
+    var_name="feature",
+    value_name="when",
+)
+g = sns.relplot(
+    data=long,
+    x="when",
+    y=TARGET,
+    col="feature",
+    alpha=0.3,
+    facet_kws={"sharex": False},
+)
+g.savefig(OUT / "target_vs_datetime.png", bbox_inches="tight")
+g

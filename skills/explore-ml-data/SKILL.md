@@ -68,9 +68,9 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 | You came here for… | → next |
 |---|---|
 | First EDA (triage or free-text) | → write md; then keep-exploring vs close |
-| Keep exploring | → extras, named research, survey, or free-text; no end-turn yet |
+| Keep exploring | → standard extras, research extras, or free-text; no end-turn yet |
 | Close this stage | → convert / site / git end-turn / `triage-ml-task` if installed |
-| Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § named concern |
+| Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § research (named concern) |
 | Changed data source or "also plot X" | → overwrite `data_analysis/data_analysis.*`, refresh JOURNAL |
 
 ## Stop conditions
@@ -144,7 +144,7 @@ evidence. End of turn only after Close.
    cells (including this first write). Markdown is about **this**
    analysis. `python -m skore_skills style` after the write.
 2. `python -m skore_skills cells run
-   data_analysis/data_analysis.py` — writes HTML and PNGs. A
+   data_analysis/data_analysis.py` — writes HTML and ONGs. A
    useless TableReport `repr` in the digest is expected.
 3. Copy `templates/facts.py` → `scratch/data_analysis/facts.py`
    with the same load and target; run it; read
@@ -156,7 +156,10 @@ evidence. End of turn only after Close.
    and figures are embedded, not linked; `![](<name>.png)` or an
    HTML iframe (`<iframe src="<slug>.html" …>`) sits beside the
    implication it supports, never in the glance. Glance stays
-   TableReport-only.
+   TableReport-only. Every `extras["pngs"]` and `extras["htmls"]`
+   path is embedded, each with a sentence citing numbers from
+   those JSON files (or a notebook summary table). Do not save a
+   figure that earns no such sentence.
    Ground claims in both JSON files and the HTML. Do not invent
    columns.
 5. JOURNAL § Data understanding table: Status `done — <date>`,
@@ -182,7 +185,9 @@ G-DATA-ANALYSIS.
 
 Methodology concern while `status.data_analysis` is present
 (leakage / “research this”): skip G-DATA-ANALYSIS; do not
-overwrite the notebook; go to **Keep exploring** § research.
+overwrite the notebook; go to **Keep exploring** § research
+with that named concern (skip the canned extra-analysis
+survey).
 
 Always load `plot-ml-figure` if installed before writing or
 rewriting figure cells. The template is not a license to skip
@@ -195,37 +200,43 @@ then leave the figure/grid as the cell output.
 
 No convert, no site build, no `git end-turn`.
 
-1. **AskUserQuestion** one pick, none recommended: more extra
-   analyses; research a named concern; open research (survey
-   first); I’ll describe what to plot.
-2. **Extras** — `references/extra_analyses.md` (its own
-   `allow_multiple` board, all unchecked). Load `plot-ml-figure`
-   if installed before figure cells.
-3. **Named concern** — load `research-ml-practice` if installed
-   (pass the concern and stage `data_analysis`). Missing skill
-   → one-line skip and return to step 1. If unnamed, that
-   worker’s intake is survey vs “I will name it” — do not turn
-   Open questions into a concern board. Do not invent
-   literature. After a **depth** note: summarize in chat; do
-   not dump it.
-   **AskUserQuestion** `allow_multiple` (unchecked): only
-   **`measure`** rows not already in the notebook (e.g.
-   “Spearman of feature vs target”). Map onto extra_analyses
-   when a recipe exists; else a custom cell. `declare` /
-   `evaluate` / `confirm` stay off this board → Open questions
-   as advice, not findings.
-4. **Open research** — load `research-ml-practice` if installed
-   with stage `data_analysis` and mode survey (no concern); else
-   one-line skip and return to step 1. Read
-   `scratch/research/survey-<slug>.md`. Summarize in chat; do
-   not dump the note. **AskUserQuestion** `allow_multiple`
-   (unchecked) on **only** that note’s proposed concerns. Picks
-   → depth searches (pass each concern). Then the **measure**
-   board in step 3. Do not build the concern board from Open
-   questions before the survey.
-5. **Free-text plot** — load `plot-ml-figure` if installed;
+1. **AskUserQuestion** one pick, none recommended: more
+   standard extra analysis; research extra analysis; I’ll
+   describe what to plot.
+2. **Standard extras** — `references/extra_analyses.md` (its
+   own `allow_multiple` board, all unchecked). Load
+   `plot-ml-figure` if installed before figure cells.
+3. **Research extra analysis** — load `research-ml-practice`
+   if installed with stage `data_analysis` and the canned
+   survey concern below. Missing skill → one-line skip and
+   return to step 1. Do not ask intake. Pass JOURNAL,
+   `data_analysis.md` (implications + open questions), and
+   `scratch/data_analysis/extras.json` as **context**. The
+   worker abstracts the **problem class** (no dataset proper
+   name) before searching. Canned question:
+
+   > Given the kind of problem in JOURNAL (domain, task,
+   > constraints) and the kinds of structure already seen in
+   > EDA (not the dataset’s proper name), what extra
+   > measurements on a raw table like this are still worth
+   > doing?
+
+   Read `scratch/research/survey-<slug>.md`. Summarize in
+   chat; do not dump the note. **AskUserQuestion**
+   `allow_multiple` (unchecked) on **only** sourced
+   **`measure`** extras that are not already in the notebook.
+   Map onto extra_analyses when a recipe exists; else a
+   custom cell. `declare` / `evaluate` / `confirm` stay off
+   this board → Open questions as advice, not findings. Do
+   not copy Open questions onto the board unless the survey
+   note listed them with a source.
+
+   A user-named methodology concern (leakage / “research
+   this”) skips the canned survey: pass that concern for
+   **depth**, then the same **`measure`** board.
+4. **Free-text plot** — load `plot-ml-figure` if installed;
    append cells.
-6. Picks that change the `.py`: `style`, `cells run`, refresh
+5. Picks that change the `.py`: `style`, `cells run`, refresh
    facts, rewrite `data_analysis.md` from JSON/PNGs/HTML
    (implications from **results**). Then re-ask keep vs close
    (procedure step 6). Do not invent domain checklists.
@@ -238,9 +249,9 @@ missing) and user free-text.
 
 Calls: `add-python-package`, `api get`, `choose-python-library` /
 stack for G-TABULAR, `research-ml-practice` if installed when the
-user wants literature on a concern or an open survey,
-`plot-ml-figure` if installed before **any** figure cells
-(default notebook, extras, free-text, research-`measure`),
+user wants extra-analysis research or a named methodology
+concern, `plot-ml-figure` if installed before **any** figure
+cells (default notebook, extras, free-text, research-`measure`),
 `style` after `data_analysis.py`.
 
 Need a package? Load `add-python-package` if installed; else name

@@ -28,12 +28,26 @@ bivariate_cols = [c for c in FRAME.columns if c != TARGET][:BIVARIATE_CAP]
 pd.Series(bivariate_cols, name="bivariate_columns")
 
 # %%
-for name in bivariate_cols:
-    if not pd.api.types.is_numeric_dtype(FRAME[name]):
-        continue
-    g = sns.catplot(data=FRAME, x=TARGET, y=name, kind="box")
-    g.savefig(OUT / f"bivariate_{name}.png", bbox_inches="tight")
-    g
+numeric_bivariate = [
+    c for c in bivariate_cols if pd.api.types.is_numeric_dtype(FRAME[c])
+]
+long = FRAME.melt(
+    id_vars=[TARGET],
+    value_vars=numeric_bivariate,
+    var_name="feature",
+    value_name="value",
+)
+g = sns.catplot(
+    data=long,
+    x=TARGET,
+    y="value",
+    col="feature",
+    col_wrap=4,
+    kind="box",
+    sharey=False,
+)
+g.savefig(OUT / "bivariate_grid.png", bbox_inches="tight")
+g
 
 # %% [markdown]
 # ## Leakage candidates

@@ -1,43 +1,94 @@
 # Search angles, corroboration, output
 
-Two modes. Survey proposes concerns from literature. Depth
-ranks actions for one named concern.
+Two modes. Survey proposes extra **measurements** for a table
+like this. Depth ranks actions for one named concern.
 
-## Survey
+## Do not overfit the named table
 
-No named concern. Context from JOURNAL / dtypes / target /
-domain is fine. Do **not** use EDA Open questions as queries
-or as the concern list.
+Toy sets (`fetch_california_housing`, Adult, Titanic, …)
+pollute search with sklearn/Kaggle *pipeline* tutorials.
+Before any query, rewrite the problem as a **class** in the
+scratchpad:
 
-Run in parallel (distinct angles, not paraphrases). Bake in
-domain and task when known:
+- Drop dataset / loader / file name from queries.
+- “California housing, MedHouseVal” → “continuous
+  housing-value regression, top-coded target, rounded lat/lon”.
+- Already in the default notebook (TableReport, duplicates,
+  univariate target, feature-vs-target, leakage flags) → do
+  not re-propose.
 
-1. Practice: `tabular machine learning [domain] [task] EDA best practices`
-2. Pitfalls: `[domain] [task] leakage pitfalls common mistakes`
-3. What to check: `what to check EDA [domain] tabular machine learning`
+Queries use **phenomena + domain + task + EDA extras**. Never
+the proper name, `sklearn.datasets`, a Kaggle slug, or
+“baseline pipeline / RandomForest / GridSearch”. Discard hits
+whose payload is model fitting, sklearn `Pipeline`, or
+leaderboard code unless they justify a **raw-table
+measurement**. Stage `data_analysis` extras must be appendable
+EDA cells (spatial autocorrelation of the target, cap/censor
+share, occupancy outliers as flags) — not transformers or
+learners.
 
-Add theory/papers only if that pass is thin. Fetch primary
-pages.
+JOURNAL and EDA findings are **context** for that rewrite.
+They are not search strings and not the extras list unless a
+fetched source supports them.
+
+## Survey (EDA extra analyses)
+
+Canned question from explore (or equivalent):
+
+> Given the kind of problem in JOURNAL (domain, task,
+> constraints) and the kinds of structure already seen in EDA
+> (not the dataset’s proper name), what extra measurements on
+> a raw table like this are still worth doing?
+
+Loop (no Wolfram / maps / image gen; no Python plots here):
+
+1. **Scratchpad** in the note: problem class (no dataset
+   name); query type straightforward / breadth-first /
+   depth-first; what JOURNAL + EDA already covered.
+2. **Wide-net:** 2–4 parallel distinct-angle searches
+   (practice, pitfalls, domain EDA extras). Bake the
+   abstracted domain/task, not the table name. Example
+   shapes:
+   - `EDA extra analyses [domain] [task] raw table measurements`
+   - `[phenomenon] exploratory analysis pitfalls leakage`
+   - `what to measure before modeling [domain] [task] spatial OR censoring OR imbalance`
+3. **Fetch** 3–5 primary pages (docs, papers, textbooks).
+   Snippets are not enough. Drop tutorial-pipeline pages.
+4. **Follow-up:** for each promising **measure** extra not
+   already in the notebook, a subsequent targeted search if
+   the first pass is thin or single-sourced. Still no
+   dataset-name queries.
+5. **Verification:** one-source claims stay uncertain or get
+   a confirm search. Sources disagree → state both; do not
+   pick a side silently.
+6. **Completeness:** re-read the canned question. If the list
+   is mostly `declare` / `evaluate`, search again for EDA
+   measurements.
 
 Write `scratch/research/survey-<slug>.md`. **No** ranked
-`measure` / `declare` action table.
+pipeline action table.
 
 ```markdown
-## Survey: <domain / task in one line>
+## Survey: extra measurements for <problem class>
+
+### Plan
+- Problem class: ... (no dataset name)
+- Query type: straightforward | breadth-first | depth-first
+- Already covered in EDA: ...
 
 ### Context
 - Stage: data_analysis | model
 - Modality / domain: ...
-- Target / model family: ... (or not yet specified)
+- Target / task: ... (or not yet specified)
 
 ### What is happening
-Plain language, 2–4 sentences (literature landscape, not a
-lecture on this table’s Open questions).
+Plain language, 2–4 sentences (literature on this *kind* of
+table, not a sklearn dataset page).
 
-### Proposed concerns
-| Concern | Why it may apply | Source |
-|---|---|---|
-| ... | ... | ... |
+### Proposed extras
+| Extra | Lane | Why it may apply | Source |
+|---|---|---|---|
+| ... | measure \| declare \| evaluate \| confirm | ... | ... |
 
 ### Confidence
 HIGH | MEDIUM | LOW — one sentence why.
@@ -46,12 +97,16 @@ HIGH | MEDIUM | LOW — one sentence why.
 Inline citations for every factual claim.
 ```
 
-Return the path. The caller asks which concerns to deepen.
+Prefer **`measure`** rows for an EDA caller. Return the path.
+The caller asks which extras to add.
 
 ## Depth
 
-Need a specific concern. Run 1, 3, and 5 first; add 2 and 4
-if thin.
+Need a specific concern. Same anti-overfit rewrite. A leakage
+question may name a statistic on *this* frame; still do not
+search the dataset’s sklearn page.
+
+Run 1, 3, and 5 first; add 2 and 4 if thin.
 
 1. Practice: `EDA OR machine learning [domain] [concern] best practices`
 2. Theory: `[concern] statistical [modality]`
@@ -60,7 +115,9 @@ if thin.
 5. Pitfalls: `[concern] mistakes pitfalls leakage [domain]`
 
 Queries must be distinct angles, not paraphrases of one string.
-If a domain is known, bake it into the queries.
+Bake abstracted domain/task, not the table name.
+
+Then fetch → verify → follow-up if thin → ranked lane table.
 
 ## Corroboration
 
@@ -74,8 +131,8 @@ If a domain is known, bake it into the queries.
 
 ## Lanes
 
-Depth notes only. Every candidate row gets one lane. Callers
-distill; do not guess.
+Every candidate / extra row gets one lane. Callers distill;
+do not guess.
 
 | Lane | Meaning |
 |---|---|
@@ -91,6 +148,10 @@ summarizes it; do not paste it wholesale into chat.
 
 ```markdown
 ## Research: <concern in one line>
+
+### Plan
+- Problem class: ... (no dataset name)
+- Query type: straightforward | breadth-first | depth-first
 
 ### Context
 - Stage: data_analysis | model

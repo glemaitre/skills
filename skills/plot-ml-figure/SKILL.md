@@ -37,10 +37,12 @@ Details: `references/when.md`.
 3. If the plot is **statistical** on a tidy DataFrame (distribution,
    categorical compare, relationship, heatmap, pairplot, facet):
    seaborn figure-level when a notebook will display it
-   (`displot`, `relplot`, `catplot`, `pairplot`, `heatmap` via
+   (   `displot`, `relplot`, `catplot`, `pairplot`, `heatmap` via
    `FacetGrid` / axes only if already on a grid). Not a
-   `plt.subplots` loop. Save PNG, leave the figure/grid as the
-   last expression. Never `plt.close`.
+   `plt.subplots` loop and not a `for` over columns with a
+   trailing `g`. One figure-level call as the last expression;
+   facet with `col=` / `col_wrap`. Save PNG, leave the
+   figure/grid as the last expression. Never `plt.close`.
 4. If it is a **simple** Series/DataFrame `bar` / `line` / `hist` /
    `area` from the index or a few columns, no statistical overlay:
    `df.plot(...)`. Save the figure (`ax.figure.savefig(...)`),

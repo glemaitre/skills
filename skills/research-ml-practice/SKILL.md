@@ -2,20 +2,22 @@
 name: research-ml-practice
 description: >
   Literature and web research for an ML methodology concern
-  (EDA interpretation, leakage, transforms, feature engineering,
-  learner family), or an open survey that proposes concerns.
-  Trigger when explore-ml-data or build-ml-pipeline load this
-  skill. Not for routine profiling or a single API signature —
-  use `api get` for symbols. Not a session owner — callers
+  (EDA extra measurements, leakage, transforms, feature
+  engineering, learner family), or an EDA extra-analysis
+  survey from JOURNAL plus existing EDA. Trigger when
+  explore-ml-data or build-ml-pipeline load this skill. Not
+  for routine profiling or a single API signature — use
+  `api get` for symbols. Not a session owner — callers
   distill and write project files.
 
   HOW TO USE: skip intake fields the caller already supplied.
-  Mode survey or a named concern; search distinct angles in
-  parallel, read primary sources, write `scratch/research/`
-  (`survey-<slug>.md` or a lane-tagged depth note). Return the
-  path plus one or two sentences to the caller. Never mutate
-  raw data, pick the final learner, or write
-  `data_analysis.md` / the design note.
+  Abstract the problem class before searching (never the
+  dataset proper name). Survey extra analyses or depth a named
+  concern; search distinct angles, fetch primary sources,
+  follow up if thin, write `scratch/research/`. Return the
+  path plus one or two sentences. Never mutate raw data, pick
+  the final learner, or write `data_analysis.md` / the design
+  note.
 ---
 
 # Research ML Practice
@@ -29,24 +31,29 @@ summary. Do not `git end-turn`.
    obvious; use a stated domain and stage (`data_analysis` |
    `model`) if the caller named them. Then pick a mode
    (`references/search.md`):
-   - Caller passed a **named concern** → **depth**. Do not
-     re-ask. Do not run a survey first.
-   - Caller passed **mode survey** (open research) → **survey**.
-     Do not ask for a concern first.
-   - Neither → **AskUserQuestion** one pick, none recommended:
-     survey first vs I will name a concern. Do **not** offer
-     EDA Open questions as a closed concern menu. Do **not**
-     start a **depth** search with an empty concern. If they
-     will name it, wait for the concern then depth.
-2. Run searches for that mode (`references/search.md`). Fetch
-   primary pages for any modelling claim — not snippets.
-3. Write `scratch/research/` using the matching template
+   - Caller passed a **named concern** (not the canned EDA
+     extra-analysis question) → **depth**. Do not re-ask. Do
+     not run the canned survey first.
+   - Caller passed the **canned extra-analysis survey** or
+     “survey extra analyses” → **survey**.
+   - Neither → if JOURNAL and an EDA report exist, run the
+     canned survey; else **AskUserQuestion** for a named
+     concern. Do not start a **depth** search with an empty
+     concern.
+2. **Abstract the problem class** before any query
+   (`references/search.md`). JOURNAL and EDA are context, not
+   the answer list and not search keywords for the table’s
+   proper name.
+3. Run the matching search loop (`references/search.md`).
+   Fetch primary pages. Follow up per promising extra if the
+   first pass is thin or single-sourced.
+4. Write `scratch/research/` using the matching template
    (survey: `survey-<slug>.md`; depth: `<slug>.md` with lanes).
    Gitignored.
-4. Return to the caller: scratch path and a one- or two-sentence
+5. Return to the caller: scratch path and a one- or two-sentence
    finding. Do not dump the full note in chat. Do not write
    `data_analysis.md`, the design note, or `data/`. The caller
-   asks which survey concerns to deepen.
+   asks which extras to add.
 
 ## Stop conditions
 
@@ -59,5 +66,10 @@ summary. Do not `git end-turn`.
 - Do not run `api get` as a substitute for literature (symbols
   still go through `api get` in the caller).
 - Missing skill from a caller → that caller one-line skips.
-- Do not turn Open questions / EDA findings into search queries
-  or a concern board. Survey proposes concerns from sources.
+- Do not copy Open questions / EDA findings onto the extras
+  list without a source.
+- Do not search the dataset proper name, `sklearn.datasets`,
+  a Kaggle slug, or “baseline pipeline”. Do not return
+  learners / `Pipeline` steps as EDA extras.
+- Never answer from memory when search ran. Do not ask the
+  user to go look something up.

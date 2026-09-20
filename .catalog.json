@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "094d6e877ada02dc4de650915774ff37fe2a759954d5370496ff5dd7a9fd7894",
+  "catalog_hash": "90e25f14ae5ada9eb94b0a38903b064559c1f5b5c7d0097eca6fe183e8223b0d",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "e765d1500e77a7fd4d763fdec6ad631e50cf7ca30c59acd6524d83300456e6aa"
+      "hash": "0268aa13fe2e15cdfb15aaef8fdf5e634b7770d6ef5371416eeabf2bc5d7b442"
     },
     {
       "id": "build-ml-pipeline",
@@ -156,7 +156,7 @@
       "summary": "Pick pandas, seaborn, plotly, or matplotlib before writing figure code.",
       "category": "action",
       "subcategory": null,
-      "hash": "1fa26235fcea0d4dcf5d5c93352c0fcb0d643f482144749f96c6dee716cbdb45"
+      "hash": "c8c3642733622dff277c444d00bc8c739cbc5e9e91c67f17084252f3172941ba"
     },
     {
       "id": "research-ml-practice",
@@ -165,7 +165,7 @@
       "summary": "Literature research for an ML methodology concern.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "e72c03e3e2849d0a8038ffb3fa52a864e370f420d1ab02a69130b751b3cb4176"
+      "hash": "0cd4d862ff7bfc4c781a24b0a5264d35c56220283c2b25ae7e4e031de9031c5c"
     },
     {
       "id": "add-python-package",

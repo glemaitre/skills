@@ -112,6 +112,8 @@
 - Include duplicate, target-distribution, bivariate-vs-target, and
   leakage cells (not TableReport dtypes/histograms/associations).
 - Embed or link that HTML from `data_analysis/data_analysis.md`.
+- Embed every saved PNG/HTML from extras in Modelling
+  implications, each with a sentence citing extras/JSON numbers.
 - Put `TableReport.json()` under `scratch/data_analysis/<table>.json`
   and extras under `scratch/data_analysis/extras.json`.
 
@@ -121,6 +123,7 @@
 - Write HTML under `data/`.
 - Modify the user's raw data files.
 - Train/test split or install sklearn unless extras were requested.
+- Leave a saved figure unembedded in `data_analysis.md`.
 
 ---
 
@@ -250,7 +253,9 @@
   leakage cells in `data_analysis/data_analysis.py` for
   **regression only**.
 - Use seaborn figure-level plots (`displot` / `relplot`); save
-  PNGs and leave figures as cell output.
+  ONGs and leave figures as cell output. Feature-vs-target is
+  one faceted `relplot` (`bivariate_grid.png`), last expression
+  `g`.
 - After `data_analysis.md`, AskUserQuestion keep exploring vs
   close (neither option recommended or preselected).
 
@@ -264,6 +269,7 @@
   `if TARGET is None`) in the notebook.
 - Call `plt.close` or `import matplotlib.pyplot` for these
   figures.
+- Loop over columns with a trailing `g` (that is not displayed).
 
 ---
 
@@ -342,8 +348,8 @@
 - User picks **Keep exploring the data**.
 
 **Must do:**
-- AskUserQuestion extras / named concern / open research
-  (survey first) / describe what to plot. None recommended.
+- AskUserQuestion more standard extra analysis / research
+  extra analysis / describe what to plot. None recommended.
 - Stay in `explore-ml-data`.
 
 **Must NOT do:**
@@ -359,12 +365,14 @@
 > Is 0.97 correlation with the target leakage?
 
 **Assumed workspace state:**
-- EDA markdown exists. User picked Keep exploring, then Research
-  this concern.
+- EDA markdown exists. User picked Keep exploring, then
+  Research extra analysis. The prompt already names a
+  leakage concern.
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**
-- Load `research-ml-practice`.
+- Load `research-ml-practice` with the named leakage concern
+  (skip the canned extra-analysis survey).
 - Summarize the scratch note in chat (what is happening + why
   it matters here).
 - AskUserQuestion `allow_multiple` on `measure` rows only.
@@ -390,9 +398,9 @@
 
 **Must do:**
 - One-line skip that `research-ml-practice` is not installed.
-- Stay in the keep-exploring menu (re-ask extras / named
-  concern / open research / describe what to plot, or keep vs
-  close).
+- Stay in the keep-exploring menu (re-ask more standard extra
+  analysis / research extra analysis / describe what to plot,
+  or keep vs close).
 
 **Must NOT do:**
 - Invent papers or leakage thresholds from memory.
@@ -415,7 +423,8 @@
 **Must do:**
 - Skip G-DATA-ANALYSIS; do not overwrite
   `data_analysis/data_analysis.py`.
-- Load `research-ml-practice` (Keep exploring § named concern).
+- Load `research-ml-practice` (Keep exploring § research,
+  named concern — skip the canned extra-analysis survey).
 - Summarize the scratch note in chat.
 
 **Must NOT do:**
@@ -447,27 +456,32 @@
 
 ---
 
-## CASE_20 — Open research surveys before a concern board
+## CASE_20 — Research extra analysis uses the problem class
 
 **User prompt:**
-> Keep exploring. Survey the literature for this table.
+> Keep exploring. Research extra analyses for this table.
 
 **Assumed workspace state:**
 - `data_analysis/data_analysis.md` exists with Open questions.
-- User picked **Keep exploring**, then **Open research**.
+- JOURNAL names California housing / MedHouseVal.
+- User picked **Keep exploring**, then **Research extra
+  analysis**.
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**
-- Load `research-ml-practice` with mode survey (no named
-  concern).
+- Load `research-ml-practice` with the canned JOURNAL+EDA
+  extra-measurement question (problem class, not the dataset
+  proper name).
 - Read `scratch/research/survey-<slug>.md`.
 - AskUserQuestion `allow_multiple` (unchecked) on **only**
-  that note’s proposed concerns.
+  sourced **`measure`** extras from that note.
 
 **Must NOT do:**
-- Build the concern board from Open questions before the
-  survey.
-- Write a ranked `measure` / `declare` action table in the
-  survey note.
+- Search `california_housing`, `sklearn.datasets`, or a
+  sklearn fetcher name.
+- Offer pipeline / learner / `GridSearch` extras on the EDA
+  board.
+- Copy Open questions onto the board without a source.
+- Write a ranked pipeline action table in the survey note.
 - Run `git end-turn` in this pass.
 - Name `Close` as recommended on keep vs close.

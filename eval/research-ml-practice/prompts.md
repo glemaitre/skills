@@ -8,17 +8,15 @@
 > Research this for me.
 
 **Assumed workspace state:**
-- Caller did not supply a concern or mode survey.
-- JOURNAL names no specific question.
+- Caller did not supply a concern or the canned extra-analysis
+  survey.
+- No JOURNAL and no EDA report.
 
 **Must do:**
-- AskUserQuestion survey first vs I will name a concern
-  (neither recommended).
+- AskUserQuestion for a named concern.
 
 **Must NOT do:**
 - Start a depth web search with an empty concern.
-- Offer EDA Open questions as a closed concern menu as if
-  they were literature.
 - Drop a column or rewrite raw data.
 
 ---
@@ -35,6 +33,8 @@
 **Must do:**
 - Run distinct-angle **depth** searches (practice, implementation,
   pitfalls at least).
+- Abstract the problem class; do not query a dataset proper
+  name.
 - Tag each candidate with a lane (`measure` / `declare` /
   `evaluate` / `confirm`).
 - Write `scratch/research/<slug>.md`.
@@ -43,7 +43,7 @@
 
 **Must NOT do:**
 - Re-ask domain and concern.
-- Run a survey first.
+- Run the canned extra-analysis survey first.
 - Drop the correlated column.
 - Run `pixi add` / `uv add`.
 - Write `data_analysis.md` or the design note.
@@ -71,26 +71,35 @@
 
 ---
 
-## CASE_04 — Open survey proposes concerns
+## CASE_04 — Extra-analysis survey abstracts the toy table
 
 **User prompt:**
-> Survey the literature for this real-estate regression table.
-> Do not pick a concern yet.
+> Given the kind of problem in JOURNAL and the kinds of
+> structure already seen in EDA, what extra measurements on a
+> raw table like this are still worth doing?
 
 **Assumed workspace state:**
-- Caller passed mode survey (or equivalent open research).
-- No named concern.
+- Caller passed the canned extra-analysis survey.
+- JOURNAL names California housing and target MedHouseVal.
+- `data_analysis/data_analysis.md` records a top-coded target
+  and lat/lon columns.
 
 **Must do:**
-- Run survey-angle searches (practice, pitfalls, what to
-  check) without a named concern.
+- Rewrite the problem class (e.g. continuous housing-value
+  regression, top-coded target, rounded lat/lon) before
+  searching.
+- Run wide-net survey searches on phenomena / domain / EDA
+  extras; follow up if a promising measure is thin.
 - Write `scratch/research/survey-<slug>.md` with sourced
-  proposed concerns.
+  extras and lanes (prefer `measure`).
 - Return the path and a one- or two-sentence finding.
 
 **Must NOT do:**
-- Write a ranked `measure` / `declare` action table in that
-  note.
-- Offer Open questions as the concern list before searching.
+- Query `california_housing`, `sklearn.datasets`, or a
+  sklearn fetcher.
+- Return sklearn `Pipeline` / estimator / `GridSearch` steps
+  as EDA extras.
+- Write a ranked pipeline action table in that note.
+- Copy unsourced Open questions as the extras list.
 - Write `data_analysis.md` or the design note.
 - Paste the full scratch note into chat.

@@ -22,6 +22,7 @@
 - Use plotly for this PNG.
 - Load `choose-python-library` for matplotlib vs seaborn vs plotly.
 - Call `plt.close`.
+- Loop over columns with a trailing `g`.
 
 ---
 
