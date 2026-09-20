@@ -47,12 +47,12 @@ them, and a JOURNAL index row.
 |---|---|
 | raw data (anywhere) | User-owned, **read-only** |
 | `data_analysis/data_analysis.py` | Human notebook — TableReport + ML-gap cells |
-| `data_analysis/data_analysis_<table>.html` | Human — TableReport page, embedded from `data_analysis.md` |
+| `data_analysis/data_analysis_<slug>.html` | Human — TableReport page, one per family |
 | `data_analysis/*.png` | Human — figures for implications, never glance |
 | `data_analysis/<slug>.html` | Human — Plotly (or other) HTML, iframe in implications |
 | `data_analysis/data_analysis.md` | Human + later modelling — TableReport iframes, implications |
-| `scratch/data_analysis/<table>.json` | Agent — `TableReport.json()`; gitignored |
-| `scratch/data_analysis/extras.json` | Agent — duplicates, target, leakage, png and html paths |
+| `scratch/data_analysis/<slug>.json` | Agent — `TableReport.json()` per family; gitignored |
+| `scratch/data_analysis/extras.json` | Agent — `tables[]`, target, leakage, png and html paths |
 | JOURNAL § Data understanding | Index: status, 2–4 line summary, link |
 
 TableReport owns dtypes, missingness, univariate distributions,
@@ -96,11 +96,19 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   "no target yet"). Decline → `<TARGET>=None`, `<TASK>=none`;
   still run duplicates. Do not persist a policy key.
 - **No train/test split.** Splitter choice is a later gate.
-  Leakage cells are qualitative flags on the raw table.
+  Leakage cells are qualitative flags on the raw family that
+  holds the target. Do not persist a joined modeling table.
+- **Families before the notebook.** More than one data file →
+  AskUserQuestion grouping (none recommended): Use a proposed
+  grouping / Profile every file separately / I will describe
+  the grouping. Propose clusters from extension, name pattern,
+  or a header/schema peek; generic slugs (`family_a`). Do not
+  silent-concat or invent families. One file → skip this ask.
 - **`api get` this turn** for symbols used (cache hits count).
   `TableReport.json()` keys drift — `.get(...)`.
-- **One `data_analysis/data_analysis.py`.** Repeat the TableReport
-  cell per table. Re-run overwrites in place.
+- **One `data_analysis/data_analysis.py`.** Repeat the
+  TableReport cell per confirmed family (or per file if the
+  user picked that). Re-run overwrites in place.
 - **Do not design the model.** Implications in
   `data_analysis.md` only.
 - Do not gitignore `data_analysis/`. Ignore specific raw patterns
@@ -113,11 +121,13 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 - [ ] G-DATA-ANALYSIS: run | skip (skip → JOURNAL only, STOP)
 - [ ] G-TABULAR + add frame lib + skrub + matplotlib + seaborn
 - [ ] Target: inferred | AskUserQuestion | none
+- [ ] Families: one file | AskUserQuestion grouping
 - [ ] IPython available or add-python-package
 - [ ] Load plot-ml-figure if installed; place
       data_analysis/data_analysis.py from the template (edit to
       the live path); cells run
-- [ ] scratch/data_analysis/facts.py → <table>.json + extras.json
+- [ ] scratch/data_analysis/facts.py → <slug>.json per family
+      + extras.json
 - [ ] Author data_analysis.md + JOURNAL
 - [ ] AskUserQuestion keep exploring vs close (skip if user
       already closed the turn)
@@ -129,29 +139,38 @@ evidence. End of turn only after Close.
 ## Procedure (run path)
 
 1. Resolve `<TARGET>` / `<TASK>` (`classification` | `regression`
-   | `none`) first. Copy `templates/data_analysis.py` if it fits,
-   then **edit** — do not paste unused branches. Substitute
-   `<pkg>`, `<LOAD_RAW_DATA>`, `<table>`. Append
+   | `none`) first. Resolve families (stop condition above).
+   Copy `templates/data_analysis.py` if it fits, then **edit**
+   — do not paste unused branches. The first family is the one
+   that contains `<TARGET>` when a target exists; substitute
+   `<pkg>`, `<LOAD_RAW_DATA>` (in-memory concat of that family's
+   shards; optional `_source_file`), `<slug>` (Python
+   identifier). Each further family → `templates/family.py` (`<OTHER_SLUG>`,
+   `<LOAD_OTHER>`). Append
    `templates/target_regression.py` **or**
-   `templates/target_classification.py` (set `TARGET` / `TASK` in
-   the load cell). No target → neither snippet, no `TARGET` /
-   `TASK` lines. Datetime columns → `templates/datetime.py` (drop
-   the relplot cell if there is no numeric target). A second table
-   on disk → `templates/drift.py` with `<OTHER_FRAME>`. Generated
-   notebook must not contain `if TARGET`, `if TASK`,
-   `OTHER = None`, empty datetime loops, or “skip this cell”.
-   Load `plot-ml-figure` if installed **before** writing figure
-   cells (including this first write). Markdown is about **this**
-   analysis. `python -m skore_skills style` after the write.
+   `templates/target_classification.py` (set `TARGET` / `TASK`
+   in the first-family load cell). No target → neither snippet,
+   no `TARGET` / `TASK` lines. Datetime columns on a family →
+   `templates/datetime.py` for that family (drop the relplot
+   cell if there is no numeric target). Two families that share
+   column names → `templates/drift.py` with `<OTHER_FRAME>`.
+   Disjoint schemas → no drift on the default pass. Do not
+   append join-coverage cells here. Generated notebook must
+   not contain `if TARGET`, `if TASK`, `OTHER = None`, empty
+   datetime loops, or “skip this cell”. Load `plot-ml-figure`
+   if installed **before** writing figure cells (including this
+   first write). Markdown is about **this** analysis.
+   `python -m skore_skills style` after the write.
 2. `python -m skore_skills cells run
    data_analysis/data_analysis.py` — writes HTML and PNGs. A
    useless TableReport `repr` in the digest is expected.
 3. Copy `templates/facts.py` → `scratch/data_analysis/facts.py`
-   with the same load and target; run it; read
-   `scratch/data_analysis/<table>.json` and `extras.json`.
+   with the same families and target; run it; read
+   `scratch/data_analysis/<slug>.json` (each family) and
+   `extras.json`.
 4. Write `data_analysis/data_analysis.md` from
-   `templates/data_analysis.md`: glance (one iframe per table and
-   nothing else), modelling implications (include
+   `templates/data_analysis.md`: glance (one iframe per family
+   and nothing else), modelling implications (include
    feature-engineering *candidates*), open questions. Reports
    and figures are embedded, not linked; `![](<name>.png)` or an
    HTML iframe (`<iframe src="<slug>.html" …>`) sits beside the
@@ -205,7 +224,7 @@ No convert, no site build, no `git end-turn`.
 
    | Label | Subtitle |
    |---|---|
-   | Choose additional pre-defined option | Name only items that apply: interactions / pairplot, PCA, hypothesis tests, subgroup, time-series, text or geo |
+   | Choose additional pre-defined option | Name only items that apply: interactions / pairplot, PCA, hypothesis tests, subgroup, time-series, text or geo, join keys / coverage (2+ families) |
    | Provide a query to extend the exploration | Describe an analysis to add to the notebook (table, test, or plot) |
    | Automatic exploration related to the data and problem | Do in-depth research related to the problem and data that we are exploring |
    | Describe a plot | You name a chart and I add cells for it |

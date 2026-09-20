@@ -3,6 +3,7 @@
 #
 # Light checks only — ADF / ACF / seasonal decomposition are extras.
 # Include the relplot only when TARGET is numeric.
+# For a further family, copy this block and use FRAME_<OTHER_SLUG>.
 
 # %%
 datetime_cols = list(FRAME.select_dtypes(include=["datetime", "datetimetz"]).columns)

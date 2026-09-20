@@ -75,15 +75,15 @@
       "id": 5,
       "title": "Human notebook vs agent scratch",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`. Skrub, IPython,\n  matplotlib, and seaborn are installed.\n- JOURNAL names target `MedHouseVal` (regression).\n- Raw data path is known.\n- User chose **run** for G-DATA-ANALYSIS.]\n\nExplore the dataset. Write the TableReport HTML next to the EDA\nscript.",
-      "expected_output": "Behavioural response satisfying: - Write `data_analysis/data_analysis_<table>.html` (not under `data/`). - End overview cells on `TableReport` (or the frame), not on a json/dict digest. - Include duplicate, target-distribution, bivariate-vs-target, and leakage cells (not TableReport dtypes/histograms/associations). It must NOT: - Put unique-ratio / column-dict / `report.json()` cells in `data_analysis/data_analysis.py`. - Write HTML under `data/`. - Modify the user's raw data files.",
+      "expected_output": "Behavioural response satisfying: - Write `data_analysis/data_analysis_<slug>.html` (not under `data/`). - End overview cells on `TableReport` (or the frame), not on a json/dict digest. - Include duplicate, target-distribution, bivariate-vs-target, and leakage cells (not TableReport dtypes/histograms/associations). It must NOT: - Put unique-ratio / column-dict / `report.json()` cells in `data_analysis/data_analysis.py`. - Write HTML under `data/`. - Modify the user's raw data files.",
       "files": [],
       "expectations": [
-        "Write `data_analysis/data_analysis_<table>.html` (not under `data/`).",
+        "Write `data_analysis/data_analysis_<slug>.html` (not under `data/`).",
         "End overview cells on `TableReport` (or the frame), not on a json/dict digest.",
         "Include duplicate, target-distribution, bivariate-vs-target, and leakage cells (not TableReport dtypes/histograms/associations).",
         "Embed or link that HTML from `data_analysis/data_analysis.md`.",
         "Embed every saved PNG/HTML from extras in Modelling implications, each with a sentence citing extras/JSON numbers.",
-        "Put `TableReport.json()` under `scratch/data_analysis/<table>.json` and extras under `scratch/data_analysis/extras.json`.",
+        "Put `TableReport.json()` under `scratch/data_analysis/<slug>.json` and extras under `scratch/data_analysis/extras.json`.",
         "The response does NOT: Put unique-ratio / column-dict / `report.json()` cells in `data_analysis/data_analysis.py`.",
         "The response does NOT: Write HTML under `data/`.",
         "The response does NOT: Modify the user's raw data files.",
@@ -192,7 +192,8 @@
         "The response does NOT: Run `git end-turn` before the user picks Close.",
         "The response does NOT: Leave classification / no-target branches (`if TASK`, `if TARGET is None`) in the notebook.",
         "The response does NOT: Call `plt.close` or `import matplotlib.pyplot` for these figures.",
-        "The response does NOT: Loop over columns with a trailing `g` (that is not displayed)."
+        "The response does NOT: Loop over columns with a trailing `g` (that is not displayed).",
+        "The response does NOT: AskUserQuestion grouping when only one data file is in play."
       ],
       "tools": false,
       "sandbox": [],
@@ -350,6 +351,76 @@
         "The response does NOT: Write a ranked pipeline action table in the survey note.",
         "The response does NOT: Run `git end-turn` in this pass.",
         "The response does NOT: Name `Close` as recommended on keep vs close."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 21,
+      "title": "Multiple files ask grouping before the notebook",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available. `add-python-package` is installed.\n- Raw files: `data/a_1.csv`, `data/a_2.csv`, `data/b.parquet`.\n- Families are not yet confirmed.]\n\nExplore the data. Target is y.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion grouping (none recommended): Use a proposed grouping / Profile every file separately / I will describe the grouping \u2014 before placing `data_analysis/data_analysis.py`. It must NOT: - Silent-concat files or invent families. - Write a joined frame to disk. - Append join-coverage cells on the default pass.",
+      "files": [],
+      "expectations": [
+        "AskUserQuestion grouping (none recommended): Use a proposed grouping / Profile every file separately / I will describe the grouping \u2014 before placing `data_analysis/data_analysis.py`.",
+        "The response does NOT: Silent-concat files or invent families.",
+        "The response does NOT: Write a joined frame to disk.",
+        "The response does NOT: Append join-coverage cells on the default pass.",
+        "The response does NOT: Place `data_analysis/data_analysis.py` before grouping is confirmed."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 22,
+      "title": "Two confirmed families, default pass",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available. `plot-ml-figure` is installed.\n- Raw files: `data/a_1.csv`, `data/a_2.csv`, `data/b.parquet`.\n- User confirmed families: `family_a` is `data/a_1.csv` and\n  `data/a_2.csv` (columns `id`, `y`); `family_b` is\n  `data/b.parquet` (columns `id`, `z`).]\n\nExplore the data. Target is y.",
+      "expected_output": "Behavioural response satisfying: - Write a TableReport cell and HTML per family (`data_analysis_family_a.html`, `data_analysis_family_b.html`). - Embed one glance iframe per family in `data_analysis/data_analysis.md`. - Put target-distribution, bivariate, and leakage cells only on `family_a`. It must NOT: - Append join-coverage cells on the default pass. - Install sklearn, skore, or pytest. - Write a joined frame to disk.",
+      "files": [],
+      "expectations": [
+        "Write a TableReport cell and HTML per family (`data_analysis_family_a.html`, `data_analysis_family_b.html`).",
+        "Embed one glance iframe per family in `data_analysis/data_analysis.md`.",
+        "Put target-distribution, bivariate, and leakage cells only on `family_a`.",
+        "Append `templates/drift.py` (shared column names).",
+        "Write `scratch/data_analysis/family_a.json`, `scratch/data_analysis/family_b.json`, and `extras.json` with `tables[]`.",
+        "The response does NOT: Append join-coverage cells on the default pass.",
+        "The response does NOT: Install sklearn, skore, or pytest.",
+        "The response does NOT: Write a joined frame to disk.",
+        "The response does NOT: Put target/bivariate/leakage cells on `family_b`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 23,
+      "title": "Keep exploring join keys / coverage",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Two families are already in `data_analysis/data_analysis.py`\n  (`family_a` with `id`, `y`; `family_b` with `id`, `z`).\n- `data_analysis/data_analysis.md` exists.\n- User picked **Keep exploring**, then **Choose additional\n  pre-defined option**, then **Join keys / coverage**.]\n\nKeep exploring. Add join keys / coverage.",
+      "expected_output": "Behavioural response satisfying: - Append `templates/join_coverage.py` (shared columns and unmatched counts on `id`). - Refresh facts and rewrite `data_analysis.md` from results. It must NOT: - Write a joined frame to disk. - Replace `FRAME` with the merge or add a TableReport on the join. - Run `git end-turn` in this keep-exploring pass.",
+      "files": [],
+      "expectations": [
+        "Append `templates/join_coverage.py` (shared columns and unmatched counts on `id`).",
+        "Refresh facts and rewrite `data_analysis.md` from results.",
+        "The response does NOT: Write a joined frame to disk.",
+        "The response does NOT: Replace `FRAME` with the merge or add a TableReport on the join.",
+        "The response does NOT: Run `git end-turn` in this keep-exploring pass."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 24,
+      "title": "Single file skips grouping",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available.\n- One raw file: `data/a.csv` (columns `id`, `y`).]\n\nExplore the data. Target is y.",
+      "expected_output": "Behavioural response satisfying: - Write `data_analysis/data_analysis.py` without an AskUserQuestion grouping board. It must NOT: - AskUserQuestion grouping (Use a proposed grouping / Profile every file separately / I will describe the grouping). - Append join-coverage cells.",
+      "files": [],
+      "expectations": [
+        "Write `data_analysis/data_analysis.py` without an AskUserQuestion grouping board.",
+        "The response does NOT: AskUserQuestion grouping (Use a proposed grouping / Profile every file separately / I will describe the grouping).",
+        "The response does NOT: Append join-coverage cells."
       ],
       "tools": false,
       "sandbox": [],

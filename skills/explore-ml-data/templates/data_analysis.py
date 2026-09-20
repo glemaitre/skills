@@ -25,8 +25,8 @@ RAW
 # Column types, missingness, cardinality, and pairwise associations.
 
 # %%
-report = skrub.TableReport(RAW, title="<table>", verbose=0)
-report.write_html(OUT / "data_analysis_<table>.html")
+report = skrub.TableReport(RAW, title="<slug>", verbose=0)
+report.write_html(OUT / "data_analysis_<slug>.html")
 report
 
 # %% [markdown]

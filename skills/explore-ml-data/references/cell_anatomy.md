@@ -10,20 +10,24 @@ Markdown cells describe **this dataset's analysis**, not the repo.
 Last expressions are rich objects or small summary frames: the
 frame (`RAW`), `skrub.TableReport(...)`, duplicate/target/leakage
 tables, bivariate column lists, **and live figures**. `write_html`
-saves `data_analysis/data_analysis_<table>.html` for
+saves `data_analysis/data_analysis_<slug>.html` for
 `data_analysis.md` to embed. Saved figures are PNG siblings under
-`data_analysis/`, or Plotly HTML siblings (`<slug>.html`, never
-`data_analysis_<table>.html`). Do not put `json()`, dict dumps of TableReport,
+`data_analysis/`, or Plotly HTML siblings (`<plot_slug>.html`, never
+`data_analysis_<slug>.html`). Do not put `json()`, dict dumps of TableReport,
 or analyses TableReport already covers (dtypes, missingness,
 cardinality, univariate histograms, pairwise associations).
 
 Start from `templates/data_analysis.py` if it fits, then **edit**.
-Append `templates/target_regression.py` or
+The first family holds `<TARGET>` when a target exists. Each
+further family: `templates/family.py`. Append
+`templates/target_regression.py` or
 `templates/target_classification.py` after the target is known;
 append `templates/datetime.py` / `templates/drift.py` only when
-those data exist. Do not leave `if TARGET` / `if TASK` /
-`OTHER = None` / empty datetime loops / “skip this cell” in the
-notebook. Load `plot-ml-figure` before figure cells. Save each
+those data exist (datetime per family; drift only when two
+families share column names). Join coverage is Keep exploring
+only (`templates/join_coverage.py`). Do not leave `if TARGET` /
+`if TASK` / `OTHER = None` / empty datetime loops / “skip this
+cell” in the notebook. Load `plot-ml-figure` before figure cells. Save each
 PNG, then leave the figure/grid as the cell output — never
 `plt.close`. Prefer seaborn figure-level (`displot`, `relplot`,
 `catplot`, `pairplot`); do not `import matplotlib.pyplot` on the
@@ -38,21 +42,21 @@ put TableReport dicts back in the notebook to feed the agent.
 ## Agent — `scratch/data_analysis/facts.py`
 
 Copy `templates/facts.py` to `scratch/data_analysis/facts.py`
-(gitignored). Reuse the same `<LOAD_RAW_DATA>`, `<TARGET>`,
-`<TASK>`. Build `TableReport(..., plot_distributions=False)` and
-write `scratch/data_analysis/<table>.json` from `report.json()` so
+(gitignored). Reuse the same families, `<TARGET>`, `<TASK>`.
+Build `TableReport(..., plot_distributions=False)` per family and
+write `scratch/data_analysis/<slug>.json` from `report.json()` so
 that snapshot has statistics, not SVG. Also write
-`scratch/data_analysis/extras.json` (duplicates, target, top
+`scratch/data_analysis/extras.json` (`tables[]`, target, top
 feature–target correlations, leakage flags, png and html paths). Confirm
-keys with `api get`; parse both JSON files with `.get(...)`. If
-`data_analysis/data_analysis_<table>.html` is missing, `write_html`
+keys with `api get`; parse JSON files with `.get(...)`. If
+`data_analysis/data_analysis_<slug>.html` is missing, `write_html`
 from a **plotting** TableReport — do not dump that report to JSON.
 
-Author `data_analysis/data_analysis.md` from both JSON files plus
-the HTML. The glance section is one iframe per table and nothing
+Author `data_analysis/data_analysis.md` from those JSON files plus
+the HTML. The glance section is one iframe per family and nothing
 else — no bullets restating the report. Every path in
 `extras["pngs"]` and `extras["htmls"]` is embedded in Modelling
-implications (`![](<name>.png)` or `<iframe src="<slug>.html">`)
+implications (`![](<name>.png)` or `<iframe src="<plot_slug>.html">`)
 beside a sentence that cites numbers from those JSON files (or a
 summary table from the notebook). If a figure earns no such
 sentence, do not save it — no orphan files under `data_analysis/`.
@@ -65,8 +69,10 @@ Extra cells after the user picks extras: `references/extra_analyses.md`.
 | Placeholder | Where |
 |---|---|
 | `<pkg>` | `from <pkg> import PROJECT_ROOT` |
-| `<LOAD_RAW_DATA>` | pandas/polars load; convert to pandas for seaborn cells |
-| `<table>` | slug for `data_analysis_<table>.html` and `<table>.json` |
+| `<LOAD_RAW_DATA>` | first family; pandas/polars load; in-memory concat of shards; convert to pandas for seaborn cells |
+| `<slug>` | Python identifier; `data_analysis_<slug>.html` and `<slug>.json` |
+| `<OTHER_SLUG>` / `<LOAD_OTHER>` | `templates/family.py` for each further family |
 | `<TARGET>` | `"column"` in the notebook load cell when a target exists; facts.py may use `None` |
 | `<TASK>` | `classification` \| `regression` \| `none` (facts.py; omit in the notebook when none) |
-| `<OTHER_FRAME>` | only in `templates/drift.py` when a second table is on disk |
+| `<OTHER_FRAME>` | `templates/drift.py` when two families share column names |
+| `<JOIN_KEY>` | `templates/join_coverage.py` (Keep exploring only) |

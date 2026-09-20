@@ -106,7 +106,7 @@
 - User chose **run** for G-DATA-ANALYSIS.
 
 **Must do:**
-- Write `data_analysis/data_analysis_<table>.html` (not under `data/`).
+- Write `data_analysis/data_analysis_<slug>.html` (not under `data/`).
 - End overview cells on `TableReport` (or the frame), not on a
   json/dict digest.
 - Include duplicate, target-distribution, bivariate-vs-target, and
@@ -114,7 +114,7 @@
 - Embed or link that HTML from `data_analysis/data_analysis.md`.
 - Embed every saved PNG/HTML from extras in Modelling
   implications, each with a sentence citing extras/JSON numbers.
-- Put `TableReport.json()` under `scratch/data_analysis/<table>.json`
+- Put `TableReport.json()` under `scratch/data_analysis/<slug>.json`
   and extras under `scratch/data_analysis/extras.json`.
 
 **Must NOT do:**
@@ -270,6 +270,7 @@
 - Call `plt.close` or `import matplotlib.pyplot` for these
   figures.
 - Loop over columns with a trailing `g` (that is not displayed).
+- AskUserQuestion grouping when only one data file is in play.
 
 ---
 
@@ -490,3 +491,110 @@
 - Write a ranked pipeline action table in the survey note.
 - Run `git end-turn` in this pass.
 - Name `Close` as recommended on keep vs close.
+
+---
+
+## CASE_21 — Multiple files ask grouping before the notebook
+
+**User prompt:**
+> Explore the data. Target is y.
+
+**Assumed workspace state:**
+- Scaffold exists. G-TABULAR is `pandas`.
+- User chose **run** for G-DATA-ANALYSIS.
+- IPython is available. `add-python-package` is installed.
+- Raw files: `data/a_1.csv`, `data/a_2.csv`, `data/b.parquet`.
+- Families are not yet confirmed.
+
+**Must do:**
+- AskUserQuestion grouping (none recommended): Use a proposed
+  grouping / Profile every file separately / I will describe
+  the grouping — before placing `data_analysis/data_analysis.py`.
+
+**Must NOT do:**
+- Silent-concat files or invent families.
+- Write a joined frame to disk.
+- Append join-coverage cells on the default pass.
+- Place `data_analysis/data_analysis.py` before grouping is
+  confirmed.
+
+---
+
+## CASE_22 — Two confirmed families, default pass
+
+**User prompt:**
+> Explore the data. Target is y.
+
+**Assumed workspace state:**
+- Scaffold exists. G-TABULAR is `pandas`.
+- User chose **run** for G-DATA-ANALYSIS.
+- IPython is available. `plot-ml-figure` is installed.
+- Raw files: `data/a_1.csv`, `data/a_2.csv`, `data/b.parquet`.
+- User confirmed families: `family_a` is `data/a_1.csv` and
+  `data/a_2.csv` (columns `id`, `y`); `family_b` is
+  `data/b.parquet` (columns `id`, `z`).
+
+**Must do:**
+- Write a TableReport cell and HTML per family
+  (`data_analysis_family_a.html`, `data_analysis_family_b.html`).
+- Embed one glance iframe per family in
+  `data_analysis/data_analysis.md`.
+- Put target-distribution, bivariate, and leakage cells only on
+  `family_a`.
+- Append `templates/drift.py` (shared column names).
+- Write `scratch/data_analysis/family_a.json`,
+  `scratch/data_analysis/family_b.json`, and `extras.json` with
+  `tables[]`.
+
+**Must NOT do:**
+- Append join-coverage cells on the default pass.
+- Install sklearn, skore, or pytest.
+- Write a joined frame to disk.
+- Put target/bivariate/leakage cells on `family_b`.
+
+---
+
+## CASE_23 — Keep exploring join keys / coverage
+
+**User prompt:**
+> Keep exploring. Add join keys / coverage.
+
+**Assumed workspace state:**
+- Two families are already in `data_analysis/data_analysis.py`
+  (`family_a` with `id`, `y`; `family_b` with `id`, `z`).
+- `data_analysis/data_analysis.md` exists.
+- User picked **Keep exploring**, then **Choose additional
+  pre-defined option**, then **Join keys / coverage**.
+
+**Must do:**
+- Append `templates/join_coverage.py` (shared columns and
+  unmatched counts on `id`).
+- Refresh facts and rewrite `data_analysis.md` from results.
+
+**Must NOT do:**
+- Write a joined frame to disk.
+- Replace `FRAME` with the merge or add a TableReport on the
+  join.
+- Run `git end-turn` in this keep-exploring pass.
+
+---
+
+## CASE_24 — Single file skips grouping
+
+**User prompt:**
+> Explore the data. Target is y.
+
+**Assumed workspace state:**
+- Scaffold exists. G-TABULAR is `pandas`.
+- User chose **run** for G-DATA-ANALYSIS.
+- IPython is available.
+- One raw file: `data/a.csv` (columns `id`, `y`).
+
+**Must do:**
+- Write `data_analysis/data_analysis.py` without an AskUserQuestion
+  grouping board.
+
+**Must NOT do:**
+- AskUserQuestion grouping (Use a proposed grouping / Profile
+  every file separately / I will describe the grouping).
+- Append join-coverage cells.

@@ -1,7 +1,8 @@
 # %% [markdown]
 # ## Second-frame drift
 #
-# A second table is already on disk. Do not invent a holdout split.
+# A second confirmed family that shares column names.
+# Do not invent a holdout split. Disjoint schemas: omit this file.
 
 # %%
 OTHER = <OTHER_FRAME>

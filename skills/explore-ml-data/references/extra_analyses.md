@@ -69,6 +69,21 @@ ACF/PACF via seaborn/statsmodels plot, save `acf.png`, last
 expression the figure. Additive seasonal decomposition only when
 the series is regular, same split (table vs figure cells).
 
+## Join keys / coverage
+
+Only if two or more confirmed families exist. No extra lib.
+
+Append `templates/join_coverage.py`. Substitute a real
+`<OTHER_SLUG>` and `<JOIN_KEY>` (a shared column). Drop the
+coverage cell if there is no candidate key. If both families
+have datetime columns, a further table cell: min/max and overlap
+of those columns — no empty datetime loop.
+
+Last expressions are the summary frames. In-memory diagnostic
+merge is allowed; do not write a joined frame to disk, do not
+replace `FRAME` with the merge, do not add a TableReport on the
+join. No figure unless it earns a sentence in `data_analysis.md`.
+
 ## Domain-specific
 
 Only if those dtypes exist. No extra lib unless needed.
