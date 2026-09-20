@@ -334,8 +334,6 @@
 
 **Must NOT do:**
 - Load `add-python-package` for sklearn / scipy / statsmodels.
-- Leave modelling implications empty of duplicate/target/leakage
-  findings.
 
 ---
 

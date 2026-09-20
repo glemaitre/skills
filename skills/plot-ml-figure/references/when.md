@@ -49,6 +49,8 @@ g
 ```
 
 Do not `import matplotlib.pyplot` for these. Do not `plt.close`.
+When the caller is explore, a correlation heatmap is
+TableReport’s job — do not `sns.heatmap` the association matrix.
 One figure-level call as the last expression. Facet with `col=` /
 `col_wrap` instead of a `for` over columns — a bare `g` inside a
 loop is not displayed.

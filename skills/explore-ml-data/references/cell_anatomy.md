@@ -15,7 +15,9 @@ saves `data_analysis/data_analysis_<slug>.html` for
 `data_analysis/`, or Plotly HTML siblings (`<plot_slug>.html`, never
 `data_analysis_<slug>.html`). Do not put `json()`, dict dumps of TableReport,
 or analyses TableReport already covers (dtypes, missingness,
-cardinality, univariate histograms, pairwise associations).
+cardinality, univariate histograms, pairwise associations,
+`sns.heatmap` of a correlation matrix). Do not add unique-ratio
+(`nunique()/n`) or column-dict cells.
 
 Start from `templates/data_analysis.py` if it fits, then **edit**.
 The first family holds `<TARGET>` when a target exists. Each
@@ -30,7 +32,9 @@ only (`templates/join_coverage.py`). Do not leave `if TARGET` /
 cell” in the notebook. Load `plot-ml-figure` before figure cells. Save each
 PNG, then leave the figure/grid as the cell output — never
 `plt.close`. Prefer seaborn figure-level (`displot`, `relplot`,
-`catplot`, `pairplot`); do not `import matplotlib.pyplot` on the
+`catplot`, `pairplot`); default target vs features is one
+faceted `relplot` saved as `bivariate_grid.png`, last
+expression `g`. Do not `import matplotlib.pyplot` on the
 normal path. One figure-level call per cell as the last
 expression; facet with `col=` / `col_wrap` instead of looping.
 A bare name inside a `for` loop is not displayed.

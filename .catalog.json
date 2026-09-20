@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "c45a013f663e6a0c5b1492c50e2caec90847af453e9d4927ae348098e31ef1b4",
+  "catalog_hash": "e62ee3a8529ec4b26d1410703408db5ad6276f3c5d933142d6871466114b5824",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "c0587df061ff8153054ca5f43d451f2308a3390ccabeca864099b5bd4e24b0e4"
+      "hash": "7862c5cc4b89bb67522a1a1446948c3b968870b49a78ba2d6099c702eb5df924"
     },
     {
       "id": "build-ml-pipeline",
@@ -102,7 +102,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "40d71bf937e2524b9932e34304102e39fdbf9bf2c69da4234ce2af53c8ada371"
+      "hash": "d5b3679d4b37531d1ecbd8b24a630c0de80e39d87cb34a7397eed7ab7f2d102a"
     },
     {
       "id": "setup-ml-project",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build, evaluation, and smoke testing.",
       "category": "meta",
       "subcategory": null,
-      "hash": "c5d66aed19a77afe6d438a52d2073ea19f71e686a9f1633bff6b6c642ff3135a"
+      "hash": "1a771162fa934e2d41800794f4bfc88c154bd605b416ad40ed8a81328d1c3cde"
     },
     {
       "id": "choose-python-library",
@@ -156,7 +156,7 @@
       "summary": "Pick pandas, seaborn, plotly, or matplotlib before writing figure code.",
       "category": "action",
       "subcategory": null,
-      "hash": "c8c3642733622dff277c444d00bc8c739cbc5e9e91c67f17084252f3172941ba"
+      "hash": "c81512f0dd35eebf69be73a204d2e7c2afa5bfce22ea48e3f811840273de29c3"
     },
     {
       "id": "research-ml-practice",
@@ -165,7 +165,7 @@
       "summary": "Literature research for an ML methodology concern.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "0cd4d862ff7bfc4c781a24b0a5264d35c56220283c2b25ae7e4e031de9031c5c"
+      "hash": "dc3b3649a83c5fa4e4f182cf4df78e9f3c87bd456d7aaf39ad82237b14e9f698"
     },
     {
       "id": "add-python-package",
@@ -201,7 +201,7 @@
       "summary": "Convert a jupytext percent file into an executed notebook.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "9ff4949bb1f8a8d796fd5ce9283c98cade12fa85253ccd191b0d7e6468e479fe"
+      "hash": "94ce843be2144897a8cc35328cfef16a9d40d65ac6dba22a7a6a70dca0928d4f"
     },
     {
       "id": "export-ml-site",

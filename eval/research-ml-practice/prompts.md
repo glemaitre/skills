@@ -31,15 +31,13 @@
 - Concern and domain are in the prompt.
 
 **Must do:**
-- Run distinct-angle **depth** searches (practice, implementation,
-  pitfalls at least).
+- Skip intake (concern and domain are already in the prompt).
 - Abstract the problem class; do not query a dataset proper
   name.
-- Tag each candidate with a lane (`measure` / `declare` /
-  `evaluate` / `confirm`).
-- Write `scratch/research/<slug>.md`.
-- Return the path and a one- or two-sentence finding to the
-  caller.
+- Return an intended `scratch/research/<slug>.md` path and a
+  one- or two-sentence finding.
+- Name that candidates are laned (`measure` / `declare` /
+  `evaluate` / `confirm`) without dumping the note.
 
 **Must NOT do:**
 - Re-ask domain and concern.
@@ -88,11 +86,8 @@
 - Rewrite the problem class (e.g. continuous housing-value
   regression, top-coded target, rounded lat/lon) before
   searching.
-- Run wide-net survey searches on phenomena / domain / EDA
-  extras; follow up if a promising measure is thin.
-- Write `scratch/research/survey-<slug>.md` with sourced
-  extras and lanes (prefer `measure`).
-- Return the path and a one- or two-sentence finding.
+- Return an intended `scratch/research/survey-<slug>.md` path
+  and a one- or two-sentence finding.
 
 **Must NOT do:**
 - Query `california_housing`, `sklearn.datasets`, or a

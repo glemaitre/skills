@@ -51,11 +51,17 @@ conversions, other sources, and the gate itself.
 
    Optional `--out path.ipynb`. Keep `*.ipynb` gitignored unless
    the user asks `setup-git` to track them.
+
+   Convert-only requests (executed notebook / ipynb / convert,
+   no HTML or site viewer): name **only** that `notebook convert`
+   line, with no `--html`. Do not mention `--html` or `site
+   build` as an optional aside.
 5. After `--html`, if `policy.site` is true, `export-ml-site`
    is installed, run `python -m skore_skills site build` so the
-   viewer is packaged. Convert without `--html` does not rebuild
-   the site. Skip in one line otherwise. Name a build error; do
-   not fail the convert.
+   viewer is packaged. Name `--html` and `site build` **only**
+   when the user asked for HTML or a site viewer. Convert
+   without `--html` does not rebuild the site. Skip in one line
+   otherwise. Name a build error; do not fail the convert.
 
 ## Stop conditions
 
@@ -63,3 +69,5 @@ conversions, other sources, and the gate itself.
 - Do not run `cells run` as a substitute for convert.
 - Do not `pixi add` / `uv add`; load `add-python-package`.
 - Missing skill or missing source → one-line skip.
+- Do not name `--html` or `python -m skore_skills site build`
+  unless the user asked for HTML or a site viewer.

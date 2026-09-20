@@ -76,7 +76,9 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 ## Stop conditions
 
 - **Read-only raw data.** Never clean, rewrite, or re-save the
-  user's files. Cleaning belongs in `build-ml-pipeline`.
+  user's files. Never tell the user to drop a column or file
+  (“drop it”). Leakage stays Open questions / a `measure`
+  board. Cleaning belongs in `build-ml-pipeline`.
 - **Deliverables under `data_analysis/`.** Raw load may point
   anywhere.
 - **G-DATA-ANALYSIS run | skip.** AskUserQuestion. "Go fast" does
@@ -93,8 +95,11 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   needs them.
 - **Target.** Infer from JOURNAL Status / the user prompt when the
   column is obvious. Otherwise AskUserQuestion (column names plus
-  "no target yet"). Decline → `<TARGET>=None`, `<TASK>=none`;
-  still run duplicates. Do not persist a policy key.
+  "no target yet") and **stop** — write no notebook yet. Do not
+  list feature-vs-target / leakage as always-on next steps.
+  After a named column, append that one target snippet. After
+  “no target yet” or Decline → `<TARGET>=None`, `<TASK>=none`;
+  TableReport + duplicates only. Do not persist a policy key.
 - **No train/test split.** Splitter choice is a later gate.
   Leakage cells are qualitative flags on the raw family that
   holds the target. Do not persist a joined modeling table.
@@ -108,7 +113,15 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   `TableReport.json()` keys drift — `.get(...)`.
 - **One `data_analysis/data_analysis.py`.** Repeat the
   TableReport cell per confirmed family (or per file if the
-  user picked that). Re-run overwrites in place.
+  user picked that). Re-run overwrites in place. Default
+  notebook = those templates only (plus the matching target
+  snippet). Do not add extra histograms, `sns.heatmap` /
+  association matrices, unique-ratio (`nunique()/n`),
+  column-dicts, or `report.json()` cells. Leakage is the
+  template table, not a comment. Default figures: seaborn
+  `displot` for the target; one faceted `relplot` →
+  `bivariate_grid.png`, last expression `g`. Do not
+  `import matplotlib.pyplot` on the default path.
 - **Do not design the model.** Implications in
   `data_analysis.md` only.
 - Do not gitignore `data_analysis/`. Ignore specific raw patterns
@@ -191,7 +204,10 @@ evidence. End of turn only after Close.
    the turn (“EDA is done”, “close the turn”): **AskUserQuestion**
    one pick. Neither option is recommended or preselected. After
    the first md, always ask (including when triage sent you here).
-   Close → End of turn.
+   Close → End of turn. Do not rewrite `data_analysis.md` on
+   Close. If chat restates findings, duplicate / target /
+   leakage stay in Modelling implications, not only Open
+   questions.
 
 If the original prompt already named extras (e.g. PCA), include
 those cells in step 1 and do not re-ask that extra.
@@ -220,7 +236,9 @@ then leave the figure/grid as the cell output.
 No convert, no site build, no `git end-turn`.
 
 1. **AskUserQuestion** one pick, none recommended. Do not say
-   “extra-analyses” or “standard extra analysis” on this board.
+   “extra-analyses” or “standard extra analysis” **anywhere
+   this turn** (chat, checklists, or the board). The file
+   `references/extra_analyses.md` may be named as a path only.
 
    | Label | Subtitle |
    |---|---|
@@ -229,8 +247,10 @@ No convert, no site build, no `git end-turn`.
    | Automatic exploration related to the data and problem | Do in-depth research related to the problem and data that we are exploring |
    | Describe a plot | You name a chart and I add cells for it |
 
-2. **Pre-defined option** — `references/extra_analyses.md` (its
-   own `allow_multiple` board, all unchecked). Load
+2. **Pre-defined option** — the recipe file
+   `references/extra_analyses.md` (path only; do not say
+   “extra-analyses” in chat). Its own `allow_multiple` board,
+   all unchecked. Load
    `plot-ml-figure` if installed before figure cells.
 3. **Query** — wait for the user’s analysis request. Append
    cells (load `plot-ml-figure` if a figure). Not the canned
@@ -251,7 +271,11 @@ No convert, no site build, no `git end-turn`.
    > doing?
 
    Read `scratch/research/survey-<slug>.md`. Summarize in
-   chat; do not dump the note. **AskUserQuestion**
+   chat; do not dump the note. If tools did not run, two
+   sentences on the **named concern** (for leakage:
+   provenance / scoring-time availability) plus the
+   `measure` board — do not claim a scratch file was read.
+   Do not say to drop a raw column. **AskUserQuestion**
    `allow_multiple` (unchecked) on **only** sourced
    **`measure`** extras that are not already in the notebook.
    Map onto extra_analyses when a recipe exists; else a
@@ -262,7 +286,9 @@ No convert, no site build, no `git end-turn`.
 
    A user-named methodology concern (leakage / “research
    this”) skips the canned survey: pass that concern for
-   **depth**, then the same **`measure`** board.
+   **depth**, then the same **`measure`** board. Summarize
+   as above if tools did not run; do not say to drop a raw
+   column.
 5. **Describe a plot** — load `plot-ml-figure` if installed;
    append cells.
 6. Picks that change the `.py`: `style`, `cells run`, refresh
@@ -289,7 +315,8 @@ it and stop. Do not `env add` here.
 ## End of turn
 
 Run this block **only after Close** (or when the user already
-closed the turn). Keep exploring never reaches here.
+closed the turn). Keep exploring never reaches here. Do not
+rewrite `data_analysis.md` in this block.
 
 If `policy.notebooks` is true, `export-ml-notebook` is installed,
 run `python -m skore_skills notebook convert

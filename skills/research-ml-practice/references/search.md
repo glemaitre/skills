@@ -144,7 +144,9 @@ do not guess.
 ## Depth output template
 
 Write this file under `scratch/research/<slug>.md`. The caller
-summarizes it; do not paste it wholesale into chat.
+summarizes it; do not paste it wholesale into chat (path + 1–2
+sentences only, even if tools did not run). If tools cannot
+search or write, stop after that — no template body in chat.
 
 ```markdown
 ## Research: <concern in one line>

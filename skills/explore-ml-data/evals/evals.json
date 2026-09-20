@@ -236,13 +236,12 @@
       "id": 14,
       "title": "Close after default pass keeps sklearn off",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Default notebook, extras.json, and `data_analysis.md` are on\n  disk.\n- User picks **Close** on keep-exploring vs close.]\n\nExplore the dataset. Target is MedHouseVal.",
-      "expected_output": "Behavioural response satisfying: - AskUserQuestion keep exploring vs close (neither option recommended or preselected). - Name `python -m skore_skills git end-turn --stage data_analysis` after Close. It must NOT: - Load `add-python-package` for sklearn / scipy / statsmodels. - Leave modelling implications empty of duplicate/target/leakage findings.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion keep exploring vs close (neither option recommended or preselected). - Name `python -m skore_skills git end-turn --stage data_analysis` after Close. It must NOT: - Load `add-python-package` for sklearn / scipy / statsmodels.",
       "files": [],
       "expectations": [
         "AskUserQuestion keep exploring vs close (neither option recommended or preselected).",
         "Name `python -m skore_skills git end-turn --stage data_analysis` after Close.",
-        "The response does NOT: Load `add-python-package` for sklearn / scipy / statsmodels.",
-        "The response does NOT: Leave modelling implications empty of duplicate/target/leakage findings."
+        "The response does NOT: Load `add-python-package` for sklearn / scipy / statsmodels."
       ],
       "tools": false,
       "sandbox": [],

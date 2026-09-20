@@ -41,6 +41,15 @@ route and ask. Do not execute another skill's methodology.
    | research / literature / “is this leakage” on the table | `explore-ml-data` (even if `data_analysis` is present). Do not load `research-ml-practice`. |
    | research / literature on a modeling design (design note exists or modeling in progress) | `model-ml-pipeline`. Do not load `research-ml-practice`. |
 
+   Certain EDA: name `python -m skore_skills status`, load
+   `explore-ml-data`, stop. Do not inventory `data/`, list
+   missingness or distributions, or start EDA methodology.
+
+   Certain generic export: first name
+   `python -m skore_skills status`, then load
+   `export-ml-project`. Do not list notebook / `--html` / site
+   as sibling options.
+
    **Modeling while `status.data_analysis` is `missing`:** if the certain
    skill is `model-ml-pipeline` (or the user asked to build the
    first experiment) **and** `explore-ml-data` is installed, do
@@ -68,13 +77,16 @@ route and ask. Do not execute another skill's methodology.
 ## Stop conditions
 
 - Do not design experiments, write pipelines, or run exploratory
-  data analysis yourself.
+  data analysis yourself. Certain EDA is load `explore-ml-data`
+  only — no data inventory and no EDA checklist.
 - Do not load every skill.
 - Do not invent workspace facts when status is unavailable.
 - Do not treat a missing `.skore` as an empty project when `src/`
   or `journal/` exist.
 - Do not invent a missing skill's steps from memory.
 - Do not invent a deleted iterate skill as the session owner.
+- Certain generic export: name `python -m skore_skills status`,
+  load `export-ml-project` only — no sibling-skill menu.
 
 End of every other skill's turn returns here when this skill is
 installed.

@@ -51,9 +51,12 @@ summary. Do not `git end-turn`.
    (survey: `survey-<slug>.md`; depth: `<slug>.md` with lanes).
    Gitignored.
 5. Return to the caller: scratch path and a one- or two-sentence
-   finding. Do not dump the full note in chat. Do not write
-   `data_analysis.md`, the design note, or `data/`. The caller
-   asks which extras to add.
+   finding. Chat is **path + those sentences only** — no pasted
+   headings, tables, or “Depth note — …” body. If tools cannot
+   search or write, **stop there**: no hypotheses, diagnostics,
+   planned-query bullets, or template headings in chat (that
+   *is* the paste). Do not write `data_analysis.md`, the design
+   note, or `data/`. The caller asks which extras to add.
 
 ## Stop conditions
 
@@ -73,3 +76,6 @@ summary. Do not `git end-turn`.
   learners / `Pipeline` steps as EDA extras.
 - Never answer from memory when search ran. Do not ask the
   user to go look something up.
+- Do not paste the scratch markdown into chat (no “Depth
+  note —”, no survey body). Path + 1–2 sentences only. If
+  tools cannot search or write, stop after that.
