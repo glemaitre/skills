@@ -68,9 +68,9 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 | You came here for… | → next |
 |---|---|
 | First EDA (triage or free-text) | → write md; then keep-exploring vs close |
-| Keep exploring | → standard extras, research extras, or free-text; no end-turn yet |
+| Keep exploring | → pre-defined option, query, automatic exploration, or describe a plot; no end-turn yet |
 | Close this stage | → convert / site / git end-turn / `triage-ml-task` if installed |
-| Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § research extra analysis (named concern skips the canned survey) |
+| Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § Automatic exploration (named concern skips the canned survey) |
 | Changed data source or "also plot X" | → overwrite `data_analysis/data_analysis.*`, refresh JOURNAL |
 
 ## Stop conditions
@@ -200,13 +200,23 @@ then leave the figure/grid as the cell output.
 
 No convert, no site build, no `git end-turn`.
 
-1. **AskUserQuestion** one pick, none recommended: more
-   standard extra analysis; research extra analysis; I’ll
-   describe what to plot.
-2. **Standard extras** — `references/extra_analyses.md` (its
+1. **AskUserQuestion** one pick, none recommended. Do not say
+   “extra-analyses” or “standard extra analysis” on this board.
+
+   | Label | Subtitle |
+   |---|---|
+   | Choose additional pre-defined option | Name only items that apply: interactions / pairplot, PCA, hypothesis tests, subgroup, time-series, text or geo |
+   | Provide a query to extend the exploration | Describe an analysis to add to the notebook (table, test, or plot) |
+   | Automatic exploration related to the data and problem | Do in-depth research related to the problem and data that we are exploring |
+   | Describe a plot | You name a chart and I add cells for it |
+
+2. **Pre-defined option** — `references/extra_analyses.md` (its
    own `allow_multiple` board, all unchecked). Load
    `plot-ml-figure` if installed before figure cells.
-3. **Research extra analysis** — load `research-ml-practice`
+3. **Query** — wait for the user’s analysis request. Append
+   cells (load `plot-ml-figure` if a figure). Not the canned
+   research survey. Then step 6.
+4. **Automatic exploration** — load `research-ml-practice`
    if installed with stage `data_analysis` and the canned
    survey concern below. Missing skill → one-line skip and
    return to step 1. Do not ask intake. Pass JOURNAL,
@@ -234,12 +244,12 @@ No convert, no site build, no `git end-turn`.
    A user-named methodology concern (leakage / “research
    this”) skips the canned survey: pass that concern for
    **depth**, then the same **`measure`** board.
-4. **Free-text plot** — load `plot-ml-figure` if installed;
+5. **Describe a plot** — load `plot-ml-figure` if installed;
    append cells.
-5. Picks that change the `.py`: `style`, `cells run`, refresh
+6. Picks that change the `.py`: `style`, `cells run`, refresh
    facts, rewrite `data_analysis.md` from JSON/PNGs/HTML
    (implications from **results**). Then re-ask keep vs close
-   (procedure step 6). Do not invent domain checklists.
+   (run path step 6). Do not invent domain checklists.
 
 ## Dispatch
 

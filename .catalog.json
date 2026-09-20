@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "9039e91979b2eb73ec4a3de94855a79fca6540a430f2cde54b462704a60b895f",
+  "catalog_hash": "fad99dd02475233100413afc6ccf2d5b5e38c77914445075be9561ef23447928",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "76c2739f2f84bbf3fe349f2f748dceb788cc3adf6f5ce8b34e2dc126eda005a4"
+      "hash": "a2a96c1480dbc4388578373bea325d9d5b8b50753af41d4a76aa0822e40d4ce8"
     },
     {
       "id": "build-ml-pipeline",

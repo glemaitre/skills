@@ -307,7 +307,7 @@
 **Must do:**
 - Load `add-python-package` for `scikit-learn`.
 - Append a PCA cell from `references/extra_analyses.md`.
-- Do not re-ask PCA on the extras board.
+- Do not re-ask PCA on the pre-defined-option board.
 
 **Must NOT do:**
 - Treat PCA as a pipeline preprocessor in this skill.
@@ -348,14 +348,18 @@
 - User picks **Keep exploring the data**.
 
 **Must do:**
-- AskUserQuestion more standard extra analysis / research
-  extra analysis / describe what to plot. None recommended.
+- AskUserQuestion four picks, none recommended: Choose
+  additional pre-defined option; Provide a query to extend the
+  exploration; Automatic exploration related to the data and
+  problem; Describe a plot.
 - Stay in `explore-ml-data`.
 
 **Must NOT do:**
 - Name `python -m skore_skills git end-turn`.
 - Invent a domain-specific checklist skill or `references/domains/`.
 - Run `python -m skore_skills site build` on keep exploring.
+- Say “extra-analyses” or “standard extra analysis” on that
+  board.
 
 ---
 
@@ -366,8 +370,8 @@
 
 **Assumed workspace state:**
 - EDA markdown exists. User picked Keep exploring, then
-  Research extra analysis. The prompt already names a
-  leakage concern.
+  Automatic exploration related to the data and problem. The
+  prompt already names a leakage concern.
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**
@@ -398,9 +402,9 @@
 
 **Must do:**
 - One-line skip that `research-ml-practice` is not installed.
-- Stay in the keep-exploring menu (re-ask more standard extra
-  analysis / research extra analysis / describe what to plot,
-  or keep vs close).
+- Stay in the keep-exploring menu (re-ask the four human
+  picks, or keep vs close). Do not say “extra-analyses” on
+  that board.
 
 **Must NOT do:**
 - Invent papers or leakage thresholds from memory.
@@ -423,8 +427,9 @@
 **Must do:**
 - Skip G-DATA-ANALYSIS; do not overwrite
   `data_analysis/data_analysis.py`.
-- Load `research-ml-practice` (Keep exploring § research extra
-  analysis; named concern — skip the canned extra-analysis survey).
+- Load `research-ml-practice` (Keep exploring § Automatic
+  exploration; named concern — skip the canned extra-analysis
+  survey).
 - Summarize the scratch note in chat.
 
 **Must NOT do:**
@@ -456,7 +461,7 @@
 
 ---
 
-## CASE_20 — Research extra analysis uses the problem class
+## CASE_20 — Automatic exploration uses the problem class
 
 **User prompt:**
 > Keep exploring. Research extra analyses for this table.
@@ -464,8 +469,8 @@
 **Assumed workspace state:**
 - `data_analysis/data_analysis.md` exists with Open questions.
 - JOURNAL names California housing / MedHouseVal.
-- User picked **Keep exploring**, then **Research extra
-  analysis**.
+- User picked **Keep exploring**, then **Automatic exploration
+  related to the data and problem**.
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**

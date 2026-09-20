@@ -218,12 +218,12 @@
       "id": 13,
       "title": "Prompt already asked for PCA",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. User chose **run**. Target is known.\n- `add-python-package` is installed.]\n\nExplore the data and add a PCA plot of the numeric columns.",
-      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `scikit-learn`. - Append a PCA cell from `references/extra_analyses.md`. - Do not re-ask PCA on the extras board. It must NOT: - Treat PCA as a pipeline preprocessor in this skill. - Run `pixi add scikit-learn` from this skill.",
+      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `scikit-learn`. - Append a PCA cell from `references/extra_analyses.md`. - Do not re-ask PCA on the pre-defined-option board. It must NOT: - Treat PCA as a pipeline preprocessor in this skill. - Run `pixi add scikit-learn` from this skill.",
       "files": [],
       "expectations": [
         "Load `add-python-package` for `scikit-learn`.",
         "Append a PCA cell from `references/extra_analyses.md`.",
-        "Do not re-ask PCA on the extras board.",
+        "Do not re-ask PCA on the pre-defined-option board.",
         "The response does NOT: Treat PCA as a pipeline preprocessor in this skill.",
         "The response does NOT: Run `pixi add scikit-learn` from this skill."
       ],
@@ -251,14 +251,15 @@
       "id": 15,
       "title": "Keep exploring does not end the turn",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- User picks **Keep exploring the data**.]\n\nExplore the dataset. Target is MedHouseVal.",
-      "expected_output": "Behavioural response satisfying: - AskUserQuestion more standard extra analysis / research extra analysis / describe what to plot. None recommended. - Stay in `explore-ml-data`. It must NOT: - Name `python -m skore_skills git end-turn`. - Invent a domain-specific checklist skill or `references/domains/`. - Run `python -m skore_skills site build` on keep exploring.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion four picks, none recommended: Choose additional pre-defined option; Provide a query to extend the exploration; Automatic exploration related to the data and problem; Describe a plot. - Stay in `explore-ml-data`. It must NOT: - Name `python -m skore_skills git end-turn`. - Invent a domain-specific checklist skill or `references/domains/`. - Run `python -m skore_skills site build` on keep exploring.",
       "files": [],
       "expectations": [
-        "AskUserQuestion more standard extra analysis / research extra analysis / describe what to plot. None recommended.",
+        "AskUserQuestion four picks, none recommended: Choose additional pre-defined option; Provide a query to extend the exploration; Automatic exploration related to the data and problem; Describe a plot.",
         "Stay in `explore-ml-data`.",
         "The response does NOT: Name `python -m skore_skills git end-turn`.",
         "The response does NOT: Invent a domain-specific checklist skill or `references/domains/`.",
-        "The response does NOT: Run `python -m skore_skills site build` on keep exploring."
+        "The response does NOT: Run `python -m skore_skills site build` on keep exploring.",
+        "The response does NOT: Say \u201cextra-analyses\u201d or \u201cstandard extra analysis\u201d on that board."
       ],
       "tools": false,
       "sandbox": [],
@@ -267,7 +268,7 @@
     {
       "id": 16,
       "title": "Keep exploring then research",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- EDA markdown exists. User picked Keep exploring, then\n  Research extra analysis. The prompt already names a\n  leakage concern.\n- `status.skills.research-ml-practice` is true.]\n\nIs 0.97 correlation with the target leakage?",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- EDA markdown exists. User picked Keep exploring, then\n  Automatic exploration related to the data and problem. The\n  prompt already names a leakage concern.\n- `status.skills.research-ml-practice` is true.]\n\nIs 0.97 correlation with the target leakage?",
       "expected_output": "Behavioural response satisfying: - Load `research-ml-practice` with the named leakage concern (skip the canned extra-analysis survey). - Summarize the scratch note in chat (what is happening + why it matters here). - AskUserQuestion `allow_multiple` on `measure` rows only. It must NOT: - Drop the correlated column from the raw data. - Run `git end-turn` in this keep-exploring pass. - Copy literature into modelling implications as if it were measured.",
       "files": [],
       "expectations": [
@@ -287,11 +288,11 @@
       "id": 17,
       "title": "Research skill missing is a one-line skip",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- EDA markdown exists. User picked Keep exploring, then Research\n  this concern.\n- `status.skills.research-ml-practice` is false or absent.]\n\nIs 0.97 correlation with the target leakage?",
-      "expected_output": "Behavioural response satisfying: - One-line skip that `research-ml-practice` is not installed. - Stay in the keep-exploring menu (re-ask more standard extra analysis / research extra analysis / describe what to plot, or keep vs close). It must NOT: - Invent papers or leakage thresholds from memory. - Run `git end-turn` in this keep-exploring pass.",
+      "expected_output": "Behavioural response satisfying: - One-line skip that `research-ml-practice` is not installed. - Stay in the keep-exploring menu (re-ask the four human picks, or keep vs close). Do not say \u201cextra-analyses\u201d on that board. It must NOT: - Invent papers or leakage thresholds from memory. - Run `git end-turn` in this keep-exploring pass.",
       "files": [],
       "expectations": [
         "One-line skip that `research-ml-practice` is not installed.",
-        "Stay in the keep-exploring menu (re-ask more standard extra analysis / research extra analysis / describe what to plot, or keep vs close).",
+        "Stay in the keep-exploring menu (re-ask the four human picks, or keep vs close). Do not say \u201cextra-analyses\u201d on that board.",
         "The response does NOT: Invent papers or leakage thresholds from memory.",
         "The response does NOT: Run `git end-turn` in this keep-exploring pass."
       ],
@@ -303,11 +304,11 @@
       "id": 18,
       "title": "Leakage question while EDA is already done",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` exists.\n- JOURNAL \u00a7 Data understanding records `Status: done`.\n- `status.data_analysis` is present.\n- The user did not pick Keep exploring first.\n- `status.skills.research-ml-practice` is true.]\n\nIs 0.97 correlation with the target leakage?",
-      "expected_output": "Behavioural response satisfying: - Skip G-DATA-ANALYSIS; do not overwrite `data_analysis/data_analysis.py`. - Load `research-ml-practice` (Keep exploring \u00a7 research extra analysis; named concern \u2014 skip the canned extra-analysis survey). - Summarize the scratch note in chat. It must NOT: - Stop as CASE_04 (EDA already recorded, no refresh). - Run `git end-turn` in this pass. - Re-run `cells run` or rewrite the default notebook.",
+      "expected_output": "Behavioural response satisfying: - Skip G-DATA-ANALYSIS; do not overwrite `data_analysis/data_analysis.py`. - Load `research-ml-practice` (Keep exploring \u00a7 Automatic exploration; named concern \u2014 skip the canned extra-analysis survey). - Summarize the scratch note in chat. It must NOT: - Stop as CASE_04 (EDA already recorded, no refresh). - Run `git end-turn` in this pass. - Re-run `cells run` or rewrite the default notebook.",
       "files": [],
       "expectations": [
         "Skip G-DATA-ANALYSIS; do not overwrite `data_analysis/data_analysis.py`.",
-        "Load `research-ml-practice` (Keep exploring \u00a7 research extra analysis; named concern \u2014 skip the canned extra-analysis survey).",
+        "Load `research-ml-practice` (Keep exploring \u00a7 Automatic exploration; named concern \u2014 skip the canned extra-analysis survey).",
         "Summarize the scratch note in chat.",
         "The response does NOT: Stop as CASE_04 (EDA already recorded, no refresh).",
         "The response does NOT: Run `git end-turn` in this pass.",
@@ -335,8 +336,8 @@
     },
     {
       "id": 20,
-      "title": "Research extra analysis uses the problem class",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` exists with Open questions.\n- JOURNAL names California housing / MedHouseVal.\n- User picked **Keep exploring**, then **Research extra\n  analysis**.\n- `status.skills.research-ml-practice` is true.]\n\nKeep exploring. Research extra analyses for this table.",
+      "title": "Automatic exploration uses the problem class",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` exists with Open questions.\n- JOURNAL names California housing / MedHouseVal.\n- User picked **Keep exploring**, then **Automatic exploration\n  related to the data and problem**.\n- `status.skills.research-ml-practice` is true.]\n\nKeep exploring. Research extra analyses for this table.",
       "expected_output": "Behavioural response satisfying: - Load `research-ml-practice` with the canned JOURNAL+EDA extra-measurement question (problem class, not the dataset proper name). - Read `scratch/research/survey-<slug>.md`. - AskUserQuestion `allow_multiple` (unchecked) on **only** sourced **`measure`** extras from that note. It must NOT: - Search `california_housing`, `sklearn.datasets`, or a sklearn fetcher name. - Offer pipeline / learner / `GridSearch` extras on the EDA board. - Copy Open questions onto the board without a source.",
       "files": [],
       "expectations": [
