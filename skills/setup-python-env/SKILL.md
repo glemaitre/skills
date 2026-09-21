@@ -42,9 +42,10 @@ after listing the boxes.
 ## Sequence
 
 1. `python -m skore_skills env detect` and `status`.
-2. **G-ENV-MGR.** Ask the manager when `env_manager` is `none`,
-   `ambiguous`, or `mismatch`. Use JSON `recommended` as the ask
-   order. PATH is not permission. Do not `curl | sh`.
+2. **G-ENV-MGR.** Read the JSON fields, not sentinel strings:
+   ask when `env_manager` is `"none"`, `ambiguous` is true, or
+   `mismatch` is true. Use `recommended` as the ask order. PATH is
+   not permission. Do not `curl | sh`.
 3. Ask whether **we** manage the env (default yes). Persist
    `python -m skore_skills policy set env.managed true` or `false`.
 4. Unmanaged: stop. Name ruff / ipython / ipykernel / skore; do
@@ -58,6 +59,11 @@ after listing the boxes.
    python -m skore_skills env verify --execute
    ```
 
+   If the selected manager is pixi and `pixi.toml` already exists,
+   skip `env init`; preserve that manifest and continue with
+   `env sync --execute`. Never replace it or try to add
+   `[tool.pixi]` to `pyproject.toml`.
+
    Do not hand-edit TOML. Do not run `pixi init`. Do not create
    `src/`. Plain Skore is the sole early stage-library exception; do
    not ask G-SKORE-MODE here. Later, `add-python-package` upgrades it
@@ -69,6 +75,14 @@ after listing the boxes.
    when that skill is installed, not a second `env init`.
    If `add-python-package` is not installed, name ruff / ipython /
    ipykernel and stop.
+
+## Return and close
+
+When dispatched by `setup-ml-project`, return to that caller after
+verification. Standalone, run
+`python -m skore_skills git end-turn --stage setup`; when action is
+`invoke`, load `persist-ml-git` and stop because it returns to
+triage. Otherwise load `triage-ml-task` when installed.
 
 ## Three environments
 

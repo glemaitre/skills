@@ -1,17 +1,18 @@
-"""Inputs to `skore.evaluate`.
+"""Optional Pattern A splitter object.
 
-Holds only the objects passed to `skore.evaluate(...)`:
+``skore.evaluate`` and ``project.put`` live in
+``experiments/NN_*.py``, not here.
 
-- `splitter` — the cross-validator,
-- optional metric overrides (skore picks task-appropriate defaults
-  otherwise).
+Pattern A (``KFold``, ``TimeSeriesSplit``, …): set ``splitter`` to a
+real cross-validator and pass it as ``splitter=`` from the experiment
+script. Do not pass this module's default ``None`` — that is an
+80/20 holdout.
 
-The evaluation itself — running `skore.evaluate`, opening a project,
-persisting the report — happens in the experiment scripts, not here.
+Pattern B (``GroupKFold`` / ``groups`` on the DataOp): do not import
+or pass ``splitter`` at all. See
+``evaluate-ml-pipeline/references/metadata-routing.md``.
 """
 
 from __future__ import annotations
 
-# Pick the cross-validator from the structural facts of the data
-# (grouping, time ordering, class balance).
-splitter = None  # e.g., KFold(n_splits=5, shuffle=True, random_state=0)
+splitter = None

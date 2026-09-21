@@ -1,4 +1,4 @@
-"""Copy organize-ml-workspace templates into a project tree."""
+"""Copy setup-workspace templates into a project tree."""
 
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ LAYOUT_READMES = (
 
 
 def template_root() -> Path:
-    """Return the packaged copy of organize-ml-workspace templates."""
+    """Return the packaged copy of setup-workspace templates."""
     return Path(str(files("skore_skills").joinpath("templates")))
 
 
@@ -93,7 +93,7 @@ def layout_exists(root: Path) -> bool:
     A manager-only root (``pixi.toml`` / ``pyproject.toml`` from
     ``pixi init``) is not a finished layout.
     """
-    return (root / "src").exists() or (root / "experiments").exists()
+    return (root / "src").exists() or (root / "journal").exists()
 
 
 def scaffold(root: Path, package: str, *, force: bool = False) -> list[Path]:

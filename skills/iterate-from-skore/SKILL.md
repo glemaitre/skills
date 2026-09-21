@@ -3,7 +3,7 @@ name: iterate-from-skore
 description: >
   Source the next ML experiment proposal by **reading the audit
   digest** at `scratch/audit/<stem>/audit.md` (produced by
-  `audit-ml-pipeline` at § 4 record-outcome). For every row in the
+  `audit-ml-pipeline` after evaluate). For every row in the
   digest's `## Checks summary` whose `severity` is `issue` or `tip`,
   follow the row's `documentation_url` to draft a Backlog row whose
   `Item` is the mitigation the docs recommend. The `## Metrics
@@ -16,8 +16,8 @@ description: >
   writes a per-experiment design note, never picks the "winning"
   finding — the user picks via `B<N>`.
 
-  TRIGGER when: `triage-ml-task` is picking a sourcing
-  strategy and the user picks `skore` from the menu; the user says
+  TRIGGER when: `manage-ml-backlog` is picking a sourcing strategy
+  and the user picks `skore` from the menu; the user says
   "mine the report", "what does skore see?", "fill the backlog from
   the diagnostic"; the previous experiment has finished and the
   user wants the report converted into actionable backlog items.
@@ -44,7 +44,7 @@ description: >
 # Iterate from skore
 
 Source: the audit digest at `scratch/audit/<stem>/audit.md`,
-produced by `audit-ml-pipeline` at § 4 record-outcome.
+produced by `audit-ml-pipeline` after evaluate.
 Output: a set of **Backlog-candidate rows** + a short human
 summary, handed back to `manage-ml-backlog`. The parent skill
 writes the rows to `JOURNAL.md` Backlog and re-presents the

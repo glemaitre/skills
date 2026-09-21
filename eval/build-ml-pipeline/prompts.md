@@ -229,25 +229,25 @@ violated. Overall: ≥ 12/13 cases pass and no Must NOT violated.
 > rows per customer. Build the pipeline.
 
 **Assumed workspace state:**
-- skrub installed at 0.9.0.
+- skrub installed at 0.10.x.
 - IID-shaped features (no cross-row history) but rows are grouped
   by customer.
 
 **Must do:**
 - Identify the group structure (multiple rows per `customer_id`).
-- Wire `mark_as_X(split_kwargs={"groups": data["customer_id"]})` at
-  the X marker.
-- Cite that `split_kwargs` is the metadata `evaluate-ml-pipeline`
-  consumes downstream for the splitter.
+- Wire `mark_as_X(cv=GroupKFold(), split_kwargs={"groups": data["customer_id"]})`
+  at the X marker (Pattern B; skrub requires `cv=` with
+  `split_kwargs`).
+- Cite that evaluate omits `splitter=` so skore reuses this `cv`
+  and `groups` (`evaluate-ml-pipeline/references/metadata-routing.md`).
 - Mention asking the user whether grouping is intended (named
   ask: "anything ending in `_id`, columns called `subject` /
   `session` / `region`").
 
 **Must NOT do:**
-- Pick the cross-validator in pipeline code (`splitter=GroupKFold(...)`,
-  `cv=GroupKFold`, `skore.evaluate(..., splitter=...)`). Naming
-  `GroupKFold` only as what `evaluate-ml-pipeline` owns later is
-  not a violation.
+- Call `skore.evaluate` from pipeline code.
+- Pick an IID splitter (`KFold`, `TimeSeriesSplit`) at the X
+  marker.
 - Leave `split_kwargs` empty without surfacing the group question.
 
 ---
@@ -407,3 +407,79 @@ violated. Overall: ≥ 12/13 cases pass and no Must NOT violated.
 - Substitute `sklearn.Pipeline` / `make_pipeline`.
 - Run `pip install graphviz`.
 - Call `env add` or `env graphviz` from this skill.
+
+---
+
+## CASE_15 — Time ordering does not become split kwargs
+
+**User prompt:**
+> Build the approved temporal pipeline and put the timestamp on X.
+
+**Assumed workspace state:**
+- The journal records temporal ordering but no custom splitter
+  consumes a `times` keyword.
+
+**Must do:**
+- Keep `split_kwargs={}` at `mark_as_X`.
+- Leave time-splitter selection to evaluate (Pattern A).
+
+**Must NOT do:**
+- Add `times=` or `split_kwargs={"times": ...}`.
+- Import `TimeSeriesSplit` into pipeline code.
+
+---
+
+## CASE_16 — Invalid times metadata is rejected
+
+**User prompt:**
+> Use `mark_as_X(split_kwargs={"times": data["timestamp"]})`.
+
+**Assumed workspace state:**
+- No custom cross-validator accepts a `times` keyword.
+
+**Must do:**
+- Reject `times` as unsupported split metadata.
+- Keep the timestamp available as project data and route temporal
+  splitter choice to evaluate.
+
+**Must NOT do:**
+- Write the requested `times=` metadata.
+- Claim sklearn splitters consume `times`.
+
+---
+
+## CASE_17 — Split kwargs require a concrete CV object
+
+**User prompt:**
+> Put `groups` in `split_kwargs` but leave `cv` unset.
+
+**Assumed workspace state:**
+- Group-aware splitting is approved.
+
+**Must do:**
+- Use Pattern B with `cv=GroupKFold(...)` and matching
+  `split_kwargs={"groups": ...}` on the X marker.
+- Name the API lookup for `GroupKFold`.
+
+**Must NOT do:**
+- Set `split_kwargs` without `cv`.
+- Defer the groups through `splitter=` on evaluate.
+
+---
+
+## CASE_18 — Integer cv is not Pattern B
+
+**User prompt:**
+> Use `cv=5` together with grouped `split_kwargs`.
+
+**Assumed workspace state:**
+- Group-aware splitting is required.
+
+**Must do:**
+- Reject integer `cv` for Pattern B because skore needs a splitter
+  object with `.split`.
+- Use the approved concrete group-aware cross-validator.
+
+**Must NOT do:**
+- Write `cv=5`.
+- Claim an integer preserves grouped metadata.

@@ -48,7 +48,7 @@ What changes versus the previous experiment, in prose. Which file in
 src/<pkg>/ is touched? State intent, not code.
 -->
 
-- **Files touched:** <e.g., `src/<pkg>/features.py`, `src/<pkg>/evaluate.py`>
+- **Files touched:** <e.g., `src/<pkg>/features.py`, `src/<pkg>/pipeline.py`>
 - **Change versus baseline (or previous experiment):** <prose>
 - **Cross-validation:** decided at the evaluation step, data-driven
   from the data's structure (groups / time ordering) — not fixed here.

@@ -113,13 +113,19 @@ read the report. The pipeline declaration is out of scope (see
   (`G-CV-SPLITTER`).** This is the **G-CV-SPLITTER** gate — owned by
   this skill, fired **after** green pytest smoke and the Evaluate
   HITL (or a certain evaluate request), **after** the design note
-  is approved at G-DESIGN, before evaluation is written into
+  has passed `model-ml-pipeline`'s explicit approval gate, before
+  evaluation is written into
   `experiments/NN_*.py`. The splitter
   is NOT pre-committed in the design note. Pick from the
-  `split_kwargs` content at the X marker via the table in rule 3 —
-  never reach for `KFold(5)` or `StratifiedKFold` out of habit. If
-  `split_kwargs` is empty *and* you cannot rule out group / temporal
-  structure, return to `build-ml-pipeline` and ask before defaulting.
+  `split_kwargs` content at the X marker **and** time from EDA /
+  the journal via the table in rule 3 — never reach for `KFold(5)`
+  or `StratifiedKFold` out of habit. Empty `split_kwargs` plus
+  possible **groups** → return to `build-ml-pipeline`. Empty
+  `split_kwargs` plus **time** in the EDA/journal → fire the
+  time-ordered AskUserQuestion (Pattern A if they pick
+  `TimeSeriesSplit`); do not attach `times=` on `mark_as_X`.
+  Wiring the chosen splitter is Pattern A or B
+  (`references/metadata-routing.md`), not "always `splitter=`".
 - **No `Stratified*` for class imbalance.** It compresses across-fold
   variance and produces over-confident error bars. Imbalance does
   not change the splitter choice.
@@ -143,9 +149,10 @@ read the report. The pipeline declaration is out of scope (see
   report's metrics accessors, extracting per-fold values,
   sanity-checking the splitter's fold geometry, multi-symbol
   `inspect.signature(...)` on skore / sklearn classes — lands in
-  `scratch/<YYYY-MM-DD>_<HHMMSS>_<short>.py` and runs via
-  `pixi run python scratch/<ts>_<short>.py`. **Inline
-  `pixi run python -c "..."` is forbidden regardless of length**
+  `scratch/<YYYY-MM-DD>_<HHMMSS>_<short>.py` and runs with the
+  composed-dev Python command reported by
+  `python -m skore_skills env verify`. **Inline composed-dev
+  `python -c "..."` is forbidden regardless of length**
   (see `python -m skore_skills api get` § Stop conditions). The previous "2-line
   inline cap" is removed.
 - **Don't filter warnings.** No `warnings.filterwarnings(...)`
@@ -160,7 +167,7 @@ read the report. The pipeline declaration is out of scope (see
   — the cross-experiment metrics view the audit digest draws
   from. **Two read-only consumers** of the Project share
   the same `summarize()` → `get(id)` → `report.*` discipline:
-  `scratch/<ts>_*.py` probes (owned by `organize-ml-workspace`
+  `scratch/<ts>_*.py` probes (owned by `setup-workspace`
   § "Scratch is read-only") and `audit/<stem>.py` files (owned by
   `audit-ml-pipeline`, executed via its bundled in-process IPython
   runner; output digest at `scratch/audit/<stem>/audit.md`).
@@ -209,7 +216,7 @@ read the report. The pipeline declaration is out of scope (see
   mandatory `AskUserQuestion` in this stack —
   `add-python-package` § "Where does the package belong?",
   `data-science-python-stack` § Tier 2 (pandas vs polars),
-  `triage-ml-task` § 2 (sourcing menu), `iterate-from-user`
+  `manage-ml-backlog` (sourcing menu), `iterate-from-user`
   § "The entry-point AskUserQuestion". When in doubt: the user's
   approval is the gate, not the harness's instruction text.
 
@@ -243,11 +250,14 @@ Pre-flight (evaluate-ml-pipeline):
                 | Read scratch/api/sklearn/<version>/cv_splitters.md
                 (or topic-matching file, this turn)
                 | Write of the same (this turn)
-                | "n/a — splitter is one already in src/<pkg>/evaluate.py
-                  and its arguments are unchanged"
-- [ ] split_kwargs at the X marker read: <groups | time | none>
+                | "n/a — Pattern A splitter already in experiments/NN_*.py
+                  with unchanged arguments, or Pattern B DataOp cv="
+- [ ] split_kwargs at the X marker read: <groups | none>
+      Time is a data fact (EDA / journal), not a split_kwargs key.
 - [ ] Splitter chosen via rule 3 mapping table: <name + reason>
 - [ ] Data-passing form picked: <X, y> | <data={...}>
+- [ ] CV pattern: A (`splitter=` on evaluate) | B (DataOp cv +
+      omit splitter=) — `references/metadata-routing.md`
 - [ ] Smoke test status (per `smoke-test-ml-pipeline`, pytest):
         passing  — CV may proceed after the Evaluate HITL (or a
                    certain evaluate request);
@@ -259,8 +269,8 @@ Pre-flight (evaluate-ml-pipeline):
                    the response).
 - [ ] If a probe is needed in this turn (skore report walk,
       metric extraction, splitter fold inspection), the payload
-      goes to `scratch/<ts>_<short>.py`, **not inline `pixi run
-      python -c "..."`**. No inline allowance — all Python
+      goes to `scratch/<ts>_<short>.py`, **not inline composed-dev
+      `python -c "..."`**. No inline allowance — all Python
       execution goes to scratch.
 ```
 
@@ -283,27 +293,29 @@ Pre-flight (evaluate-ml-pipeline):
    redirect them through `skore.evaluate`. Consult `python -m skore_skills api get` for
    the exact signature.
 
-   **Always pass `splitter=` explicitly.** When `splitter=` is
-   omitted, `evaluate` auto-selects: if the learner's DataOp was
-   declared with `mark_as_X(cv=...)` it reuses that cross-validator
-   (→ `CrossValidationReport`), otherwise it falls back to a single
-   80/20 holdout (→ `EstimatorReport`). This stack does not declare
-   `cv` at the X marker (`build-ml-pipeline` § S3), so an omitted
-   `splitter=` would silently produce a holdout instead of the
-   gated CV choice. Passing `splitter=` explicitly is what makes the
-   `G-CV-SPLITTER` decision visible, and it **overrides** any DataOp
-   `cv`.
+   **CV wiring is Pattern A or Pattern B** — see
+   `references/metadata-routing.md`. `evaluate` has no `groups=`
+   (or other `split()` kwargs).
+
+   - **Pattern A** (kwargs-free splitter: `KFold`,
+     `TimeSeriesSplit`, …): **always pass `splitter=`**. Omitted
+     `splitter=` with no DataOp `cv` is a silent 80/20 holdout.
+   - **Pattern B** (`split()` needs `groups` or other kwargs):
+     those keys plus `cv=<that splitter>()` live on
+     `.skb.mark_as_X`. **Omit `splitter=`** so skore reuses DataOp
+     `cv` and `split_kwargs`. Passing `splitter=` **drops**
+     `split_kwargs`.
 
    **Two data-passing forms — pick the one that matches the
    estimator:**
 
    - sklearn-style: `skore.evaluate(estimator, X, y, splitter=...)`
      for any estimator whose `fit` is `(X, y)`.
-   - env-dict-style: `skore.evaluate(learner, data={"X": X, "y": y,
-     ...}, splitter=...)` for a skrub `SkrubLearner` (its `fit`
-     takes a single environment dict mapping `skrub.var(name=...)`
-     names to values). This is the right form for the pipelines
-     produced by `build-ml-pipeline`.
+   - env-dict-style: `skore.evaluate(learner, data={...})` for a
+     skrub `SkrubLearner` (its `fit` takes a single environment
+     dict mapping `skrub.var(name=...)` names to values). Add
+     `splitter=` for Pattern A; omit it for Pattern B. This is the
+     right form for the pipelines produced by `build-ml-pipeline`.
 
    `X`/`y` and `data` are mutually exclusive. The same split applies
    to `CrossValidationReport(...)`; `EstimatorReport(...)` uses
@@ -332,14 +344,15 @@ Pre-flight (evaluate-ml-pipeline):
    — not by default (the `G-CV-SPLITTER` gate).** The data tells you
    what splitter is correct.
    The structural facts arrive at the X marker through
-   `split_kwargs` (set by `build-ml-pipeline` at declaration time).
-   Mapping rules:
+   `split_kwargs` (set by `build-ml-pipeline` at declaration time)
+   **or** from EDA / the journal for time (time is not a
+   `split_kwargs` key). Mapping rules:
 
-   | `split_kwargs` content | Splitter |
+   | Fact | Splitter |
    |---|---|
-   | `groups` | `GroupKFold` |
-   | temporal ordering | **ask the user** (see "Time-ordered data" below) |
-   | none | `KFold` (or `RepeatedKFold` for small / noisy data) |
+   | `split_kwargs` has `groups` | `GroupKFold` (Pattern B) |
+   | time-ordered rows (EDA / journal) | **ask the user** (see "Time-ordered data"; Pattern A if they pick `TimeSeriesSplit`) |
+   | none | `KFold` (or `RepeatedKFold` for small / noisy data) — Pattern A |
 
 When `split_kwargs` contains `groups`, the next token in the reply
 is **`GroupKFold`**. The mapping table is the name source;
@@ -405,10 +418,10 @@ API CLI is only for the signature after the name.
    call). This is a follow-up question, not a substitute for
    the splitter pick.
 
-   If `split_kwargs` is empty *and* you cannot confirm there's
-   no structure (from build-time checks or from the user), do
-   not silently default. Return to `build-ml-pipeline` and ask
-   the user first.
+   If `split_kwargs` is empty *and* you cannot confirm there's no
+   **group** structure, return to `build-ml-pipeline` and ask.
+   Time-ordered data with empty `split_kwargs` is expected; use the
+   AskUserQuestion above, not a fake `times=` key.
 
 4. **Trust skore's metric defaults; override only on explicit user
    request.** `skore.evaluate` picks task-appropriate metrics
@@ -434,10 +447,9 @@ API CLI is only for the signature after the name.
 3. Map to a splitter using the table in rule 3.
 4. Pick the data-passing form (rule 1): `data={"X": X, "y": y, ...}`
    for a `SkrubLearner`, positional `X, y` otherwise.
-5. Pass the splitter via `splitter=...` to the chosen entry point
-   (always explicit — never rely on the omitted-`splitter` default,
-   which would holdout-or-DataOp-cv; an explicit `splitter=`
-   overrides any DataOp `cv`).
+5. Wire the splitter (see `references/metadata-routing.md`):
+   Pattern A → `splitter=` on `evaluate`; Pattern B → DataOp
+   `cv=` + `split_kwargs`, **omit** `splitter=`.
 6. Inspect the report; override metrics only on explicit user
    request.
 
@@ -471,7 +483,8 @@ API CLI is only for the signature after the name.
   script puts the report; the audit file loads it via
   `project.summarize()` → `project.get(id)` and renders a
   markdown digest for the agent (no `evaluate`, no `put`).
-  Fires at `manage-ml-backlog` § 4 record-outcome.
+  Fires after successful evaluate and before record-outcome; its
+  digest is an input to `manage-ml-backlog`.
 - **`smoke-test-ml-pipeline`** — router for `tests/`. Owns layout and
   the stem pairing between an experiment and its smoke test.
 - **`add-python-package`** — detection + install commands for the
@@ -485,15 +498,16 @@ API CLI is only for the signature after the name.
   ROC/PR in matplotlib. Save PNG (or HTML) and leave the figure
   visible in a notebook; never `plt.close` there. Missing skill →
   one-line skip.
-- **`python -m skore_skills style`** — **must be invoked** after writing or
-  editing `src/<pkg>/evaluate.py` (and, if a custom splitter is
-  authored, the module that holds it). Running `pixi run ruff
-  check` directly without invoking this skill silently drops the
-  NumPyDoc docstring convention this stack expects: ruff's
-  `D`-rules pass on a one-line summary, but only the skill body
-  teaches the parameter-shape-in-type-slot, `Parameters` /
-  `Returns` / `Yields` sections, and the imperative one-line
-  summary.
+- **`python -m skore_skills style`** — **must be invoked** after
+  writing or editing `experiments/NN_*.py` (and `src/<pkg>/evaluate.py`
+  only if that stub holds a Pattern A splitter object; and, if a
+  custom splitter is authored, the module that holds it). Running
+  a manager-specific ruff command directly without invoking this skill
+  silently drops the NumPyDoc docstring convention this stack
+  expects: ruff's `D`-rules pass on a one-line summary, but only
+  the skill body teaches the parameter-shape-in-type-slot,
+  `Parameters` / `Returns` / `Yields` sections, and the imperative
+  one-line summary.
 
 ## End of turn
 
@@ -512,9 +526,9 @@ When `model-ml-pipeline` dispatched this turn, return to it — the
 dispatcher owns record-outcome / convert / site / `git end-turn`.
 Otherwise this skill owns the close and runs the block below.
 
-If `audit-ml-pipeline` ran this turn, it already dispatched
-record-outcome; go straight to the convert step. Otherwise load
-`manage-ml-backlog` in **record-outcome mode** so the run reaches
+If `audit-ml-pipeline` ran this turn, pass its digest into
+`manage-ml-backlog` **record-outcome mode**. Otherwise call that
+mode with the user's headline value, if any, so the run reaches
 `journal/JOURNAL.md` History and the design-note Status block.
 Without an audit digest, pass the user's headline value or skip in
 one line — do not invent a metric, and never mark `done` while
@@ -534,8 +548,9 @@ Then, if `policy.site` is true, `export-ml-site` is installed, run
 Name a build error; do not fail the evaluate turn.
 
 Run `python -m skore_skills git end-turn --stage evaluate`. If JSON
-`action` is `invoke`, load `persist-ml-git` and follow it. Then
-load `triage-ml-task`. Do not run `git commit` in this skill.
+`action` is `invoke`, load `persist-ml-git` and stop; that skill
+returns to triage. Otherwise load `triage-ml-task`. Do not run
+`git commit` in this skill.
 
 ## Need a package?
 

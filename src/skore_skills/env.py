@@ -15,7 +15,11 @@ from typing import Any
 
 from skore_skills.policy import load_policy
 from skore_skills.style import RUFF_PYPROJECT_TABLE, ensure_ruff_in_pyproject
-from skore_skills.workspace import MANAGER_ORDER, manager_evidence, package_name
+from skore_skills.workspace import (
+    MANAGER_ORDER,
+    manager_detection,
+    package_name,
+)
 
 NO_MANAGER = "no env manager detected; record one before installing packages"
 AMBIGUOUS = "multiple env managers are visible; do not pick automatically"
@@ -254,12 +258,6 @@ def _recommended(
     return list(MANAGER_ORDER)
 
 
-def _mismatch(root: Path, evidence: dict[str, list[str]]) -> bool:
-    recorded = _recorded_manager(root)
-    present = [name for name in MANAGER_ORDER if name in evidence]
-    return recorded is not None and len(present) == 1 and present[0] != recorded
-
-
 def detect(root: Path) -> dict[str, Any]:
     """Return detection JSON for ``root``.
 
@@ -268,22 +266,11 @@ def detect(root: Path) -> dict[str, Any]:
     ``recommended`` may still rank a recorded policy or ``skore``
     provenance; those do not change ``env_manager``.
     """
-    evidence = manager_evidence(root)
-    managers = [name for name in MANAGER_ORDER if name in evidence]
-    ambiguous = len(managers) > 1
-    if not managers:
-        env_manager: str | None = "none"
-    elif ambiguous:
-        env_manager = None
-    else:
-        env_manager = managers[0]
+    manager = manager_detection(root)
+    evidence = manager["evidence"]
     provenance = skore_cli_provenance()
     return {
-        "env_manager": env_manager,
-        "managers": managers,
-        "evidence": evidence,
-        "ambiguous": ambiguous,
-        "mismatch": _mismatch(root, evidence),
+        **manager,
         "recommended": _recommended(root, evidence, provenance["manager"]),
         "provenance": provenance,
         "managed": load_policy(root).get("env", {}).get("managed"),
@@ -523,7 +510,8 @@ def reexec_in_dev(root: Path, argv: Sequence[str] | None = None) -> int | None:
         return None
     payload = detect(root)
     if payload["ambiguous"]:
-        return None
+        sys.stderr.write(AMBIGUOUS + "\n")
+        return 1
     manager = payload["env_manager"]
     if manager in {None, "none"}:
         return None
@@ -964,6 +952,8 @@ def init_environment(
     if _unmanaged(root):
         return UNMANAGED + "\n", 1
     payload = detect(root)
+    if payload["ambiguous"]:
+        return AMBIGUOUS + "\n", 1
     detected = payload["env_manager"]
     if detected not in {None, "none", manager}:
         return INIT_MISMATCH.format(detected=detected, wanted=manager) + "\n", 1

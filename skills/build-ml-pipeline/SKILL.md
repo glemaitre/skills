@@ -225,12 +225,16 @@ bottom; any match means STOP.
 
 ### S3. Splitter selection is out of scope
 
-- **Rule:** no `KFold` / `StratifiedKFold` / `train_test_split` /
-  any splitter import in pipeline code.
-- **Symptom:** you're about to type `from sklearn.model_selection
-  import KFold` in `pipeline.py`.
-- **Recovery:** that's `evaluate-ml-pipeline`'s territory. This
-  skill only wires `split_kwargs` AT the X marker (see Rule 2).
+- **Rule:** no `train_test_split` and no `skore.evaluate` in
+  pipeline code. Do not pick IID vs time splitters (`KFold`,
+  `TimeSeriesSplit`) here. **Exception:** when `split_kwargs` is
+  non-empty, pass `cv=<mapping-table splitter>()` on `mark_as_X`
+  (skrub requires it). That is Pattern B — see
+  `evaluate-ml-pipeline/references/metadata-routing.md`.
+- **Symptom:** `from sklearn.model_selection import KFold` as an
+  IID default, or `skore.evaluate` in `pipeline.py`.
+- **Recovery:** kwargs-free CV is `evaluate-ml-pipeline` Pattern A
+  (`splitter=`). Grouped metadata stays on the X marker.
 
 ### S4. `skrub.X(...)` / `skrub.y(...)` are not acceptable graph roots
 
@@ -333,9 +337,11 @@ Layer 3: features take X + history as references.
 - **Rule:** every Python command (version check, signature
   lookup, data inspection, loader sanity-check, anything) lands
   in `scratch/<YYYY-MM-DD>_<HHMMSS>_<short>.py` and runs via
-  `pixi run python scratch/<ts>_<short>.py`.
-- **Symptom:** you catch yourself typing `pixi run python -c`
-  or `python -c`.
+  the composed-dev Python command reported by
+  `python -m skore_skills env verify`, replacing its import probe
+  with `scratch/<ts>_<short>.py`.
+- **Symptom:** you catch yourself typing an inline composed-dev
+  `python -c`.
 - **Recovery:** write the file first, then execute. **Inline is
   forbidden regardless of length** (see `python -m skore_skills api get` § Stop
   conditions). No 2-line carve-out.
@@ -357,7 +363,7 @@ Layer 3: features take X + history as references.
 | `feature_steps=[]` toggle "to make predict work" | S5 symptom. Fix the graph, not the predict-time bypass |
 | `skore.evaluate(learner, X, y, ...)` | SkrubLearner takes an env-dict. Use `data={"data_dir": ..., ...}` |
 | `bare sklearn.Pipeline` as top-level | Rewrite as skrub DataOps graph (Rule 1) |
-| Inline `pixi run python -c "..."` | S7. Write to `scratch/<ts>_*.py` instead |
+| Inline composed-dev `python -c "..."` | S7. Write to `scratch/<ts>_*.py` instead |
 
 ## Pre-flight — emit before any code
 
@@ -367,7 +373,7 @@ Evidence = unchecked.
 ```
 Pre-flight (build-ml-pipeline):
 - [ ] Tier 1 mandatory libs importable: sklearn, skrub, skore
-      Evidence: scratch/<ts>_check_tier1.py + `pixi run python …` output.
+      Evidence: scratch/<ts>_check_tier1.py + composed-dev Python output.
                 **Inline `python -c` is NOT evidence.**
 - [ ] Tabular library identified: pandas | polars
       Evidence: `status.policy.tabular` | user quote
@@ -496,45 +502,49 @@ production fit / cross-validate.
 **Downstream evaluation contract.** A `SkrubLearner` does NOT
 implement sklearn's `fit(X, y)` signature — it takes an
 environment dict. Pair with
-`skore.evaluate(learner, data={"data_dir": ..., ...}, splitter=...)`,
-never with `skore.evaluate(learner, X, y, ...)` (raises). See
-`evaluate-ml-pipeline`; confirm signatures via
-`python -m skore_skills api get`.
+`skore.evaluate(learner, data={"data_dir": ..., ...})`, never
+with `skore.evaluate(learner, X, y, ...)` (raises). Pass
+`splitter=` only for Pattern A; omit it for Pattern B. See
+`evaluate-ml-pipeline/references/metadata-routing.md`; confirm
+signatures via `python -m skore_skills api get`.
 
 **Cross-validation metadata at the X marker.** If the data has
 group structure (subjects, sessions, customer IDs, repeated
-measures) or temporal ordering, attach the relevant column at
-`.skb.mark_as_X(split_kwargs={...})`:
+measures), attach the group column at `.skb.mark_as_X` (Pattern B
+below). **Ask the user** when you can't tell from data alone —
+name suspect columns (anything ending in `_id`, `subject` /
+`session` / `region`) and ask whether to wire them. Don't
+silently leave `split_kwargs` empty when group structure is
+plausible.
+
+**Time ordering is not a `split_kwargs` key.** `TimeSeriesSplit`
+needs rows already sorted and no extra `split()` kwargs (Pattern
+A). Sort upstream; leave `split_kwargs` empty. Detect time from
+EDA / the journal, not by putting `times=` on `mark_as_X`. Only
+a **custom** splitter whose `split()` actually takes `times=`
+(or similar) is Pattern B.
+
+**Pattern B** (splitter `split()` needs kwargs `evaluate` cannot
+take, typically `groups`): pass both `cv=` and `split_kwargs`.
+skrub requires `cv=` whenever `split_kwargs` is set. Name the
+mapping-table splitter (`GroupKFold` for `groups`) as a
+constructor placeholder — `G-CV-SPLITTER` still owns the *choice*;
+this is not picking `KFold` vs `TimeSeriesSplit`.
 
 ```python
-X = data.drop(columns=[...]).skb.mark_as_X(
+from sklearn.model_selection import GroupKFold
+
+X = data.drop(columns=[..., "customer_id"]).skb.mark_as_X(
+    cv=GroupKFold(),
     split_kwargs={"groups": data["customer_id"]},
 )
 ```
 
-Keys map to the cross-validator's `split(X, y, **split_kwargs)`
-(e.g. `groups`). **Ask the user** when you can't tell from data
-alone whether such structure exists — name suspect columns
-(anything ending in `_id`, columns called `subject` / `session` /
-`region`, any `date` / `timestamp` for temporal ordering) and
-ask whether to wire them. Don't silently leave `split_kwargs`
-empty when group structure is plausible — that produces optimistic
-CV downstream. Choosing the splitter itself is
-`evaluate-ml-pipeline`'s job; this skill only wires the metadata.
+**Pattern A** (`KFold`, `TimeSeriesSplit`, …): do **not** set `cv=`
+or `split_kwargs`. `evaluate-ml-pipeline` passes `splitter=`.
 
-`mark_as_X` also accepts a `cv=<splitter>` argument, and
-`skore.evaluate(...)` without an explicit `splitter=` will reuse it
-(with these `split_kwargs`). **Do not use `cv=` here** — it would
-pull a splitter import into pipeline code (forbidden by S3). Wire
-only `split_kwargs`; `evaluate-ml-pipeline` selects the splitter and
-passes `splitter=`, which overrides any DataOp `cv` anyway.
-
-**Stop after wiring `split_kwargs`.** Do not write
-`splitter=GroupKFold(...)` or `skore.evaluate(..., splitter=...)`
-in this skill. Do not name `GroupKFold` / `KFold` /
-`TimeSeriesSplit` as the likely default — that is picking the
-splitter. Say only: `evaluate-ml-pipeline` consumes `split_kwargs`
-and owns the splitter.
+Do not write `skore.evaluate(...)` in this skill. Full table:
+`evaluate-ml-pipeline/references/metadata-routing.md`.
 
 Even when `customer_id` is already wired, still paste this ask
 verbatim (the named-heuristic tokens are load-bearing):
@@ -685,7 +695,7 @@ examples: → `references/reproducibility_mechanics.md`):
 
 ### Cheap executable check
 
-`triage-ml-task` § 3's smoke-test gate runs **all** of
+The post-build smoke gate runs **all** of
 `tests/smoke/`, not just the new one. A prior smoke test going
 red after a change = default behavior not preserved. Fix before
 declaring the new experiment ready.
@@ -729,7 +739,7 @@ catalogue with code: → `references/common_patterns.md`.
 | `smoke-test-ml-pipeline` | **Sub-step.** Writes `tests/smoke/test_NN_*.py` and **runs pytest**. Red pytest → stay here and fix topology; do not loosen the assertion |
 | `add-python-package` | Detection + install commands. Invoke when `import skrub` raises |
 | `research-ml-practice` | Literature worker. Load if installed on a FE / transform / leakage concern; distill below. Missing → one-line skip |
-| `python -m skore_skills style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct `pixi run ruff check` drops the NumPyDoc convention |
+| `python -m skore_skills style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct manager-specific ruff commands drop the NumPyDoc convention |
 
 ## Literature distillation
 

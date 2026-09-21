@@ -113,8 +113,8 @@ Defaults (override in `pixi.toml` or on the CLI):
   - small — `openrouter/qwen/qwen3.7-flash`: no default assignment
   - medium — `openrouter/deepseek/deepseek-v4.1-flash`:
     `setup-workspace`, `setup-python-env`, `evaluate-ml-pipeline`,
-    `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`
-    (and, when they gain evals, `explore-ml-data`, `audit-ml-pipeline`)
+    `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`,
+    `explore-ml-data`, `audit-ml-pipeline`
   - big — `openrouter/deepseek/deepseek-v4.1-flash`:
     `build-ml-pipeline`
 - judge: `openrouter/deepseek/deepseek-v4.1-flash` (not tiered)
@@ -140,10 +140,10 @@ pixi run -e eval eval -- -k build-ml-pipeline
 # One case (node ids are `{skill}-case{N}-{title-slug}-{mode}-{model}`)
 pixi run -e eval eval -- -k 'build-ml-pipeline and case1'
 
-# All skills, each on its assigned tier (~79 nodes)
+# All skills, each on its assigned tier (~180 cases)
 pixi run -e eval eval
 
-# Only the big-tier skills (Kimi K3)
+# Only the big-tier skills
 pixi run -e eval eval -- --skill-tier big
 
 # Full matrix: every skill x small/medium/big

@@ -56,14 +56,13 @@ reading the digest. Read-only against the skore Project.
 | Came here from… | After audit, next is… |
 |---|---|
 | `model-ml-pipeline` (implement loop) | → Return to the dispatcher for convert / site / git end-turn |
-| `manage-ml-backlog` § 4 record-outcome | → Read audit digest, fill Status block + JOURNAL row |
 | User free-text ("audit 02", "re-audit 04") | → Surface metrics, then own the close (see § End of turn) |
 | Re-run of an existing experiment | → Re-execute the existing audit file; surface diff if metrics changed |
 
-The audit is dispatched **FIRST** in § 4, before any scratch probes.
-The digest carries the checks summary and the metrics summary — it
-replaces ad-hoc `scratch/<ts>_inspect_*.py` files for the metric
-extraction step.
+The implement loop dispatches audit **after evaluate and before
+record-outcome**. The digest carries the checks summary and metrics
+summary; `manage-ml-backlog` record-outcome consumes it and never
+dispatches audit back.
 
 ## Where things live — visual map
 
@@ -180,29 +179,28 @@ conditions for the three-consumer rule.
 | Add a fix-up cell that mutates `data/` or `reports/` | Audit files are read-only. State mutations belong in a `scratch/<ts>_*.py` probe or the experiment script |
 | Substitute `<SKORE_PROJECT_INIT>` in `audit/<stem>.py` without reading `experiments/<stem>.py` first | Audit must open the same Project. Always Read experiments/<stem>.py this turn and copy the literal Project init block byte-identical (modulo formatting) |
 | Hub mode: put `skore.login(mode="hub")` after `skore.Project(...)` | `Project(...)` constructor authenticates at init time; without prior `login`, fails. Order is fixed: login first, Project second |
-| § 4 dispatched audit → write scratch probe first to "double-check metrics" | The audit IS the metric-extraction step in § 4. Scratch probes for metrics are the anti-pattern this dispatch replaces |
+| Implement-loop audit → write scratch probe first to "double-check metrics" | The audit IS the metric-extraction step. Scratch probes for metrics are the anti-pattern this dispatch replaces |
 
 ## Pre-flight — emit before any audit-file write or execution
 
 ```
 Pre-flight (audit-ml-pipeline):
 - [ ] Experiment stem confirmed: <NN_short_name>
-      Evidence: journal/NN_<short_name>.md exists AND state ≥ done
+      Evidence: journal/NN_<short_name>.md exists AND state is approved
                 | "n/a — user invoked re-audit on existing stem"
 - [ ] Four-way pairing complete:
-        journal/NN_<short_name>.md       — design note (state ≥ done)
+        journal/NN_<short_name>.md       — design note (state approved or done)
         experiments/NN_<short_name>.py   — script
         tests/smoke/test_NN_<short_name>.py — smoke test (passing)
         audit/NN_<short_name>.py         — about to be written / refreshed
       Evidence: ls / Glob on each path
 - [ ] Report present in skore Project under key=<NN_short_name>
-      Evidence: scratch/<ts>_check_report.py probe ran
-                project.summarize() this turn; row with
+      Evidence: project.summarize() this turn; row with
                 key == "<NN_short_name>" appears.
                 "Run finished, put() landed" is NOT sufficient.
 - [ ] Agent feature available:
-        `pixi run -e dev ipython -c "print(0)"` exit 0
-        `pixi run -e dev ipython --version` exit 0
+        run `ipython -c "print(0)"` and `ipython --version`
+        through the project's composed dev environment
       Evidence: tool output of each
                 | JOURNAL.md Status `agent feature: installed`
                 Missing → STOP, delegate to add-python-package agent tools (ruff / ipython / ipykernel)
@@ -341,7 +339,7 @@ do not `pixi add`.
 
 ## Four-way stem-pairing rule
 
-Extends `organize-ml-workspace`'s pairing rule from three artifacts
+Extends `setup-workspace`'s pairing rule from three artifacts
 to four:
 
 ```
@@ -360,8 +358,8 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 
 | Caller | When |
 |---|---|
-| `manage-ml-backlog` § 4 record-outcome | Automatic; dispatched FIRST (replaces scratch probes for metric extraction). Agent feature must be available |
-| `triage-ml-task` § 0 (bootstrap) | After the first baseline run, dispatch here for `audit/01_baseline.py` |
+| `model-ml-pipeline` | After successful evaluate, before record-outcome |
+| `evaluate-ml-pipeline` | Standalone evaluate may run audit before its close |
 | User free-text | "audit experiment 02", "show me what 03", "re-audit 04" — resolves directly |
 
 ### Calls into
@@ -401,8 +399,8 @@ error; do not fail the audit turn.
 Run `python -m skore_skills git end-turn --stage evaluate` — the
 audit continues the evaluate stage; there is no `audit` stage on
 that command. If JSON `action` is `invoke`, load `persist-ml-git`
-and follow it. Then load `triage-ml-task`. Do not run
-`git commit` in this skill.
+and stop; that skill returns to triage. Otherwise load
+`triage-ml-task`. Do not run `git commit` in this skill.
 
 ## Failure modes and recovery
 
@@ -437,10 +435,10 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 
 | Skill | Relationship |
 |---|---|
-| `manage-ml-backlog` | Caller. § 4 dispatches here FIRST; the digest feeds the `JOURNAL.md` Status + History update |
+| `manage-ml-backlog` | Downstream record-outcome consumer; never dispatches audit from record-outcome mode |
 | `iterate-from-skore` | Downstream consumer of this skill's digest. `audit-ml-pipeline` opens the Project and renders the digest; `iterate-from-skore` parses the digest as text and drafts Backlog rows from each surfaced check. Never opens the Project itself |
 | `evaluate-ml-pipeline` | Producer side. `skore.evaluate` + `project.put` live only in `experiments/NN_*.py` |
-| `organize-ml-workspace` | Workspace layout; four-way stem pairing |
+| `setup-workspace` | Workspace layout; four-way stem pairing |
 | `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |
 | `python -m skore_skills api get` | skore symbol lookups. Cache hits first |
 | `python -m skore_skills style` | ruff after writing/editing `audit/<stem>.py` |

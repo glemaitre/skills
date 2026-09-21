@@ -95,6 +95,10 @@ def test_status_organized_fixture(
     assert payload == {
         "package": "demo-pkg",
         "env_manager": "pixi",
+        "managers": ["pixi"],
+        "evidence": {"pixi": ["pixi.toml"]},
+        "ambiguous": False,
+        "mismatch": False,
         "has_src": True,
         "has_experiments": True,
         "has_journal": True,

@@ -18,6 +18,10 @@ MANAGER_ORDER = ("pixi", "uv", "poetry", "hatch", "conda", "pip-venv")
 STATUS_KEYS = (
     "package",
     "env_manager",
+    "managers",
+    "evidence",
+    "ambiguous",
+    "mismatch",
     "has_src",
     "has_experiments",
     "has_journal",
@@ -116,6 +120,31 @@ def first_manager(evidence: dict[str, list[str]]) -> str:
     return "none"
 
 
+def manager_detection(root: Path) -> dict[str, Any]:
+    """Return manifest-based manager facts shared by status and env detect."""
+    evidence = manager_evidence(root)
+    managers = [name for name in MANAGER_ORDER if name in evidence]
+    ambiguous = len(managers) > 1
+    env_manager: str | None
+    if ambiguous:
+        env_manager = None
+    elif managers:
+        env_manager = managers[0]
+    else:
+        env_manager = "none"
+    recorded = load_policy(root).get("env_manager")
+    mismatch = (
+        recorded in MANAGER_ORDER and len(managers) == 1 and managers[0] != recorded
+    )
+    return {
+        "env_manager": env_manager,
+        "managers": managers,
+        "evidence": evidence,
+        "ambiguous": ambiguous,
+        "mismatch": mismatch,
+    }
+
+
 def package_name(root: Path) -> str | None:
     """Return ``[project].name`` or the first ``src/`` package directory."""
     pyproject = load_pyproject(root)
@@ -185,10 +214,10 @@ def is_scaffolded(root: Path) -> bool:
 
 def snapshot(root: Path) -> dict[str, Any]:
     """Return the frozen ``status`` mapping for ``root``."""
-    evidence = manager_evidence(root)
+    manager = manager_detection(root)
     payload: dict[str, Any] = {
         "package": package_name(root),
-        "env_manager": first_manager(evidence),
+        **manager,
         "has_src": (root / "src").is_dir(),
         "has_experiments": (root / "experiments").is_dir(),
         "has_journal": (root / "journal").is_dir(),

@@ -98,11 +98,12 @@ proposal. Stop for explicit design approval after populating it.
    first. No report → do not invent an audit; stop.
 4. After audit — or after evaluate when audit was skipped — load
    `manage-ml-backlog` in **record-outcome mode**, handing it the
-   audit digest. It writes the `JOURNAL.md` History row and the
-   design-note Status block, then returns; it does not rescan the
-   Backlog and does not open the next-lever menu. Never mark
-   `done` while smoke is red. Missing digest and no user value →
-   one-line skip; do not invent a metric.
+   normalized G-REPORT-LOCATOR and the optional audit digest or
+   headline. It writes the `JOURNAL.md` History row and design-note
+   Status block, then returns; it does not rescan the Backlog or
+   open the next-lever menu. Never mark `done` while smoke is red.
+   Audit-skipped runs still record the locator; missing headline
+   becomes `n/a`, never an invented metric.
 
 Do not duplicate child-skill methodology. Before new library
 symbols are written, children use
@@ -133,7 +134,10 @@ symbols are written, children use
   `research-ml-practice` if installed). Do not distill research
   here; do not invent papers from memory.
 
-After **Stop**, or while smoke is red: skip evaluate and audit.
+After **Stop**, or while smoke is red: skip evaluate, audit, and
+record-outcome. This is an explicit no-result close: do not mark
+the experiment done, but still perform the conversion/site steps
+below when applicable, then run `git end-turn` and return to triage.
 If `policy.notebooks` is true and `export-ml-notebook` is
 installed, run
 `python -m skore_skills notebook convert experiments/<stem>.py`
@@ -158,6 +162,7 @@ Name a build error; do not fail the model turn.
 
 Then run
 `python -m skore_skills git end-turn --stage implement`. If JSON
-`action` is `invoke`, load `persist-ml-git` and follow it. Then
-load `triage-ml-task`. Do not run `git commit` in this skill.
+`action` is `invoke`, load `persist-ml-git` and stop; that skill
+returns to triage. Otherwise load `triage-ml-task`. Do not run
+`git commit` in this skill.
 Never mark `done` while smoke is red.

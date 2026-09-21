@@ -235,7 +235,12 @@ substitution replaces the comment AND the block that follows it
 marker comment itself **is removed** in the substituted file —
 it's not a permanent anchor, it's a scaffold-time signal.
 
-### Before substitution (`templates/experiment.py`)
+### Authoritative experiment skeleton before substitution
+
+Use the experiment call shapes in
+`build-ml-pipeline/references/skrub_interop.md`; there is no
+packaged `templates/experiment.py` file. The relevant Project-init
+block starts as:
 
 ```python
 # %%

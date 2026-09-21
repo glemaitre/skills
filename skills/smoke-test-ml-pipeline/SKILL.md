@@ -411,7 +411,7 @@ metric problem.
 ## What this skill does NOT do
 
 - Write the design note or the experiment script. Those are
-  `triage-ml-task` and `organize-ml-workspace` /
+  `model-ml-pipeline` and `setup-workspace` /
   `build-ml-pipeline`.
 - Touch the skore Project. The smoke test does not call
   `project.put` — it's a pre-flight check, not a metric
@@ -428,7 +428,8 @@ metric problem.
 
 This is the executable proof. After the test file is written or
 updated, run pytest on `tests/smoke/test_NN_<short_name>.py`
-(project env: `pixi run pytest …` or the equivalent). Red
+(project composed dev environment, using the manager reported by
+`python -m skore_skills env detect`). Red
 pytest → route to `build-ml-pipeline` to modify the pipeline;
 do not start evaluate. Green pytest → return to build for the
 design HITL when this skill was loaded as a sub-step.
@@ -452,7 +453,7 @@ design HITL when this skill was loaded as a sub-step.
 - **`data-science-python-stack`** — declares pytest as a Tier 1
   mandatory dependency for any workspace using this skill.
 - **`python -m skore_skills style`** — **must be invoked** after writing or
-  editing `tests/smoke/test_NN_*.py`. Running `pixi run ruff
+  editing `tests/smoke/test_NN_*.py`. Running a manager-specific ruff
   check` directly without invoking this skill silently drops the
   NumPyDoc docstring convention the stack expects: ruff's
   `D`-rules pass on a one-line summary, but only the skill body

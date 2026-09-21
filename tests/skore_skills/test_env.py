@@ -52,6 +52,40 @@ def test_env_detect_ambiguous(monkeypatch: pytest.MonkeyPatch) -> None:
     assert payload["managers"] == ["pixi", "conda"]
 
 
+def test_status_reports_ambiguous_manager(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Status exposes the same ambiguity facts as env detect."""
+    monkeypatch.chdir(FIXTURES / "ambiguous")
+    result = CliRunner().invoke(cli, ["status"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] is None
+    assert payload["ambiguous"] is True
+    assert payload["mismatch"] is False
+    assert payload["managers"] == ["pixi", "conda"]
+
+
+def test_reexec_in_dev_refuses_ambiguous_manager(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Library commands do not fall back to ambient Python when ambiguous."""
+    from skore_skills import env as env_mod
+
+    called = False
+
+    def fake_run(*args: Any, **kwargs: Any) -> Any:
+        nonlocal called
+        called = True
+        raise AssertionError("subprocess must not run")
+
+    monkeypatch.delenv(env_mod.IN_DEV_ENV, raising=False)
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    code = env_mod.reexec_in_dev(FIXTURES / "ambiguous", argv=["api", "version", "x"])
+    assert code == 1
+    assert called is False
+
+
 def test_env_add_pixi_never_pip(monkeypatch: pytest.MonkeyPatch) -> None:
     """``env add`` on a pixi fixture prints ``pixi add``, never ``pip install``."""
     monkeypatch.chdir(FIXTURES / "pixi")
@@ -462,6 +496,21 @@ def test_env_init_refuses_pixi_toml(
     result = CliRunner().invoke(cli, ["env", "init", "--manager", "pixi"])
     assert result.exit_code != 0
     assert "pixi.toml already exists" in result.output
+
+
+def test_env_init_refuses_ambiguous_manifests(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Init never chooses or mutates one manager in an ambiguous root."""
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    conda = tmp_path / "environment.yml"
+    conda.write_text("name: existing\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "conda"])
+    assert result.exit_code != 0
+    assert "multiple env managers" in result.output
+    assert conda.read_text(encoding="utf-8") == "name: existing\n"
+    assert not (tmp_path / "environment-agent.yml").exists()
 
 
 def test_env_init_refuses_when_unmanaged(

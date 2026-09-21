@@ -1,0 +1,77 @@
+{
+  "skill_name": "audit-ml-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Audit is read-only and returns a digest",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The design is approved, smoke is green, and the persisted report exists.\n- `evaluate-ml-pipeline` dispatched this audit.]\n\nAudit experiment 02 after evaluation.",
+      "expected_output": "Behavioural response satisfying: - Confirm the report with `project.summarize()` and load it with `project.get(id)`. - Render checks and metrics into the audit digest. - Return the digest and normalized report locator to the caller. It must NOT: - Call `skore.evaluate` or `project.put`. - Require the experiment to be `done` before audit. - Dispatch record-outcome before producing the digest.",
+      "files": [],
+      "expectations": [
+        "Confirm the report with `project.summarize()` and load it with `project.get(id)`.",
+        "Render checks and metrics into the audit digest.",
+        "Return the digest and normalized report locator to the caller.",
+        "The response does NOT: Call `skore.evaluate` or `project.put`.",
+        "The response does NOT: Require the experiment to be `done` before audit.",
+        "The response does NOT: Dispatch record-outcome before producing the digest.",
+        "The response does NOT: Write the journal directly."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "Direct audit owns the close",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- This is a direct free-text invocation.\n- The report exists and smoke is green.]\n\nRe-audit experiment 03.",
+      "expected_output": "Behavioural response satisfying: - Surface the normalized persisted-report locator. - Run audit, then call `manage-ml-backlog` record-outcome with the digest and locator. - Build the site only after record-outcome when enabled. It must NOT: - Open the next-lever menu from record-outcome mode. - Call record-outcome before audit. - Run `git commit`.",
+      "files": [],
+      "expectations": [
+        "Surface the normalized persisted-report locator.",
+        "Run audit, then call `manage-ml-backlog` record-outcome with the digest and locator.",
+        "Build the site only after record-outcome when enabled.",
+        "Close with `git end-turn --stage evaluate`.",
+        "The response does NOT: Open the next-lever menu from record-outcome mode.",
+        "The response does NOT: Call record-outcome before audit.",
+        "The response does NOT: Run `git commit`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "Dispatched audit returns without a second close",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `model-ml-pipeline` dispatched the audit.]\n\nContinue the model loop and audit the evaluated baseline.",
+      "expected_output": "Behavioural response satisfying: - Return the digest, locator, and optional headline to `model-ml-pipeline`. - State that the dispatcher owns record-outcome, site, and git close. It must NOT: - Run a second `git end-turn`. - Load triage after returning to the dispatcher. - Dispatch `manage-ml-backlog` before returning.",
+      "files": [],
+      "expectations": [
+        "Return the digest, locator, and optional headline to `model-ml-pipeline`.",
+        "State that the dispatcher owns record-outcome, site, and git close.",
+        "The response does NOT: Run a second `git end-turn`.",
+        "The response does NOT: Load triage after returning to the dispatcher.",
+        "The response does NOT: Dispatch `manage-ml-backlog` before returning."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "Missing report stops without fabrication",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The design is approved and smoke is green.\n- `project.summarize()` has no row for experiment 04.]\n\nAudit experiment 04.",
+      "expected_output": "Behavioural response satisfying: - Stop and report that the persisted report is missing. - Route recovery to evaluation. It must NOT: - Re-run `skore.evaluate` from audit. - Invent a report id, URL, metrics, or digest. - Mark the experiment done.",
+      "files": [],
+      "expectations": [
+        "Stop and report that the persisted report is missing.",
+        "Route recovery to evaluation.",
+        "The response does NOT: Re-run `skore.evaluate` from audit.",
+        "The response does NOT: Invent a report id, URL, metrics, or digest.",
+        "The response does NOT: Mark the experiment done."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

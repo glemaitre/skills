@@ -14,6 +14,9 @@ Markdown is the report: its figures, TableReport HTML, and existing
 converted notebooks (`<stem>.nb.html`, written only by
 `export-ml-notebook` with `notebook convert --html`) are embedded
 inline. HTML viewers have open-separately and fullscreen controls.
+The gitignored serialized Skore `reports/` directory is private
+runtime state and is never copied into the site. Only Markdown and
+already-generated notebook/HTML viewers are exported.
 On desktop, site pages are in the top bar (experiments in a
 scrollable dropdown) and the page contents are in a collapsible
 left rail beside a 1200px report column. Mobile uses a drawer.
@@ -39,4 +42,5 @@ left rail beside a 1200px report column. Mobile uses a drawer.
 - Do not `git commit` or `git end-turn`.
 - Do not `pixi add` / `uv add`; load `add-python-package`.
 - Do not convert or execute `# %%` scripts.
+- Do not copy or link serialized files from gitignored `reports/`.
 - Skip in one line if this skill is not installed.

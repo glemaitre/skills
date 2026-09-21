@@ -53,6 +53,10 @@ the pipeline carries `split_kwargs={"groups": ...}`, the custom
 splitter's `split(self, X, y, groups)` is called with that `groups`
 value at fold time.
 
+If `split` needs extra kwargs, that is Pattern B: declare `cv=` +
+`split_kwargs` on the DataOp and omit `splitter=` on `evaluate`.
+See `metadata-routing.md`.
+
 Add only the kwargs you need. Extra kwargs not declared in your
 splitter's `split` signature will surface as a `TypeError` —
 investigate which side has the mismatch (the X marker or the

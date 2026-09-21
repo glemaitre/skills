@@ -199,6 +199,24 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 12,
+      "title": "Model close preserves the report locator",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Smoke is green and evaluate returned\n  `[Open report](https://example.invalid/report/42) \u00b7 hub \u00b7 id: 42`.\n- Audit is unavailable, so it was skipped.]\n\nFinish the successful baseline evaluation.",
+      "expected_output": "Behavioural response satisfying: - Pass the exact locator to `manage-ml-backlog` record-outcome even though audit was skipped. - Include the same locator in the user-facing close. - Record before convert, site build, and git end-turn. It must NOT: - Drop the locator because there is no audit digest. - Invent a headline metric. - Open the next-lever Backlog menu.",
+      "files": [],
+      "expectations": [
+        "Pass the exact locator to `manage-ml-backlog` record-outcome even though audit was skipped.",
+        "Include the same locator in the user-facing close.",
+        "Record before convert, site build, and git end-turn.",
+        "The response does NOT: Drop the locator because there is no audit digest.",
+        "The response does NOT: Invent a headline metric.",
+        "The response does NOT: Open the next-lever Backlog menu."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

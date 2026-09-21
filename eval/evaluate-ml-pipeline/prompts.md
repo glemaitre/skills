@@ -8,8 +8,8 @@ violated.
 ## CASE_01 — Standard skore.evaluate entry, IID tabular
 
 **User prompt:**
-> Wire `evaluate.py` for the baseline. Tabular regression, no
-> groups, no temporal ordering.
+> Wire `experiments/01_baseline.py` for the baseline. Tabular
+> regression, no groups, no temporal ordering.
 
 **Assumed workspace state:**
 - `journal/01_baseline.md` approved.
@@ -24,7 +24,8 @@ violated.
 **Must do:**
 - Pick **`skore.evaluate(learner, data={...}, splitter=...)`** as
   the entry point (not `cross_val_score`, not `cross_validate`).
-- Map empty `split_kwargs` + IID → **`KFold`** per the mapping table.
+- Map empty `split_kwargs` + IID → **`KFold`** per the mapping table
+  (Pattern A: pass `splitter=KFold(...)`).
 - Name `python -m skore_skills api get` for `skore.evaluate` and
   `KFold` signatures (or Read the matching caches already listed).
 - Mention `data={...}` (env-dict) for `SkrubLearner`, NOT
@@ -47,13 +48,14 @@ violated.
 ## CASE_02 — Time-ordered data, mandatory AskUserQuestion
 
 **User prompt:**
-> Wire `evaluate.py` for the 24h-ahead load forecast experiment.
-> Pick the splitter.
+> Wire `experiments/02_load_forecast.py` for the 24h-ahead load
+> forecast experiment. Pick the splitter.
 
 **Assumed workspace state:**
 - `journal/02_load_forecast.md` approved.
-- `pipeline.py` X-marker has `split_kwargs={"times": ...}` (temporal
-  ordering attached at build time).
+- `pipeline.py` X-marker has empty `split_kwargs` (no `cv=`).
+  Rows are already time-ordered. `TimeSeriesSplit` needs no
+  extra `split()` kwargs (Pattern A).
 - Forecast horizon is 24h.
 - Matching smoke pytest is green.
 - Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering
@@ -82,8 +84,8 @@ violated.
 **Must NOT do:**
 - Skip the four-option ask and lock a splitter with no user pick.
   Naming a **recommended** option (e.g. `TimeSeriesSplit(gap=horizon)`)
-  next to the menu, or drafting `evaluate.py` labeled pending
-  confirmation, is not a silent pick.
+  next to the menu, or drafting `experiments/02_load_forecast.py`
+  labeled pending confirmation, is not a silent pick.
 - Default to `KFold` because empty `gap` "feels safer".
 - Treat harness "no clarifying questions" hint as waiving the
   mandatory ask.
@@ -93,17 +95,21 @@ violated.
 ## CASE_03 — `split_kwargs={"groups": ...}` → GroupKFold
 
 **User prompt:**
-> Wire `evaluate.py` for a tabular regression where rows are grouped
-> by customer.
+> Wire `experiments/NN_*.py` for a tabular regression where rows
+> are grouped by customer.
 
 **Assumed workspace state:**
 - `pipeline.py` X-marker has
-  `split_kwargs={"groups": data["customer_id"]}`.
+  `cv=GroupKFold()` and
+  `split_kwargs={"groups": data["customer_id"]}` (Pattern B).
 - No temporal structure.
 
 **Must do:**
 - Paste **`GroupKFold`** from the mapping table (`groups` →
   `GroupKFold`). That identifier is the mapping; do not withhold it.
+- Call `skore.evaluate(learner, data={...})` **without**
+  `splitter=` so skore reuses the DataOp `cv` and `groups`
+  (`references/metadata-routing.md` Pattern B).
 - `python -m skore_skills api get` for the *signature* may be named
   as the next live turn. Do not fail if signature lookup is BLOCKED
   as long as `GroupKFold` is named.
@@ -114,14 +120,16 @@ violated.
 - Use `StratifiedGroupKFold`.
 - Use `LeaveOneGroupOut` (forbidden — per-fold variance too high).
 - Pick `KFold` ignoring the group structure.
+- Pass `splitter=GroupKFold()` (or any `splitter=`) to `evaluate`
+  — that drops `split_kwargs` and `groups` becomes None.
 
 ---
 
 ## CASE_04 — Empty `split_kwargs` BUT possible group structure
 
 **User prompt:**
-> Wire `evaluate.py`. The data has a `region` column. Not sure if
-> we should treat it as a group.
+> Wire `experiments/NN_*.py`. The data has a `region` column. Not
+> sure if we should treat it as a group.
 
 **Assumed workspace state:**
 - `pipeline.py` X-marker has empty `split_kwargs`.
@@ -132,9 +140,8 @@ violated.
 - Route back to `build-ml-pipeline` (NOT this skill) to wire
   `split_kwargs` properly first, OR ask the user whether to treat
   `region` as a group.
-- Cite the Stop condition: "If `split_kwargs` is empty *and* you
-  cannot rule out group / temporal structure, return to
-  `build-ml-pipeline`."
+- Cite the Stop condition: empty `split_kwargs` plus possible
+  **groups** → return to `build-ml-pipeline`.
 
 **Must NOT do:**
 - Default to `KFold` and proceed.
@@ -165,7 +172,7 @@ violated.
   instead.
 
 **Must NOT do:**
-- Write `cross_val_score(...)` in `evaluate.py`.
+- Write `cross_val_score(...)` in `experiments/NN_*.py`.
 - Use `print(mean_squared_error(...))` instead of the report
   object.
 - Allow the substitution as a "just for now" workaround.
@@ -232,7 +239,7 @@ violated.
 ## CASE_08 — G-SKORE-MODE unset at first evaluate
 
 **User prompt:**
-> Wire `evaluate.py` for the baseline.
+> Wire `experiments/01_baseline.py` for the baseline.
 
 **Assumed workspace state:**
 - `journal/01_baseline.md` approved.
@@ -263,7 +270,7 @@ violated.
 ## CASE_09 — Recorded skore mode is not re-asked
 
 **User prompt:**
-> Wire `evaluate.py` for the baseline.
+> Wire `experiments/01_baseline.py` for the baseline.
 
 **Assumed workspace state:**
 - Same as CASE_01.
@@ -431,3 +438,72 @@ violated.
 - Invent an HTTP URL for the file store.
 - Treat `file:./mlruns` as a clickable run page.
 - Convert, site-build, or `git end-turn` without the locator.
+
+---
+
+## CASE_16 — Do not pass `splitter=` when groups are on the DataOp
+
+**User prompt:**
+> Groups are already on `mark_as_X`. Call `skore.evaluate` with
+> `splitter=GroupKFold()` so the gate is visible.
+
+**Assumed workspace state:**
+- X marker has `cv=GroupKFold()` and
+  `split_kwargs={"groups": data["customer_id"]}`.
+- Smoke is green.
+
+**Must do:**
+- Cite Pattern B (`references/metadata-routing.md`): omit
+  `splitter=` so skore reuses DataOp `cv` + `groups`.
+- Write `skore.evaluate(learner, data={...})` with no `splitter=`.
+
+**Must NOT do:**
+- Pass `splitter=GroupKFold()` (or any `splitter=`) — that drops
+  `split_kwargs` and `groups` becomes None.
+
+---
+
+## CASE_17 — Standalone evaluate close is ordered
+
+**User prompt:**
+> Evaluate the approved, smoke-green experiment and finish the turn.
+
+**Assumed workspace state:**
+- This is a standalone evaluate invocation.
+- Notebooks and site are enabled.
+
+**Must do:**
+- After `put`, surface G-REPORT-LOCATOR first.
+- Run audit when available, then record-outcome with locator and
+  optional digest/headline.
+- Order the remaining close as notebook convert, site build, then
+  `git end-turn --stage evaluate`.
+- If git returns `invoke`, stop after loading `persist-ml-git`
+  because it returns to triage.
+
+**Must NOT do:**
+- Record before the locator exists.
+- Build the site before record-outcome.
+- Load triage a second time after `persist-ml-git`.
+
+---
+
+## CASE_18 — Direct first evaluation still requires post-smoke consent
+
+**User prompt:**
+> Run evaluation for 05_new_model.
+
+**Assumed workspace state:**
+- The design is approved and smoke is green.
+- This experiment has never been evaluated.
+- The user has not yet chosen Evaluate at the post-smoke gate.
+
+**Must do:**
+- Present Evaluate (Recommended) / Modify / Stop before the first
+  evaluation.
+- Explain that an explicit re-evaluation request for an existing
+  persisted report can proceed directly.
+
+**Must NOT do:**
+- Treat the first-run request as re-evaluation.
+- Write or execute `skore.evaluate` before the gate answer.

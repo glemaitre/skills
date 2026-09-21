@@ -24,7 +24,7 @@ Decide where artifacts live. Do not design an experiment here.
 
 ## Detection
 
-- `src/` or `experiments/` present → **existing**. Reuse names and
+- `src/` or `journal/` present → **existing**. Reuse names and
   folders. Do not scaffold again.
 - Manager manifest without `src/<pkg>/` → **manager-only**. Still
   scaffold; keep existing `pyproject.toml`. No `--force`.
@@ -50,7 +50,8 @@ after listing the boxes.
    name as the default option). “You pick” / “go fast” does not
    resolve it. Do not confirm in prose instead of the tool. A
    matching `[project] name` + `src/<pkg>/` already resolves it —
-   do not re-ask.
+   do not re-ask. Persist the resolved import name with
+   `python -m skore_skills policy set package <pkg>`.
 2. Fresh / manager-only:
 
    ```bash
@@ -89,8 +90,9 @@ after listing the boxes.
 5. If `setup-ml-project` dispatched this turn and is in this
    session, return to it; else stop. Standalone:
    `python -m skore_skills git end-turn --stage setup`. If JSON
-   `action` is `invoke`, load `persist-ml-git` when installed.
-   Then load `triage-ml-task` when installed.
+   `action` is `invoke`, load `persist-ml-git` when installed and
+   stop; it returns to triage. Otherwise load `triage-ml-task` when
+   installed.
 
 ## Stop conditions
 

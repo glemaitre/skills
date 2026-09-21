@@ -39,9 +39,11 @@ error: return to `model-ml-pipeline`; do not fabricate B1.
 ## Record-outcome mode
 
 When `model-ml-pipeline`, `evaluate-ml-pipeline`, or
-`audit-ml-pipeline` calls at end of turn with the audit digest
-already in hand. This is the only path that records an outcome
-without a full backlog turn.
+`audit-ml-pipeline` calls at end of turn with the normalized
+G-REPORT-LOCATOR plus an optional audit digest or user-supplied
+headline. This is the only path that records an outcome without a
+full backlog turn. Audit may have been skipped; the locator remains
+required.
 
 Run Procedure steps 1-3 and nothing else:
 
@@ -49,10 +51,10 @@ Run Procedure steps 1-3 and nothing else:
    stem.
 2. Step 2 — read `journal/JOURNAL.md`; scaffold the index if it is
    missing.
-3. Step 3 — update the matching History row and the design-note
-   Status block from the digest, including its normalized persisted
-   report locator. Also refresh the `JOURNAL.md` Status rows `Last
-   experiment` and `Last result`.
+3. Step 3 — update the matching History row and design-note Status
+   block from the digest or user-supplied headline when available,
+   including the normalized persisted report locator. Also refresh
+   the `JOURNAL.md` Status rows `Last experiment` and `Last result`.
 
 Then return to the caller. Skip step 4 (Backlog rescan) and step 5
 (the next-lever triage menu) — the caller did not ask what to try
@@ -65,15 +67,16 @@ this skill's End of turn either: the caller owns convert / site /
 
 The Procedure guards still bind. Never mark `done` while smoke is
 red, and never invent a metric — no digest and no user-supplied
-value means a one-line skip, not a guess. Never construct a missing
+value means use `n/a`, not a guess. Never construct a missing
 backend URL. Record `n/a — backend did not expose a locator` in
 both markdown destinations when the digest has no authoritative
 locator.
 
 ## Procedure
 
-1. Run `python -m skore_skills status`. Require an approved stem
-   and a report/audit digest when recording a done outcome.
+1. Run `python -m skore_skills status`. Require an approved stem,
+   green smoke evidence, and a normalized report locator when
+   recording a done outcome. An audit digest is optional.
 2. Read `journal/JOURNAL.md` History and Backlog. If the index is
    missing, run `python -m skore_skills scaffold --journal`. Do
    not write or paste the file. The CLI writes four sections:
@@ -93,12 +96,15 @@ locator.
    `n/a — backend did not expose a locator` in both places; do not
    derive or guess a URL. Update the rest of the design-note Status
    block the same way.
-4. Scan Backlog. Resolve rows the run answered or killed. Add at
-   most a few next-lever options (`skore:<stem>`, `user`,
-   `my-pick:<stem>`).
-5. Ask triage: draft the next experiment now, pick a Backlog row,
-   or stop. When a row is selected, the model stage can create its
-   design-note shell with
+4. Perform a full Backlog rescan. Resolve rows the run answered or
+   killed, preserving stable indices. Then route sourcing explicitly:
+   report-derived ideas → `iterate-from-skore`; user proposals →
+   `iterate-from-user`; an existing row or stop → `model-ml-pipeline`.
+   Returned candidates/proposals are written by this parent, not by
+   either sourcing child.
+5. Ask whether to draft from the refreshed Backlog or stop. When a
+   row is selected, return it to `model-ml-pipeline`, which can
+   create its design-note shell with
    `python -m skore_skills scaffold --journal --stem <NN_short_name>`.
    Do not draft that template in this backlog turn.
 
@@ -112,7 +118,8 @@ locator.
 - Do not paste a `JOURNAL.md` body or recreate the index from
   memory.
 - Do not mark `done` while smoke is red.
-- G-DESIGN stays in the implement/evaluate skills, not here.
+- Design approval is owned by `model-ml-pipeline`; this skill only
+  returns a confirmed proposal or selected Backlog row.
 
 ## End of turn
 
@@ -123,5 +130,6 @@ in one line otherwise. Name a build error; do not fail the
 backlog turn.
 
 Run `python -m skore_skills git end-turn --stage backlog`. If JSON
-`action` is `invoke`, load `persist-ml-git` and follow it. Then
-load `triage-ml-task`. Do not run `git commit` in this skill.
+`action` is `invoke`, load `persist-ml-git` and stop; that skill
+returns to triage. Otherwise load `triage-ml-task`. Do not run
+`git commit` in this skill.

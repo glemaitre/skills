@@ -259,3 +259,26 @@
 - Convert `audit/01_baseline.py` here — the audit skill did it.
 - Open the next-lever Backlog menu in record-outcome mode.
 - Write the journal files directly instead of dispatching.
+
+---
+
+## CASE_12 — Model close preserves the report locator
+
+**User prompt:**
+> Finish the successful baseline evaluation.
+
+**Assumed workspace state:**
+- Smoke is green and evaluate returned
+  `[Open report](https://example.invalid/report/42) · hub · id: 42`.
+- Audit is unavailable, so it was skipped.
+
+**Must do:**
+- Pass the exact locator to `manage-ml-backlog` record-outcome even
+  though audit was skipped.
+- Include the same locator in the user-facing close.
+- Record before convert, site build, and git end-turn.
+
+**Must NOT do:**
+- Drop the locator because there is no audit digest.
+- Invent a headline metric.
+- Open the next-lever Backlog menu.

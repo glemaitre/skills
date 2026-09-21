@@ -24,6 +24,10 @@ def test_scaffold_tree_and_no_placeholders(
     assert (src / "features.py").is_file()
     assert (src / "pipeline.py").is_file()
     assert (src / "evaluate.py").is_file()
+    evaluate_stub = (src / "evaluate.py").read_text(encoding="utf-8")
+    assert "Pattern A" in evaluate_stub
+    assert "Pattern B" in evaluate_stub
+    assert "splitter = None" in evaluate_stub
     assert not (tmp_path / "experiments" / "01_baseline.py").exists()
     assert not (tmp_path / "data" / "data_analysis.py").exists()
     for rel in (
@@ -100,6 +104,22 @@ def test_scaffold_on_manager_only_root(
     assert '[project]\nname = "demo"\n' in kept
     assert "[tool.ruff]" in kept
     assert gitignore.read_text(encoding="utf-8") == "# pixi\n.pixi/\n"
+
+
+def test_full_scaffold_refuses_journal_only_workspace_without_overwrite(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A journal-only workspace is existing and its index is preserved."""
+    journal = tmp_path / "journal"
+    journal.mkdir()
+    index = journal / "JOURNAL.md"
+    index.write_text("# Existing journal\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["scaffold", "--package", "demo_pkg"])
+    assert result.exit_code != 0
+    assert "refusing to overwrite" in result.output
+    assert index.read_text(encoding="utf-8") == "# Existing journal\n"
+    assert not (tmp_path / "src").exists()
 
 
 def test_scaffold_specializes_env_init_skeleton(

@@ -20,6 +20,10 @@ The hook already ran this turn. Follow its JSON. Run `git` yourself.
    none). Do not re-ask names gone from the next JSON. Never keep
    `.env` or `.skore`. If `ambiguous_dotfiles` is empty or `reason`
    is `persist`, do not ask about hidden paths.
+   Exit code 2 from `git ignore-merge` is the structured
+   `dotfile decision required` outcome, not a generic command
+   failure: read its JSON, ask the decision, and rerun with
+   `--decide`.
 3. Run `git status`. Stage only non-secret, non-ignored paths:
    `git add -- <paths>`. Never `.env` or `.skore`.
 4. Commit with a **one-line** subject from this turn's files and

@@ -14,8 +14,8 @@ description: >
   Stops at "Proposal returned, user-confirmed"; never writes a
   design note, never authors acceptance criteria.
 
-  TRIGGER when: `triage-ml-task` is picking a sourcing
-  strategy and the user picks `user` from the menu; the user
+  TRIGGER when: `manage-ml-backlog` is picking a sourcing strategy
+  and the user picks `user` from the menu; the user
   volunteers a concrete idea ("I want to try X"); the user pastes
   or links a scientific article, GitHub issue, spec file, or
   reference repo and asks us to read it.
@@ -41,7 +41,7 @@ description: >
 
 Source: the user — directly, or via something they've pointed at
 (article, issue, spec, repo). Output: a **user-confirmed** Proposal
-block, handed back to `triage-ml-task`.
+block, handed back to `manage-ml-backlog`.
 
 ## Output contract (read this before the body)
 
@@ -67,7 +67,8 @@ have nothing in hand, the parent's menu re-presents itself.
 
 - **Don't write `journal/` files.** That belongs to
   `manage-ml-backlog`. This skill returns the Proposal as
-  conversation text; the parent skill drafts the file.
+  conversation text; the parent records/routes it and
+  `model-ml-pipeline` owns the design note.
 - **Don't infer source content from memory.** If the user
   references an article, an issue, or a file, fetch / read it.
   Don't reconstruct from a title or a one-line description.
@@ -144,7 +145,7 @@ text enumeration if it is genuinely unavailable in the current
 session.
 
 **Exception — pre-resolved entry point.** When
-`triage-ml-task` dispatches here after free-text handling
+`manage-ml-backlog` dispatches here after free-text handling
 at the sourcing-menu level has already resolved the branch (the
 user typed a URL, an issue link, or a concrete idea directly
 into the sourcing AskUserQuestion), the parent passes the
@@ -268,7 +269,7 @@ The user picks `free-text` and types their idea directly.
 ## Confirm before returning
 
 In every branch, before handing the Proposal back to
-`triage-ml-task`, the agent emits a short plain-text
+`manage-ml-backlog`, the agent emits a short plain-text
 synthesis to the user and waits for explicit approval:
 
 > "From <source>, I understand you'd like to **<one-line
@@ -311,18 +312,22 @@ Proposal (from: user via <article-link | resource-link | free-text>):
 ```
 
 `manage-ml-backlog` consumes this and drafts
-`journal/NN_short_name.md`. **No `Success` field** — the skill
-deliberately does not author acceptance criteria; the user judges
-the result post-run.
+or updates a Backlog candidate, then returns the confirmed proposal
+to `model-ml-pipeline`. **No `Success` field** — the skill
+deliberately does not author acceptance criteria; the model stage
+owns the design note and approval gate.
 
 ## Companion skills
 
-- **`triage-ml-task`** — the caller; owns the design notes.
+- **`manage-ml-backlog`** — the caller; owns writing confirmed
+  proposals/candidates into the Backlog and returning selections.
+- **`model-ml-pipeline`** — owns design-note creation and approval
+  after a proposal or Backlog row is selected.
 - **`iterate-from-skore`** — the only sibling strategy; sources
   the next experiment by mining the previous skore report into
   the Backlog.
 - **`data-science-python-stack`** — consulted when an article
   introduces a new dependency (Stop conditions, above).
 - **`build-ml-pipeline`** / **`evaluate-ml-pipeline`** — owners
-  of the files (`pipeline.py`, `evaluate.py`, …) that the
+  of the files (`pipeline.py`, `experiments/NN_*.py`, …) that the
   `Method outline` will eventually touch.
