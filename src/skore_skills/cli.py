@@ -10,6 +10,8 @@ import click
 from skore_skills import __version__
 from skore_skills.api import get_symbol, package_version
 from skore_skills.check import render_workspace_check
+from skore_skills.design_consent import render_design_consent
+from skore_skills.evaluate_consent import render_evaluate_consent
 from skore_skills.model_choices import render_model_choices
 from skore_skills.status import render_status
 
@@ -183,6 +185,36 @@ def model_group() -> None:
 def model_choices_cmd() -> None:
     """Print the available model-entry choices as JSON."""
     click.echo(render_model_choices(Path.cwd()), nl=False)
+
+
+@cli.group("evaluate")
+def evaluate_group() -> None:
+    """Inspect deterministic evaluate-workflow gates."""
+
+
+@evaluate_group.command("consent")
+@click.option("--stem", required=True, help="Experiment stem, e.g. 05_new_model.")
+def evaluate_consent_cmd(stem: str) -> None:
+    """Print whether first-eval HITL is required as JSON."""
+    try:
+        click.echo(render_evaluate_consent(Path.cwd(), stem), nl=False)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+
+
+@cli.group("design")
+def design_group() -> None:
+    """Inspect deterministic design-note gates."""
+
+
+@design_group.command("consent")
+@click.option("--stem", required=True, help="Experiment stem, e.g. 05_new_model.")
+def design_consent_cmd(stem: str) -> None:
+    """Print whether design approval is required as JSON."""
+    try:
+        click.echo(render_design_consent(Path.cwd(), stem), nl=False)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
 
 
 @cli.group("check")

@@ -54,7 +54,9 @@ read the report. The pipeline declaration is out of scope (see
   shift, lag, rolling window, target shift, or join with side
   history: if `tests/smoke/test_NN_<short_name>.py` is missing, or
   pytest is red / not run, STOP. Do **not** write `skore.evaluate`.
-  Route to `build-ml-pipeline` (it loads smoke and runs pytest).
+  Do not include `skore.evaluate` / `project.put` in later-turn
+  example fences. Route to `build-ml-pipeline` (it loads smoke and
+  runs pytest).
   Documented n/a only when there is no history-dependent step.
   Direct "evaluate" requests use this same gate.
 - **G-SKORE-MODE before `skore.evaluate`.** Read
@@ -104,15 +106,34 @@ read the report. The pipeline declaration is out of scope (see
 - **`BLOCKED` is scoped to the lookup, not to the whole turn.** It
   withholds the splitter *name*; it does not excuse the rest of the
   work. The mandatory user gate still gets presented with its
-  options spelled out, the leakage reasoning still gets written, and
-  the replacement call shape still gets proposed. Blocking on one
+  options spelled out, and the leakage reasoning still gets written.
+  Propose a `skore.evaluate(...)` call fence **only after** consent
+  is Evaluate or `evaluate consent` returned `proceed`. Naming
+  `skore.evaluate` in a STOP sentence is fine. Blocking on one
   unresolvable fact and then declining everything else is a refusal
   wearing the banner of a safeguard. A cache hit for the symbol is a
   satisfied lookup, not a block.
+- **First evaluation still needs the post-smoke HITL
+  (`evaluate consent`).** Before G-CV-SPLITTER or any
+  `skore.evaluate(...)` fence, run
+  `python -m skore_skills evaluate consent --stem <stem>`. Treat
+  JSON `action` as authoritative.
+  - `ask` — no persisted report for this stem. Present
+    **Evaluate (Recommended) / Modify / Stop** and **stop**. Do
+    not write `skore.evaluate(...)`. "Run evaluation" / "evaluate
+    it" is not consent on a first run. If this turn's user answer
+    was already **Evaluate** from `build-ml-pipeline`'s post-smoke
+    menu, do not re-prompt; continue to G-CV-SPLITTER / write.
+  - `proceed` — History or the design note already has a real
+    G-REPORT-LOCATOR. This is a **re-evaluation**; skip the
+    post-smoke HITL, then G-CV-SPLITTER / `api get` / write.
+  - `stop` — `tests/smoke/test_<stem>.py` is missing. Do not
+    evaluate. Route to `build-ml-pipeline` (it loads smoke).
 - **Splitter choice is data-driven, not default-driven
   (`G-CV-SPLITTER`).** This is the **G-CV-SPLITTER** gate — owned by
-  this skill, fired **after** green pytest smoke and the Evaluate
-  HITL (or a certain evaluate request), **after** the design note
+  this skill, fired **after** green pytest smoke and Evaluate
+  consent (`evaluate consent` `action` is `proceed`, or the user
+  answered **Evaluate** on `ask`), **after** the design note
   has passed `model-ml-pipeline`'s explicit approval gate, before
   evaluation is written into
   `experiments/NN_*.py`. The splitter
@@ -259,8 +280,9 @@ Pre-flight (evaluate-ml-pipeline):
 - [ ] CV pattern: A (`splitter=` on evaluate) | B (DataOp cv +
       omit splitter=) — `references/metadata-routing.md`
 - [ ] Smoke test status (per `smoke-test-ml-pipeline`, pytest):
-        passing  — CV may proceed after the Evaluate HITL (or a
-                   certain evaluate request);
+        passing  — CV may proceed after Evaluate consent
+                   (`evaluate consent` is `proceed`, or the user
+                   answered Evaluate on `ask`);
         failing / missing (history-dependent) — STOP. Do not
                    write `skore.evaluate`. Route to
                    `build-ml-pipeline`;

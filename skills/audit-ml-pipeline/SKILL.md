@@ -114,9 +114,10 @@ conditions for the three-consumer rule.
   first. If `has_src` and `has_journal` are both false, STOP and
   send the user to `setup-ml-project` / triage. Do not require
   `git`.
-- **No report → STOP.** Four-way pairing is hard: approved
-  `journal/NN_*.md` + `experiments/NN_*.py` + smoke pytest passed +
-  a report under that key in the Project. If the report is
+- **No report → STOP.** Four-way pairing is hard: run
+  `python -m skore_skills design consent --stem <stem>` (`ask` /
+  `stop` → do not audit) + `experiments/NN_*.py` + smoke pytest
+  passed + a report under that key in the Project. If the report is
   missing, explain and stop. Do not `skore.evaluate` / `project.put`.
   Route to `evaluate-ml-pipeline` or `model-ml-pipeline`. Direct
   "audit 02" uses this same gate.

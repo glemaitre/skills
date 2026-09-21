@@ -53,7 +53,7 @@ Run Procedure steps 1-3 and nothing else:
    missing.
 3. Step 3 — update the matching History row and design-note Status
    block from the digest or user-supplied headline when available,
-   including the normalized persisted report locator. Also refresh
+   including the digest locator pasted verbatim. Also refresh
    the `JOURNAL.md` Status rows `Last experiment` and `Last result`.
 
 Then return to the caller. Skip step 4 (Backlog rescan) and step 5
@@ -74,9 +74,12 @@ locator.
 
 ## Procedure
 
-1. Run `python -m skore_skills status`. Require an approved stem,
-   green smoke evidence, and a normalized report locator when
-   recording a done outcome. An audit digest is optional.
+1. Run `python -m skore_skills status`. When recording a done
+   outcome, run
+   `python -m skore_skills design consent --stem <stem>`.
+   `ask` / `stop` → do not mark `done`. Also require green smoke
+   evidence and a normalized report locator. An audit digest is
+   optional.
 2. Read `journal/JOURNAL.md` History and Backlog. If the index is
    missing, run `python -m skore_skills scaffold --journal`. Do
    not write or paste the file. The CLI writes four sections:
@@ -91,7 +94,8 @@ locator.
    matching History row (`planned` → `done` only if smoke passed).
    Copy the digest's persisted-report locator into the History
    `Report` cell and the design note's `Persisted report` Status
-   line. Preserve the normalized Markdown value byte-for-byte. If
+   line. Paste that string verbatim; do not paraphrase it as
+   "normalized" or rewrite the Hub URL. If
    the digest has none, write
    `n/a — backend did not expose a locator` in both places; do not
    derive or guess a URL. Update the rest of the design-note Status

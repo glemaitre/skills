@@ -60,8 +60,11 @@ features after the marker.
 
 ## Procedure
 
-1. `python -m skore_skills status`. Missing scaffold, approved
-   design, or data contract → setup/triage (S0).
+1. `python -m skore_skills status`. Missing scaffold → setup/triage
+   (S0). Then `python -m skore_skills design consent --stem
+   <stem>`. Treat JSON `action` as authoritative. `ask` / `stop`
+   → do not declare the pipeline ("build it" is not approval).
+   `proceed` continues. Missing data contract → S0.
 2. Emit Pre-flight; tick only with evidence from this turn.
 3. Declare `build_learner` under `src/<pkg>/` (Rule 1–3). Confirm
    new symbols with `python -m skore_skills api get`. After edits,
@@ -73,16 +76,22 @@ features after the marker.
    `tests/smoke/test_NN_<short_name>.py`. Red → fix topology here;
    do not loosen the assertion; do not evaluate.
 5. Green pytest: report stem, Method / Status.headline, and the
-   learner. Then **AskUserQuestion** (single choice), in order:
-   - **Evaluate (Recommended)** — extensive computation on the
-     full dataset. If the caller is `model-ml-pipeline`, return
-     there; it owns evaluate / audit / record-outcome / git.
-     Otherwise load `evaluate-ml-pipeline`.
-   - **Modify** — edit, then pytest again. Do not load evaluate.
-   - **Stop** — end this skill. No `skore.evaluate`.
+   learner. Then run
+   `python -m skore_skills evaluate consent --stem <stem>`.
+   Treat JSON `action` as authoritative.
+   - `ask` — **AskUserQuestion** (single choice), in order:
+     **Evaluate (Recommended)** / **Modify** / **Stop**, then
+     **stop**. Do not write `skore.evaluate(...)`. Green pytest
+     is not Evaluate. If the user answers **Evaluate**, load
+     `evaluate-ml-pipeline` (or return to `model-ml-pipeline` if
+     that is the caller). **Modify** — edit, then pytest again.
+     **Stop** — end this skill. No `skore.evaluate`.
+   - `proceed` — skip the post-smoke menu; load evaluate / return
+     to model for re-eval.
+   - `stop` — smoke file missing; do not evaluate.
 
-Do not load evaluate before this ask. Re-emit Pre-flight with
-evidence before the final message.
+Do not load evaluate before Evaluate on `ask` (or `proceed`).
+Re-emit Pre-flight with evidence before the final message.
 
 ## Entry contracts
 
@@ -94,7 +103,9 @@ Implement the approved design; do not silently upgrade a choice.
   equivalent from `api get`) plus a traditional estimator. No EDA
   features, column recipes, or search.
 - **EDA-backed** — only Method-cited findings. Missing choice →
-  stop and ask.
+  stop and ask. Temporal grouping is Pattern B metadata (`cv=` +
+  `split_kwargs`), not a license for three-layer / lag / `AlignXy`
+  unless Method names those steps.
 - **Backlog / discussion** — Method is the boundary.
 
 ## Canonical pipeline shape — IID flat-table
@@ -133,9 +144,11 @@ Scan top to bottom; any match means STOP.
 
 - **Rule:** `status` first. `has_src` and `has_journal` both false
   → STOP. Do not require `git`.
-- **Recovery:** setup/triage. Missing design or data contract:
-  explain and stop (`scaffold --journal --stem` if the stem is
-  known and journal is the only gap).
+- **Recovery:** setup/triage. Missing design: run
+  `python -m skore_skills design consent --stem <stem>`; `ask` /
+  `stop` stop here (`scaffold --journal --stem` if the stem is
+  known and journal is the only gap). Missing data contract:
+  explain and stop.
 
 ### S1. Missing dependency
 
@@ -281,10 +294,13 @@ Root at `skrub.var(...)`, not a bare `sklearn.Pipeline`.
 with `api get`.
 
 **If the user asks for `sklearn.Pipeline` / `build_pipeline()`:**
-do not `from sklearn.pipeline import Pipeline`. Redirect to
-`skrub.var(...)` and `build_learner` returning
-`predictions.skb.make_learner()`. Do not illustrate the refusal
-with a `Pipeline([...])` constructor in a docstring.
+do not `from sklearn.pipeline import Pipeline`, even as an inner
+estimator. Redirect to `skrub.var(...)` and `build_learner`
+returning `predictions.skb.make_learner()`. Attach `StandardScaler`
+then `Ridge` with separate `.skb.apply` calls, or
+`skrub.tabular_pipeline` plus a regressor. Do not illustrate the
+refusal with a `Pipeline([...])` constructor in a docstring,
+heading, or “what I did not write” fence.
 
 https://skrub-data.org/stable/data_ops.html
 
@@ -333,6 +349,9 @@ Evaluate omits `splitter=` so skore reuses this `cv` + `groups`
 **Time is not a `split_kwargs` key.** Sort upstream; leave
 `split_kwargs` empty. Pattern A (`TimeSeriesSplit`) is evaluate.
 Only a custom splitter whose `split()` takes `times=` is Pattern B.
+Refuse integer `cv` and unsupported time metadata in prose. Do not
+paste forbidden `mark_as_X(...)` / `cv=5` / `times=` into headings
+or “what I did not write” fences.
 
 Ask when grouping is plausible (load-bearing tokens):
 
@@ -407,10 +426,10 @@ Look up symbols with `api get`. Code: `references/common_patterns.md`.
 | Skill | Relationship |
 |---|---|
 | `python -m skore_skills api get` | Symbol lookup; cache hits first |
-| `evaluate-ml-pipeline` | `skore.evaluate` and CV choice after green pytest + Evaluate HITL. Pattern A/B: `references/metadata-routing.md` |
+| `evaluate-ml-pipeline` | `skore.evaluate` and CV choice after green pytest + `evaluate consent` (Evaluate HITL on `ask`). Pattern A/B: `references/metadata-routing.md` |
 | `smoke-test-ml-pipeline` | Sub-step. Writes and **runs pytest** on `tests/smoke/test_NN_*.py` |
 | `add-python-package` | Missing `skrub` / sklearn / Graphviz companions |
-| `research-ml-practice` | Load if installed on FE / transform / leakage. Abstract the **problem class**, not the table name. Summarize `scratch/research/<slug>.md`. AskUserQuestion `allow_multiple` on **`declare`** rows that do not violate stops. `measure` → revisit EDA; do not edit `data_analysis.py`. `evaluate` → name `evaluate-ml-pipeline`. `confirm` → ask the user. Missing skill → one-line skip |
+| `research-ml-practice` | Load if installed on FE / transform / leakage. Abstract the **problem class**, not the table name. Summarize `scratch/research/<slug>.md`. AskUserQuestion `allow_multiple` on **`declare`** rows that do not violate stops. `measure` → revisit EDA; do not edit `data_analysis.py`. Declaring id handling does **not** wire Pattern B — no `cv=` / `split_kwargs` / `GroupKFold` until grouping is an approved Method choice. `evaluate` → name `evaluate-ml-pipeline`. `confirm` → ask the user. Missing skill → one-line skip |
 | `python -m skore_skills style` | After writing/editing `pipeline.py` / `features.py` / `data.py` |
 
 ## References (load on demand)

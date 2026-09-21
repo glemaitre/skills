@@ -318,7 +318,9 @@ violated. 18 cases; Must-NOT is all-or-nothing.
   full dataset).
 
 **Must NOT do:**
-- Write `skore.evaluate` before that AskUserQuestion.
+- Author a `skore.evaluate(...)` call site before that
+  AskUserQuestion. Naming it in a docstring or "not written
+  now" sentence is allowed.
 - Skip pytest and jump to CV.
 
 ---
@@ -386,6 +388,7 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 **Must NOT do:**
 - Invent another EDA finding or domain fact.
 - Re-run or edit EDA from this skill.
+- Add align / join / lag steps not named in the assumed Method.
 
 ---
 
@@ -424,7 +427,9 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 - Leave time-splitter selection to evaluate (Pattern A).
 
 **Must NOT do:**
-- Add `times=` or `split_kwargs={"times": ...}`.
+- Put `times=` or `split_kwargs={"times": ...}` on the declared
+  `mark_as_X`. Quoting the user's request in a refusal heading is
+  not a violation.
 - Import `TimeSeriesSplit` into pipeline code.
 
 ---
@@ -443,7 +448,8 @@ violated. 18 cases; Must-NOT is all-or-nothing.
   splitter choice to evaluate.
 
 **Must NOT do:**
-- Write the requested `times=` metadata.
+- Put the requested `times=` metadata on the declared learner.
+  Quoting the user's request in a refusal is not a violation.
 - Claim sklearn splitters consume `times`.
 
 ---
@@ -481,5 +487,6 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 - Use the approved concrete group-aware cross-validator.
 
 **Must NOT do:**
-- Write `cv=5`.
+- Put `cv=5` on the declared `mark_as_X`. Quoting the user's
+  integer `cv` in a refusal heading is not a violation.
 - Claim an integer preserves grouped metadata.

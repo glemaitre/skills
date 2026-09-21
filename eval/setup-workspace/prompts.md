@@ -318,9 +318,11 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 
 **Assumed workspace state:**
 - Empty folder. Fresh layout.
+- `policy.package` is already set; G-PKG-NAME is already answered.
+- Scaffold has run.
 - `policy.notebooks` and `policy.site` are `null`.
 - `add-python-package` is installed.
-- After G-PKG-NAME and scaffold, the user checks **both** boxes.
+- The user checks **both** notebooks and site boxes.
 
 **Must do:**
 - Persist `policy set notebooks true` and `policy set site true`.

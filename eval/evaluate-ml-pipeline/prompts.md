@@ -302,7 +302,8 @@ violated.
 - STOP. Route to `build-ml-pipeline` (pytest smoke).
 
 **Must NOT do:**
-- Write `skore.evaluate` or `project.put`.
+- Author `skore.evaluate` / `project.put` call sites this turn
+  (naming them in a STOP sentence is allowed).
 - Say CV can still be produced while smoke is failing.
 
 ---
@@ -388,7 +389,11 @@ violated.
 **Must NOT do:**
 - Treat the return from `put` as the report id.
 - Link an internal serialized report file.
-- Announce a locator before `put` succeeds.
+- Announce a locator when `put` has not succeeded, or invent
+  an id. Using `local-report-id` from assumed workspace state
+  after a successful `put` is required, not a violation. Saying
+  the live shell did not re-run `put` this turn is not a
+  violation.
 - Convert, site-build, or `git end-turn` without the locator.
 
 ---

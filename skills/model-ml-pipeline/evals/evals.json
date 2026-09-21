@@ -185,13 +185,13 @@
       "id": 11,
       "title": "Implement loop records the outcome after audit",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `01_baseline` design note approved; smoke green.\n- The user chose Evaluate at the post-smoke gate.\n- `evaluate-ml-pipeline` and `audit-ml-pipeline` are installed.\n- `policy.notebooks` and `policy.site` are both true.]\n\nEvaluate it.",
-      "expected_output": "Behavioural response satisfying: - Run evaluate, then audit, then load `manage-ml-backlog` in record-outcome mode with the audit digest. - Record before `notebook convert` and `site build`. - Name `python -m skore_skills git end-turn --stage implement` last. It must NOT: - End the turn with the History row still `planned`. - Convert `audit/01_baseline.py` here \u2014 the audit skill did it. - Open the next-lever Backlog menu in record-outcome mode.",
+      "expected_output": "Behavioural response satisfying: - Run evaluate, then audit, then load `manage-ml-backlog` in record-outcome mode with the audit digest. - Record before `notebook convert` and `site build`. - Name `python -m skore_skills git end-turn --stage implement` last. It must NOT: - Leave History `planned` in any journal excerpt you author. - Convert `audit/01_baseline.py` here \u2014 the audit skill did it. - Open the next-lever Backlog menu in record-outcome mode.",
       "files": [],
       "expectations": [
         "Run evaluate, then audit, then load `manage-ml-backlog` in record-outcome mode with the audit digest.",
         "Record before `notebook convert` and `site build`.",
         "Name `python -m skore_skills git end-turn --stage implement` last.",
-        "The response does NOT: End the turn with the History row still `planned`.",
+        "The response does NOT: Leave History `planned` in any journal excerpt you author.",
         "The response does NOT: Convert `audit/01_baseline.py` here \u2014 the audit skill did it.",
         "The response does NOT: Open the next-lever Backlog menu in record-outcome mode.",
         "The response does NOT: Write the journal files directly instead of dispatching."

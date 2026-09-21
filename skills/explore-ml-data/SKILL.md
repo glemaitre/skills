@@ -90,9 +90,11 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 - **G-TABULAR before `data_analysis/data_analysis.py`.**
   `status.policy.tabular`; else `choose-python-library` (recommend
   pandas) then `add-python-package` for that lib **and** `skrub`,
-  `matplotlib`, and `seaborn`. No silent default. Do not install
-  sklearn / skore / pytest unless the user picked an extra that
-  needs them.
+  `matplotlib`, and `seaborn`. No silent default. If G-TABULAR,
+  target, or families are unanswered, **stop after the asks** —
+  no default-path notebook, even as a “Deliverable A assuming
+  pandas.” Do not install sklearn / skore / pytest unless the
+  user picked an extra that needs them.
 - **Target.** Infer from JOURNAL Status / the user prompt when the
   column is obvious. Otherwise AskUserQuestion (column names plus
   "no target yet") and **stop** — write no notebook yet. Do not
@@ -102,7 +104,10 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   TableReport + duplicates only. Do not persist a policy key.
 - **No train/test split.** Splitter choice is a later gate.
   Leakage cells are qualitative flags on the raw family that
-  holds the target. Do not persist a joined modeling table.
+  holds the target. Further families use `templates/family.py`
+  only (TableReport + duplicates) — no leakage / target /
+  bivariate cells on a family that does not hold the target.
+  Do not persist a joined modeling table.
 - **Families before the notebook.** More than one data file →
   AskUserQuestion grouping (none recommended): Use a proposed
   grouping / Profile every file separately / I will describe
@@ -119,9 +124,12 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   association matrices, unique-ratio (`nunique()/n`),
   column-dicts, or `report.json()` cells. Leakage is the
   template table, not a comment. Default figures: seaborn
-  `displot` for the target; one faceted `relplot` →
-  `bivariate_grid.png`, last expression `g`. Do not
-  `import matplotlib.pyplot` on the default path.
+  `displot` for the target only inside
+  `templates/target_regression.py` /
+  `target_classification.py` (describe + one target figure),
+  not an extra histogram cell next to `TableReport`. One
+  faceted `relplot` → `bivariate_grid.png`, last expression
+  `g`. Do not `import matplotlib.pyplot` on the default path.
 - **Do not design the model.** Implications in
   `data_analysis.md` only.
 - Do not gitignore `data_analysis/`. Ignore specific raw patterns

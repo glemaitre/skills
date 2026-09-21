@@ -148,7 +148,8 @@
 - Dispatch `audit-ml-pipeline`.
 - Run `site build` or `git end-turn --stage backlog` — the caller
   owns the close.
-- Reconstruct or normalize the supplied Hub URL.
+- Rewrite or shorten the supplied Hub URL. Pasting the digest
+  string unchanged is required, not a violation.
 
 ---
 

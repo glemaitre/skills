@@ -262,6 +262,8 @@
 **Must NOT do:**
 - Re-plot TableReport univariate histograms or the association
   matrix in extra cells.
+- Add a target `displot` as a sibling of `TableReport` outside
+  `templates/target_regression.py`.
 - Install sklearn, skore, pytest, or plotly on the default path.
 - Train/test split the raw table.
 - Run `git end-turn` before the user picks Close.

@@ -73,8 +73,9 @@ after listing the boxes.
 
    Persist each box this turn: checked →
    `python -m skore_skills policy set notebooks true` (or `site`);
-   unchecked → `false`. Do not leave them `null`. Do not write
-   notebooks or site into JOURNAL; policy is the record.
+   unchecked → `false`. Do not leave them `null` while waiting on
+   an earlier gate that workspace state already passed. Do not
+   write notebooks or site into JOURNAL; policy is the record.
 
    Same turn after persist:
 

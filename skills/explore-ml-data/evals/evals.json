@@ -178,7 +178,7 @@
       "id": 11,
       "title": "Default run adds ML-gap cells",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- `add-python-package` is installed.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available.]\n\nExplore the California housing CSV. Target is MedHouseVal.",
-      "expected_output": "Behavioural response satisfying: - Load `plot-ml-figure` if installed before writing figure cells. - Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing). - Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py` for **regression only**. It must NOT: - Re-plot TableReport univariate histograms or the association matrix in extra cells. - Install sklearn, skore, pytest, or plotly on the default path. - Train/test split the raw table.",
+      "expected_output": "Behavioural response satisfying: - Load `plot-ml-figure` if installed before writing figure cells. - Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing). - Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py` for **regression only**. It must NOT: - Re-plot TableReport univariate histograms or the association matrix in extra cells. - Add a target `displot` as a sibling of `TableReport` outside `templates/target_regression.py`. - Install sklearn, skore, pytest, or plotly on the default path.",
       "files": [],
       "expectations": [
         "Load `plot-ml-figure` if installed before writing figure cells.",
@@ -187,6 +187,7 @@
         "Use seaborn figure-level plots (`displot` / `relplot`); save PNGs and leave figures as cell output. Feature-vs-target is one faceted `relplot` (`bivariate_grid.png`), last expression `g`.",
         "After `data_analysis.md`, AskUserQuestion keep exploring vs close (neither option recommended or preselected).",
         "The response does NOT: Re-plot TableReport univariate histograms or the association matrix in extra cells.",
+        "The response does NOT: Add a target `displot` as a sibling of `TableReport` outside `templates/target_regression.py`.",
         "The response does NOT: Install sklearn, skore, pytest, or plotly on the default path.",
         "The response does NOT: Train/test split the raw table.",
         "The response does NOT: Run `git end-turn` before the user picks Close.",

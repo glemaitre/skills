@@ -49,9 +49,11 @@ user-visible content is the complete test file in a fenced block
 with no pre-history buffer, real `data/` source, soft assertion
 with the CV-mean hardcoded as a literal, no `skore` import).
 Then **run pytest** on that file. Do not stop at a plan or leave
-the file only in a thinking channel. Do not AskUserQuestion for
-evaluate here — that gate belongs to `build-ml-pipeline` after
-pytest is green.
+the file only in a thinking channel. Never tell the user or CI
+to run pytest later. Name the exact
+`pytest tests/smoke/test_NN_<short_name>.py` invocation. Do not
+AskUserQuestion for evaluate here — that gate belongs to
+`build-ml-pipeline` after pytest is green.
 
 ## Stop conditions — read before anything else
 
@@ -59,10 +61,12 @@ pytest is green.
   first. If `has_src` and `has_journal` are both false, STOP and
   send the user to setup/triage. Do not require `git`.
 - **No smoke test without an approved design note + script.** The pairing
-  rule is hard:
-  `tests/smoke/test_NN_<short_name>.py` exists only when
-  `journal/NN_<short_name>.md` is at least `approved` *and*
+  rule is hard: run
+  `python -m skore_skills design consent --stem <stem>`.
+  `tests/smoke/test_NN_<short_name>.py` exists only when that JSON
+  is `proceed` *and*
   `experiments/NN_<short_name>.py` exists with the matching stem.
+  `ask` / `stop` → do not write the smoke test.
 - **Missing pytest.** If `pytest` is not importable in the project
   env, STOP. Load `add-python-package` for `pytest` on **default**
   (confirm; `env route` maps pytest off `--feature agent`). Do not

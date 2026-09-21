@@ -179,13 +179,13 @@
       "id": 10,
       "title": "After declaration, pytest smoke then HITL",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved `journal/01_baseline.md`.\n- Experiment shell `experiments/01_baseline.py` exists after\n  the declaration.\n- Workspace is scaffolded.]\n\nThe design is approved. Declare the learner and stop before\nfull-dataset CV.",
-      "expected_output": "Behavioural response satisfying: - Load `smoke-test-ml-pipeline` after the declaration. - Treat pytest on `tests/smoke/test_01_baseline.py` as the way to modify the pipeline. - After green smoke, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset). It must NOT: - Write `skore.evaluate` before that AskUserQuestion. - Skip pytest and jump to CV.",
+      "expected_output": "Behavioural response satisfying: - Load `smoke-test-ml-pipeline` after the declaration. - Treat pytest on `tests/smoke/test_01_baseline.py` as the way to modify the pipeline. - After green smoke, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset). It must NOT: - Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed. - Skip pytest and jump to CV.",
       "files": [],
       "expectations": [
         "Load `smoke-test-ml-pipeline` after the declaration.",
         "Treat pytest on `tests/smoke/test_01_baseline.py` as the way to modify the pipeline.",
         "After green smoke, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset).",
-        "The response does NOT: Write `skore.evaluate` before that AskUserQuestion.",
+        "The response does NOT: Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed.",
         "The response does NOT: Skip pytest and jump to CV."
       ],
       "tools": false,
@@ -231,13 +231,14 @@
       "id": 13,
       "title": "EDA-backed build stays within cited findings",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The Method cites high cardinality and a temporal grouping\n  finding from `data_analysis/data_analysis.md`.]\n\nImplement the approved EDA-backed design.",
-      "expected_output": "Behavioural response satisfying: - Implement only the cited preprocessing/grouping decisions. - Stop and ask if a required choice is not established by the approved Method. It must NOT: - Invent another EDA finding or domain fact. - Re-run or edit EDA from this skill.",
+      "expected_output": "Behavioural response satisfying: - Implement only the cited preprocessing/grouping decisions. - Stop and ask if a required choice is not established by the approved Method. It must NOT: - Invent another EDA finding or domain fact. - Re-run or edit EDA from this skill. - Add align / join / lag steps not named in the assumed Method.",
       "files": [],
       "expectations": [
         "Implement only the cited preprocessing/grouping decisions.",
         "Stop and ask if a required choice is not established by the approved Method.",
         "The response does NOT: Invent another EDA finding or domain fact.",
-        "The response does NOT: Re-run or edit EDA from this skill."
+        "The response does NOT: Re-run or edit EDA from this skill.",
+        "The response does NOT: Add align / join / lag steps not named in the assumed Method."
       ],
       "tools": false,
       "sandbox": [],
@@ -264,12 +265,12 @@
       "id": 15,
       "title": "Time ordering does not become split kwargs",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The journal records temporal ordering but no custom splitter\n  consumes a `times` keyword.]\n\nBuild the approved temporal pipeline and put the timestamp on X.",
-      "expected_output": "Behavioural response satisfying: - Keep `split_kwargs={}` at `mark_as_X`. - Leave time-splitter selection to evaluate (Pattern A). It must NOT: - Add `times=` or `split_kwargs={\"times\": ...}`. - Import `TimeSeriesSplit` into pipeline code.",
+      "expected_output": "Behavioural response satisfying: - Keep `split_kwargs={}` at `mark_as_X`. - Leave time-splitter selection to evaluate (Pattern A). It must NOT: - Put `times=` or `split_kwargs={\"times\": ...}` on the declared `mark_as_X`. Quoting the user's request in a refusal heading is not a violation. - Import `TimeSeriesSplit` into pipeline code.",
       "files": [],
       "expectations": [
         "Keep `split_kwargs={}` at `mark_as_X`.",
         "Leave time-splitter selection to evaluate (Pattern A).",
-        "The response does NOT: Add `times=` or `split_kwargs={\"times\": ...}`.",
+        "The response does NOT: Put `times=` or `split_kwargs={\"times\": ...}` on the declared `mark_as_X`. Quoting the user's request in a refusal heading is not a violation.",
         "The response does NOT: Import `TimeSeriesSplit` into pipeline code."
       ],
       "tools": false,
@@ -280,12 +281,12 @@
       "id": 16,
       "title": "Invalid times metadata is rejected",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- No custom cross-validator accepts a `times` keyword.]\n\nUse `mark_as_X(split_kwargs={\"times\": data[\"timestamp\"]})`.",
-      "expected_output": "Behavioural response satisfying: - Reject `times` as unsupported split metadata. - Keep the timestamp available as project data and route temporal splitter choice to evaluate. It must NOT: - Write the requested `times=` metadata. - Claim sklearn splitters consume `times`.",
+      "expected_output": "Behavioural response satisfying: - Reject `times` as unsupported split metadata. - Keep the timestamp available as project data and route temporal splitter choice to evaluate. It must NOT: - Put the requested `times=` metadata on the declared learner. Quoting the user's request in a refusal is not a violation. - Claim sklearn splitters consume `times`.",
       "files": [],
       "expectations": [
         "Reject `times` as unsupported split metadata.",
         "Keep the timestamp available as project data and route temporal splitter choice to evaluate.",
-        "The response does NOT: Write the requested `times=` metadata.",
+        "The response does NOT: Put the requested `times=` metadata on the declared learner. Quoting the user's request in a refusal is not a violation.",
         "The response does NOT: Claim sklearn splitters consume `times`."
       ],
       "tools": false,
@@ -312,12 +313,12 @@
       "id": 18,
       "title": "Integer cv is not Pattern B",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Group-aware splitting is required.]\n\nUse `cv=5` together with grouped `split_kwargs`.",
-      "expected_output": "Behavioural response satisfying: - Reject integer `cv` for Pattern B because skore needs a splitter object with `.split`. - Use the approved concrete group-aware cross-validator. It must NOT: - Write `cv=5`. - Claim an integer preserves grouped metadata.",
+      "expected_output": "Behavioural response satisfying: - Reject integer `cv` for Pattern B because skore needs a splitter object with `.split`. - Use the approved concrete group-aware cross-validator. It must NOT: - Put `cv=5` on the declared `mark_as_X`. Quoting the user's integer `cv` in a refusal heading is not a violation. - Claim an integer preserves grouped metadata.",
       "files": [],
       "expectations": [
         "Reject integer `cv` for Pattern B because skore needs a splitter object with `.split`.",
         "Use the approved concrete group-aware cross-validator.",
-        "The response does NOT: Write `cv=5`.",
+        "The response does NOT: Put `cv=5` on the declared `mark_as_X`. Quoting the user's integer `cv` in a refusal heading is not a violation.",
         "The response does NOT: Claim an integer preserves grouped metadata."
       ],
       "tools": false,

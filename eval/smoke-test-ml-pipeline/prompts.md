@@ -210,9 +210,10 @@ violated.
 
 **Must do:**
 - Write `tests/smoke/test_01_baseline.py`.
-- Run pytest on that file.
+- Name the exact `pytest tests/smoke/test_01_baseline.py`
+  invocation.
 
 **Must NOT do:**
-- Skip pytest and leave execution to the user or CI.
+- Defer pytest to the user or CI.
 - AskUserQuestion Evaluate (Recommended) / Modify / Stop (that gate is build's).
 - Write `skore.evaluate`.

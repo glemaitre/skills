@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "72174aeba3e01fbb0f612e03b2dc057a1db0f6429fb6ba841287db58af824425",
+  "catalog_hash": "36b830a4bff8411a429bce4deebde13c5e07904a433d8e21507025764472f699",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "7862c5cc4b89bb67522a1a1446948c3b968870b49a78ba2d6099c702eb5df924"
+      "hash": "3a8386e4bd4cd557f874934e5c3c20a975e55c3dbcb9bf638f51b832c5d9b89b"
     },
     {
       "id": "build-ml-pipeline",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "ead1fa136e8e522facf97163198653f2bf403e40df736d19348335711c2171d6"
+      "hash": "e1771dc57c384e4c4898fc6c01210c28408945390c2c99310502d956fbc2693a"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "3906769abb223aee979e34db79287a210200e1280192bae4d41dae9246969259"
+      "hash": "5e0c0ad09b35d7d1dcf5add861700b560774d3e5055eb508b0964437d1c5fbb1"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
       "category": "orchestration",
       "subcategory": "test-strategies",
-      "hash": "852bb186d8e0dfc6bb31f9844f9fdb12f7e634b93899d485c80b8865179ff63d"
+      "hash": "27ed3dc2db6796a46ebdc4d04a02bc81fe5a0495ae659d3754462c4face7b73f"
     },
     {
       "id": "audit-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "ab66522ba67d2c8ab40316d5ea1ac9a0a8365c8441f9a4121fc4db04e8476168"
+      "hash": "c22514e3e7830b2f80f3a08700c0e7d7afedc11c0a8b6b25a3145efda80703eb"
     },
     {
       "id": "manage-ml-backlog",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "569e6d6024a5ccb59e68bdec1ac64338c37a63ca0a6c886cd3c13cbbde3cf549"
+      "hash": "72fbcd32ca7f79cc693f68badb3e7d1ee82c54e250d481a4ff984b4691afd517"
     },
     {
       "id": "iterate-from-skore",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "e9bdfb02515a9fa8590a5a50d85a56d1a618fdf19afea426bb783daa0a50388a"
+      "hash": "80de188a26e6ad9d03045c71a81e2a7b8d160d7e5629866844882dbc123b6a60"
     },
     {
       "id": "choose-python-library",
@@ -183,7 +183,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "5ac01140d7f9adfa19cdbc9f174a038310176e41c0c2ae7400a8aa883c977aeb"
+      "hash": "169c00deef2e267b35adef4f4709c2cb77e13af079e592fcacaf829b44f85d40"
     },
     {
       "id": "setup-python-env",

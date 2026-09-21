@@ -22,9 +22,13 @@ Do not load `smoke-test-ml-pipeline` as a sibling of evaluate.
    to `setup-ml-project` / triage. Do not require `git`.
 2. **Resume beats menu.** If the user names an experiment stem, or
    `status.policy.loop.stem` / `last_history_stem` identifies a
-   current design, read its note. If it is approved, resume that
-   stem directly. Do not ask how to start again. If it is not
-   approved, show it and wait for approval; do not write code.
+   current design, run
+   `python -m skore_skills design consent --stem <stem>`. Treat
+   JSON `action` as authoritative. `proceed` → resume that stem
+   directly; do not ask how to start again. `ask` → show the note
+   and **stop** for approval; do not write code. `stop` → missing
+   note: name `scaffold --journal --stem` (or abandoned: explain
+   and do not implement). Do not infer approval from "build it".
 3. Otherwise run `python -m skore_skills model choices`. Treat its
    JSON as authoritative. Present exactly `choices[]`, in returned
    order, in one single-choice **AskUserQuestion**:
@@ -76,10 +80,11 @@ note.
   confirmation create/populate the design note and seek approval.
   If no idea is agreed, return to the entry choices.
 
-If the design-note shell is missing, run
-`python -m skore_skills scaffold --journal --stem <NN_short>`.
-The shell must exist before it is populated from the confirmed
-proposal. Stop for explicit design approval after populating it.
+If the design-note shell is missing, this turn only names
+`python -m skore_skills scaffold --journal --stem <NN_short>`
+and stops. Do not fill Question / Motivation / Method / Risks
+from memory. Populate those sections only after that command
+has created the shell, then stop for explicit design approval.
 
 ## Approved-design implement loop
 
@@ -87,12 +92,15 @@ proposal. Stop for explicit design approval after populating it.
    skill loads `smoke-test-ml-pipeline` after the experiment file
    exists and **runs pytest** on `tests/smoke/test_NN_*.py`. Red
    pytest stays in build (modify the pipeline, re-run pytest).
-   Green pytest: build reports the design and AskUserQuestion
-   (Evaluate (Recommended) / Modify / Stop).
+   Green pytest: build reports the design, then
+   `python -m skore_skills evaluate consent --stem <stem>`
+   (Evaluate / Modify / Stop on `ask`).
 2. Only if the user chose **Evaluate** and smoke is green:
    `evaluate-ml-pipeline` — leakage-safe splitter and
    `skore.evaluate` in the experiment script. Re-run `status`
-   first. Missing `evaluate-ml-pipeline` → one-line skip.
+   first, then `python -m skore_skills evaluate consent --stem
+   <stem>`. Consent JSON is authoritative, not the user's wording
+   alone. Missing `evaluate-ml-pipeline` → one-line skip.
 3. After a successful evaluate: `audit-ml-pipeline` if installed
    (same stem). Missing skill → one-line skip. Re-run `status`
    first. No report → do not invent an audit; stop.
@@ -103,7 +111,10 @@ proposal. Stop for explicit design approval after populating it.
    Status block, then returns; it does not rescan the Backlog or
    open the next-lever menu. Never mark `done` while smoke is red.
    Audit-skipped runs still record the locator; missing headline
-   becomes `n/a`, never an invented metric.
+   becomes `n/a`, never an invented metric. The Evaluate
+   branch's visible close is that dispatch sequence. Do not claim
+   History remains `planned` because a child was not executed
+   in-process.
 
 Do not duplicate child-skill methodology. Before new library
 symbols are written, children use
@@ -115,16 +126,21 @@ symbols are written, children use
   false): setup/triage; do not start build.
 - Generic model landing: do not hand-author the menu; run
   `python -m skore_skills model choices`.
-- If `journal/NN_<short>.md` is missing, create its packaged shell
-  with `python -m skore_skills scaffold --journal --stem
-  <NN_short>`. Do not recreate the template from memory. Populate
-  it only from a confirmed proposal, then stop for user approval.
-- Require that design note to be approved before code.
+- If `journal/NN_<short>.md` is missing, this turn only names
+  `python -m skore_skills scaffold --journal --stem
+  <NN_short>` and stops. Do not recreate or fill the template
+  from memory. Populate Question / Motivation / Method / Risks
+  only after that command has created the shell, then stop for
+  user approval.
+- Require `design consent` `proceed` before code. Do not treat
+  "the user asked to build" as approval.
 - Preserve identical stems across design, experiment, smoke, audit.
 - Do not replace skrub DataOps with bare sklearn Pipeline.
 - Do not persist a result as done while smoke tests fail.
 - Do not load evaluate (or write `skore.evaluate`) before the
-  post-smoke HITL answer is Evaluate, or while pytest is red.
+  post-smoke HITL answer is Evaluate (`evaluate consent` `ask`),
+  except `proceed` for a stem that already has a persisted report,
+  or while pytest is red.
 - Do not load `smoke-test-ml-pipeline` from this dispatcher.
 - Do not duplicate child-skill methodology in this dispatcher.
 - If `status.data_analysis` is `missing`, continue with facts the user

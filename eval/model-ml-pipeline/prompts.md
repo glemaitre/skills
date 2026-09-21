@@ -255,7 +255,7 @@
   last.
 
 **Must NOT do:**
-- End the turn with the History row still `planned`.
+- Leave History `planned` in any journal excerpt you author.
 - Convert `audit/01_baseline.py` here — the audit skill did it.
 - Open the next-lever Backlog menu in record-outcome mode.
 - Write the journal files directly instead of dispatching.

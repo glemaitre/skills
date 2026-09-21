@@ -177,12 +177,12 @@
       "id": 10,
       "title": "Smoke not green stops before skore.evaluate",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_load_forecast.md` approved.\n- `experiments/02_load_forecast.py` exists.\n- Pipeline has lag features (history-dependent).\n- `tests/smoke/test_02_load_forecast.py` is missing, or pytest is red.]\n\nWire evaluate for the 24h-ahead load forecast. Run CV now.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - STOP. Route to `build-ml-pipeline` (pytest smoke). It must NOT: - Write `skore.evaluate` or `project.put`. - Say CV can still be produced while smoke is failing.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - STOP. Route to `build-ml-pipeline` (pytest smoke). It must NOT: - Author `skore.evaluate` / `project.put` call sites this turn (naming them in a STOP sentence is allowed). - Say CV can still be produced while smoke is failing.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
         "STOP. Route to `build-ml-pipeline` (pytest smoke).",
-        "The response does NOT: Write `skore.evaluate` or `project.put`.",
+        "The response does NOT: Author `skore.evaluate` / `project.put` call sites this turn (naming them in a STOP sentence is allowed).",
         "The response does NOT: Say CV can still be produced while smoke is failing."
       ],
       "tools": false,
@@ -235,7 +235,7 @@
       "id": 13,
       "title": "Local put records workspace locator",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Smoke is green and `policy.skore_mode` is `local`.\n- `project.put(\"01_baseline\", report)` succeeds.\n- The newest matching summary row has id `local-report-id`.]\n\nEvaluate and save 01_baseline locally.",
-      "expected_output": "Behavioural response satisfying: - Read `project.summarize().frame()` after the successful put and select the newest matching-key row. - Include `local workspace: [reports/](../reports/) \u00b7 id: local-report-id` and the resolved absolute `reports/` path in the End of turn close (G-REPORT-LOCATOR). - Pass that locator to audit / record-outcome. It must NOT: - Treat the return from `put` as the report id. - Link an internal serialized report file. - Announce a locator before `put` succeeds.",
+      "expected_output": "Behavioural response satisfying: - Read `project.summarize().frame()` after the successful put and select the newest matching-key row. - Include `local workspace: [reports/](../reports/) \u00b7 id: local-report-id` and the resolved absolute `reports/` path in the End of turn close (G-REPORT-LOCATOR). - Pass that locator to audit / record-outcome. It must NOT: - Treat the return from `put` as the report id. - Link an internal serialized report file. - Announce a locator when `put` has not succeeded, or invent an id. Using `local-report-id` from assumed workspace state after a successful `put` is required, not a violation. Saying the live shell did not re-run `put` this turn is not a violation.",
       "files": [],
       "expectations": [
         "Read `project.summarize().frame()` after the successful put and select the newest matching-key row.",
@@ -243,7 +243,7 @@
         "Pass that locator to audit / record-outcome.",
         "The response does NOT: Treat the return from `put` as the report id.",
         "The response does NOT: Link an internal serialized report file.",
-        "The response does NOT: Announce a locator before `put` succeeds.",
+        "The response does NOT: Announce a locator when `put` has not succeeded, or invent an id. Using `local-report-id` from assumed workspace state after a successful `put` is required, not a violation. Saying the live shell did not re-run `put` this turn is not a violation.",
         "The response does NOT: Convert, site-build, or `git end-turn` without the locator."
       ],
       "tools": false,

@@ -108,7 +108,7 @@
         "The response does NOT: Ask the next-lever triage question.",
         "The response does NOT: Dispatch `audit-ml-pipeline`.",
         "The response does NOT: Run `site build` or `git end-turn --stage backlog` \u2014 the caller owns the close.",
-        "The response does NOT: Reconstruct or normalize the supplied Hub URL."
+        "The response does NOT: Rewrite or shorten the supplied Hub URL. Pasting the digest string unchanged is required, not a violation."
       ],
       "tools": false,
       "sandbox": [],
