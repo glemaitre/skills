@@ -102,9 +102,7 @@ def build_learner(predict_grid_preview=None, history_source_preview=None):
     # Layer 2: align predict_grid + history into (X, y).
     # `align_xy` is a small stateful BaseEstimator:
     #   fit_transform → {X, y}; transform → {X, y=None}.
-    # See build-ml-pipeline/references/pre_mark_alignment.md for the full
-    # production-style walkthrough drawn from this workspace's
-    # 01_baseline.
+    # Production AlignXy walkthrough is below.
     aligned = skrub.as_data_op(
         {"predict_grid": predict_grid, "history": history}
     ).skb.apply(align_xy)
@@ -163,8 +161,7 @@ class AlignByHorizon(TransformerMixin, BaseEstimator):
     the target time exists in history — there is nothing to drop.
     If you find yourself adding row-filtering inside `transform`,
     you have built the forbidden wrapper-NaN-filter pattern
-    (see `SKILL.md` § "Anti-pattern symptoms"). Fix the join
-    instead.
+    (see `SKILL.md` S5). Fix the join instead.
     """
 
     def __init__(self, horizon_hours: int = 24):
@@ -207,8 +204,7 @@ The litmus test for any Layer-2 aligner you write:
 
 - Does `transform` call `.drop_nulls()` / `.dropna()` / `.filter()`
   on data the pipeline itself produced? → **forbidden** (the
-  wrapper-NaN-filter pattern; see `SKILL.md` § "Anti-pattern
-  symptoms"). Rewrite as a JOIN.
+  wrapper-NaN-filter pattern; see `SKILL.md` S5). Rewrite as a JOIN.
 - Does the inner-join shape mean no row-filtering is needed? →
   correct.
 - Does `transform` return `{"X": <grid>, "y": None}` at predict
@@ -219,3 +215,127 @@ row-count assertion: a correct aligner returns
 `len(predictions) == len(predict_grid)` on a fresh predict env
 that carries no pre-history buffer; the wrong shape silently drops
 rows and the count mismatches.
+
+Naive *load → featurize → split* looks green under CV because each
+fold only sees in-fold history. A lag computed on a test fold is
+NaN at the fold start, so the model either eats garbage or the
+pipeline drops rows (`len(predictions) < n_predict_grid_rows`).
+Mark X on the predict grid and pass the **full** history DataOp
+into Layer 3 so joins are not fold-local.
+
+### Production `AlignXy` — load forecast at t+12
+
+`AlignXy` is a stateful `BaseEstimator`: `fit_transform` returns
+`{"X", "y"}`; `transform` returns `{"X", "y": None}`. `mark_as_X`
+lands on the predict-grid node. Layer-3 functions take `history`
+as a positional argument (not the current fold's rows).
+
+```python
+from sklearn.base import BaseEstimator
+import polars as pl
+
+_HORIZON_H = 12
+
+
+class AlignXy(BaseEstimator):
+    """Derive the t+12 target from the load history.
+
+    fit_transform → {"X": DataFrame[time], "y": Series[load at t+12]}
+    transform     → {"X": DataFrame[time], "y": None}
+    """
+
+    def fit_transform(self, data, y=None):
+        history = data["history"]
+        future = history.select(
+            (pl.col("time") - pl.duration(hours=_HORIZON_H)).alias("time"),
+            pl.col("actual_load_mw").alias("target_load_mw"),
+        )
+        predict_grid = history.select("time")
+        joined = predict_grid.join(
+            future.drop_nulls(), on="time", how="inner"
+        ).sort("time")
+        return {
+            "X": joined.drop("target_load_mw"),
+            "y": joined["target_load_mw"],
+        }
+
+    def transform(self, data):
+        return {"X": data["history"].select("time").sort("time"), "y": None}
+
+    def fit(self, data, y=None):
+        return self
+```
+
+`transform()` returns *all* timestamps, not only rows with
+observable targets. Smoke asserts predict on a 24-hour window with
+no extra buffer yields 24 predictions.
+
+```python
+_LOAD_LAGS_H = (12, 24, 168)
+
+
+def add_lag_features(
+    predict_grid: pl.DataFrame,
+    history: pl.DataFrame,
+    lags: tuple[int, ...] = _LOAD_LAGS_H,
+) -> pl.DataFrame:
+    """Join lagged load from the full (non-split) history."""
+    out = predict_grid
+    for lag in lags:
+        col = f"lag_{lag}h"
+        lagged = history.select(
+            (pl.col("time") + pl.duration(hours=lag)).alias("time"),
+            pl.col("actual_load_mw").alias(col),
+        )
+        out = out.join(lagged, on="time", how="left")
+    return out
+```
+
+Calendar / holiday features take only the predict grid.
+
+```python
+import skrub
+from skrub import tabular_pipeline
+
+
+def build_learner(
+    data_dir_preview=None,
+    *,
+    include_calendar_features: bool = False,
+):
+    data_dir = (
+        skrub.var("data_dir", value=str(data_dir_preview))
+        if data_dir_preview is not None
+        else skrub.var("data_dir")
+    )
+    history = data_dir.skb.apply_func(load_history)
+
+    aligned = skrub.as_data_op({"history": history}).skb.apply(AlignXy())
+    X = aligned["X"].skb.mark_as_X()
+    y = aligned["y"].skb.mark_as_y()
+
+    X = X.skb.apply_func(add_lag_features, history)
+    X = X.skb.apply_func(add_weather_features, history)
+    if include_calendar_features:
+        X = X.skb.apply_func(add_calendar_features)
+
+    predictions = X.skb.apply(tabular_pipeline("regressor"), y=y)
+    return predictions.skb.make_learner()
+```
+
+`data_dir_preview` is only for `learner.skb.preview()`. Production
+binds via `skore.evaluate(learner, data={"data_dir": ...}, ...)`
+(`evaluate-ml-pipeline/references/skrub_interop.md`).
+
+**Skip this pattern** for IID flat tables (per-row math, no
+lags/joins) and when every predict-time row already carries its
+features. Smoke still asserts row count; the diagnostic matters
+for cross-row graphs.
+
+## Companion references
+
+- `build-ml-pipeline/references/source-binding.md` — why Layer 1
+  binds source identifiers.
+- `evaluate-ml-pipeline/references/skrub_interop.md` — env-dict
+  `skore.evaluate` for the learner this graph produces.
+- `smoke-test-ml-pipeline` — row-count proof of the pattern.

@@ -14,7 +14,7 @@ so the target can `read_file` the history-dependent JOIN example
 (the same file `SKILL.md` points at). Other cases stay single-turn.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. Overall: ≥ 12/13 cases pass and no Must NOT violated.
+violated. 18 cases; Must-NOT is all-or-nothing.
 
 ---
 

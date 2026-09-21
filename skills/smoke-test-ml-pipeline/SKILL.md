@@ -291,10 +291,8 @@ match whichever the experiment uses:
 For the second shape (predict-grid + raw-history sources), the
 three layers — sources → predict-grid + alignment + `mark_as_X`
 → features after (with history as an upstream reference) — are
-described in `build-ml-pipeline` § "Common patterns" rule 2,
-with a full worked example (drawn from this workspace's
-01_baseline pipeline) in
-`build-ml-pipeline/references/pre_mark_alignment.md`. Read that
+described in `build-ml-pipeline` Rule 2, with worked code in
+`build-ml-pipeline/references/layer_examples.md`. Read that
 reference before constructing the predict env for an early-mark
 pipeline.
 

@@ -296,7 +296,7 @@ version — the kwargs differ between `EstimatorReport` (uses
 
 ## Companion references
 
-- `build-ml-pipeline/references/pre_mark_alignment.md` — the 3-layer
+- `build-ml-pipeline/references/layer_examples.md` — the 3-layer
   DataOps pattern that produces the `SkrubLearner` consumed here.
 - `build-ml-pipeline/references/source-binding.md` — when to use
   source-bound vars vs materialized `(X, y)` bindings.

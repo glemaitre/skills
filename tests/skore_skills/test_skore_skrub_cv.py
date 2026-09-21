@@ -52,7 +52,9 @@ def _is_cv_report(report: object) -> bool:
     return type(report).__name__ == "CrossValidationReport"
 
 
-def _split_groups(report: object, frame: pd.DataFrame) -> list[tuple[set[str], set[str]]]:
+def _split_groups(
+    report: object, frame: pd.DataFrame
+) -> list[tuple[set[str], set[str]]]:
     """Train/test group ids per fold from the stored report."""
     splits = getattr(report, "_split_indices", None)
     if not splits:

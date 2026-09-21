@@ -147,10 +147,9 @@ Mark X and y inside the graph at the split point in either case.
 
 ## Companion references
 
-- `build-ml-pipeline/references/pre_mark_alignment.md` — the full 3-layer
+- `build-ml-pipeline/references/layer_examples.md` — the 3-layer
   walkthrough showing how source-bound vars at Layer 1 feed the
-  pre-mark alignment at Layer 2 and the history-dependent features
-  at Layer 3.
-- `build-ml-pipeline/references/skrub_interop.md` — how the env-dict at
+  alignment at Layer 2 and history-dependent features at Layer 3.
+- `evaluate-ml-pipeline/references/skrub_interop.md` — how the env-dict at
   `skore.evaluate(learner, data={...})` time binds those same
   source variables for fit / CV.

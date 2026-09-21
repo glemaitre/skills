@@ -238,7 +238,7 @@ it's not a permanent anchor, it's a scaffold-time signal.
 ### Authoritative experiment skeleton before substitution
 
 Use the experiment call shapes in
-`build-ml-pipeline/references/skrub_interop.md`; there is no
+`evaluate-ml-pipeline/references/skrub_interop.md`; there is no
 packaged `templates/experiment.py` file. The relevant Project-init
 block starts as:
 

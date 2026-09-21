@@ -323,7 +323,7 @@ Pre-flight (evaluate-ml-pipeline):
    `X_train` / `y_train` / `X_test` / `y_test`. The full interop
    pattern (env-dict-style vs sklearn-style, how `data={...}` keys
    map to `skrub.var` roots, key conventions in the Project store)
-   is in `build-ml-pipeline/references/skrub_interop.md`; for exact
+   is in `evaluate-ml-pipeline/references/skrub_interop.md`; for exact
    signatures, run `python -m skore_skills api get` against the
    installed skore version.
 

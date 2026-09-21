@@ -106,7 +106,7 @@ The tuning skill discovers the knobs by walking the graph.
 Author one **only when** (a) no built-in fits and (b) the
 operation is stateful. Subclass `TransformerMixin` + `BaseEstimator`
 (Mixin first — sklearn convention so the mixin's `fit_transform`
-wins MRO; see SKILL.md Rule 5). Implement `fit(self, X, y=None)` to
+wins MRO; see SKILL.md Rule 3). Implement `fit(self, X, y=None)` to
 learn state and `transform(self, X)` to apply it; add
 `get_feature_names_out` if downstream consumers need feature names.
 
