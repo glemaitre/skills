@@ -186,14 +186,19 @@
 **Assumed workspace state:**
 - Managed uv project.
 - `env route skrub` returns `scope: default`.
-- `env graphviz` returns `action: system` and `dot: null`.
+- `env graphviz` already returned `action: system`, `dot: null`,
+  and `instructions`: "Install Graphviz with your OS package
+  manager so `dot` is on PATH."
 
 **Must do:**
 - Name `python -m skore_skills env add --execute skrub`.
-- Name `python -m skore_skills env graphviz`.
-- Ask the Graphviz question using JSON `instructions` only.
+- Treat that `env graphviz` JSON as already returned (naming
+  `python -m skore_skills env graphviz` is optional).
+- Ask the Graphviz question quoting JSON `instructions` only.
 
 **Must NOT do:**
-- Name `env add graphviz` or `uv add graphviz`.
+- Propose `env add graphviz` or `uv add graphviz` as the
+  Graphviz install (a fenced command or a step to run). Naming
+  them in a STOP / "will not" sentence is allowed.
 - Run `pip install graphviz`.
 - Invent `brew install graphviz` without quoting CLI stdout.

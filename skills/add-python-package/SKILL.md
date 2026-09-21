@@ -128,8 +128,10 @@ after listing the boxes.
      `instructions` (system) from print-only JSON.
 
    Never invent `brew` / `apt` / `winget` / `dot -c` from
-   memory. Never `pip install graphviz`. Never
-   `env add graphviz` on uv / poetry / hatch / pip-venv.
+   memory. Do not pip-install Graphviz or add it as a Python
+   package on uv / poetry / hatch / pip-venv. Refuse that in
+   prose; do not paste `env add graphviz` or `uv add graphviz`
+   as a command fence.
 
 Return when the import is available, when the user confirmed they
 installed it, or when they chose to handle it themselves.

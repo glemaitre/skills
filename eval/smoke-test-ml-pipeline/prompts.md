@@ -204,16 +204,25 @@ violated.
 > Write the smoke test for `01_baseline` and prove it.
 
 **Assumed workspace state:**
-- Design note approved; experiment script exists.
+- `journal/01_baseline.md` approved (`design consent` `proceed`)
+  with Status.headline `MAE 0.42 (5-fold CV)`.
+- `experiments/01_baseline.py` exists; `build_learner` consumes
+  `data_dir`.
+- Package import is `pricing`; `src/pricing/data.py` exposes
+  `build_supervised_frame(data_dir)`.
 - `pytest` is installed.
+- `python -m skore_skills api get sklearn.metrics.mean_absolute_error`
+  already succeeded this turn.
 - Loaded from `build-ml-pipeline` after the declaration.
 
 **Must do:**
-- Write `tests/smoke/test_01_baseline.py`.
+- Write a complete `tests/smoke/test_01_baseline.py` using those
+  facts (hardcoded `0.42`, package `pricing`, no `<FILL_…>`).
 - Name the exact `pytest tests/smoke/test_01_baseline.py`
   invocation.
 
 **Must NOT do:**
-- Defer pytest to the user or CI.
+- Tell the user or CI to run pytest. Naming the invocation and
+  noting a no-tools turn cannot execute it is allowed.
 - AskUserQuestion Evaluate (Recommended) / Modify / Stop (that gate is build's).
 - Write `skore.evaluate`.

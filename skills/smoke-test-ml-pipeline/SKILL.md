@@ -51,7 +51,11 @@ with the CV-mean hardcoded as a literal, no `skore` import).
 Then **run pytest** on that file. Do not stop at a plan or leave
 the file only in a thinking channel. Never tell the user or CI
 to run pytest later. Name the exact
-`pytest tests/smoke/test_NN_<short_name>.py` invocation. Do not
+`pytest tests/smoke/test_NN_<short_name>.py` invocation. A
+no-tools harness still gets a **complete** test file (use
+assumed journal / experiment / package facts; no `<FILL_…>`)
+and that invocation. Saying this turn cannot execute pytest is
+fine; instructing the user to run it is not. Do not
 AskUserQuestion for evaluate here — that gate belongs to
 `build-ml-pipeline` after pytest is green.
 

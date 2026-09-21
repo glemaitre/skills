@@ -111,9 +111,10 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 - **Families before the notebook.** More than one data file →
   AskUserQuestion grouping (none recommended): Use a proposed
   grouping / Profile every file separately / I will describe
-  the grouping. Propose clusters from extension, name pattern,
-  or a header/schema peek; generic slugs (`family_a`). Do not
-  silent-concat or invent families. One file → skip this ask.
+  the   grouping. Propose clusters from extension, name pattern,
+  or a header/schema peek; generic slugs (`family_a`). Inventing
+  families means writing them before the answer, not proposing
+  those slugs in the ask. One file → skip this ask.
 - **`api get` this turn** for symbols used (cache hits count).
   `TableReport.json()` keys drift — `.get(...)`.
 - **One `data_analysis/data_analysis.py`.** Repeat the
@@ -126,8 +127,9 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   template table, not a comment. Default figures: seaborn
   `displot` for the target only inside
   `templates/target_regression.py` /
-  `target_classification.py` (describe + one target figure),
-  not an extra histogram cell next to `TableReport`. One
+  `target_classification.py` (describe + one target figure).
+  Copy that snippet into the live notebook; do not invent a
+  second target histogram next to `TableReport`. One
   faceted `relplot` → `bivariate_grid.png`, last expression
   `g`. Do not `import matplotlib.pyplot` on the default path.
 - **Do not design the model.** Implications in

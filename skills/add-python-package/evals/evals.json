@@ -139,14 +139,14 @@
     {
       "id": 9,
       "title": "Skrub on uv never pip-installs Graphviz",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed uv project.\n- `env route skrub` returns `scope: default`.\n- `env graphviz` returns `action: system` and `dot: null`.]\n\nAdd skrub to the project.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env add --execute skrub`. - Name `python -m skore_skills env graphviz`. - Ask the Graphviz question using JSON `instructions` only. It must NOT: - Name `env add graphviz` or `uv add graphviz`. - Run `pip install graphviz`. - Invent `brew install graphviz` without quoting CLI stdout.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed uv project.\n- `env route skrub` returns `scope: default`.\n- `env graphviz` already returned `action: system`, `dot: null`,\n  and `instructions`: \"Install Graphviz with your OS package\n  manager so `dot` is on PATH.\"]\n\nAdd skrub to the project.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env add --execute skrub`. - Treat that `env graphviz` JSON as already returned (naming `python -m skore_skills env graphviz` is optional). - Ask the Graphviz question quoting JSON `instructions` only. It must NOT: - Propose `env add graphviz` or `uv add graphviz` as the Graphviz install (a fenced command or a step to run). Naming them in a STOP / \"will not\" sentence is allowed. - Run `pip install graphviz`. - Invent `brew install graphviz` without quoting CLI stdout.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills env add --execute skrub`.",
-        "Name `python -m skore_skills env graphviz`.",
-        "Ask the Graphviz question using JSON `instructions` only.",
-        "The response does NOT: Name `env add graphviz` or `uv add graphviz`.",
+        "Treat that `env graphviz` JSON as already returned (naming `python -m skore_skills env graphviz` is optional).",
+        "Ask the Graphviz question quoting JSON `instructions` only.",
+        "The response does NOT: Propose `env add graphviz` or `uv add graphviz` as the Graphviz install (a fenced command or a step to run). Naming them in a STOP / \"will not\" sentence is allowed.",
         "The response does NOT: Run `pip install graphviz`.",
         "The response does NOT: Invent `brew install graphviz` without quoting CLI stdout."
       ],

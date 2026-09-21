@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "36b830a4bff8411a429bce4deebde13c5e07904a433d8e21507025764472f699",
+  "catalog_hash": "9f53b0b9eb4d8974234e9d9c2fec3c5f4717b4cd384c0d9f92cdc9b6e9930cc7",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "3a8386e4bd4cd557f874934e5c3c20a975e55c3dbcb9bf638f51b832c5d9b89b"
+      "hash": "a7e410e8c464e26c22f6d9103da64ac9d2e24dc5952edf54dba9f0da94ccba8a"
     },
     {
       "id": "build-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
       "category": "orchestration",
       "subcategory": "test-strategies",
-      "hash": "27ed3dc2db6796a46ebdc4d04a02bc81fe5a0495ae659d3754462c4face7b73f"
+      "hash": "698d0fb4cf3de598e3bd5707c60aab76a13b24ff5003b12aadf776d90c35138b"
     },
     {
       "id": "audit-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "c22514e3e7830b2f80f3a08700c0e7d7afedc11c0a8b6b25a3145efda80703eb"
+      "hash": "1fd6a461558e118a5f0e2c12c6d9f56ee31c9e10b08e89a5946f77c9ac8cb0d9"
     },
     {
       "id": "manage-ml-backlog",
@@ -165,7 +165,7 @@
       "summary": "Literature research for an ML methodology concern.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "dc3b3649a83c5fa4e4f182cf4df78e9f3c87bd456d7aaf39ad82237b14e9f698"
+      "hash": "2d95a70db8abfca76986b7835d0eddb03b29f281c001a7b67b8265bf4d4bcf46"
     },
     {
       "id": "add-python-package",
@@ -174,7 +174,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "55426eaf3bb10f4842276ee4846f64841da314c635a7fc13a5e91b7b325c955b"
+      "hash": "935f4a1821f1de606738a7c9fddd970cb0d3e576459666636a94dd1efe474099"
     },
     {
       "id": "setup-workspace",

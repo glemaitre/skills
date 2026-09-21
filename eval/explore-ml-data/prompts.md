@@ -262,8 +262,11 @@
 **Must NOT do:**
 - Re-plot TableReport univariate histograms or the association
   matrix in extra cells.
-- Add a target `displot` as a sibling of `TableReport` outside
-  `templates/target_regression.py`.
+- Add a **second** target histogram / extra `displot` besides
+  the one regression snippet. Copying
+  `templates/target_regression.py` into
+  `data_analysis/data_analysis.py` (that file's `displot`) is
+  required, not a violation.
 - Install sklearn, skore, pytest, or plotly on the default path.
 - Train/test split the raw table.
 - Run `git end-turn` before the user picks Close.
@@ -512,11 +515,13 @@
   the grouping — before placing `data_analysis/data_analysis.py`.
 
 **Must NOT do:**
-- Silent-concat files or invent families.
+- Place `data_analysis/data_analysis.py` or concat shards on
+  disk before the user answers the grouping ask. Do not treat
+  `family_a` / `family_b` as confirmed until that pick. Proposing
+  those slugs and an in-memory concat **inside** "Use the
+  proposed grouping" is required, not a violation.
 - Write a joined frame to disk.
 - Append join-coverage cells on the default pass.
-- Place `data_analysis/data_analysis.py` before grouping is
-  confirmed.
 
 ---
 

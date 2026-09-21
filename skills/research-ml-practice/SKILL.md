@@ -17,7 +17,8 @@ description: >
   follow up if thin, write `scratch/research/`. Return the
   path plus one or two sentences. Never mutate raw data, pick
   the final learner, or write `data_analysis.md` / the design
-  note.
+  note. Chat stays path + those sentences even when a harness
+  asks for a complete answer in the message.
 ---
 
 # Research ML Practice
@@ -51,12 +52,17 @@ summary. Do not `git end-turn`.
    (survey: `survey-<slug>.md`; depth: `<slug>.md` with lanes).
    Gitignored.
 5. Return to the caller: scratch path and a one- or two-sentence
-   finding. Chat is **path + those sentences only** — no pasted
-   headings, tables, or “Depth note — …” body. If tools cannot
-   search or write, **stop there**: no hypotheses, diagnostics,
-   planned-query bullets, or template headings in chat (that
-   *is* the paste). Do not write `data_analysis.md`, the design
-   note, or `data/`. The caller asks which extras to add.
+   finding. Name that candidates are laned (`measure` /
+   `declare` / `evaluate` / `confirm`). Chat is **path + those
+   sentences only** — no pasted headings, tables, or “Depth
+   note — …” body. That is the complete user-facing deliverable
+   even when a harness says to put the full answer in chat. If
+   tools cannot search or write, **stop there**: still only
+   path + sentences (name the intended `scratch/research/`
+   path). No hypotheses, diagnostics, planned-query bullets, or
+   template headings in chat (that *is* the paste). Do not write
+   `data_analysis.md`, the design note, or `data/`. The caller
+   asks which extras to add.
 
 ## Stop conditions
 
@@ -78,4 +84,5 @@ summary. Do not `git end-turn`.
   user to go look something up.
 - Do not paste the scratch markdown into chat (no “Depth
   note —”, no survey body). Path + 1–2 sentences only. If
-  tools cannot search or write, stop after that.
+  tools cannot search or write, stop after that. A no-tools
+  harness does not license pasting the note.

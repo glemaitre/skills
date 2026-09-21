@@ -178,7 +178,7 @@
       "id": 11,
       "title": "Default run adds ML-gap cells",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- `add-python-package` is installed.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available.]\n\nExplore the California housing CSV. Target is MedHouseVal.",
-      "expected_output": "Behavioural response satisfying: - Load `plot-ml-figure` if installed before writing figure cells. - Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing). - Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py` for **regression only**. It must NOT: - Re-plot TableReport univariate histograms or the association matrix in extra cells. - Add a target `displot` as a sibling of `TableReport` outside `templates/target_regression.py`. - Install sklearn, skore, pytest, or plotly on the default path.",
+      "expected_output": "Behavioural response satisfying: - Load `plot-ml-figure` if installed before writing figure cells. - Load `add-python-package` for `matplotlib` and `seaborn` (and skrub / pandas if missing). - Write duplicate, target-distribution, bivariate-vs-target, and leakage cells in `data_analysis/data_analysis.py` for **regression only**. It must NOT: - Re-plot TableReport univariate histograms or the association matrix in extra cells. - Add a **second** target histogram / extra `displot` besides the one regression snippet. Copying `templates/target_regression.py` into `data_analysis/data_analysis.py` (that file's `displot`) is required, not a violation. - Install sklearn, skore, pytest, or plotly on the default path.",
       "files": [],
       "expectations": [
         "Load `plot-ml-figure` if installed before writing figure cells.",
@@ -187,7 +187,7 @@
         "Use seaborn figure-level plots (`displot` / `relplot`); save PNGs and leave figures as cell output. Feature-vs-target is one faceted `relplot` (`bivariate_grid.png`), last expression `g`.",
         "After `data_analysis.md`, AskUserQuestion keep exploring vs close (neither option recommended or preselected).",
         "The response does NOT: Re-plot TableReport univariate histograms or the association matrix in extra cells.",
-        "The response does NOT: Add a target `displot` as a sibling of `TableReport` outside `templates/target_regression.py`.",
+        "The response does NOT: Add a **second** target histogram / extra `displot` besides the one regression snippet. Copying `templates/target_regression.py` into `data_analysis/data_analysis.py` (that file's `displot`) is required, not a violation.",
         "The response does NOT: Install sklearn, skore, pytest, or plotly on the default path.",
         "The response does NOT: Train/test split the raw table.",
         "The response does NOT: Run `git end-turn` before the user picks Close.",
@@ -360,14 +360,13 @@
       "id": 21,
       "title": "Multiple files ask grouping before the notebook",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available. `add-python-package` is installed.\n- Raw files: `data/a_1.csv`, `data/a_2.csv`, `data/b.parquet`.\n- Families are not yet confirmed.]\n\nExplore the data. Target is y.",
-      "expected_output": "Behavioural response satisfying: - AskUserQuestion grouping (none recommended): Use a proposed grouping / Profile every file separately / I will describe the grouping \u2014 before placing `data_analysis/data_analysis.py`. It must NOT: - Silent-concat files or invent families. - Write a joined frame to disk. - Append join-coverage cells on the default pass.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion grouping (none recommended): Use a proposed grouping / Profile every file separately / I will describe the grouping \u2014 before placing `data_analysis/data_analysis.py`. It must NOT: - Place `data_analysis/data_analysis.py` or concat shards on disk before the user answers the grouping ask. Do not treat `family_a` / `family_b` as confirmed until that pick. Proposing those slugs and an in-memory concat **inside** \"Use the proposed grouping\" is required, not a violation. - Write a joined frame to disk. - Append join-coverage cells on the default pass.",
       "files": [],
       "expectations": [
         "AskUserQuestion grouping (none recommended): Use a proposed grouping / Profile every file separately / I will describe the grouping \u2014 before placing `data_analysis/data_analysis.py`.",
-        "The response does NOT: Silent-concat files or invent families.",
+        "The response does NOT: Place `data_analysis/data_analysis.py` or concat shards on disk before the user answers the grouping ask. Do not treat `family_a` / `family_b` as confirmed until that pick. Proposing those slugs and an in-memory concat **inside** \"Use the proposed grouping\" is required, not a violation.",
         "The response does NOT: Write a joined frame to disk.",
-        "The response does NOT: Append join-coverage cells on the default pass.",
-        "The response does NOT: Place `data_analysis/data_analysis.py` before grouping is confirmed."
+        "The response does NOT: Append join-coverage cells on the default pass."
       ],
       "tools": false,
       "sandbox": [],

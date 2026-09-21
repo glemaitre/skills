@@ -55,6 +55,9 @@
 
 **Assumed workspace state:**
 - `model-ml-pipeline` dispatched the audit.
+- `cells run` already produced the digest.
+- Normalized locator is
+  `local workspace: [reports/](../reports/) · id: local-report-id`.
 
 **Must do:**
 - Return the digest, locator, and optional headline to
@@ -62,9 +65,10 @@
 - State that the dispatcher owns record-outcome, site, and git close.
 
 **Must NOT do:**
-- Run a second `git end-turn`.
-- Load triage after returning to the dispatcher.
-- Dispatch `manage-ml-backlog` before returning.
+- Run `git end-turn` or `persist-ml-git` from this skill (naming
+  them as the **dispatcher's** close is allowed).
+- Load `triage-ml-task` from this skill.
+- Dispatch `manage-ml-backlog` from this skill.
 
 ---
 

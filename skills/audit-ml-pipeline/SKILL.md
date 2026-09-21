@@ -374,12 +374,16 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 
 ## End of turn
 
-When `model-ml-pipeline` or `manage-ml-backlog` dispatched this
-turn, return to that caller — it owns record-outcome / convert /
-site / `git end-turn`. On a direct free-text audit this skill owns
-the close and runs the block below.
+**Dispatched** (`model-ml-pipeline` or `manage-ml-backlog` this
+turn): return the digest, the persisted-report locator (or
+`n/a — backend did not expose a locator`), and an optional
+headline to that caller. Stop. Do not run record-outcome,
+`notebook convert`, `site build`, `git end-turn`, or triage
+here — the caller owns that close. Do not paste the direct-audit
+close as a preview of what the dispatcher will run.
 
-The digest's persisted-report locator **must** appear in the
+**Direct free-text audit:** this skill owns the close. The
+digest's persisted-report locator **must** appear in the
 user-facing message (or `n/a — backend did not expose a locator`)
 before site build or `git end-turn`.
 
