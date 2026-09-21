@@ -29,6 +29,7 @@ violated.
   pointing to the design note).
 - Mention NOT importing `skore` in the test file (test must run
   in any skrub-capable env).
+- Run pytest on `tests/smoke/test_02_load_forecast.py`.
 
 **Must NOT do:**
 - Synthesize a fake DataFrame fixture.
@@ -194,3 +195,24 @@ violated.
 **Must NOT do:**
 - `pip install pytest`.
 - Call `env add` from this skill.
+
+---
+
+## CASE_08 — Pytest is the smoke execution
+
+**User prompt:**
+> Write the smoke test for `01_baseline` and prove it.
+
+**Assumed workspace state:**
+- Design note approved; experiment script exists.
+- `pytest` is installed.
+- Loaded from `build-ml-pipeline` after the declaration.
+
+**Must do:**
+- Write `tests/smoke/test_01_baseline.py`.
+- Run pytest on that file.
+
+**Must NOT do:**
+- Skip pytest and leave execution to the user or CI.
+- AskUserQuestion Evaluate (Recommended) / Modify / Stop (that gate is build's).
+- Write `skore.evaluate`.

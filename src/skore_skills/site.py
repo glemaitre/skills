@@ -66,6 +66,7 @@ class Page:
     dest_name: str
     notebook: Path | None = None
     section: str | None = None
+    audit: Path | None = None
 
 
 def _notebook_for(directory: Path, stem: str) -> Path | None:
@@ -76,6 +77,11 @@ def _notebook_for(directory: Path, stem: str) -> Path | None:
 def notebook_dest(page: Page) -> str:
     """Return the staged file name of the notebook page for ``page``."""
     return f"{Path(page.dest_name).stem}.nb.html"
+
+
+def audit_dest(page: Page) -> str:
+    """Return the staged file name of the audit notebook for ``page``."""
+    return f"{Path(page.dest_name).stem}.audit.nb.html"
 
 
 def collect_pages(root: Path) -> list[Page]:
@@ -106,6 +112,7 @@ def collect_pages(root: Path) -> list[Page]:
                     path.name,
                     _notebook_for(root / "experiments", path.stem),
                     "Experiments",
+                    _notebook_for(root / "audit", path.stem),
                 )
             )
     return pages
@@ -281,15 +288,18 @@ def embed_assets(text: str) -> str:
 
 
 def inject_notebook(text: str, page: Page) -> str:
-    """Append the paired notebook viewer to its report page."""
-    if page.notebook is None:
-        return text
-    name = notebook_dest(page)
-    if f'src="{name}"' in text:
-        return text
-    if not text.endswith("\n"):
-        text += "\n"
-    return f"{text}\n## Notebook\n\n{render_embed(name, f'{page.title} notebook')}\n"
+    """Append the paired notebook viewers; the audit continues the experiment."""
+    for source, heading, name in (
+        (page.notebook, "Notebook", notebook_dest(page)),
+        (page.audit, "Audit", audit_dest(page)),
+    ):
+        if source is None or f'src="{name}"' in text:
+            continue
+        if not text.endswith("\n"):
+            text += "\n"
+        embed = render_embed(name, f"{page.title} {heading.lower()}")
+        text = f"{text}\n## {heading}\n\n{embed}\n"
+    return text
 
 
 def with_height_reporter(text: str) -> str:
@@ -381,6 +391,8 @@ def stage_docs(root: Path) -> tuple[Path, list[Page], bool]:
         (docs / page.dest_name).write_text(text, encoding="utf-8")
         if page.notebook is not None:
             _copy_notebook(page.notebook, docs / notebook_dest(page))
+        if page.audit is not None:
+            _copy_notebook(page.audit, docs / audit_dest(page))
     _copy_data_analysis_assets(root, docs)
     _copy_site_assets(docs)
     stub_home = _write_stub_index(docs)

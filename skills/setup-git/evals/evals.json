@@ -61,11 +61,11 @@
       "id": 4,
       "title": "Resolve hidden paths",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `python -m skore_skills git ignore-merge` returns\n  `action: resolve-dotfiles` with `.cursor/` listed.\n- `policy.git.autocommit` is already `on`.\n- No HEAD yet.]\n\nSet up git and keep the `.cursor` folder tracked.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills git ignore-merge`. - Ask which hidden paths to keep, then re-run `python -m skore_skills git ignore-merge --keep .cursor`. - After autocommit `on` and no HEAD, `git add` and `git commit`. It must NOT: - `--keep` `.env` or `.skore`. - Use `python -m skore_skills git end-turn` to create the first commit.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills git ignore-merge`. - Ask which hidden paths to keep, then re-run `python -m skore_skills git ignore-merge --decide --keep .cursor`. - After autocommit `on` and no HEAD, `git add` and `git commit`. It must NOT: - `--keep` `.env` or `.skore`. - Use `python -m skore_skills git end-turn` to create the first commit.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills git ignore-merge`.",
-        "Ask which hidden paths to keep, then re-run `python -m skore_skills git ignore-merge --keep .cursor`.",
+        "Ask which hidden paths to keep, then re-run `python -m skore_skills git ignore-merge --decide --keep .cursor`.",
         "After autocommit `on` and no HEAD, `git add` and `git commit`.",
         "The response does NOT: `--keep` `.env` or `.skore`.",
         "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."

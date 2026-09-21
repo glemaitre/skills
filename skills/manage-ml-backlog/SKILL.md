@@ -2,9 +2,12 @@
 name: manage-ml-backlog
 description: >
   Canonical backlog loop step. Record an experiment outcome in
-  History, refresh Backlog, and name next-lever options. Trigger
-  after audit, when a run finishes, or when the user asks what to
-  try next. This is cadence, not a dispatcher.
+  History, refresh Backlog, and name next-lever options. Also
+  supports the model-entry selection mode: show real B<N> rows
+  supplied by the deterministic CLI and consume one into a
+  proposal. Trigger after audit, when a run finishes, when the
+  user asks what to try next, or when model-ml-pipeline routes its
+  Backlog choice here. This is cadence, not a methodology owner.
 ---
 
 # Manage ML Backlog
@@ -12,6 +15,56 @@ description: >
 Replace iterate-as-cadence. Do not own setup, exploratory data
 analysis, build, smoke,
 evaluate, or audit methodology.
+
+## Model-entry selection mode
+
+When `model-ml-pipeline` calls with the `backlog` array from
+`python -m skore_skills model choices`:
+
+1. Present exactly those `B<N>` rows in their returned order and
+   AskUserQuestion for one pick. Do not rescan into a different
+   menu and do not add an idea.
+2. Turn the selected row's Item + Source into a Proposal. Ask only
+   for missing shaping facts; do not invent a Method from a
+   one-line item.
+3. Return the confirmed Proposal to `model-ml-pipeline`. After the
+   model stage creates and populates the design note, remove only
+   the selected Backlog row and add the planned History row.
+   Preserve every other stable B<N> index.
+
+This mode does not require a report/audit digest and does not run
+the outcome-recording procedure below. Empty Backlog is a routing
+error: return to `model-ml-pipeline`; do not fabricate B1.
+
+## Record-outcome mode
+
+When `model-ml-pipeline`, `evaluate-ml-pipeline`, or
+`audit-ml-pipeline` calls at end of turn with the audit digest
+already in hand. This is the only path that records an outcome
+without a full backlog turn.
+
+Run Procedure steps 1-3 and nothing else:
+
+1. Step 1 — `python -m skore_skills status`; require an approved
+   stem.
+2. Step 2 — read `journal/JOURNAL.md`; scaffold the index if it is
+   missing.
+3. Step 3 — update the matching History row and the design-note
+   Status block from the digest. Also refresh the `JOURNAL.md`
+   Status rows `Last experiment` and `Last result`.
+
+Then return to the caller. Skip step 4 (Backlog rescan) and step 5
+(the next-lever triage menu) — the caller did not ask what to try
+next.
+
+Do not dispatch `audit-ml-pipeline` in this mode; the digest is
+already in hand and dispatching would bounce back here. Do not run
+this skill's End of turn either: the caller owns convert / site /
+`git end-turn`.
+
+The Procedure guards still bind. Never mark `done` while smoke is
+red, and never invent a metric — no digest and no user-supplied
+value means a one-line skip, not a guess.
 
 ## Procedure
 
@@ -43,6 +96,8 @@ evaluate, or audit methodology.
 
 - Do not design or implement the next experiment in this turn.
 - Do not dispatch setup, model, or audit by skill id.
+- In model-entry selection mode, do not invent a Backlog row or
+  remove it before the paired design note exists.
 - Do not invent metrics.
 - Do not paste a `JOURNAL.md` body or recreate the index from
   memory.

@@ -21,9 +21,12 @@
 - Name `python -m skore_skills env add --execute skrub` (or
   `env route` then that add). Do not invent `pixi add` from memory.
 - Route skrub to default (not `--feature agent`).
+- Name `python -m skore_skills env graphviz` and, with `action`
+  conda and managed, `env graphviz --execute`.
 
 **Must NOT do:**
 - Run `pip install skrub`.
+- Run `pip install graphviz`.
 - Re-bootstrap with `env init`.
 
 ---
@@ -172,3 +175,25 @@
 - Silently `pixi add optuna` from memory.
 - Put `--feature` / `--group` in the question text.
 - Put optuna on `--feature agent` without asking.
+
+---
+
+## CASE_09 — Skrub on uv never pip-installs Graphviz
+
+**User prompt:**
+> Add skrub to the project.
+
+**Assumed workspace state:**
+- Managed uv project.
+- `env route skrub` returns `scope: default`.
+- `env graphviz` returns `action: system` and `dot: null`.
+
+**Must do:**
+- Name `python -m skore_skills env add --execute skrub`.
+- Name `python -m skore_skills env graphviz`.
+- Ask the Graphviz question using JSON `instructions` only.
+
+**Must NOT do:**
+- Name `env add graphviz` or `uv add graphviz`.
+- Run `pip install graphviz`.
+- Invent `brew install graphviz` without quoting CLI stdout.

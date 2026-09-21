@@ -19,10 +19,14 @@ description: >
   user asks how to pick a cross-validator; user wants to see a
   report / metrics / diagnostic plots for a fitted learner.
 
-  STOP when `python -m skore_skills status` shows no declared
-  learner or no approved design: explain the missing prerequisite
-  and ask the user to run the model pack or ask triage. Also stop
-  for hyperparameter search, final-model serving, or multi-run
+  STOP when `python -m skore_skills status` shows no scaffold
+  (`has_src` and `has_journal` both false), no declared learner,
+  no approved design, or smoke not green: explain the missing
+  prerequisite and send the user to setup/triage or
+  `build-ml-pipeline` (it owns pytest smoke). Do not require
+  `git`. Do not write `skore.evaluate` while smoke is red or
+  missing on a history-dependent pipeline. Also stop for
+  hyperparameter search, final-model serving, or multi-run
   tracking. Do not require another action skill to be installed.
 
   HOW TO USE: invoke before any evaluation call. **First, resolve
@@ -42,11 +46,25 @@ read the report. The pipeline declaration is out of scope (see
 
 ## Stop conditions — read before anything else
 
+- **Workspace not scaffolded.** Run `python -m skore_skills status`
+  first. If `has_src` and `has_journal` are both false, STOP and
+  send the user to `setup-ml-project` / triage. Do not require
+  `git`.
+- **Smoke not green is a STOP.** For a pipeline with a backward
+  shift, lag, rolling window, target shift, or join with side
+  history: if `tests/smoke/test_NN_<short_name>.py` is missing, or
+  pytest is red / not run, STOP. Do **not** write `skore.evaluate`.
+  Route to `build-ml-pipeline` (it loads smoke and runs pytest).
+  Documented n/a only when there is no history-dependent step.
+  Direct "evaluate" requests use this same gate.
 - **G-SKORE-MODE before `skore.evaluate`.** Read
   `status.policy.skore_mode`. If unset: ask local (recommended) /
   hub / mlflow. Persist `python -m skore_skills policy set
   skore_mode <mode>`. Keep a recorded mode unless the user
-  migrates. Then load `add-python-package`, which runs
+  migrates. If the mode is **local** (just persisted or already
+  recorded), `mkdir reports` (`exist_ok`); do not write
+  `reports/README.md`. If **hub** or **mlflow**, do not create
+  `reports/`. Then load `add-python-package`, which runs
   `python -m skore_skills env add-skore --mode <mode> --execute`.
   That command selects conda-forge for pixi/conda and PyPI
   requirements for other managers. Confirm the add; do not spell
@@ -93,9 +111,10 @@ read the report. The pipeline declaration is out of scope (see
   satisfied lookup, not a block.
 - **Splitter choice is data-driven, not default-driven
   (`G-CV-SPLITTER`).** This is the **G-CV-SPLITTER** gate — owned by
-  this skill, fired during `triage-ml-task` § 3 (the build →
-  evaluate → test chain, **after** the design note is approved at
-  G-DESIGN), before `src/<pkg>/evaluate.py` is written. The splitter
+  this skill, fired **after** green pytest smoke and the Evaluate
+  HITL (or a certain evaluate request), **after** the design note
+  is approved at G-DESIGN, before evaluation is written into
+  `experiments/NN_*.py`. The splitter
   is NOT pre-committed in the design note. Pick from the
   `split_kwargs` content at the X marker via the table in rule 3 —
   never reach for `KFold(5)` or `StratifiedKFold` out of habit. If
@@ -112,13 +131,13 @@ read the report. The pipeline declaration is out of scope (see
   loads-then-features-then-splits passes CV trivially and still
   silently drops cold-start rows when handed a fresh
   `learner.predict(env₂)`. The structural check that catches this
-  is the smoke test owned by `smoke-test-ml-pipeline` — required
-  alongside CV for any pipeline that has a backward shift, lag,
+  is the smoke test owned by `smoke-test-ml-pipeline` (loaded
+  from `build-ml-pipeline`, **run with pytest**) — required
+  before CV for any pipeline that has a backward shift, lag,
   rolling window, target shift, or join with side history. If
-  you produce a CV report and the pipeline has any such step,
-  the matching `tests/smoke/test_NN_<short_name>.py` must also
-  pass before the experiment can flip to `done` (enforced by
-  `triage-ml-task` § 4).
+  pytest is red or the smoke file is missing for such a
+  pipeline, STOP (see the smoke-not-green Stop condition).
+  Do not produce a CV report "anyway".
 - **All Python execution goes to `scratch/`.** Every Python
   command — version checks, signature lookups, walking the skore
   report's metrics accessors, extracting per-fold values,
@@ -203,13 +222,12 @@ Pre-flight (evaluate-ml-pipeline):
 - [ ] split_kwargs at the X marker read: <groups | time | none>
 - [ ] Splitter chosen via rule 3 mapping table: <name + reason>
 - [ ] Data-passing form picked: <X, y> | <data={...}>
-- [ ] Smoke test status (per `smoke-test-ml-pipeline`):
-        passing  — CV report can be persisted and experiment can
-                   flip to `done`;
-        failing  — pipeline has a structural bug; route back to
-                   `build-ml-pipeline` (CV report can still be
-                   produced, but the experiment stays `approved`,
-                   not `done`, until smoke passes);
+- [ ] Smoke test status (per `smoke-test-ml-pipeline`, pytest):
+        passing  — CV may proceed after the Evaluate HITL (or a
+                   certain evaluate request);
+        failing / missing (history-dependent) — STOP. Do not
+                   write `skore.evaluate`. Route to
+                   `build-ml-pipeline`;
         n/a      — pipeline has no history-dependent step (rare
                    for time-series / panel data; explain why in
                    the response).
@@ -452,6 +470,31 @@ API CLI is only for the signature after the name.
   summary.
 
 ## End of turn
+
+When `model-ml-pipeline` dispatched this turn, return to it — the
+dispatcher owns record-outcome / convert / site / `git end-turn`.
+Otherwise this skill owns the close and runs the block below.
+
+If `audit-ml-pipeline` ran this turn, it already dispatched
+record-outcome; go straight to the convert step. Otherwise load
+`manage-ml-backlog` in **record-outcome mode** so the run reaches
+`journal/JOURNAL.md` History and the design-note Status block.
+Without an audit digest, pass the user's headline value or skip in
+one line — do not invent a metric, and never mark `done` while
+smoke is red. This runs **before** convert and site build so the
+updated journal files are on disk when the site is staged and
+`git end-turn` stages the turn.
+
+If `policy.notebooks` is true and `export-ml-notebook` is
+installed, run `python -m skore_skills notebook convert
+experiments/<stem>.py`, with `--html` when `policy.site` is also
+true. Convert re-executes the script; say so when it is slow.
+Missing jupytext / nbclient / nbconvert → one-line skip naming
+`add-python-package`; do not fail the turn, do not `pixi add`.
+
+Then, if `policy.site` is true, `export-ml-site` is installed, run
+`python -m skore_skills site build`. Skip in one line otherwise.
+Name a build error; do not fail the evaluate turn.
 
 Run `python -m skore_skills git end-turn --stage evaluate`. If JSON
 `action` is `invoke`, load `persist-ml-git` and follow it. Then

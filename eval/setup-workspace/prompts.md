@@ -36,7 +36,7 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
   action after G-PKG-NAME.
 - Mention scaffolding the default layout: `src/<pkg>/`,
   `journal/`, `experiments/`, `data_analysis/`, `data/`, `audit/`,
-  `tests/smoke/`, `scratch/`, `reports/`, each with `README.md`.
+  `tests/smoke/`, `scratch/`, each with `README.md`.
 - After scaffold, AskUserQuestion executed notebooks +
   documentation site (`allow_multiple`, both **unchecked** by
   default). Persist `false` when left unchecked.

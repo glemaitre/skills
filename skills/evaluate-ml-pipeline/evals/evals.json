@@ -26,7 +26,7 @@
     {
       "id": 2,
       "title": "Time-ordered data, mandatory AskUserQuestion",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_load_forecast.md` approved.\n- `pipeline.py` X-marker has `split_kwargs={\"times\": ...}` (temporal\n  ordering attached at build time).\n- Forecast horizon is 24h.\n- Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering\n  `KFold` / `GroupKFold` / `TimeSeriesSplit` \u2014 the splitter lookup\n  is already satisfied.]\n\nWire `evaluate.py` for the 24h-ahead load forecast experiment.\nPick the splitter.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_load_forecast.md` approved.\n- `pipeline.py` X-marker has `split_kwargs={\"times\": ...}` (temporal\n  ordering attached at build time).\n- Forecast horizon is 24h.\n- Matching smoke pytest is green.\n- Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering\n  `KFold` / `GroupKFold` / `TimeSeriesSplit` \u2014 the splitter lookup\n  is already satisfied.]\n\nWire `evaluate.py` for the 24h-ahead load forecast experiment.\nPick the splitter.",
       "expected_output": "Behavioural response satisfying: - Name **`AskUserQuestion`** (or a narrative equivalent that lists the picks and waits) as the mandatory gate before a splitter is locked in. No tools this turn: enumerating the options in the message counts as firing the gate. - Present the **four canonical options** (wording need not be verbatim): 1. `TimeSeriesSplit(gap=horizon)` \u2014 safe default 2. `TimeSeriesSplit(gap=0)` \u2014 only on explicit user pick; warn about leakage 3. Custom splitter (purged-and-embargoed / blocked calendar / walk-forward) 4. `KFold` ignoring time \u2014 only with explicit user reason - Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to `gap=0` which silently leaks at non-trivial horizons. Any sentence that `gap=0` is the memory default / leaks is enough; do not require the exact constructor spelling if `gap=0` is named. It must NOT: - Skip the four-option ask and lock a splitter with no user pick. Naming a **recommended** option (e.g. `TimeSeriesSplit(gap=horizon)`) next to the menu, or drafting `evaluate.py` labeled pending confirmation, is not a silent pick. - Default to `KFold` because empty `gap` \"feels safer\". - Treat harness \"no clarifying questions\" hint as waiving the mandatory ask.",
       "files": [],
       "expectations": [
@@ -110,7 +110,8 @@
         "State that a passing smoke test is still required before the caller may flip the status.",
         "The response does NOT: Edit `journal/02_load_forecast.md` Status to `done`.",
         "The response does NOT: Edit `journal/JOURNAL.md` History row to `done`.",
-        "The response does NOT: Treat clean CV as sufficient for a history-dependent pipeline."
+        "The response does NOT: Treat clean CV as sufficient for a history-dependent pipeline.",
+        "The response does NOT: Write `skore.evaluate` while pytest smoke is red."
       ],
       "tools": false,
       "sandbox": [],
@@ -138,16 +139,18 @@
       "id": 8,
       "title": "G-SKORE-MODE unset at first evaluate",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` approved.\n- `src/<pkg>/pipeline.py` has `build_learner`.\n- `policy.skore_mode` is unset. `import skore` may fail.\n- `add-python-package` is installed.]\n\nWire `evaluate.py` for the baseline.",
-      "expected_output": "Behavioural response satisfying: - Ask G-SKORE-MODE (local recommended / hub / mlflow) before writing `skore.evaluate`. - Persist `policy set skore_mode` after the user answers. - Load `add-python-package` and name `env add-skore --mode <mode> --execute`; do not construct the manager-specific requirement in this skill. It must NOT: - Silent-default `mode=\"local\"` without asking. - Drop back to `cross_val_score` because skore is missing. - Re-ask G-TABULAR.",
+      "expected_output": "Behavioural response satisfying: - Ask G-SKORE-MODE (local recommended / hub / mlflow) before writing `skore.evaluate`. - Persist `policy set skore_mode` after the user answers. - If the answer is **local**, create `reports/` (`mkdir`, exist_ok) with no README. If **hub** or **mlflow**, do not create `reports/`. It must NOT: - Silent-default `mode=\"local\"` without asking. - Drop back to `cross_val_score` because skore is missing. - Re-ask G-TABULAR.",
       "files": [],
       "expectations": [
         "Ask G-SKORE-MODE (local recommended / hub / mlflow) before writing `skore.evaluate`.",
         "Persist `policy set skore_mode` after the user answers.",
+        "If the answer is **local**, create `reports/` (`mkdir`, exist_ok) with no README. If **hub** or **mlflow**, do not create `reports/`.",
         "Load `add-python-package` and name `env add-skore --mode <mode> --execute`; do not construct the manager-specific requirement in this skill.",
         "The response does NOT: Silent-default `mode=\"local\"` without asking.",
         "The response does NOT: Drop back to `cross_val_score` because skore is missing.",
         "The response does NOT: Re-ask G-TABULAR.",
-        "The response does NOT: Send `skore[hub]` / `skore[mlflow]` directly to pixi or conda."
+        "The response does NOT: Send `skore[hub]` / `skore[mlflow]` directly to pixi or conda.",
+        "The response does NOT: Write `reports/README.md`."
       ],
       "tools": false,
       "sandbox": [],
@@ -163,6 +166,60 @@
         "Use local mode; do not re-ask G-SKORE-MODE.",
         "Pick `skore.evaluate` as the entry point.",
         "The response does NOT: Re-open local vs hub vs mlflow."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 10,
+      "title": "Smoke not green stops before skore.evaluate",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_load_forecast.md` approved.\n- `experiments/02_load_forecast.py` exists.\n- Pipeline has lag features (history-dependent).\n- `tests/smoke/test_02_load_forecast.py` is missing, or pytest is red.]\n\nWire evaluate for the 24h-ahead load forecast. Run CV now.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - STOP. Route to `build-ml-pipeline` (pytest smoke). It must NOT: - Write `skore.evaluate` or `project.put`. - Say CV can still be produced while smoke is failing.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "STOP. Route to `build-ml-pipeline` (pytest smoke).",
+        "The response does NOT: Write `skore.evaluate` or `project.put`.",
+        "The response does NOT: Say CV can still be produced while smoke is failing."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 11,
+      "title": "Direct evaluate owns convert and site build",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Same as CASE_01; smoke is green.\n- `model-ml-pipeline` did NOT dispatch this turn.\n- `policy.notebooks` and `policy.site` are both true.\n- `export-ml-notebook` and `export-ml-site` are installed.]\n\nEvaluate the baseline.",
+      "expected_output": "Behavioural response satisfying: - Load `manage-ml-backlog` in record-outcome mode before the convert, since no audit ran this turn. - Name `python -m skore_skills notebook convert experiments/01_baseline.py --html` after the evaluation. - Name `python -m skore_skills site build` after the convert. It must NOT: - End the turn without convert or site build while both gates are true. - Run `site build` before the journal is recorded. - Write `journal/JOURNAL.md` or the design note directly.",
+      "files": [],
+      "expectations": [
+        "Load `manage-ml-backlog` in record-outcome mode before the convert, since no audit ran this turn.",
+        "Name `python -m skore_skills notebook convert experiments/01_baseline.py --html` after the evaluation.",
+        "Name `python -m skore_skills site build` after the convert.",
+        "Name `python -m skore_skills git end-turn --stage evaluate`.",
+        "If that command returns `invoke`, load `persist-ml-git`.",
+        "The response does NOT: End the turn without convert or site build while both gates are true.",
+        "The response does NOT: Run `site build` before the journal is recorded.",
+        "The response does NOT: Write `journal/JOURNAL.md` or the design note directly.",
+        "The response does NOT: Run `git commit` in this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 12,
+      "title": "Dispatched evaluate returns instead of closing",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Same as CASE_01; smoke is green.\n- `model-ml-pipeline` dispatched this turn and owns the close.\n- `policy.notebooks` and `policy.site` are both true.]\n\nEvaluate the baseline.",
+      "expected_output": "Behavioural response satisfying: - Return to `model-ml-pipeline` after the evaluation. - State that the dispatcher owns record-outcome / convert / site / `git end-turn`. It must NOT: - Run `notebook convert`, `site build`, or `git end-turn` here. - Load `manage-ml-backlog` here. - Load `triage-ml-task` directly.",
+      "files": [],
+      "expectations": [
+        "Return to `model-ml-pipeline` after the evaluation.",
+        "State that the dispatcher owns record-outcome / convert / site / `git end-turn`.",
+        "The response does NOT: Run `notebook convert`, `site build`, or `git end-turn` here.",
+        "The response does NOT: Load `manage-ml-backlog` here.",
+        "The response does NOT: Load `triage-ml-task` directly."
       ],
       "tools": false,
       "sandbox": [],

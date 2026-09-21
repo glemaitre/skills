@@ -115,7 +115,6 @@ data/
 audit/
 tests/smoke/
 scratch/
-reports/
 ```
 
 Each directory has `README.md`.

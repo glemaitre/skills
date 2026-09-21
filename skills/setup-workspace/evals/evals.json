@@ -13,7 +13,7 @@
         "Name **G-PKG-NAME** as the next gate \u2014 the `src/<pkg>/` import name goes to the user via `AskUserQuestion`, with the folder name as the default, and is not picked here.",
         "Do not ask G-ENV-MGR.",
         "Name `python -m skore_skills scaffold --package <pkg>` as the action after G-PKG-NAME.",
-        "Mention scaffolding the default layout: `src/<pkg>/`, `journal/`, `experiments/`, `data_analysis/`, `data/`, `audit/`, `tests/smoke/`, `scratch/`, `reports/`, each with `README.md`.",
+        "Mention scaffolding the default layout: `src/<pkg>/`, `journal/`, `experiments/`, `data_analysis/`, `data/`, `audit/`, `tests/smoke/`, `scratch/`, each with `README.md`.",
         "After scaffold, AskUserQuestion executed notebooks + documentation site (`allow_multiple`, both **unchecked** by default). Persist `false` when left unchecked.",
         "Name `python -m skore_skills git end-turn --stage setup` at the end of this standalone turn.",
         "If that command returns `invoke`, load `persist-ml-git`.",

@@ -79,7 +79,7 @@ Source: https://docs.skore.probabl.ai/stable/reference/api/skore.Project.html
 | `workspace=` argument | **required**: `workspace=str(PROJECT_ROOT / "reports")` (on-disk dir) | **required**: `workspace="<hub-workspace>"` (the Hub workspace name) | **MUST be absent** — `tracking_uri=` is used instead |
 | `tracking_uri=` argument | not used | not used | **required**: the MLflow tracking server URI |
 | Install command | `env add-skore --mode local --execute` | `env add-skore --mode hub --execute` | `env add-skore --mode mlflow --execute` (`mlflow>=3` required) |
-| Pre-condition | none | Skore Hub account + access to `<hub-workspace>` | reachable MLflow tracking server at `<uri>` |
+| Pre-condition | `reports/` exists (create at this gate; no README) | Skore Hub account + access to `<hub-workspace>` | reachable MLflow tracking server at `<uri>` |
 
 ## The gate — AskUserQuestion shape
 
@@ -176,10 +176,13 @@ because the companion kwarg changes.
 ## Persistence
 
 Record the mode with `python -m skore_skills policy set
-skore_mode <local | hub | mlflow>`. Hub workspace names and MLflow
-tracking URIs live in the experiment's `<SKORE_PROJECT_INIT>`
-block, not in JOURNAL. On later sessions, read
-`status.policy.skore_mode` and skip re-asking.
+skore_mode <local | hub | mlflow>`. If **local**, create
+`reports/` if missing (`mkdir`, exist_ok) and do not write a
+README. If **hub** or **mlflow**, do not create `reports/` —
+that directory is the on-disk Project store only. Hub workspace
+names and MLflow tracking URIs live in the experiment's
+`<SKORE_PROJECT_INIT>` block, not in JOURNAL. On later sessions,
+read `status.policy.skore_mode` and skip re-asking.
 
 ## Switching mid-project
 

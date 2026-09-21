@@ -23,11 +23,14 @@ description: >
   - The user wants a human-readable narrative of a past experiment
     without firing the full `iterate-from-skore` flow.
 
-  STOP when `python -m skore_skills status` shows no approved design,
-  experiment report, or agent feature. Explain the missing fact and
-  ask the user to run the setup/model pack or ask triage. Also stop
-  when the request concerns raw-data exploration or sourcing a future
-  experiment. Do not require another action skill to be installed.
+  STOP when `python -m skore_skills status` shows no scaffold
+  (`has_src` and `has_journal` both false), no approved design,
+  no experiment report, or no agent feature. Explain the missing
+  fact and send the user to setup/triage, `evaluate-ml-pipeline`,
+  or `model-ml-pipeline`. Do not require `git`. Do not call
+  `skore.evaluate` or `project.put`. Also stop when the request
+  concerns raw-data exploration or sourcing a future experiment.
+  Do not require another action skill to be installed.
 
   HOW TO USE: confirm the four-way stem pairing exists (`journal/NN_*.md`
   approved + `experiments/NN_*.py` exists + smoke test passed +
@@ -52,8 +55,9 @@ reading the digest. Read-only against the skore Project.
 
 | Came here from… | After audit, next is… |
 |---|---|
+| `model-ml-pipeline` (implement loop) | → Return to the dispatcher for convert / site / git end-turn |
 | `manage-ml-backlog` § 4 record-outcome | → Read audit digest, fill Status block + JOURNAL row |
-| User free-text ("audit 02", "re-audit 04") | → Surface metrics to the user; no further dispatch |
+| User free-text ("audit 02", "re-audit 04") | → Surface metrics, then own the close (see § End of turn) |
 | Re-run of an existing experiment | → Re-execute the existing audit file; surface diff if metrics changed |
 
 The audit is dispatched **FIRST** in § 4, before any scratch probes.
@@ -107,6 +111,16 @@ conditions for the three-consumer rule.
 
 ## Stop conditions — read before anything else
 
+- **Workspace not scaffolded.** Run `python -m skore_skills status`
+  first. If `has_src` and `has_journal` are both false, STOP and
+  send the user to `setup-ml-project` / triage. Do not require
+  `git`.
+- **No report → STOP.** Four-way pairing is hard: approved
+  `journal/NN_*.md` + `experiments/NN_*.py` + smoke pytest passed +
+  a report under that key in the Project. If the report is
+  missing, explain and stop. Do not `skore.evaluate` / `project.put`.
+  Route to `evaluate-ml-pipeline` or `model-ml-pipeline`. Direct
+  "audit 02" uses this same gate.
 - **Read-only against the skore Project.** See § Read-only contract.
   Never `skore.evaluate(...)` or `project.put(...)` in an audit file.
 - **`project.get(...)` is by id, not key.** For hub mode, read the
@@ -297,10 +311,13 @@ created if missing). Details:
 
 If `policy.notebooks` is true and `export-ml-notebook` is
 installed, run `python -m skore_skills notebook convert
-audit/<stem>.py` after the digest. No `--html` — the site has no
-audit page, so the viewer would have nothing to embed. Missing
-jupytext / nbclient → one-line skip naming `add-python-package`;
-do not fail the audit, do not `pixi add`.
+audit/<stem>.py` after the digest, with `--html` when
+`policy.site` is also true. The audit has no page of its own: the
+site appends its viewer to the matching
+`journal/NN_<short_name>.md` page, after the experiment notebook,
+as the continuation of evaluate. Missing jupytext / nbclient →
+one-line skip naming `add-python-package`; do not fail the audit,
+do not `pixi add`.
 
 ### Re-execution semantics
 
@@ -343,7 +360,35 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 |---|---|
 | `python -m skore_skills api get` | Every skore symbol (`Project`, `project.summarize`, `project.get`, `report.checks.summarize`, `report.metrics.summarize`, `.frame()`). Cache hits first |
 | `add-python-package` | When `ipython` is missing |
+| `manage-ml-backlog` (record-outcome mode) | End of turn on a direct free-text audit — hands over the digest so the History row and design-note Status block get written |
 | `python -m skore_skills style` | After writing / editing `audit/<stem>.py` — bundled `ruff.toml` carries `audit/**` per-file ignores; also contextualizes the header to name the audited experiment and strips workflow/process prose |
+
+## End of turn
+
+When `model-ml-pipeline` or `manage-ml-backlog` dispatched this
+turn, return to that caller — it owns record-outcome / convert /
+site / `git end-turn`. On a direct free-text audit this skill owns
+the close and runs the block below.
+
+Load `manage-ml-backlog` in **record-outcome mode** and hand it
+the digest, so the run reaches `journal/JOURNAL.md` History and
+the design-note Status block. That mode records and returns; it
+does not re-dispatch this skill and does not open the next-lever
+menu. Never mark `done` while smoke is red. This runs **before**
+site build so the updated journal files are on disk when the site
+is staged and `git end-turn` stages the turn.
+
+The `notebook convert` for `audit/<stem>.py` already ran above.
+If `policy.site` is true, `export-ml-site` is installed, run
+`python -m skore_skills site build` so the audit viewer reaches
+the experiment page. Skip in one line otherwise. Name a build
+error; do not fail the audit turn.
+
+Run `python -m skore_skills git end-turn --stage evaluate` — the
+audit continues the evaluate stage; there is no `audit` stage on
+that command. If JSON `action` is `invoke`, load `persist-ml-git`
+and follow it. Then load `triage-ml-task`. Do not run
+`git commit` in this skill.
 
 ## Failure modes and recovery
 
@@ -366,7 +411,9 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 - Open or write the skore Project's reports (`evaluate-ml-pipeline`).
 - Install `ipython` (`add-python-package` owns).
 - Enrich the Backlog from the audit digest (`iterate-from-skore`).
-- Write or edit `journal/NN_*.md` (`manage-ml-backlog`).
+- Write or edit `journal/NN_*.md` or `JOURNAL.md` directly. At end
+  of turn, dispatch `manage-ml-backlog` record-outcome mode
+  instead — that skill owns every journal write.
 - Run pytest / smoke tests (`smoke-test-ml-pipeline`).
 - Render commits or PRs.
 - Decide *which* metrics matter — the cells are filled per task,

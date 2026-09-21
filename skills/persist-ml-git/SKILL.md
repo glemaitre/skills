@@ -13,10 +13,13 @@ The hook already ran this turn. Follow its JSON. Run `git` yourself.
 
 1. If `action` is `skip`, stop. Do not nag. Load `triage-ml-task`
    if installed, else stop.
-2. If `reason` is `resolve-dotfiles`, ask once which hidden paths
-   to keep. Then
-   `python -m skore_skills git ignore-merge --keep <path>` or leave
-   them ignored. Never keep `.env` or `.skore`.
+2. If `reason` is `resolve-dotfiles` and `ambiguous_dotfiles` is
+   non-empty, ask once which hidden paths to keep. Then
+   `python -m skore_skills git ignore-merge --decide` plus
+   `--keep <path>` for each chosen path (no `--keep` if they keep
+   none). Do not re-ask names gone from the next JSON. Never keep
+   `.env` or `.skore`. If `ambiguous_dotfiles` is empty or `reason`
+   is `persist`, do not ask about hidden paths.
 3. Run `git status`. Stage only non-secret, non-ignored paths:
    `git add -- <paths>`. Never `.env` or `.skore`.
 4. Commit with a **one-line** subject from this turn's files and

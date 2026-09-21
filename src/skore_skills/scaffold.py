@@ -35,7 +35,6 @@ LAYOUT_READMES = (
     ("readme_audit.md", Path("audit") / "README.md"),
     ("readme_tests_smoke.md", Path("tests") / "smoke" / "README.md"),
     ("readme_scratch.md", Path("scratch") / "README.md"),
-    ("readme_reports.md", Path("reports") / "README.md"),
 )
 
 

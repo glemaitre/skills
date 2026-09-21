@@ -89,7 +89,7 @@
 **Must do:**
 - Name `python -m skore_skills git ignore-merge`.
 - Ask which hidden paths to keep, then re-run
-  `python -m skore_skills git ignore-merge --keep .cursor`.
+  `python -m skore_skills git ignore-merge --decide --keep .cursor`.
 - After autocommit `on` and no HEAD, `git add` and `git commit`.
 
 **Must NOT do:**

@@ -26,12 +26,15 @@ description: >
   - The user asks to build / declare / set up a pipeline /
     classifier / regressor for X.
 
-  STOP when `python -m skore_skills status` shows no scaffold,
-  approved design, or data contract: explain the missing fact and
-  ask the user to run the setup/model pack or ask triage. This
-  action does not cover fitting, CV, metrics, persistence, inference,
-  pure exploratory data analysis, or abstract library choice. Do not require another
-  action skill to be installed.
+  STOP when `python -m skore_skills status` shows no scaffold
+  (`has_src` and `has_journal` both false), no approved design,
+  or no data contract: explain the missing fact and send the user
+  to setup/triage. Do not require `git`. After the declaration
+  exists, load `smoke-test-ml-pipeline` and iterate on pytest;
+  do not start CV here. This action does not cover fitting, CV,
+  metrics, persistence, inference, pure exploratory data analysis,
+  or abstract library choice. Smoke-test may be loaded as a
+  sub-step; do not require other action skills to be installed.
 
   HOW TO USE: consult before the first declarative line and on
   every structural edit (added/swapped step, changed input columns,
@@ -69,13 +72,66 @@ Read these once; they're referenced throughout.
 
 ## Completion
 
-Return the declared graph and its verified API evidence. The caller
-decides whether to continue with evaluation or smoke testing. If a
-dependency or workspace fact is missing, state it and suggest the
-setup/model pack or triage rather than loading another action.
+Return the declared graph and its verified API evidence, then run
+the smoke sub-step (pytest) and the design HITL. Do not start
+`evaluate-ml-pipeline` before that ask. If a dependency or
+workspace fact is missing, state it and send the user to
+setup/triage.
 
 Always re-emit the Pre-flight checklist with evidence before
 declaring the turn done.
+
+## After the declaration — pytest smoke, then HITL
+
+`smoke-test-ml-pipeline` is a **sub-step of this skill**, not a
+peer the caller picks. After `experiments/NN_*.py` exists with
+the matching stem:
+
+1. Load `smoke-test-ml-pipeline`. That skill **runs pytest** on
+   `tests/smoke/test_NN_<short_name>.py` (write the test first if
+   it is missing). Pytest is how the pipeline is modified: red
+   means fix topology **here**, re-load smoke, re-run pytest.
+   Do not loosen the assertion. Do not offer evaluate while
+   pytest is red.
+2. When pytest is green, **report the design** to the user:
+   stem, journal Method / Status.headline, and what the learner
+   is. Then **AskUserQuestion** (single choice), in this order:
+   - **Evaluate (Recommended)** — go forward; say this runs
+     **extensive computation on the full dataset**. If the
+     caller is `model-ml-pipeline`, return there. Otherwise
+     load `evaluate-ml-pipeline`.
+   - **Modify** — edit the declaration or design; then smoke
+     (pytest) again. Do not load evaluate.
+   - **Stop** — end this skill. No `skore.evaluate`.
+
+Do not load evaluate before this ask.
+
+## Model-entry pipeline contracts
+
+The approved design note records which entry choice produced this
+experiment. Implement that contract; do not silently upgrade one
+choice into another.
+
+- **Dummy predictor.** Use the task-appropriate sklearn
+  `DummyClassifier` or `DummyRegressor` as the predictor in the
+  normal skrub DataOps graph. Its purpose is operational: exercise
+  the real loader, declaration, fit/predict, and pytest smoke path.
+  Do not claim predictive value, add domain features, or substitute
+  a stronger learner. Confirm the exact Dummy symbol with
+  `python -m skore_skills api get`.
+- **Standard baseline.** Use skrub's automatic tabular
+  preprocessing (`tabular_pipeline`, or the installed-version
+  equivalent confirmed by `api get`) with a task-appropriate
+  traditional estimator. No EDA-specific feature engineering,
+  hand-tuned column recipes, or hyperparameter search. The result
+  is the first real comparison point.
+- **EDA-backed proposal.** Implement only the EDA findings cited
+  in the approved Method. Do not add uncited findings, re-run EDA,
+  or turn observations into domain facts. If the proposal needs a
+  choice that the EDA does not establish, stop and ask.
+- **Backlog / discussion proposal.** Treat the approved Method as
+  the boundary. A short Backlog item or chat is not permission to
+  invent extra transforms.
 
 ## Canonical pipeline shape — IID flat-table
 
@@ -121,6 +177,16 @@ For loader-baked-shift counter-example (what NOT to do):
 Each Stop condition: **rule → symptom → recovery**. Scan top to
 bottom; any match means STOP.
 
+### S0. Workspace not scaffolded
+
+- **Rule:** run `python -m skore_skills status` first. If `has_src`
+  and `has_journal` are both false, STOP. Do not require `git`.
+- **Symptom:** empty folder, no `src/` and no `journal/`.
+- **Recovery:** send the user to `setup-ml-project` / triage.
+  Missing approved design or data contract: explain and stop
+  the same way (scaffold `--journal --stem` when the stem is
+  known and journal is the only gap).
+
 ### S1. Missing dependency
 
 - **Rule:** `import skrub` or `import sklearn` raising means
@@ -133,6 +199,18 @@ bottom; any match means STOP.
   `scikit-learn`. Do NOT substitute with `sklearn.Pipeline` /
   `make_pipeline` / `FunctionTransformer` — that silently rewrites
   this skill out of the project.
+
+### S1b. DataOp graph needs Pydot and Graphviz
+
+- **Rule:** skrub's HTML repr of a DataOp / learner (`<Apply …>`,
+  "To display the DataOp graph, please install Pydot and
+  Graphviz") is a missing-companion gap, not a pipeline rewrite.
+- **Symptom:** notebook or chat shows that stub instead of a
+  graph, including after `notebook convert`.
+- **Recovery:** load `add-python-package` for `skrub` (pydot and
+  conda Graphviz ride along; that skill owns `env graphviz` and
+  `dot -c`). Do NOT `pip install graphviz`. Do NOT replace the
+  DataOps graph with `sklearn.Pipeline`.
 
 ### S2. Symbol from memory is forbidden
 
@@ -647,9 +725,8 @@ catalogue with code: → `references/common_patterns.md`.
 | Skill | Relationship |
 |---|---|
 | `python -m skore_skills api get` | Authoritative lookup of sklearn / skrub / skore. Invoke whenever picking a symbol; cache hits first (Shape 0) |
-| `evaluate-ml-pipeline` | Owns `skore.evaluate`, CV selection, metric defaults. Consumes the `split_kwargs` wired at the X marker |
-| `smoke-test-ml-pipeline` | Executable proof of Rule 2's early-mark. Smoke failure → route back here; fix the topology, don't loosen the assertion |
-| `smoke-test-ml-pipeline` | Router for `tests/`. Smoke test pairs 1:1 with the experiment script |
+| `evaluate-ml-pipeline` | Owns `skore.evaluate`, CV selection, metric defaults. Load only after green pytest and the Evaluate HITL pick. Consumes the `split_kwargs` wired at the X marker |
+| `smoke-test-ml-pipeline` | **Sub-step.** Writes `tests/smoke/test_NN_*.py` and **runs pytest**. Red pytest → stay here and fix topology; do not loosen the assertion |
 | `add-python-package` | Detection + install commands. Invoke when `import skrub` raises |
 | `research-ml-practice` | Literature worker. Load if installed on a FE / transform / leakage concern; distill below. Missing → one-line skip |
 | `python -m skore_skills style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct `pixi run ruff check` drops the NumPyDoc convention |

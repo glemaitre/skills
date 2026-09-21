@@ -5,14 +5,16 @@
       "id": 1,
       "title": "Managed add",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Pixi project (`pixi.toml` or `[tool.pixi]`).\n- `status.policy.env.managed` is true.\n- `env_manager` is pixi.\n- `python -m skore_skills env route skrub` returns\n  `scope: default`.]\n\nAdd skrub to the project.",
-      "expected_output": "Behavioural response satisfying: - Emit the Pre-flight then run the commands (do not stop after listing boxes). - Name `python -m skore_skills env detect` / status. - Name `python -m skore_skills env add --execute skrub` (or `env route` then that add). Do not invent `pixi add` from memory. It must NOT: - Run `pip install skrub`. - Re-bootstrap with `env init`.",
+      "expected_output": "Behavioural response satisfying: - Emit the Pre-flight then run the commands (do not stop after listing boxes). - Name `python -m skore_skills env detect` / status. - Name `python -m skore_skills env add --execute skrub` (or `env route` then that add). Do not invent `pixi add` from memory. It must NOT: - Run `pip install skrub`. - Run `pip install graphviz`. - Re-bootstrap with `env init`.",
       "files": [],
       "expectations": [
         "Emit the Pre-flight then run the commands (do not stop after listing boxes).",
         "Name `python -m skore_skills env detect` / status.",
         "Name `python -m skore_skills env add --execute skrub` (or `env route` then that add). Do not invent `pixi add` from memory.",
         "Route skrub to default (not `--feature agent`).",
+        "Name `python -m skore_skills env graphviz` and, with `action` conda and managed, `env graphviz --execute`.",
         "The response does NOT: Run `pip install skrub`.",
+        "The response does NOT: Run `pip install graphviz`.",
         "The response does NOT: Re-bootstrap with `env init`."
       ],
       "tools": false,
@@ -129,6 +131,24 @@
         "The response does NOT: Silently `pixi add optuna` from memory.",
         "The response does NOT: Put `--feature` / `--group` in the question text.",
         "The response does NOT: Put optuna on `--feature agent` without asking."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 9,
+      "title": "Skrub on uv never pip-installs Graphviz",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed uv project.\n- `env route skrub` returns `scope: default`.\n- `env graphviz` returns `action: system` and `dot: null`.]\n\nAdd skrub to the project.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills env add --execute skrub`. - Name `python -m skore_skills env graphviz`. - Ask the Graphviz question using JSON `instructions` only. It must NOT: - Name `env add graphviz` or `uv add graphviz`. - Run `pip install graphviz`. - Invent `brew install graphviz` without quoting CLI stdout.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills env add --execute skrub`.",
+        "Name `python -m skore_skills env graphviz`.",
+        "Ask the Graphviz question using JSON `instructions` only.",
+        "The response does NOT: Name `env add graphviz` or `uv add graphviz`.",
+        "The response does NOT: Run `pip install graphviz`.",
+        "The response does NOT: Invent `brew install graphviz` without quoting CLI stdout."
       ],
       "tools": false,
       "sandbox": [],

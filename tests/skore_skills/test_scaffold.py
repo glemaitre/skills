@@ -35,9 +35,10 @@ def test_scaffold_tree_and_no_placeholders(
         "audit/README.md",
         "tests/smoke/README.md",
         "scratch/README.md",
-        "reports/README.md",
     ):
         assert (tmp_path / rel).is_file(), rel
+    assert not (tmp_path / "reports").exists()
+    assert not (tmp_path / "reports" / "README.md").exists()
     assert (tmp_path / "pyproject.toml").is_file()
     assert (tmp_path / ".gitignore").is_file()
     gitignore = (tmp_path / ".gitignore").read_text(encoding="utf-8")

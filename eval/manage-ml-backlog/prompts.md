@@ -87,3 +87,81 @@
 - Fail the backlog turn if site build errors.
 - Run `notebook convert`.
 - Run `git commit` in this skill or `git push`.
+
+---
+
+## CASE_05 — Model-entry mode consumes one CLI row
+
+**User prompt:**
+> I picked “Pick from the Backlog” in the model menu.
+
+**Assumed workspace state:**
+- `model choices` returned B1 and B4 in that order.
+- B1 Item is “try robust scaling”, Source is `user`.
+- B4 Item is “inspect residual seasonality”, Source is
+  `skore:02_baseline`.
+
+**Must do:**
+- Present exactly B1 and B4 and ask for one pick.
+- Turn the selected Item + Source into a proposal, asking for
+  missing shaping facts.
+- Remove only the selected row after the model stage creates its
+  design note.
+
+**Must NOT do:**
+- Invent B2/B3 or renumber B4.
+- Invent a Method from the one-line item.
+- Require an audit digest for this selection mode.
+- Start pipeline implementation.
+
+---
+
+## CASE_06 — Record-outcome mode writes the journal and returns
+
+**User prompt:**
+> (dispatched by `audit-ml-pipeline` at end of turn, in
+> record-outcome mode, with the digest in hand)
+
+**Assumed workspace state:**
+- Audit digest for `01_baseline` exists with a headline ROC-AUC.
+- Smoke tests passed.
+- History row for `01_baseline` is `planned`.
+- Backlog has rows `B1` and `B2`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Flip the `01_baseline` History row to `done` and copy the
+  headline result from the digest.
+- Update the design-note Status block for `01_baseline`.
+- Refresh the `JOURNAL.md` Status rows `Last experiment` and
+  `Last result`.
+- Return to the caller after recording.
+
+**Must NOT do:**
+- Rescan the Backlog or add/resolve `B1` / `B2` rows.
+- Ask the next-lever triage question.
+- Dispatch `audit-ml-pipeline`.
+- Run `site build` or `git end-turn --stage backlog` — the caller
+  owns the close.
+
+---
+
+## CASE_07 — Record-outcome mode never invents a metric
+
+**User prompt:**
+> (dispatched by `evaluate-ml-pipeline` at end of turn, in
+> record-outcome mode)
+
+**Assumed workspace state:**
+- `audit-ml-pipeline` is not installed, so there is no digest.
+- The user gave no headline value.
+- History row for `03_calendar` is `planned`.
+
+**Must do:**
+- Skip the headline result in one line, naming the missing digest.
+- Leave the History row status unchanged.
+
+**Must NOT do:**
+- Invent or estimate a metric.
+- Mark the row `done` without a result.
+- Ask the next-lever triage question.

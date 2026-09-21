@@ -16,7 +16,7 @@ after listing the boxes.
 ```
 - [ ] status (skip autocommit ask if already on/off)
 - [ ] git init if no .git
-- [ ] git ignore-merge (+ --keep if resolve-dotfiles)
+- [ ] git ignore-merge (+ --decide / --keep if resolve-dotfiles)
 - [ ] git.autocommit ask if null
 - [ ] first commit only if autocommit is on and no HEAD yet
 ```
@@ -29,10 +29,12 @@ after listing the boxes.
 2. If there is no `.git` directory, run `git init`. Do not run
    `git config`.
 3. Run `python -m skore_skills git ignore-merge`.
-4. If JSON `action` is `resolve-dotfiles`, ask once which hidden
-   paths to keep tracked, then re-run
-   `python -m skore_skills git ignore-merge --keep <path>`. Leave
-   the rest ignored. Never `--keep` `.env` or `.skore`.
+4. If JSON `ambiguous_dotfiles` is non-empty, ask once which hidden
+   paths to keep tracked. Then re-run
+   `python -m skore_skills git ignore-merge --decide` plus
+   `--keep <path>` for each chosen path (no `--keep` if they keep
+   none). Do not re-ask names gone from the next JSON. Never
+   `--keep` `.env` or `.skore`.
 5. If `policy.git.autocommit` is `null`, ask **once**: should later
    stages persist with `git commit` (`on`) or never (`off`)? Persist
    with `python -m skore_skills policy set git.autocommit on` or

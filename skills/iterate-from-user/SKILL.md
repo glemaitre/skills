@@ -154,6 +154,13 @@ hand — the user has effectively already answered it. The
 synthesis-confirmation gate at the end of the branch still
 fires; only the entry-point question is short-circuited.
 
+The same exception applies when `model-ml-pipeline`'s **Discuss
+the next step** branch has already produced an open conversation
+and a concrete idea. Skip the article/resource/free-text menu;
+apply the three shaping questions and confirmation gate directly
+to the agreed idea. If the discussion ends without an idea, return
+to the model-entry choices and emit no Proposal.
+
 ## The three shaping questions
 
 Every Proposal returned from this skill — in every branch — must

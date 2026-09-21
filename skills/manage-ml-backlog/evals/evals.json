@@ -71,6 +71,63 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 5,
+      "title": "Model-entry mode consumes one CLI row",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `model choices` returned B1 and B4 in that order.\n- B1 Item is \u201ctry robust scaling\u201d, Source is `user`.\n- B4 Item is \u201cinspect residual seasonality\u201d, Source is\n  `skore:02_baseline`.]\n\nI picked \u201cPick from the Backlog\u201d in the model menu.",
+      "expected_output": "Behavioural response satisfying: - Present exactly B1 and B4 and ask for one pick. - Turn the selected Item + Source into a proposal, asking for missing shaping facts. - Remove only the selected row after the model stage creates its design note. It must NOT: - Invent B2/B3 or renumber B4. - Invent a Method from the one-line item. - Require an audit digest for this selection mode.",
+      "files": [],
+      "expectations": [
+        "Present exactly B1 and B4 and ask for one pick.",
+        "Turn the selected Item + Source into a proposal, asking for missing shaping facts.",
+        "Remove only the selected row after the model stage creates its design note.",
+        "The response does NOT: Invent B2/B3 or renumber B4.",
+        "The response does NOT: Invent a Method from the one-line item.",
+        "The response does NOT: Require an audit digest for this selection mode.",
+        "The response does NOT: Start pipeline implementation."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 6,
+      "title": "Record-outcome mode writes the journal and returns",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Audit digest for `01_baseline` exists with a headline ROC-AUC.\n- Smoke tests passed.\n- History row for `01_baseline` is `planned`.\n- Backlog has rows `B1` and `B2`.]\n\n(dispatched by `audit-ml-pipeline` at end of turn, in\nrecord-outcome mode, with the digest in hand)",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Flip the `01_baseline` History row to `done` and copy the headline result from the digest. - Update the design-note Status block for `01_baseline`. It must NOT: - Rescan the Backlog or add/resolve `B1` / `B2` rows. - Ask the next-lever triage question. - Dispatch `audit-ml-pipeline`.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Flip the `01_baseline` History row to `done` and copy the headline result from the digest.",
+        "Update the design-note Status block for `01_baseline`.",
+        "Refresh the `JOURNAL.md` Status rows `Last experiment` and `Last result`.",
+        "Return to the caller after recording.",
+        "The response does NOT: Rescan the Backlog or add/resolve `B1` / `B2` rows.",
+        "The response does NOT: Ask the next-lever triage question.",
+        "The response does NOT: Dispatch `audit-ml-pipeline`.",
+        "The response does NOT: Run `site build` or `git end-turn --stage backlog` \u2014 the caller owns the close."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "Record-outcome mode never invents a metric",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `audit-ml-pipeline` is not installed, so there is no digest.\n- The user gave no headline value.\n- History row for `03_calendar` is `planned`.]\n\n(dispatched by `evaluate-ml-pipeline` at end of turn, in\nrecord-outcome mode)",
+      "expected_output": "Behavioural response satisfying: - Skip the headline result in one line, naming the missing digest. - Leave the History row status unchanged. It must NOT: - Invent or estimate a metric. - Mark the row `done` without a result. - Ask the next-lever triage question.",
+      "files": [],
+      "expectations": [
+        "Skip the headline result in one line, naming the missing digest.",
+        "Leave the History row status unchanged.",
+        "The response does NOT: Invent or estimate a metric.",
+        "The response does NOT: Mark the row `done` without a result.",
+        "The response does NOT: Ask the next-lever triage question."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

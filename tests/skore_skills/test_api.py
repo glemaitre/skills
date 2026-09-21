@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import sys
+import types
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
 
+from skore_skills.api import load_symbol
 from skore_skills.cli import cli
 
 
@@ -81,3 +84,78 @@ def test_api_version_missing() -> None:
     """Missing package version lookup fails."""
     result = CliRunner().invoke(cli, ["api", "version", "definitely_not_installed"])
     assert result.exit_code != 0
+
+
+def test_api_get_dynamic_eval_in_mode_method(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Classes with ``__getattr__`` and ``_eval_in_mode`` expose mode methods."""
+    module = types.ModuleType("dynmode_probe")
+
+    class Probe:
+        def __getattr__(self, name: str) -> object:
+            raise AttributeError(name)
+
+        def _eval_in_mode(self, mode: str, environment: dict) -> None:
+            return None
+
+    module.Probe = Probe
+    monkeypatch.setitem(sys.modules, "dynmode_probe", module)
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["api", "get", "dynmode_probe.Probe.fit"])
+    assert result.exit_code == 0, result.output
+    assert "environment" in result.output
+    assert "env-dict" in result.output
+    caches = list((tmp_path / "scratch" / "api").rglob("*.md"))
+    assert len(caches) == 1
+
+
+def test_api_get_getattr_without_eval_in_mode_still_fails() -> None:
+    """``__getattr__`` alone does not synthesize a method."""
+    module = types.ModuleType("dynmode_getattr_only")
+
+    class Probe:
+        def __getattr__(self, name: str) -> object:
+            raise AttributeError(name)
+
+    module.Probe = Probe
+    sys.modules["dynmode_getattr_only"] = module
+    try:
+        with pytest.raises(LookupError, match="cannot resolve"):
+            load_symbol("dynmode_getattr_only.Probe.fit")
+    finally:
+        del sys.modules["dynmode_getattr_only"]
+
+
+def test_api_get_real_estimator_fit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Real class methods still resolve through ``getattr``."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["api", "get", "sklearn.dummy.DummyRegressor.fit"])
+    assert result.exit_code == 0, result.output
+    assert "DummyRegressor" in result.output or "fit" in result.output
+
+
+def test_api_get_missing_method_on_real_class(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Unknown methods on ordinary classes still fail."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(
+        cli, ["api", "get", "sklearn.model_selection.KFold.not_a_method"]
+    )
+    assert result.exit_code != 0
+    assert not (tmp_path / "scratch" / "api").exists()
+
+
+def test_api_get_skrub_learner_fit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``SkrubLearner.fit`` is a dynamic DataOp-mode method."""
+    pytest.importorskip("skrub")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["api", "get", "skrub.SkrubLearner.fit"])
+    assert result.exit_code == 0, result.output
+    assert "environment" in result.output
+    assert "env-dict" in result.output

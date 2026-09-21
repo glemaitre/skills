@@ -21,23 +21,21 @@ description: >
   executable proof; an experiment script changes the pipeline
   shape and the matching smoke test needs revisiting.
 
-  STOP when `python -m skore_skills status` shows no approved design
-  or matching experiment script: explain the missing fact and ask
-  the user to run the model pack or ask triage. This action does not
-  cover regression/distribution tests or CV interpretation. Do not
-  require another action skill to be installed.
+  STOP when `python -m skore_skills status` shows no scaffold
+  (`has_src` and `has_journal` both false), no approved design,
+  or no matching experiment script: explain the missing fact and
+  send the user to setup/triage or stay in `build-ml-pipeline`.
+  Do not require `git`. Parent skill is `build-ml-pipeline`
+  (loaded after the declaration). Direct "why is smoke failing?"
+  still this skill. This action does not cover regression tests
+  or CV interpretation. Do not write `skore.evaluate`.
 
-  HOW TO USE: read the matching experiment's `journal/NN_*.md` and
-  `experiments/NN_*.py` first to understand the pipeline's source
-  binding (what env-dict keys does `build_learner` expect?). Then
-  construct two env-dicts from the **real `data/` source** — a
-  train env and a predict env — such that the predict env carries
-  *only the rows we want predictions for* and *no pre-history
-  buffer*. The hard assertion is that the prediction count
-  matches the predict-env row count exactly. The soft assertion
-  is that the smoke set's MAE is within `3 × CV_mean` (or the
-  task-appropriate analogue). **Do not write the design note
-  or run CV — that's other skills' job.**
+  HOW TO USE: run `status` first. Read the matching experiment's
+  `journal/NN_*.md` and `experiments/NN_*.py` for env-dict keys.
+  Write or update `tests/smoke/test_NN_*.py`, then **run pytest**
+  on that file. Red pytest is the signal to modify the pipeline
+  in `build-ml-pipeline`; do not loosen the assertion. Do not
+  write the design note or run CV.
 ---
 
 # Smoke Test ML Pipeline
@@ -50,11 +48,16 @@ user-visible content is the complete test file in a fenced block
 (`assert len(predictions) == n_predict_grid_rows`, predict env
 with no pre-history buffer, real `data/` source, soft assertion
 with the CV-mean hardcoded as a literal, no `skore` import).
-Do not stop at a plan or leave the file only in a thinking
-channel.
+Then **run pytest** on that file. Do not stop at a plan or leave
+the file only in a thinking channel. Do not AskUserQuestion for
+evaluate here — that gate belongs to `build-ml-pipeline` after
+pytest is green.
 
 ## Stop conditions — read before anything else
 
+- **Workspace not scaffolded.** Run `python -m skore_skills status`
+  first. If `has_src` and `has_journal` are both false, STOP and
+  send the user to setup/triage. Do not require `git`.
 - **No smoke test without an approved design note + script.** The pairing
   rule is hard:
   `tests/smoke/test_NN_<short_name>.py` exists only when
@@ -148,6 +151,9 @@ Pre-flight (smoke-test-ml-pipeline):
       analogue). Value is a literal pulled from the matching
       `journal/NN_<short_name>.md` § Status.headline; the test does
       not import `skore` / read the project store at runtime.
+- [ ] Pytest run this turn on `tests/smoke/test_NN_<short_name>.py`.
+      Red → return to `build-ml-pipeline`. Green (sub-step) →
+      return to build for the design HITL.
 ```
 
 ## What the smoke test asserts
@@ -397,16 +403,13 @@ metric problem.
   predict time, so a lag column is silently NaN. Inspect
   `learner.skb.full_report()` and look for nodes whose value at
   predict time doesn't match what fit time saw.
-- **Failure blocks `done` status.** `triage-ml-task` § 4
-  refuses to flip an experiment to `done` until the matching
-  smoke test passes. The CV report can land in the skore Project
-  before the smoke test passes (CV is independent of predict-time
-  binding), but the experiment row in `JOURNAL.md` stays `approved`
-  until smoke passes.
+- **Failure blocks `done` status.** `triage-ml-task` refuses to
+  flip an experiment to `done` until the matching smoke test
+  passes. `evaluate-ml-pipeline` also STOPs while pytest is red
+  (or the smoke file is missing on a history-dependent pipeline).
 
 ## What this skill does NOT do
 
-- Run pytest. Test execution is the user's call (or CI's).
 - Write the design note or the experiment script. Those are
   `triage-ml-task` and `organize-ml-workspace` /
   `build-ml-pipeline`.
@@ -417,20 +420,28 @@ metric problem.
   structural; the soft assertion is a sanity bound, not a
   performance target. Performance judgment is the user's, per
   `triage-ml-task`'s rule that the user judges results.
+- Ask Evaluate (Recommended) / Modify / Stop. After pytest, return to
+  `build-ml-pipeline` (parent) or report pass/fail on a
+  direct debug request.
+
+## Run pytest
+
+This is the executable proof. After the test file is written or
+updated, run pytest on `tests/smoke/test_NN_<short_name>.py`
+(project env: `pixi run pytest …` or the equivalent). Red
+pytest → route to `build-ml-pipeline` to modify the pipeline;
+do not start evaluate. Green pytest → return to build for the
+design HITL when this skill was loaded as a sub-step.
 
 ## Companion skills
 
-- **`build-ml-pipeline`** — owns the X-marker placement rule
-  the smoke test asserts. Smoke-test failure typically routes
-  back here for a pipeline-shape fix.
+- **`build-ml-pipeline`** — parent. Owns the X-marker placement
+  rule the smoke test asserts, and the post-green HITL. Smoke
+  failure typically routes back there for a pipeline-shape fix.
+  Pytest is the loop: red → modify pipeline → pytest again.
 - **`triage-ml-task`** — owns the iteration loop. Requires
   the smoke test to pass before an experiment can flip to `done`.
-- **`evaluate-ml-pipeline`** — owns CV. The smoke test fills the
-  predict-time-binding gap CV doesn't cover. The soft assertion's
-  CV-mean baseline is *hardcoded* in the smoke test from the
-  matching design note's Status.headline (which `evaluate-ml-pipeline`
-  ultimately fills in after the run); the test does not import
-  skore at runtime.
+- **`evaluate-ml-pipeline`** — owns CV. Do not load it from here.
 - **`python -m skore_skills api get`** — symbol references for
   the predicting-package APIs the smoke test uses. Consult
   before naming any imported function in the test body.

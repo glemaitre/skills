@@ -57,7 +57,7 @@ def test_env_add_pixi_never_pip(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(FIXTURES / "pixi")
     result = CliRunner().invoke(cli, ["env", "add", "skrub"])
     assert result.exit_code == 0, result.output
-    assert result.output.strip() == "pixi add skrub"
+    assert result.output.strip() == "pixi add skrub pydot graphviz"
     assert "pip install" not in result.output
 
 
@@ -162,8 +162,8 @@ def test_env_add_execute_runs_subprocess(
     monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
     result = CliRunner().invoke(cli, ["env", "add", "--execute", "skrub"])
     assert result.exit_code == 0, result.output
-    assert seen == [["pixi", "add", "skrub"]]
-    assert result.output.strip() == "pixi add skrub"
+    assert seen == [["pixi", "add", "skrub", "pydot", "graphviz"]]
+    assert result.output.strip() == "pixi add skrub pydot graphviz"
 
 
 def test_install_argv_unknown_manager() -> None:
@@ -628,7 +628,7 @@ def test_env_route_named_booster_is_default() -> None:
 
 
 def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Editable pixi add uses ``--pypi --editable pkg --path .``."""
+    """Editable pixi add uses ``--pypi pkg --path . --editable``."""
     (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
     (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
     (tmp_path / "pyproject.toml").write_text(
@@ -638,7 +638,7 @@ def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["env", "add", "--editable"])
     assert result.exit_code == 0, result.output
-    assert result.output.strip() == "pixi add --pypi --editable demo-pkg --path ."
+    assert result.output.strip() == "pixi add --pypi demo-pkg --path . --editable"
 
 
 def test_env_add_editable_pixi_execute(
@@ -667,7 +667,7 @@ def test_env_add_editable_pixi_execute(
     monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
     result = CliRunner().invoke(cli, ["env", "add", "--editable", "--execute"])
     assert result.exit_code == 0, result.output
-    assert seen == [["pixi", "add", "--pypi", "--editable", "demo-pkg", "--path", "."]]
+    assert seen == [["pixi", "add", "--pypi", "demo-pkg", "--path", ".", "--editable"]]
 
 
 @pytest.mark.parametrize(
@@ -781,7 +781,17 @@ def test_env_add_conda_execute_mirrors_default_into_dev(
     result = CliRunner().invoke(cli, ["env", "add", "--execute", "skrub"])
     assert result.exit_code == 0, result.output
     assert seen == [
-        ["conda", "install", "-n", "workspace", "-c", "conda-forge", "skrub"],
+        [
+            "conda",
+            "install",
+            "-n",
+            "workspace",
+            "-c",
+            "conda-forge",
+            "skrub",
+            "pydot",
+            "graphviz",
+        ],
         [
             "conda",
             "install",
@@ -790,6 +800,8 @@ def test_env_add_conda_execute_mirrors_default_into_dev(
             "-c",
             "conda-forge",
             "skrub",
+            "pydot",
+            "graphviz",
         ],
     ]
 
@@ -1212,3 +1224,218 @@ def test_reexec_hints_when_skore_skills_missing(
     assert MISSING_SKORE_SKILLS_HINT in stderr.getvalue()
     assert "env add-skore --mode local --execute" in stderr.getvalue()
     assert "env sync" not in stderr.getvalue()
+
+
+def test_env_add_skrub_uv_adds_pydot_not_graphviz(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pip-based managers get pydot; Graphviz is not a PyPI package here."""
+    monkeypatch.chdir(FIXTURES / "uv")
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "uv add skrub pydot"
+    assert "graphviz" not in result.output
+
+
+def test_env_add_skrub_pip_adds_pydot_not_graphviz(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """pip-venv follows the same pydot-only expansion as uv."""
+    monkeypatch.chdir(FIXTURES / "pip-venv")
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "pip install skrub pydot"
+    assert "graphviz" not in result.output
+
+
+def test_env_add_skrub_hatch_writes_pydot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hatch records pydot next to skrub; not graphviz."""
+    (tmp_path / "hatch.toml").write_text("# hatch\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code == 0, result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"skrub"' in text
+    assert '"pydot"' in text
+    assert "graphviz" not in text
+
+
+def _graphviz_run(
+    seen: list[list[str]], *, which: str | None = "/usr/bin/dot", dot_c: int = 0
+) -> Any:
+    """Return a subprocess.run stand-in for ``env graphviz`` probes."""
+    from skore_skills.env import DOT_C_SNIPPET, WHICH_DOT_SNIPPET
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(list(argv))
+        snippet = argv[-1] if argv else ""
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        if snippet == WHICH_DOT_SNIPPET:
+            Result.stdout = (which or "") + "\n"
+            Result.returncode = 0
+        elif snippet == DOT_C_SNIPPET:
+            Result.returncode = dot_c
+            Result.stderr = "plugin cache locked\n" if dot_c else ""
+        return Result()
+
+    return fake_run
+
+
+def test_env_graphviz_pixi_missing_dot_prints_conda_command(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pixi without ``dot`` reports action conda and the add command."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(env_mod.subprocess, "run", _graphviz_run(seen, which=None))
+    result = CliRunner().invoke(cli, ["env", "graphviz"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["action"] == "conda"
+    assert payload["dot"] is None
+    assert payload["command"] == ["pixi", "add", "graphviz"]
+    assert "graphviz.org/download" in payload["instructions"]
+    assert not any(argv[-1:] == [env_mod.DOT_C_SNIPPET] for argv in seen)
+
+
+def test_env_graphviz_pixi_execute_adds_then_dot_c(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Managed pixi ``--execute`` installs Graphviz then rebuilds the cache."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+    which_hits = {"n": 0}
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(list(argv))
+        snippet = argv[-1] if argv else ""
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        if snippet == env_mod.WHICH_DOT_SNIPPET:
+            which_hits["n"] += 1
+            Result.stdout = ("" if which_hits["n"] == 1 else "/pixi/env/bin/dot") + "\n"
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["dot"] == "/pixi/env/bin/dot"
+    assert ["pixi", "add", "graphviz"] in seen
+    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+
+
+def test_env_graphviz_dot_present_execute_only_dot_c(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """When ``dot`` is already on the env PATH, ``--execute`` only runs ``dot -c``."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(
+        env_mod.subprocess, "run", _graphviz_run(seen, which="/usr/bin/dot")
+    )
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["dot"] == "/usr/bin/dot"
+    assert payload["command"] is None
+    assert ["pixi", "add", "graphviz"] not in seen
+    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+
+
+def test_env_graphviz_uv_missing_dot_refuses_os_execute(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pip-based managers never ``env add graphviz``; ``--execute`` cannot brew."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "uv")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(env_mod.subprocess, "run", _graphviz_run(seen, which=None))
+    printed = CliRunner().invoke(cli, ["env", "graphviz"])
+    assert printed.exit_code == 0, printed.output
+    payload = json.loads(printed.output)
+    assert payload["action"] == "system"
+    assert payload["command"] is None
+    executed = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert executed.exit_code != 0
+    assert not any("brew" in " ".join(argv) for argv in seen)
+    assert not any(argv[:2] == ["uv", "add"] for argv in seen)
+
+
+def test_env_graphviz_uv_dot_present_runs_dot_c(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """System Graphviz already on PATH: ``--execute`` still rebuilds the cache."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "uv")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(
+        env_mod.subprocess, "run", _graphviz_run(seen, which="/usr/bin/dot")
+    )
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code == 0, result.output
+    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+
+
+def test_env_graphviz_dot_c_permission_message(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A failed ``dot -c`` names admin rerun; the CLI never sudoes."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import DOT_C_ADMIN
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(
+        env_mod.subprocess,
+        "run",
+        _graphviz_run(seen, which="/usr/bin/dot", dot_c=1),
+    )
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code != 0
+    assert DOT_C_ADMIN in result.output
+    assert "sudo" not in result.output.lower()
+
+
+def test_env_graphviz_unmanaged_prints_json(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Unmanaged workspaces still get print-only Graphviz JSON."""
+    from skore_skills import env as env_mod
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    seen: list[list[str]] = []
+    monkeypatch.setattr(env_mod.subprocess, "run", _graphviz_run(seen, which=None))
+    printed = CliRunner().invoke(cli, ["env", "graphviz"])
+    assert printed.exit_code == 0, printed.output
+    payload = json.loads(printed.output)
+    assert payload["action"] == "conda"
+    assert payload["command"] == ["pixi", "add", "graphviz"]
+    executed = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert executed.exit_code != 0
+    assert "user-managed" in executed.output
+    assert ["pixi", "add", "graphviz"] not in seen

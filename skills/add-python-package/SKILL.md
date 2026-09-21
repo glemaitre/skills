@@ -29,6 +29,8 @@ name the manager command from print-only stdout (`pixi add …`,
 `uv add …`, `pip install …`) or a plain-language intent. Never
 paste `python -m skore_skills`, `env add`, `env add-skore`, or
 `--feature` / `--group` as something the user should run or choose.
+Never paste `env graphviz` either; quote that command's
+`instructions` or printed manager line.
 
 ## Pre-flight
 
@@ -39,6 +41,7 @@ after listing the boxes.
 - [ ] status + env detect
 - [ ] env.managed: null → stop | false → ask, no --execute | true → continue
 - [ ] classify: editable | add-skore | env route then env add
+- [ ] skrub → env graphviz (execute conda/`dot -c` when allowed)
 ```
 
 ## Sequence
@@ -106,6 +109,27 @@ after listing the boxes.
    When `managed` is true and `scope` is not `refuse`, pass
    `--execute` on that one command. Never paste `pixi add` /
    `uv add` / `pip install` from memory.
+
+8. If this turn is `skrub`, Graphviz is required for DataOp HTML
+   graphs. After the add, run `python -m skore_skills env
+   graphviz`. Then:
+
+   - `dot` is set, or `action` is `conda` and managed →
+     `python -m skore_skills env graphviz --execute` (installs
+     conda Graphviz when needed, then always `dot -c` in the
+     composed env).
+   - `action` is `system` and `dot` is null → AskUserQuestion
+     with two options, quoting JSON `instructions` only:
+     1. **I will install Graphviz** (default) — do not wait;
+        return.
+     2. **Please wait until I confirm** — wait, then re-run
+        `env graphviz --execute` so `dot -c` still runs.
+   - Unmanaged → do not `--execute`. Show `command` (conda) or
+     `instructions` (system) from print-only JSON.
+
+   Never invent `brew` / `apt` / `winget` / `dot -c` from
+   memory. Never `pip install graphviz`. Never
+   `env add graphviz` on uv / poetry / hatch / pip-venv.
 
 Return when the import is available, when the user confirmed they
 installed it, or when they chose to handle it themselves.

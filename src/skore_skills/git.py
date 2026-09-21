@@ -39,6 +39,7 @@ MUST_IGNORE_DOTFILES = frozenset(
 )
 BLOCKED_NAMES = frozenset({".env", ".skore"})
 GIT_MISSING = "git is not installed on PATH"
+RESOLVED_DOTFILES_PREFIX = "# skore-skills resolved-dotfiles:"
 
 
 def _git_env() -> dict[str, str]:
@@ -99,6 +100,68 @@ def _keep_patterns(root: Path, posix: str) -> list[str]:
     return [f"!{posix}"]
 
 
+def _dotfile_key(name: str) -> str:
+    return name.rstrip("/")
+
+
+def _gitignore_lines(root: Path) -> list[str]:
+    dest = root / ".gitignore"
+    if not dest.is_file():
+        return []
+    return dest.read_text(encoding="utf-8").splitlines()
+
+
+def _kept_from_gitignore(root: Path) -> set[str]:
+    keys: set[str] = set()
+    for line in _gitignore_lines(root):
+        stripped = line.strip()
+        if not stripped.startswith("!"):
+            continue
+        pattern = stripped[1:]
+        if pattern.endswith("/**"):
+            pattern = pattern[:-3]
+        keys.add(_dotfile_key(pattern))
+    return keys
+
+
+def _resolved_from_gitignore(root: Path) -> set[str]:
+    keys: set[str] = set()
+    for line in _gitignore_lines(root):
+        stripped = line.strip()
+        if not stripped.startswith(RESOLVED_DOTFILES_PREFIX):
+            continue
+        rest = stripped[len(RESOLVED_DOTFILES_PREFIX) :].strip()
+        for token in rest.split():
+            keys.add(_dotfile_key(token))
+    return keys
+
+
+def _append_resolved(root: Path, names: Sequence[str]) -> None:
+    if not names:
+        return
+    dest = root / ".gitignore"
+    existing = dest.read_text(encoding="utf-8") if dest.is_file() else ""
+    current = _resolved_from_gitignore(root)
+    current.update(_dotfile_key(name) for name in names)
+    rendered: list[str] = []
+    for key in sorted(current):
+        suffix = "/" if (root / key).is_dir() else ""
+        rendered.append(f"{key}{suffix}")
+    new_line = f"{RESOLVED_DOTFILES_PREFIX} {' '.join(rendered)}"
+    out: list[str] = []
+    found = False
+    for line in existing.splitlines():
+        if line.strip().startswith(RESOLVED_DOTFILES_PREFIX):
+            if not found:
+                out.append(new_line)
+                found = True
+            continue
+        out.append(line)
+    if not found:
+        out.append(new_line)
+    dest.write_text("\n".join(out) + "\n", encoding="utf-8")
+
+
 def _append_keep_exceptions(root: Path, keep: Sequence[str]) -> list[str]:
     dest = root / ".gitignore"
     existing = dest.read_text(encoding="utf-8") if dest.is_file() else ""
@@ -154,7 +217,9 @@ def merge_gitignore(root: Path) -> list[str]:
 
 def list_ambiguous_dotfiles(root: Path, keep: Sequence[str] = ()) -> list[str]:
     """Return top-level ``.*`` paths that need a user decision."""
-    kept = set(keep)
+    decided = {_dotfile_key(item) for item in keep}
+    decided |= _kept_from_gitignore(root)
+    decided |= _resolved_from_gitignore(root)
     names: list[str] = []
     if not root.is_dir():
         return names
@@ -164,7 +229,7 @@ def list_ambiguous_dotfiles(root: Path, keep: Sequence[str] = ()) -> list[str]:
             continue
         if name in KEEP_EXCEPTIONS or name in MUST_IGNORE_DOTFILES:
             continue
-        if name in kept or f"{name}/" in kept:
+        if name in decided:
             continue
         names.append(name + ("/" if path.is_dir() else ""))
     return names
@@ -213,12 +278,14 @@ def _payload(**fields: Any) -> dict[str, Any]:
 
 
 def run_ignore_merge(
-    root: Path, *, keep: Sequence[str] = ()
+    root: Path, *, keep: Sequence[str] = (), decide: bool = False
 ) -> tuple[dict[str, Any], int]:
     """Merge packaged ignore rules; do not run git."""
     keep_paths = _resolve_keep(root, keep)
     ignore_added = merge_gitignore(root)
     ignore_added.extend(_append_keep_exceptions(root, keep_paths))
+    if decide:
+        _append_resolved(root, list_ambiguous_dotfiles(root, keep_paths))
     ambiguous = list_ambiguous_dotfiles(root, keep_paths)
     payload = _payload(
         action="resolve-dotfiles" if ambiguous else "ready",

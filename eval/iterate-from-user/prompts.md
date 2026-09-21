@@ -188,3 +188,25 @@ violated.
   resource-link / free-text) — it's been pre-resolved.
 - Skip the confirmation gate (still required even with
   pre-resolved entry).
+
+---
+
+## CASE_07 — Model discussion is already pre-resolved
+
+**User prompt:**
+> [model-ml-pipeline passes: discussion agreed on testing a
+> monotonic target transform]
+> Shape and confirm the proposal.
+
+**Assumed workspace state:**
+- The open discussion already established a concrete idea.
+
+**Must do:**
+- Skip the article/resource/free-text entry menu.
+- Apply the three shaping questions to the agreed idea.
+- Show the synthesis confirmation and wait before returning a
+  Proposal.
+
+**Must NOT do:**
+- Re-ask which source type the user has.
+- Return a Proposal before confirmation.

@@ -173,6 +173,91 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 10,
+      "title": "After declaration, pytest smoke then HITL",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved `journal/01_baseline.md`.\n- Experiment shell `experiments/01_baseline.py` exists after\n  the declaration.\n- Workspace is scaffolded.]\n\nThe design is approved. Declare the learner and stop before\nfull-dataset CV.",
+      "expected_output": "Behavioural response satisfying: - Load `smoke-test-ml-pipeline` after the declaration. - Treat pytest on `tests/smoke/test_01_baseline.py` as the way to modify the pipeline. - After green smoke, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset). It must NOT: - Write `skore.evaluate` before that AskUserQuestion. - Skip pytest and jump to CV.",
+      "files": [],
+      "expectations": [
+        "Load `smoke-test-ml-pipeline` after the declaration.",
+        "Treat pytest on `tests/smoke/test_01_baseline.py` as the way to modify the pipeline.",
+        "After green smoke, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset).",
+        "The response does NOT: Write `skore.evaluate` before that AskUserQuestion.",
+        "The response does NOT: Skip pytest and jump to CV."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 11,
+      "title": "Dummy remains an operational predictor",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The approved Method names a dummy predictor.\n- No prior model exists.]\n\nImplement the approved dummy-predictor design for this\nclassification task.",
+      "expected_output": "Behavioural response satisfying: - Use `DummyClassifier` as the predictor in the skrub DataOps graph and name `api get` for its installed signature. - Continue to pytest smoke and the normal Evaluate (Recommended) / Modify / Stop gate. - State that this validates the operational path, not predictive value. It must NOT: - Substitute a stronger estimator. - Add domain feature engineering. - Skip pytest because the predictor is trivial.",
+      "files": [],
+      "expectations": [
+        "Use `DummyClassifier` as the predictor in the skrub DataOps graph and name `api get` for its installed signature.",
+        "Continue to pytest smoke and the normal Evaluate (Recommended) / Modify / Stop gate.",
+        "State that this validates the operational path, not predictive value.",
+        "The response does NOT: Substitute a stronger estimator.",
+        "The response does NOT: Add domain feature engineering.",
+        "The response does NOT: Skip pytest because the predictor is trivial."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 12,
+      "title": "Standard baseline uses automatic preprocessing",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The approved Method requests a quick traditional-ML baseline.]\n\nImplement the approved standard baseline for this mixed-type\ntabular regression problem.",
+      "expected_output": "Behavioural response satisfying: - Use skrub automatic tabular preprocessing plus a task-appropriate traditional regressor. - Name `api get` for the installed skrub entry point and estimator. It must NOT: - Add EDA-specific domain features. - Hand-tune per-column preprocessing or run hyperparameter search. - Replace the DataOps graph with a bare sklearn Pipeline.",
+      "files": [],
+      "expectations": [
+        "Use skrub automatic tabular preprocessing plus a task-appropriate traditional regressor.",
+        "Name `api get` for the installed skrub entry point and estimator.",
+        "The response does NOT: Add EDA-specific domain features.",
+        "The response does NOT: Hand-tune per-column preprocessing or run hyperparameter search.",
+        "The response does NOT: Replace the DataOps graph with a bare sklearn Pipeline."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 13,
+      "title": "EDA-backed build stays within cited findings",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The Method cites high cardinality and a temporal grouping\n  finding from `data_analysis/data_analysis.md`.]\n\nImplement the approved EDA-backed design.",
+      "expected_output": "Behavioural response satisfying: - Implement only the cited preprocessing/grouping decisions. - Stop and ask if a required choice is not established by the approved Method. It must NOT: - Invent another EDA finding or domain fact. - Re-run or edit EDA from this skill.",
+      "files": [],
+      "expectations": [
+        "Implement only the cited preprocessing/grouping decisions.",
+        "Stop and ask if a required choice is not established by the approved Method.",
+        "The response does NOT: Invent another EDA finding or domain fact.",
+        "The response does NOT: Re-run or edit EDA from this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 14,
+      "title": "Pydot/Graphviz stub is not a pipeline rewrite",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Design note approved; `import skrub` succeeds.\n- Smoke is green.]\n\nThe learner cell printed \"To display the DataOp graph, please\ninstall Pydot and Graphviz\" instead of a figure.",
+      "expected_output": "Behavioural response satisfying: - STOP and load `add-python-package` for `skrub`. - Keep the skrub DataOps graph. It must NOT: - Substitute `sklearn.Pipeline` / `make_pipeline`. - Run `pip install graphviz`. - Call `env add` or `env graphviz` from this skill.",
+      "files": [],
+      "expectations": [
+        "STOP and load `add-python-package` for `skrub`.",
+        "Keep the skrub DataOps graph.",
+        "The response does NOT: Substitute `sklearn.Pipeline` / `make_pipeline`.",
+        "The response does NOT: Run `pip install graphviz`.",
+        "The response does NOT: Call `env add` or `env graphviz` from this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

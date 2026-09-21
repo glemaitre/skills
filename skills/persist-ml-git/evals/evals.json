@@ -5,14 +5,15 @@
       "id": 1,
       "title": "Hook said invoke",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `python -m skore_skills git end-turn --stage data_analysis` already returned\n  `action: invoke`, `reason: persist`, autocommit `on`.\n- Dirty paths include `data_analysis/data_analysis.py` and `data_analysis/data_analysis.md`.]\n\nPersist this EDA turn.",
-      "expected_output": "Behavioural response satisfying: - Run `git status`. - Stage with `git add` (not `.env` / `.skore`). - Run `git commit -m` with a one-line subject from this turn. It must NOT: - Run `git push`. - Call `python -m skore_skills git end-turn` to create the commit.",
+      "expected_output": "Behavioural response satisfying: - Run `git status`. - Stage with `git add` (not `.env` / `.skore`). - Run `git commit -m` with a one-line subject from this turn. It must NOT: - Run `git push`. - Call `python -m skore_skills git end-turn` to create the commit. - Ask about hidden paths when `ambiguous_dotfiles` is empty or `reason` is `persist`.",
       "files": [],
       "expectations": [
         "Run `git status`.",
         "Stage with `git add` (not `.env` / `.skore`).",
         "Run `git commit -m` with a one-line subject from this turn.",
         "The response does NOT: Run `git push`.",
-        "The response does NOT: Call `python -m skore_skills git end-turn` to create the commit."
+        "The response does NOT: Call `python -m skore_skills git end-turn` to create the commit.",
+        "The response does NOT: Ask about hidden paths when `ambiguous_dotfiles` is empty or `reason` is `persist`."
       ],
       "tools": false,
       "sandbox": [],

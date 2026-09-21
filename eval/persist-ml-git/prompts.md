@@ -20,6 +20,8 @@
 **Must NOT do:**
 - Run `git push`.
 - Call `python -m skore_skills git end-turn` to create the commit.
+- Ask about hidden paths when `ambiguous_dotfiles` is empty or
+  `reason` is `persist`.
 
 ---
 

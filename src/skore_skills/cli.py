@@ -10,6 +10,7 @@ import click
 from skore_skills import __version__
 from skore_skills.api import get_symbol, package_version
 from skore_skills.check import render_workspace_check
+from skore_skills.model_choices import render_model_choices
 from skore_skills.status import render_status
 
 
@@ -171,6 +172,17 @@ def api_version(package: str) -> None:
 def status_cmd(fmt: str) -> None:
     """Print a read-only JSON snapshot of the current workspace."""
     click.echo(render_status(Path.cwd(), fmt.lower()), nl=False)
+
+
+@cli.group("model")
+def model_group() -> None:
+    """Inspect deterministic model-workflow choices."""
+
+
+@model_group.command("choices")
+def model_choices_cmd() -> None:
+    """Print the available model-entry choices as JSON."""
+    click.echo(render_model_choices(Path.cwd()), nl=False)
 
 
 @cli.group("check")
@@ -393,6 +405,22 @@ def env_route(package: str) -> None:
     click.echo(json.dumps(payload, indent=2))
 
 
+@env_group.command("graphviz")
+@click.option(
+    "--execute",
+    is_flag=True,
+    help="Install conda Graphviz when possible and run dot -c.",
+)
+def env_graphviz(execute: bool) -> None:
+    """Print JSON for Graphviz; optionally install and rebuild the plugin cache."""
+    from skore_skills.env import ensure_graphviz
+
+    text, code = ensure_graphviz(Path.cwd(), execute=execute)
+    click.echo(text, nl=False)
+    if code:
+        raise SystemExit(code)
+
+
 @env_group.command("verify")
 @click.argument("packages", nargs=-1, required=False)
 @click.option(
@@ -471,12 +499,17 @@ def git_group() -> None:
     multiple=True,
     help="Force-track a hidden path after the user decides to keep it.",
 )
-def git_ignore_merge_cmd(keep_paths: tuple[str, ...]) -> None:
+@click.option(
+    "--decide",
+    is_flag=True,
+    help="Record this as the hidden-path answer: --keep tracked, the rest ignored.",
+)
+def git_ignore_merge_cmd(keep_paths: tuple[str, ...], decide: bool) -> None:
     """Union packaged ignore rules into ``.gitignore``. No git commands."""
     from skore_skills.git import render_git_json, run_ignore_merge
 
     try:
-        payload, code = run_ignore_merge(Path.cwd(), keep=keep_paths)
+        payload, code = run_ignore_merge(Path.cwd(), keep=keep_paths, decide=decide)
     except ValueError as exc:
         raise click.ClickException(str(exc)) from exc
     click.echo(render_git_json(payload), nl=False)

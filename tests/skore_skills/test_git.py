@@ -189,11 +189,57 @@ def test_ignore_merge_keep_clears_ambiguity(
     assert payload["ambiguous_dotfiles"] == []
 
 
-def test_ignore_merge_rejects_keep_env(
+def test_ignore_merge_keep_survives_second_call(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Secrets cannot be force-tracked."""
+    """Keep exceptions in ``.gitignore`` stay decided without re-passing ``--keep``."""
     monkeypatch.chdir(tmp_path)
-    result = CliRunner().invoke(cli, ["git", "ignore-merge", "--keep", ".env"])
-    assert result.exit_code != 0
-    assert "blocked" in result.output.lower() or "keep" in result.output.lower()
+    _write(tmp_path / ".python-version", "3.12\n")
+    first = CliRunner().invoke(
+        cli, ["git", "ignore-merge", "--keep", ".python-version"]
+    )
+    assert first.exit_code == 0, first.output
+    second = CliRunner().invoke(cli, ["git", "ignore-merge"])
+    assert second.exit_code == 0, second.output
+    payload = json.loads(second.output)
+    assert payload["action"] == "ready"
+    assert payload["ambiguous_dotfiles"] == []
+
+
+def test_ignore_merge_decide_clears_unkept(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``--decide`` records ignored hidden paths so end-turn does not re-ask."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    set_policy_value(tmp_path, "git.autocommit", "on")
+    _write(tmp_path / "src" / "pkg" / "data.py")
+    _write(tmp_path / ".python-version", "3.12\n")
+    result = CliRunner().invoke(cli, ["git", "ignore-merge", "--decide"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["action"] == "ready"
+    assert payload["ambiguous_dotfiles"] == []
+    end = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "data_analysis"])
+    assert end.exit_code == 0, end.output
+    hook = json.loads(end.output)
+    assert hook["reason"] != "resolve-dotfiles"
+    assert hook["action"] == "invoke"
+    assert hook["reason"] == "persist"
+
+
+def test_ignore_merge_decide_still_reports_new_hidden(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A hidden path that appears after ``--decide`` is still ambiguous."""
+    monkeypatch.chdir(tmp_path)
+    _write(tmp_path / ".python-version", "3.12\n")
+    decided = CliRunner().invoke(cli, ["git", "ignore-merge", "--decide"])
+    assert decided.exit_code == 0, decided.output
+    _write(tmp_path / ".foo", "x\n")
+    later = CliRunner().invoke(cli, ["git", "ignore-merge"])
+    assert later.exit_code == 2, later.output
+    payload = json.loads(later.output)
+    assert payload["action"] == "resolve-dotfiles"
+    assert ".foo" in payload["ambiguous_dotfiles"]
+    assert ".python-version" not in payload["ambiguous_dotfiles"]

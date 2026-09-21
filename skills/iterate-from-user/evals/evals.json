@@ -119,6 +119,23 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "Model discussion is already pre-resolved",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The open discussion already established a concrete idea.]\n\n[model-ml-pipeline passes: discussion agreed on testing a\nmonotonic target transform]\nShape and confirm the proposal.",
+      "expected_output": "Behavioural response satisfying: - Skip the article/resource/free-text entry menu. - Apply the three shaping questions to the agreed idea. - Show the synthesis confirmation and wait before returning a Proposal. It must NOT: - Re-ask which source type the user has. - Return a Proposal before confirmation.",
+      "files": [],
+      "expectations": [
+        "Skip the article/resource/free-text entry menu.",
+        "Apply the three shaping questions to the agreed idea.",
+        "Show the synthesis confirmation and wait before returning a Proposal.",
+        "The response does NOT: Re-ask which source type the user has.",
+        "The response does NOT: Return a Proposal before confirmation."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

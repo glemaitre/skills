@@ -14,7 +14,7 @@ so the target can `read_file` the history-dependent JOIN example
 (the same file `SKILL.md` points at). Other cases stay single-turn.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. Overall: ≥ 8/9 cases pass and no Must NOT violated.
+violated. Overall: ≥ 12/13 cases pass and no Must NOT violated.
 
 ---
 
@@ -294,3 +294,116 @@ violated. Overall: ≥ 8/9 cases pass and no Must NOT violated.
 - Edit `data_analysis/data_analysis.py`.
 - Drop `customer_id` from raw files under `data/`.
 - Pick a cross-validator in pipeline code.
+
+---
+
+## CASE_10 — After declaration, pytest smoke then HITL
+
+**User prompt:**
+> The design is approved. Declare the learner and stop before
+> full-dataset CV.
+
+**Assumed workspace state:**
+- Approved `journal/01_baseline.md`.
+- Experiment shell `experiments/01_baseline.py` exists after
+  the declaration.
+- Workspace is scaffolded.
+
+**Must do:**
+- Load `smoke-test-ml-pipeline` after the declaration.
+- Treat pytest on `tests/smoke/test_01_baseline.py` as the way
+  to modify the pipeline.
+- After green smoke, AskUserQuestion: Evaluate (Recommended) /
+  Modify / Stop (Evaluate first; extensive computation on the
+  full dataset).
+
+**Must NOT do:**
+- Write `skore.evaluate` before that AskUserQuestion.
+- Skip pytest and jump to CV.
+
+---
+
+## CASE_11 — Dummy remains an operational predictor
+
+**User prompt:**
+> Implement the approved dummy-predictor design for this
+> classification task.
+
+**Assumed workspace state:**
+- The approved Method names a dummy predictor.
+- No prior model exists.
+
+**Must do:**
+- Use `DummyClassifier` as the predictor in the skrub DataOps
+  graph and name `api get` for its installed signature.
+- Continue to pytest smoke and the normal Evaluate
+  (Recommended) / Modify / Stop gate.
+- State that this validates the operational path, not predictive
+  value.
+
+**Must NOT do:**
+- Substitute a stronger estimator.
+- Add domain feature engineering.
+- Skip pytest because the predictor is trivial.
+
+---
+
+## CASE_12 — Standard baseline uses automatic preprocessing
+
+**User prompt:**
+> Implement the approved standard baseline for this mixed-type
+> tabular regression problem.
+
+**Assumed workspace state:**
+- The approved Method requests a quick traditional-ML baseline.
+
+**Must do:**
+- Use skrub automatic tabular preprocessing plus a
+  task-appropriate traditional regressor.
+- Name `api get` for the installed skrub entry point and estimator.
+
+**Must NOT do:**
+- Add EDA-specific domain features.
+- Hand-tune per-column preprocessing or run hyperparameter search.
+- Replace the DataOps graph with a bare sklearn Pipeline.
+
+---
+
+## CASE_13 — EDA-backed build stays within cited findings
+
+**User prompt:**
+> Implement the approved EDA-backed design.
+
+**Assumed workspace state:**
+- The Method cites high cardinality and a temporal grouping
+  finding from `data_analysis/data_analysis.md`.
+
+**Must do:**
+- Implement only the cited preprocessing/grouping decisions.
+- Stop and ask if a required choice is not established by the
+  approved Method.
+
+**Must NOT do:**
+- Invent another EDA finding or domain fact.
+- Re-run or edit EDA from this skill.
+
+---
+
+## CASE_14 — Pydot/Graphviz stub is not a pipeline rewrite
+
+**User prompt:**
+> The learner cell printed "To display the DataOp graph, please
+> install Pydot and Graphviz" instead of a figure.
+
+**Assumed workspace state:**
+- Design note approved; `import skrub` succeeds.
+- Smoke is green.
+
+**Must do:**
+- STOP and load `add-python-package` for `skrub`.
+- Keep the skrub DataOps graph.
+
+**Must NOT do:**
+- Substitute `sklearn.Pipeline` / `make_pipeline`.
+- Run `pip install graphviz`.
+- Call `env add` or `env graphviz` from this skill.

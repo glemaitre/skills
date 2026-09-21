@@ -34,6 +34,44 @@ def package_version(name: str) -> str:
     return str(version)
 
 
+def _synthesize_mode_method(cls: Any, name: str) -> Any:
+    """Return a lookup-only callable for a DataOp-mode instance method."""
+    eval_in_mode = cls._eval_in_mode
+    params = [
+        param
+        for param in inspect.signature(eval_in_mode).parameters.values()
+        if param.name not in {"self", "mode"}
+    ]
+
+    def method(*args: Any, **kwargs: Any) -> None:
+        raise NotImplementedError("lookup-only synthetic method")
+
+    method.__name__ = name
+    method.__qualname__ = f"{cls.__name__}.{name}"
+    method.__signature__ = inspect.Signature(params)  # type: ignore[attr-defined]
+    method.__doc__ = (
+        f"Instance method `{name}` is provided dynamically via "
+        f"`{cls.__name__}.__getattr__`. Typical call: "
+        f"`learner.{name}(environment)` with an env-dict "
+        f"(e.g. `{{'data_dir': ...}}`)."
+    )
+    return method
+
+
+def _lookup_attr(obj: Any, part: str) -> Any:
+    """Resolve ``part`` on ``obj``, including DataOp-mode ``__getattr__`` methods."""
+    try:
+        return getattr(obj, part)
+    except AttributeError:
+        if (
+            inspect.isclass(obj)
+            and "__getattr__" in vars(obj)
+            and callable(getattr(obj, "_eval_in_mode", None))
+        ):
+            return _synthesize_mode_method(obj, part)
+        raise
+
+
 def load_symbol(dotted: str) -> tuple[str, Any]:
     """Import a dotted symbol from the running environment.
 
@@ -69,7 +107,7 @@ def load_symbol(dotted: str) -> tuple[str, Any]:
         obj: Any = module
         try:
             for part in parts[i:]:
-                obj = getattr(obj, part)
+                obj = _lookup_attr(obj, part)
         except AttributeError as exc:
             last_error = exc
             continue

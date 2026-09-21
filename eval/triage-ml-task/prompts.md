@@ -17,7 +17,6 @@
 - Name `python -m skore_skills status`.
 - AskUserQuestion listing installed entry skills
   (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
-  `evaluate-ml-pipeline`, `audit-ml-pipeline`,
   `manage-ml-backlog`, `export-ml-project` if installed). One pick.
 - Name `explore-ml-data` as the recommended next stage; do not
   auto-load it.
@@ -31,6 +30,8 @@
 - Auto-load a stage skill without asking.
 - Ask only stay / go deeper / next stage without naming entry
   skills.
+- Put `evaluate-ml-pipeline` or `audit-ml-pipeline` on the
+  uncertain entry board.
 
 ---
 
@@ -290,4 +291,24 @@
 **Must NOT do:**
 - Load `research-ml-practice` as the certain skill.
 - Load `explore-ml-data` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_15 — Certain audit loads audit, not the meta skill
+
+**User prompt:**
+> Audit experiment 02.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.audit-ml-pipeline` is `true`.
+- `status.skills.model-ml-pipeline` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `audit-ml-pipeline` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `model-ml-pipeline` as the certain skill.
 - Ask which entry skill to run.

@@ -44,6 +44,18 @@ _IMPORT_NAMES = {
     "ipython": "IPython",
     "scikit-learn": "sklearn",
 }
+CONDA_GRAPHVIZ_MANAGERS = frozenset({"pixi", "conda"})
+GRAPHVIZ_DOCS = "https://graphviz.org/download/"
+DOT_C_ADMIN = (
+    "dot -c failed; rerun dot -c with admin rights if the plugin "
+    "directory is not writable"
+)
+DOT_C_SNIPPET = (
+    "import shutil, subprocess, sys; "
+    "p = shutil.which('dot'); "
+    "sys.exit(1 if not p else subprocess.call([p, '-c']))"
+)
+WHICH_DOT_SNIPPET = "import shutil; print(shutil.which('dot') or '')"
 
 _SKELETON = """\
 [build-system]
@@ -293,6 +305,22 @@ def _package_key(package: str) -> str:
     return package.strip().lower().split("[", 1)[0]
 
 
+def expand_display_packages(manager: str, packages: list[str]) -> list[str]:
+    """Append pydot (and conda Graphviz) when ``skrub`` is among ``packages``."""
+    if "skrub" not in {_package_key(name) for name in packages}:
+        return packages
+    extras = ["pydot"]
+    if manager in CONDA_GRAPHVIZ_MANAGERS:
+        extras.append("graphviz")
+    seen = {_package_key(name) for name in packages}
+    expanded = list(packages)
+    for extra in extras:
+        if extra not in seen:
+            expanded.append(extra)
+            seen.add(extra)
+    return expanded
+
+
 def _unmanaged(root: Path) -> bool:
     return load_policy(root).get("env", {}).get("managed") is False
 
@@ -441,10 +469,10 @@ def editable_argv(manager: str, package: str) -> list[str] | None:
             "pixi",
             "add",
             "--pypi",
-            "--editable",
             package,
             "--path",
             ".",
+            "--editable",
         ],
         "uv": ["uv", "add", "--editable", "."],
         "poetry": ["poetry", "add", "--editable", "."],
@@ -675,11 +703,12 @@ def add_packages(
     manager, error = _ready_manager(root)
     if error is not None:
         return error + "\n", 1
+    assert manager is not None
+    packages = expand_display_packages(manager, packages)
     for name in packages:
         reason = forbidden_reason(name)
         if reason is not None:
             return reason + "\n", 1
-    assert manager is not None
     if manager == "hatch":
         text = _hatch_add(root, packages, feature=feature)
         if not execute:
@@ -700,6 +729,122 @@ def add_packages(
     if not execute:
         return rendered, 0
     return rendered, _run_argvs(argvs, cwd=root)
+
+
+def system_graphviz_instructions() -> str:
+    """Return OS-specific Graphviz install lines. Never a pip command."""
+    if sys.platform == "darwin":
+        install = "brew install graphviz"
+    elif sys.platform.startswith("linux"):
+        install = "sudo apt-get install graphviz"
+    elif sys.platform == "win32":
+        install = "winget install Graphviz.Graphviz"
+    else:
+        install = "install Graphviz with your system package manager"
+    return f"{install}\nGraphviz installation instructions -> {GRAPHVIZ_DOCS}"
+
+
+def _which_dot(manager: str, root: Path) -> str | None:
+    """Return ``dot`` as seen inside the composed env, not the outer PATH."""
+    argv = [*dev_run_argv(manager, root=root), "-c", WHICH_DOT_SNIPPET]
+    completed = subprocess.run(
+        argv,
+        check=False,
+        cwd=root,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode:
+        return None
+    lines = (completed.stdout or "").strip().splitlines()
+    if not lines:
+        return None
+    path = lines[-1].strip()
+    return path or None
+
+
+def _dot_c_argv(manager: str, root: Path) -> list[str]:
+    return [*dev_run_argv(manager, root=root), "-c", DOT_C_SNIPPET]
+
+
+def _conda_graphviz_argvs(manager: str, root: Path) -> list[list[str]]:
+    argv = install_argv(manager, ["graphviz"], root=root)
+    assert argv is not None
+    argvs = [argv]
+    if manager == "conda":
+        dev_argv = install_argv("conda", ["graphviz"], feature="dev", root=root)
+        assert dev_argv is not None
+        if dev_argv != argv:
+            argvs.append(dev_argv)
+    return argvs
+
+
+def graphviz_status(root: Path) -> tuple[dict[str, Any], int]:
+    """Return how to get ``dot`` on the composed-env PATH.
+
+    Print-only even when ``env.managed`` is false so the skill can
+    show the manager or OS line. ``ensure_graphviz(..., execute=True)``
+    still refuses to install or run ``dot -c`` while unmanaged.
+    """
+    detected = detect(root)
+    manager = detected["env_manager"]
+    payload: dict[str, Any] = {
+        "dot": None,
+        "manager": manager,
+        "action": None,
+        "command": None,
+        "instructions": system_graphviz_instructions(),
+        "managed": detected.get("managed"),
+    }
+    if detected["ambiguous"]:
+        payload["error"] = AMBIGUOUS
+        return payload, 1
+    if manager in {None, "none"}:
+        payload["error"] = NO_MANAGER
+        return payload, 1
+    payload["dot"] = _which_dot(str(manager), root)
+    if manager in CONDA_GRAPHVIZ_MANAGERS:
+        payload["action"] = "conda"
+        if payload["dot"] is None:
+            payload["command"] = _conda_graphviz_argvs(str(manager), root)[0]
+        else:
+            payload["command"] = None
+    else:
+        payload["action"] = "system"
+        payload["command"] = None
+    return payload, 0
+
+
+def ensure_graphviz(root: Path, *, execute: bool = False) -> tuple[str, int]:
+    """Print JSON; ``--execute`` may install conda Graphviz and run ``dot -c``."""
+    payload, code = graphviz_status(root)
+    rendered = json.dumps(payload, indent=2) + "\n"
+    if code or not execute:
+        return rendered, code
+    if _unmanaged(root):
+        return rendered + UNMANAGED + "\n", 1
+    manager = payload["manager"]
+    assert manager is not None
+    if payload["action"] == "conda" and payload["command"] is not None:
+        run_code = _run_argvs(_conda_graphviz_argvs(manager, root), cwd=root)
+        if run_code:
+            return rendered, run_code
+        payload["dot"] = _which_dot(manager, root)
+        payload["command"] = None
+        rendered = json.dumps(payload, indent=2) + "\n"
+    if payload["dot"]:
+        completed = subprocess.run(
+            _dot_c_argv(manager, root),
+            check=False,
+            cwd=root,
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode:
+            sys.stderr.write(completed.stderr or "")
+            return rendered + DOT_C_ADMIN + "\n", completed.returncode
+        return rendered, 0
+    return rendered, 1
 
 
 def add_skore(

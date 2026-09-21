@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "e62ee3a8529ec4b26d1410703408db5ad6276f3c5d933142d6871466114b5824",
+  "catalog_hash": "5555bd2b298fb1d9e312ecfa0da7593a0686a4186ff28b6712866ffd66816af3",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "1d29d05229ff37efbafd30c20b94b442034364239374d2fcff44b7226eb6f4ea"
+      "hash": "cc92fc3e4c91be49722c02a6309efed8791704f185203cadad7e9ded81f17ef0"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "70bfded90f9fec444bfdcb79c738d99041f0097b16f29230a96bfad578d45811"
+      "hash": "1a3bbac86ab6d4325ed0d0801f48771c0a90b62ed4bae0f9a33c1a33b05294cb"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
       "category": "orchestration",
       "subcategory": "test-strategies",
-      "hash": "3ee29b34a235732e532a419db3a977e2dddd558948d70865ad96bb284ca862fb"
+      "hash": "efbf1207c5048d3558c41845e4ff9eaa35b915176adb94608e131edea8183c46"
     },
     {
       "id": "audit-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "63dfff2f7763b6ab77be6359c597ddd127525c7d5ba75a400208b9a596d9c70f"
+      "hash": "fe6274d3c41967237f094dad4733d50d6c2689692adbc6d03653624eb8e0a3de"
     },
     {
       "id": "manage-ml-backlog",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "93452f822d33b05368da2891c49f3da343bdb85fff0c177aa6b8baa52049fa53"
+      "hash": "0f9c8b3fbb0a61831daaee1917813656712882e52ab1641da2bbdbde107257bf"
     },
     {
       "id": "iterate-from-skore",
@@ -75,7 +75,7 @@
       "summary": "As a user be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo).",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "f60d48b4dd65d2b69923c73a72f76fcbfe72adea1f50fb45005d45dab48755ed"
+      "hash": "1f09e657096f53c1db9144cbb08ff661dedcb1c59863583f992eb9be2bf7be7e"
     },
     {
       "id": "organize-ml-workspace",
@@ -102,7 +102,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "d5b3679d4b37531d1ecbd8b24a630c0de80e39d87cb34a7397eed7ab7f2d102a"
+      "hash": "badc975287e2b3381216d087dc34262bd6ea99c357ec59f51d83aa1c9872020f"
     },
     {
       "id": "setup-ml-project",
@@ -120,7 +120,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "0df9a947615c2950b9e371bfb7432750b795460a1d2876584b11c8e9fdf24f16"
+      "hash": "f77a088aa4a9e5ceaa2e33eb91750627af3af63c316dacab6fcef1543bab1f44"
     },
     {
       "id": "persist-ml-git",
@@ -129,16 +129,16 @@
       "summary": "Commit the current loop stage with the real git CLI when the end-turn hook says invoke.",
       "category": "action",
       "subcategory": null,
-      "hash": "5901b54a57e0a64ce49b4d48c63c39729c0c27d6d73673f0be6ceda71474e940"
+      "hash": "17ec64b8e1a0bbe08c605f25c2d193710c157e3dbb52eae058e07b6786370484"
     },
     {
       "id": "model-ml-pipeline",
       "path": "skills/model-ml-pipeline",
       "title": "Model ML Pipeline",
-      "summary": "Coordinate build, evaluation, and smoke testing.",
+      "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "1a771162fa934e2d41800794f4bfc88c154bd605b416ad40ed8a81328d1c3cde"
+      "hash": "a0c96a9cbaec285876d564f1e29b4beeb861bf538495cceecaab277bf9c58d68"
     },
     {
       "id": "choose-python-library",
@@ -174,7 +174,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
       "category": "action",
       "subcategory": null,
-      "hash": "229d27a6672cd4ac8a63d4b7e9cea6dddfcd5bfddddd410856a9cb6b0c847e67"
+      "hash": "55426eaf3bb10f4842276ee4846f64841da314c635a7fc13a5e91b7b325c955b"
     },
     {
       "id": "setup-workspace",
@@ -183,7 +183,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "59cbe20d1d08eac7fea0d09ddfebc65433cf91eeb737f44641fb43b56bc2cc04"
+      "hash": "e91d54c2feb7566a2184133e0d7d1213ba21e1fea1366f7c8339c8692524a302"
     },
     {
       "id": "setup-python-env",
@@ -266,12 +266,15 @@
     {
       "id": "model",
       "title": "Model an ML Pipeline",
-      "summary": "Build, evaluate, and test an ML pipeline.",
+      "summary": "Build, smoke-test with pytest, evaluate, and audit an ML pipeline.",
       "includes": [
         "model-ml-pipeline",
+        "manage-ml-backlog",
+        "iterate-from-user",
         "build-ml-pipeline",
         "evaluate-ml-pipeline",
         "smoke-test-ml-pipeline",
+        "audit-ml-pipeline",
         "research-ml-practice",
         "plot-ml-figure",
         "add-python-package",

@@ -55,6 +55,7 @@ violated.
 - `pipeline.py` X-marker has `split_kwargs={"times": ...}` (temporal
   ordering attached at build time).
 - Forecast horizon is 24h.
+- Matching smoke pytest is green.
 - Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering
   `KFold` / `GroupKFold` / `TimeSeriesSplit` — the splitter lookup
   is already satisfied.
@@ -196,6 +197,7 @@ violated.
 - Edit `journal/02_load_forecast.md` Status to `done`.
 - Edit `journal/JOURNAL.md` History row to `done`.
 - Treat clean CV as sufficient for a history-dependent pipeline.
+- Write `skore.evaluate` while pytest smoke is red.
 
 ---
 
@@ -242,6 +244,9 @@ violated.
 - Ask G-SKORE-MODE (local recommended / hub / mlflow) before
   writing `skore.evaluate`.
 - Persist `policy set skore_mode` after the user answers.
+- If the answer is **local**, create `reports/` (`mkdir`, exist_ok)
+  with no README. If **hub** or **mlflow**, do not create
+  `reports/`.
 - Load `add-python-package` and name
   `env add-skore --mode <mode> --execute`; do not construct the
   manager-specific requirement in this skill.
@@ -251,6 +256,7 @@ violated.
 - Drop back to `cross_val_score` because skore is missing.
 - Re-ask G-TABULAR.
 - Send `skore[hub]` / `skore[mlflow]` directly to pixi or conda.
+- Write `reports/README.md`.
 
 ---
 
@@ -270,3 +276,75 @@ violated.
 
 **Must NOT do:**
 - Re-open local vs hub vs mlflow.
+
+---
+
+## CASE_10 — Smoke not green stops before skore.evaluate
+
+**User prompt:**
+> Wire evaluate for the 24h-ahead load forecast. Run CV now.
+
+**Assumed workspace state:**
+- `journal/02_load_forecast.md` approved.
+- `experiments/02_load_forecast.py` exists.
+- Pipeline has lag features (history-dependent).
+- `tests/smoke/test_02_load_forecast.py` is missing, or pytest is red.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- STOP. Route to `build-ml-pipeline` (pytest smoke).
+
+**Must NOT do:**
+- Write `skore.evaluate` or `project.put`.
+- Say CV can still be produced while smoke is failing.
+
+---
+
+## CASE_11 — Direct evaluate owns convert and site build
+
+**User prompt:**
+> Evaluate the baseline.
+
+**Assumed workspace state:**
+- Same as CASE_01; smoke is green.
+- `model-ml-pipeline` did NOT dispatch this turn.
+- `policy.notebooks` and `policy.site` are both true.
+- `export-ml-notebook` and `export-ml-site` are installed.
+
+**Must do:**
+- Load `manage-ml-backlog` in record-outcome mode before the
+  convert, since no audit ran this turn.
+- Name `python -m skore_skills notebook convert
+  experiments/01_baseline.py --html` after the evaluation.
+- Name `python -m skore_skills site build` after the convert.
+- Name `python -m skore_skills git end-turn --stage evaluate`.
+- If that command returns `invoke`, load `persist-ml-git`.
+
+**Must NOT do:**
+- End the turn without convert or site build while both gates are
+  true.
+- Run `site build` before the journal is recorded.
+- Write `journal/JOURNAL.md` or the design note directly.
+- Run `git commit` in this skill.
+
+---
+
+## CASE_12 — Dispatched evaluate returns instead of closing
+
+**User prompt:**
+> Evaluate the baseline.
+
+**Assumed workspace state:**
+- Same as CASE_01; smoke is green.
+- `model-ml-pipeline` dispatched this turn and owns the close.
+- `policy.notebooks` and `policy.site` are both true.
+
+**Must do:**
+- Return to `model-ml-pipeline` after the evaluation.
+- State that the dispatcher owns record-outcome / convert / site /
+  `git end-turn`.
+
+**Must NOT do:**
+- Run `notebook convert`, `site build`, or `git end-turn` here.
+- Load `manage-ml-backlog` here.
+- Load `triage-ml-task` directly.

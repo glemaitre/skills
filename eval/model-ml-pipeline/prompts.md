@@ -9,20 +9,33 @@
 
 **Assumed workspace state:**
 - Matching approved design note and experiment shell exist.
+- Workspace is scaffolded (`has_src` and `has_journal` true).
 
 **Must do:**
-- Dispatch build, evaluate, then smoke-test in that order.
+- Name `python -m skore_skills status`.
+- Resume the approved stem directly; do not show the starting
+  choices menu.
+- Dispatch `build-ml-pipeline` (do not load
+  `smoke-test-ml-pipeline` as a sibling of evaluate).
+- Treat smoke as a **step of build** that **runs pytest**.
+- Name the post-smoke AskUserQuestion (Evaluate (Recommended) /
+  Modify / Stop) before full-dataset evaluation.
 - Preserve the matching experiment stem.
 - Name `python -m skore_skills git end-turn --stage implement`
-  after build and smoke.
+  after the implement loop.
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
+- Load `smoke-test-ml-pipeline` as a sibling dispatcher step.
+- Write `skore.evaluate` or load `evaluate-ml-pipeline` /
+  `audit-ml-pipeline` before the Evaluate HITL pick.
 - Replace skrub DataOps with a bare sklearn Pipeline.
 - Mark the experiment done while smoke tests fail.
 - Run `git commit` in this skill or `git push`.
 - Distill `scratch/research/` here instead of loading
   `build-ml-pipeline`.
+- Run `python -m skore_skills model choices` for this explicit,
+  already-approved stem.
 
 ---
 
@@ -59,15 +72,17 @@
 - `export-ml-site` is installed.
 
 **Must do:**
-- Dispatch build, evaluate, then smoke-test in that order.
-- Name `python -m skore_skills site build` after smoke, before
-  git end-turn.
+- Dispatch `build-ml-pipeline` (smoke + pytest inside build).
+- Name the post-smoke HITL before evaluate.
+- Name `python -m skore_skills site build` after the implement
+  loop, before git end-turn.
 - Name `python -m skore_skills git end-turn --stage implement`.
 
 **Must NOT do:**
 - Fail the model turn if site build errors; name the error.
 - Run `notebook convert` while the notebooks gate is off.
 - Run `git commit` in this skill or `git push`.
+- Write `skore.evaluate` before the Evaluate HITL pick.
 
 ---
 
@@ -84,9 +99,10 @@
 - `jupytext`, `nbclient`, and `nbconvert` are installed.
 
 **Must do:**
+- Dispatch `build-ml-pipeline` (smoke + pytest inside build).
 - Name `python -m skore_skills notebook convert
-  experiments/01_baseline.py --html` after smoke, before site
-  build.
+  experiments/01_baseline.py --html` after the implement loop,
+  before site build.
 - Name `python -m skore_skills site build` before git end-turn.
 - Name `python -m skore_skills git end-turn --stage implement`.
 
@@ -94,3 +110,152 @@
 - Fail the model turn if convert errors; name the error.
 - Run `cells run` as a substitute for convert.
 - Run `git commit` in this skill or `git push`.
+- Write `skore.evaluate` before the Evaluate HITL pick.
+
+---
+
+## CASE_05 — Smoke red or Stop does not start evaluate
+
+**User prompt:**
+> The baseline design is approved. Implement the model. Pytest
+> smoke is red on row count.
+
+**Assumed workspace state:**
+- Approved design and experiment script exist.
+- `tests/smoke/test_01_baseline.py` fails pytest (row count).
+
+**Must do:**
+- Stay with `build-ml-pipeline` / pytest smoke to fix topology.
+- Name that smoke is a build step run with pytest.
+
+**Must NOT do:**
+- Load `evaluate-ml-pipeline` or write `skore.evaluate`.
+- Load `audit-ml-pipeline`.
+- Loosen the smoke assertion so pytest passes.
+
+---
+
+## CASE_06 — First-model menu without EDA or Backlog
+
+**User prompt:**
+> Let us start modeling. What can we do?
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- No experiment scripts or completed/running History rows.
+- `status.data_analysis` is `missing`.
+- Backlog is empty.
+
+**Must do:**
+- Name `python -m skore_skills status` and
+  `python -m skore_skills model choices`.
+- Ask one question with, in order: Build a dummy predictor;
+  Build a standard baseline; Discuss the next step.
+
+**Must NOT do:**
+- Offer an EDA-derived proposal.
+- Offer Pick from the Backlog.
+- Write model code before a proposal and design are approved.
+
+---
+
+## CASE_07 — Existing model with EDA and Backlog
+
+**User prompt:**
+> Start the next modeling iteration.
+
+**Assumed workspace state:**
+- `experiments/01_baseline.py` exists.
+- `status.data_analysis` is `present`.
+- Backlog contains B1 and B2.
+
+**Must do:**
+- Name `python -m skore_skills model choices`.
+- Ask one question with, in order: Propose a pipeline from the
+  EDA; Pick from the Backlog; Discuss the next step.
+
+**Must NOT do:**
+- Offer a dummy predictor or standard baseline.
+- Silently pick B1.
+
+---
+
+## CASE_08 — Skipped EDA is not an EDA proposal
+
+**User prompt:**
+> What model should we build next?
+
+**Assumed workspace state:**
+- A prior experiment exists.
+- `status.data_analysis` is `skipped`.
+- Backlog is empty.
+
+**Must do:**
+- Offer only Discuss the next step.
+
+**Must NOT do:**
+- Treat skipped EDA as recorded findings.
+- Offer dummy, standard baseline, EDA proposal, or Backlog.
+
+---
+
+## CASE_09 — Discussion becomes a confirmed proposal
+
+**User prompt:**
+> I want to talk through what to model next.
+
+**Assumed workspace state:**
+- The user selected Discuss the next step.
+
+**Must do:**
+- Discuss what to learn, why now, and what changes.
+- Once an idea is agreed, summarize it and ask the user to
+  confirm before creating/populating a design note.
+
+**Must NOT do:**
+- Force the article/resource/free-text entry menu.
+- Emit a proposal or model code before confirmation.
+
+---
+
+## CASE_10 — Backlog selection consumes one real row
+
+**User prompt:**
+> Pick from the backlog.
+
+**Assumed workspace state:**
+- CLI returned B1 and B3; B2 was previously consumed.
+
+**Must do:**
+- Load `manage-ml-backlog` and present B1 and B3 in that order.
+- Ask for one selection and preserve the unselected row.
+
+**Must NOT do:**
+- Renumber B3 to B2.
+- Invent a new Backlog item.
+
+---
+
+## CASE_11 — Implement loop records the outcome after audit
+
+**User prompt:**
+> Evaluate it.
+
+**Assumed workspace state:**
+- `01_baseline` design note approved; smoke green.
+- The user chose Evaluate at the post-smoke gate.
+- `evaluate-ml-pipeline` and `audit-ml-pipeline` are installed.
+- `policy.notebooks` and `policy.site` are both true.
+
+**Must do:**
+- Run evaluate, then audit, then load `manage-ml-backlog` in
+  record-outcome mode with the audit digest.
+- Record before `notebook convert` and `site build`.
+- Name `python -m skore_skills git end-turn --stage implement`
+  last.
+
+**Must NOT do:**
+- End the turn with the History row still `planned`.
+- Convert `audit/01_baseline.py` here — the audit skill did it.
+- Open the next-lever Backlog menu in record-outcome mode.
+- Write the journal files directly instead of dispatching.

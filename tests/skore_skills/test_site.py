@@ -480,6 +480,76 @@ def test_site_build_pairs_experiment_notebook(
     assert "01_x notebook" not in nav
 
 
+def test_site_build_appends_audit_after_experiment_notebook(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """audit/NN.nb.html continues the experiment notebook on the same page."""
+    _scaffold(tmp_path)
+    (tmp_path / "journal" / "01_x.md").write_text("# design\n", encoding="utf-8")
+    (tmp_path / "experiments").mkdir()
+    (tmp_path / "experiments" / "01_x.nb.html").write_text(
+        "<html>run</html>\n", encoding="utf-8"
+    )
+    (tmp_path / "audit").mkdir()
+    (tmp_path / "audit" / "01_x.nb.html").write_text(
+        "<html>audit</html>\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    docs = tmp_path / "_build" / "docs"
+    assert (docs / "01_x.audit.nb.html").read_text(encoding="utf-8") == (
+        "<html>audit</html>\n"
+    )
+    staged = (docs / "01_x.md").read_text(encoding="utf-8")
+    assert staged.index('<iframe src="01_x.nb.html"') < staged.index(
+        '<iframe src="01_x.audit.nb.html"'
+    )
+    assert "## Audit" in staged
+    nav = (tmp_path / "_build" / "mkdocs.yml").read_text(encoding="utf-8")
+    assert "01_x audit" not in nav
+
+
+def test_site_build_without_audit_has_no_audit_section(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """No ``audit/NN.nb.html`` leaves the experiment page unchanged."""
+    _scaffold(tmp_path)
+    (tmp_path / "journal" / "01_x.md").write_text("# design\n", encoding="utf-8")
+    (tmp_path / "experiments").mkdir()
+    (tmp_path / "experiments" / "01_x.nb.html").write_text(
+        "<html>run</html>\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    docs = tmp_path / "_build" / "docs"
+    assert not (docs / "01_x.audit.nb.html").exists()
+    assert "## Audit" not in (docs / "01_x.md").read_text(encoding="utf-8")
+
+
+def test_site_build_audit_without_experiment_notebook(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An audit notebook is embedded even when the experiment has none."""
+    _scaffold(tmp_path)
+    (tmp_path / "journal" / "01_x.md").write_text("# design\n", encoding="utf-8")
+    (tmp_path / "audit").mkdir()
+    (tmp_path / "audit" / "01_x.nb.html").write_text(
+        "<html>audit</html>\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    docs = tmp_path / "_build" / "docs"
+    staged = (docs / "01_x.md").read_text(encoding="utf-8")
+    assert '<iframe src="01_x.audit.nb.html"' in staged
+    assert "## Notebook" not in staged
+
+
 def test_site_build_embeds_assets(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
