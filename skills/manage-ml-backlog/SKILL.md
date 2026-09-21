@@ -40,10 +40,10 @@ error: return to `model-ml-pipeline`; do not fabricate B1.
 
 When `model-ml-pipeline`, `evaluate-ml-pipeline`, or
 `audit-ml-pipeline` calls at end of turn with the normalized
-G-REPORT-LOCATOR plus an optional audit digest or user-supplied
-headline. This is the only path that records an outcome without a
-full backlog turn. Audit may have been skipped; the locator remains
-required.
+G-REPORT-LOCATOR, optional headline, and G-AUDIT-FINDING. This is
+the only path that records an outcome without a full backlog turn.
+Audit may have been skipped; the locator remains required and the
+finding becomes `n/a — audit not run`.
 
 Run Procedure steps 1-3 and nothing else:
 
@@ -52,9 +52,10 @@ Run Procedure steps 1-3 and nothing else:
 2. Step 2 — read `journal/JOURNAL.md`; scaffold the index if it is
    missing.
 3. Step 3 — update the matching History row and design-note Status
-   block from the digest or user-supplied headline when available,
-   including the digest locator pasted verbatim. Also refresh
-   the `JOURNAL.md` Status rows `Last experiment` and `Last result`.
+   block from the digest or user-supplied headline when available.
+   Paste G-REPORT-LOCATOR and G-AUDIT-FINDING verbatim into their
+   separate Status lines. Also refresh the `JOURNAL.md` Status rows
+   `Last experiment` and `Last result`.
 
 Then return to the caller. Skip step 4 (Backlog rescan) and step 5
 (the next-lever triage menu) — the caller did not ask what to try
@@ -79,7 +80,9 @@ locator.
    `python -m skore_skills design consent --stem <stem>`.
    `ask` / `stop` → do not mark `done`. Also require green smoke
    evidence and a normalized report locator. An audit digest is
-   optional.
+   optional. G-AUDIT-FINDING is required as one of: the value
+   returned by audit, `n/a — audit not run`, or
+   `n/a — audit digest unavailable`.
 2. Read `journal/JOURNAL.md` History and Backlog. If the index is
    missing, run `python -m skore_skills scaffold --journal`. Do
    not write or paste the file. The CLI writes four sections:
@@ -92,19 +95,29 @@ locator.
 3. If recording a run: copy the headline metric from the audit
    digest or the user's value. Do not invent numbers. Update the
    matching History row (`planned` → `done` only if smoke passed).
-   Copy the digest's persisted-report locator into the History
-   `Report` cell and the design note's `Persisted report` Status
-   line. Paste that string verbatim; do not paraphrase it as
+   Headline metric remains the source for History and Last result;
+   never substitute G-AUDIT-FINDING for performance. Copy the
+   digest's persisted-report locator into the History `Report`
+   cell and the design note's `Persisted report` Status line.
+   Paste that string verbatim; do not paraphrase it as
    "normalized" or rewrite the Hub URL. If
    the digest has none, write
    `n/a — backend did not expose a locator` in both places; do not
-   derive or guess a URL. Update the rest of the design-note Status
-   block the same way.
+   derive or guess a URL. Copy G-AUDIT-FINDING verbatim into the
+   design note's `Audit findings` line. Audit skipped →
+   `n/a — audit not run`; missing/errored digest →
+   `n/a — audit digest unavailable`. Update the rest of the
+   design-note Status block the same way.
 4. Perform a full Backlog rescan. Resolve rows the run answered or
    killed, preserving stable indices. Then route sourcing explicitly:
-   report-derived ideas → `iterate-from-skore`; user proposals →
-   `iterate-from-user`; an existing row or stop → `model-ml-pipeline`.
-   Returned candidates/proposals are written by this parent, not by
+   report-derived ideas → load `iterate-from-skore` only if
+   `status.skills.iterate-from-skore` is true; user proposals →
+   load `iterate-from-user` only if
+   `status.skills.iterate-from-user` is true; an existing row or
+   stop → `model-ml-pipeline` only if
+   `status.skills.model-ml-pipeline` is true. Missing child →
+   one-line skip; do not invent that skill's steps. Returned
+   candidates/proposals are written by this parent, not by
    either sourcing child.
 5. Ask whether to draft from the refreshed Backlog or stop. When a
    row is selected, return it to `model-ml-pipeline`, which can
@@ -119,6 +132,8 @@ locator.
 - In model-entry selection mode, do not invent a Backlog row or
   remove it before the paired design note exists.
 - Do not invent metrics.
+- Do not derive, shorten, or merge G-AUDIT-FINDING with the
+  headline metric. Copy each into its owned field.
 - Do not paste a `JOURNAL.md` body or recreate the index from
   memory.
 - Do not mark `done` while smoke is red.
@@ -134,6 +149,9 @@ in one line otherwise. Name a build error; do not fail the
 backlog turn.
 
 Run `python -m skore_skills git end-turn --stage backlog`. If JSON
-`action` is `invoke`, load `persist-ml-git` and stop; that skill
-returns to triage. Otherwise load `triage-ml-task`. Do not run
+`action` is `invoke`, load `persist-ml-git` only if
+`status.skills.persist-ml-git` is true and stop; that skill
+returns to triage. If persist is missing, name the pending
+`staged` paths and stop. Otherwise load `triage-ml-task` only if
+`status.skills.triage-ml-task` is true; else stop. Do not run
 `git commit` in this skill.

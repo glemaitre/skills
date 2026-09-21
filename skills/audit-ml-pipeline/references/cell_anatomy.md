@@ -166,7 +166,29 @@ user asks for a deeper accessor.
 That's the whole template. Deeper accessors
 (`prediction_error()`, `confusion_matrix()`, `roc()`,
 `permutation_importance()`, …) are intentionally out of scope —
-add them per-experiment only when the user asks.
+add them per-experiment only after the user picks Additional
+report view, Custom query, or Custom plot from the post-audit gate.
+Confirm every accessor with `api get`, append it to the same
+durable audit file, and rerun the digest.
+
+## Digest-to-finding contract
+
+G-AUDIT-FINDING is derived after every digest run:
+
+1. Collect `issue` checks, then `tip` checks, preserving their
+   order within each severity.
+2. Report counts and each code/severity:
+   `<I> issue(s), <T> tip(s) — <CODE> (issue), <CODE> (tip)`.
+3. Append a short headline metric clause only when that value is
+   present in the metrics summary.
+4. With no actionable checks, use
+   `0 issues, 0 tips — automated checks surfaced no actionable finding`.
+5. With a missing or errored digest, use
+   `n/a — audit digest unavailable`.
+
+The finding is not the headline result. It is handed separately to
+record-outcome and copied verbatim into the design note's Status
+block.
 
 ## Why `.frame()` is load-bearing on cells 6–7
 

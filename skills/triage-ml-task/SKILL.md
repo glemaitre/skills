@@ -19,8 +19,9 @@ route and ask. Do not execute another skill's methodology.
    missing, that is expected. Do not treat a missing file as an
    empty project when `src/` or `journal/` exist.
 2. **Certain request** — name and load that skill. Do not list the
-   catalog. Only if `status.skills` is true; otherwise skip in one
-   line and do not invent the procedure:
+   catalog. `status.skills` is a per-id dict. Load the mapped
+   skill only if `status.skills.<id>` is true; else one-line skip
+   and do not invent that skill's steps:
 
    | User intent | Skill |
    |---|---|
@@ -53,25 +54,30 @@ route and ask. Do not execute another skill's methodology.
 
    **Modeling while `status.data_analysis` is `missing`:** if the certain
    skill is `model-ml-pipeline` (or the user asked to build the
-   first experiment) **and** `explore-ml-data` is installed, do
-   not load modeling yet. **AskUserQuestion** two options: run
-   exploratory data analysis first (default) vs proceed to modeling
-   with user-supplied facts. Do not invent dataset facts here. If
-   `data_analysis` is `present` or `skipped`, load
-   `model-ml-pipeline` with no extra gate.
+   first experiment) **and** `status.skills.explore-ml-data` is
+   true, do not load modeling yet. **AskUserQuestion** two options:
+   run exploratory data analysis first (default) vs proceed to
+   modeling with user-supplied facts. Do not invent dataset facts
+   here. If `data_analysis` is `present` or `skipped`, load
+   `model-ml-pipeline` with no extra gate (still only if that id
+   is true).
 
 3. **Uncertain** (open session, “what can you do”, finished stage,
    mixed intent) — **AskUserQuestion** with the **installed**
    entry skills only. One pick, then load it.
 
-   Offer if `skills` is true: `setup-ml-project`, `explore-ml-data`,
-   `model-ml-pipeline`, `manage-ml-backlog`, `export-ml-project`.
+   Offer an entry only if `status.skills.<id>` is true:
+   `setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
+   `manage-ml-backlog`, `export-ml-project`. If none of those ids
+   are true, say so in one line; do not invent a menu.
 
    Do not put `evaluate-ml-pipeline` or `audit-ml-pipeline` on this
    board (certain requests still load them).
 
-   If `status.data_analysis` is `missing`, name `explore-ml-data` as the
-   recommended next stage (`loop_stage: data_analysis`). Do not auto-load it.
+   If `status.data_analysis` is `missing` and
+   `status.skills.explore-ml-data` is true, name `explore-ml-data`
+   as the recommended next stage (`loop_stage: data_analysis`). Do
+   not auto-load it.
 
    Do not put internals on this board (`build-ml-pipeline`,
    `smoke-test-ml-pipeline` except as a **certain** debug load,

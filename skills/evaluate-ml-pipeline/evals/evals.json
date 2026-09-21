@@ -371,6 +371,42 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 21,
+      "title": "Register a custom check before persistence",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The post-smoke answer was Evaluate in this turn.\n- This is a sklearn-style estimator, not a SkrubLearner.\n- `python -m skore_skills api get` confirmed the installed\n  `skore.evaluate`, `skore.Check`, `CheckNotApplicable`, and\n  `checks.add` signatures.]\n\nEvaluate 08_wide_table and add a custom check that flags when\nthe test set has more than 50 features, then save the report.",
+      "expected_output": "Behavioural response satisfying: - Load `references/custom-checks.md`. - Define a named module-level `Check` subclass (not a lambda). - Order the implementation as `skore.evaluate(...)`, then `report.checks.add(...)`, then `report.checks.summarize(...)`, then `project.put(...)`. It must NOT: - Call `project.put` before registering the custom check. - Replace or disable built-in SKD checks. - Use a lambda or nested class for the persisted check.",
+      "files": [],
+      "expectations": [
+        "Load `references/custom-checks.md`.",
+        "Define a named module-level `Check` subclass (not a lambda).",
+        "Order the implementation as `skore.evaluate(...)`, then `report.checks.add(...)`, then `report.checks.summarize(...)`, then `project.put(...)`.",
+        "The response does NOT: Call `project.put` before registering the custom check.",
+        "The response does NOT: Replace or disable built-in SKD checks.",
+        "The response does NOT: Use a lambda or nested class for the persisted check.",
+        "The response does NOT: Register the check from `audit/` instead of `experiments/NN_*.py`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 22,
+      "title": "Do not invent a custom check",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/01_baseline.md` approved.\n- `src/<pkg>/pipeline.py` exists with `build_learner` returning a\n  `SkrubLearner`. The X-marker has empty `split_kwargs`.\n- Matching smoke pytest is green.\n- The post-smoke answer was Evaluate in this turn.\n- The user did not ask for a custom metric or custom check.]\n\nWire `experiments/01_baseline.py` for the baseline. Tabular\nregression, no groups, no temporal ordering.",
+      "expected_output": "Behavioural response satisfying: - Pick `skore.evaluate(learner, data={...}, splitter=...)` with Pattern A `KFold`. - Trust skore metric and SKD-check defaults. It must NOT: - Define a `Check` subclass or call `report.checks.add`. - Pass `scoring=` to `skore.evaluate`. - Call `report.metrics.add` without an explicit metric request.",
+      "files": [],
+      "expectations": [
+        "Pick `skore.evaluate(learner, data={...}, splitter=...)` with Pattern A `KFold`.",
+        "Trust skore metric and SKD-check defaults.",
+        "The response does NOT: Define a `Check` subclass or call `report.checks.add`.",
+        "The response does NOT: Pass `scoring=` to `skore.evaluate`.",
+        "The response does NOT: Call `report.metrics.add` without an explicit metric request."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

@@ -29,12 +29,13 @@ description: >
   STOP when `python -m skore_skills status` shows no scaffold
   (`has_src` and `has_journal` both false), no approved design,
   or no data contract: explain the missing fact and send the user
-  to setup/triage. Do not require `git`. After the declaration
-  exists, load `smoke-test-ml-pipeline` and iterate on pytest;
-  do not start CV here. This action does not cover fitting, CV,
-  metrics, persistence, inference, pure exploratory data analysis,
-  or abstract library choice. Smoke-test may be loaded as a
-  sub-step; do not require other action skills to be installed.
+  to setup/triage. Do not require `git`.   After the declaration
+  exists, load `smoke-test-ml-pipeline` only if
+  `status.skills.smoke-test-ml-pipeline` is true and iterate on
+  pytest; else one-line skip and do not invent the pytest file.
+  Do not start CV here. This action does not cover fitting, CV,
+  metrics, persistence, inference, or pure exploratory data
+  analysis. Do not invent a missing action skill's steps.
 
   HOW TO USE: consult before the first declarative line and on
   every structural edit (added/swapped step, changed input columns,
@@ -72,9 +73,11 @@ features after the marker.
    composed-dev Python from `env verify` (no inline `python -c`,
    no warning filters unless the user asks).
 4. When `experiments/NN_*.py` exists with the matching stem, load
-   `smoke-test-ml-pipeline` and **run pytest** on
-   `tests/smoke/test_NN_<short_name>.py`. Red → fix topology here;
-   do not loosen the assertion; do not evaluate.
+   `smoke-test-ml-pipeline` only if
+   `status.skills.smoke-test-ml-pipeline` is true and **run pytest**
+   on `tests/smoke/test_NN_<short_name>.py`. Missing skill →
+   one-line skip; do not invent the pytest file. Red → fix
+   topology here; do not loosen the assertion; do not evaluate.
 5. Green pytest: report stem, Method / Status.headline, and the
    learner. Then run
    `python -m skore_skills evaluate consent --stem <stem>`.
@@ -83,8 +86,10 @@ features after the marker.
      **Evaluate (Recommended)** / **Modify** / **Stop**, then
      **stop**. Do not write `skore.evaluate(...)`. Green pytest
      is not Evaluate. If the user answers **Evaluate**, load
-     `evaluate-ml-pipeline` (or return to `model-ml-pipeline` if
-     that is the caller). **Modify** — edit, then pytest again.
+     `evaluate-ml-pipeline` only if
+     `status.skills.evaluate-ml-pipeline` is true (or return to
+     `model-ml-pipeline` if that is the caller). Missing skill →
+     one-line skip. **Modify** — edit, then pytest again.
      **Stop** — end this skill. No `skore.evaluate`.
    - `proceed` — skip the post-smoke menu; load evaluate / return
      to model for re-eval.
@@ -434,7 +439,7 @@ Look up symbols with `api get`. Code: `references/common_patterns.md`.
 |---|---|
 | `python -m skore_skills api get` | Symbol lookup; cache hits first |
 | `evaluate-ml-pipeline` | `skore.evaluate` and CV choice after green pytest + `evaluate consent` (Evaluate HITL on `ask`). Pattern A/B: `references/metadata-routing.md` |
-| `smoke-test-ml-pipeline` | Sub-step. Writes and **runs pytest** on `tests/smoke/test_NN_*.py` |
+| `smoke-test-ml-pipeline` | Sub-step. Load only if `status.skills.smoke-test-ml-pipeline` is true. Writes and **runs pytest** on `tests/smoke/test_NN_*.py`. Missing skill → one-line skip; do not invent the pytest file |
 | `add-python-package` | Missing `skrub` / sklearn / Graphviz companions |
 | `research-ml-practice` | Load if installed on FE / transform / leakage. Abstract the **problem class**, not the table name. Summarize `scratch/research/<slug>.md`. AskUserQuestion `allow_multiple` on **`declare`** rows that do not violate stops. `measure` → revisit EDA; do not edit `data_analysis.py`. Declaring id handling does **not** wire Pattern B — no `cv=` / `split_kwargs` / `GroupKFold` until grouping is an approved Method choice. `evaluate` → name `evaluate-ml-pipeline`. `confirm` → ask the user. Missing skill → one-line skip |
 | `python -m skore_skills style` | After writing/editing `pipeline.py` / `features.py` / `data.py` |

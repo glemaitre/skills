@@ -208,6 +208,11 @@ def test_scaffold_journal_index_and_design(
     assert "| Headline result | Report | Design note |" in journal_text
     assert design_text.startswith("# 02_target_transform\n")
     assert "- **Persisted report:**" in design_text
+    assert "- **Audit findings:** n/a — audit not run" in design_text
+    assert design_text.count("## Notebooks") == 1
+    assert design_text.index("### Evaluation notebook") < design_text.index(
+        "### Audit notebook"
+    )
 
 
 def test_scaffold_journal_preserves_index_and_refuses_existing_design(

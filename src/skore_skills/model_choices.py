@@ -48,7 +48,7 @@ def _journal_facts(root: Path) -> tuple[set[str], list[dict[str, str]]]:
 
     history_stems = {
         row[0]
-        for row in _table_rows(sections.get("History", ""), 5)
+        for row in _table_rows(sections.get("History", ""), 6)
         if row[2].lower() in _MODEL_STATUSES
     }
     backlog = [

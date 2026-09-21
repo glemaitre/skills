@@ -30,6 +30,9 @@ IMAGE_LINK = re.compile(
     r"(?<!!)\[([^\]]*)\]\(([^)\s]+\.(?:png|jpe?g|svg|gif))\)", re.IGNORECASE
 )
 RAW_IFRAME = re.compile(r'<iframe[^>]+src="([^"]+)"[^>]*>\s*</iframe>', re.IGNORECASE)
+NOTEBOOKS_SECTION = re.compile(
+    r"(?ms)^## Notebooks\s*\n.*?(?=^## |\Z)",
+)
 # Staged report pages measure themselves and post their height up, so the
 # viewer fits the report exactly. Reading the document from the parent is
 # blocked under ``file://``; postMessage is not. Measure the body box, not
@@ -288,7 +291,28 @@ def embed_assets(text: str) -> str:
 
 
 def inject_notebook(text: str, page: Page) -> str:
-    """Append the paired notebook viewers; the audit continues the experiment."""
+    """Insert paired experiment viewers or append one analysis viewer."""
+    if page.section == "Experiments":
+        viewers: list[str] = []
+        for source, heading, name in (
+            (page.notebook, "Evaluation notebook", notebook_dest(page)),
+            (page.audit, "Audit notebook", audit_dest(page)),
+        ):
+            if source is None:
+                continue
+            embed = render_embed(name, f"{page.title} {heading.lower()}")
+            viewers.append(f"### {heading}\n\n{embed}")
+
+        section = "## Notebooks\n"
+        if viewers:
+            section += "\n" + "\n\n".join(viewers) + "\n"
+
+        if NOTEBOOKS_SECTION.search(text):
+            return NOTEBOOKS_SECTION.sub(section, text, count=1)
+        if not viewers:
+            return text
+        return f"{text.rstrip()}\n\n{section}"
+
     for source, heading, name in (
         (page.notebook, "Notebook", notebook_dest(page)),
         (page.audit, "Audit", audit_dest(page)),

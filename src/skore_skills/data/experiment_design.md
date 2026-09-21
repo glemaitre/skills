@@ -12,10 +12,10 @@ Lifecycle:
   abandoned → discarded; record a one-line reason on State
 
 The four content sections (Question, Motivation, Method, Risks) are
-fixed once approved; only the Status block changes afterwards. There
-is no "Success criteria" section — judge the result once it is in.
-When `experiments/<NN>_<short_name>.nb.html` has been exported, site
-build attaches it as an HTML viewer on this page.
+fixed once approved; only the Status block and generated notebook
+viewers change afterwards. There is no "Success criteria" section —
+judge the result once it is in. Site build places the exported
+evaluation and audit viewers under Notebooks below.
 -->
 
 ## Question / hypothesis
@@ -81,4 +81,17 @@ run (to interpret the headline result honestly).
 - **Approved by user on:** <date or n/a>
 - **Headline result:** <fill in after run, or `n/a — abandoned: <reason>`>
 - **Persisted report:** <backend locator after `project.put`, or `n/a — not persisted`>
+- **Audit findings:** n/a — audit not run
 - **Implication for next iteration:** <fill in after run — what it suggests to try next. For abandonment: one line on what the abandonment teaches (e.g., "rules out monotonic-NN direction without paid GPU env")>
+
+## Notebooks
+
+<!--
+Site build inserts the available HTML viewers below. It keeps both
+under this one section, in evaluation-then-audit order. Missing
+viewers are omitted.
+-->
+
+### Evaluation notebook
+
+### Audit notebook

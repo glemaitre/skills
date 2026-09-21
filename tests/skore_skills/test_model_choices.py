@@ -45,10 +45,10 @@ def test_history_run_counts_as_a_prior_model(tmp_path: Path) -> None:
     _write(
         tmp_path / "journal" / "JOURNAL.md",
         "## History\n\n"
-        "| Stem | Intent | Status | Headline result | Design note |\n"
-        "|---|---|---|---|---|\n"
-        "| `01_old` | baseline | done | score | note |\n"
-        "| `02_plan` | next | planned | n/a | note |\n\n"
+        "| Stem | Intent | Status | Headline result | Report | Design note |\n"
+        "|---|---|---|---|---|---|\n"
+        "| `01_old` | baseline | done | score | n/a | note |\n"
+        "| `02_plan` | next | planned | n/a | n/a | note |\n\n"
         "## Backlog\n",
     )
 
@@ -88,8 +88,8 @@ def test_real_backlog_rows_are_returned_and_malformed_rows_ignored(
     _write(
         tmp_path / "journal" / "JOURNAL.md",
         "## History\n\n"
-        "| Stem | Intent | Status | Headline result | Design note |\n"
-        "|---|---|---|---|---|\n\n"
+        "| Stem | Intent | Status | Headline result | Report | Design note |\n"
+        "|---|---|---|---|---|---|\n\n"
         "## Backlog\n\n"
         "| # | Item | Source |\n"
         "|---|---|---|\n"

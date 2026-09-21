@@ -20,32 +20,37 @@ after listing the boxes.
 - [ ] status (read skills + has_src)
 - [ ] ask which pieces (all installed boxes preselected)
 - [ ] load selected | skip
-- [ ] status again; load triage-ml-task if installed
+- [ ] status again; load triage-ml-task only if
+      status.skills.triage-ml-task is true
 ```
 
 ## Sequence
 
-1. Run `python -m skore_skills status`.
+1. Run `python -m skore_skills status`. `status.skills` is a
+   per-id dict, never a boolean.
 2. **AskUserQuestion** with `allow_multiple`. Include a box only
-   when `status.skills` is true:
+   when **that** id is true:
 
    - Python environment (`setup-python-env`)
    - Workspace layout (`setup-workspace`)
-   - Editable install (`add-python-package`) — show when that
-     skill is installed and (`has_src` is true **or** workspace
-     is on this board)
+   - Editable install (`add-python-package`) — show when
+     `status.skills.add-python-package` is true and (`has_src`
+     is true **or** workspace is on this board)
    - Git (`setup-git`)
 
    **Preselect every installed piece** (all boxes on). Do not
    leave a box off because the layout already looks done. The
    user may uncheck.
 3. Load **still-checked** skills only, in this order: env →
-   workspace → editable (`has_src`) → git.
-4. Unchecked or `skills: false` → one-line skip.
+   workspace → editable (`has_src`) → git. Load `<id>` only if
+   `status.skills.<id>` is true; else one-line skip. Do not
+   invent that skill's steps.
+4. Unchecked or that id is false → one-line skip.
 5. Editable checked, `has_src` false, and workspace not selected
    → one-line stop. Do not scaffold from this meta.
-6. `status` again. Load `triage-ml-task` if installed, else stop.
-   Do not start exploratory data analysis or a pipeline.
+6. `status` again. Load `triage-ml-task` only if
+   `status.skills.triage-ml-task` is true; else stop. Do not
+   start exploratory data analysis or a pipeline.
 
 ## Stop conditions
 

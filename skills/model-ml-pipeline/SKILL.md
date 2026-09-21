@@ -68,7 +68,9 @@ note.
   EDA findings that motivate one pipeline proposal. Do not invent
   findings or present multiple silent alternatives. Confirm the
   proposal and design before build.
-- **Backlog (`backlog`).** Load `manage-ml-backlog`. Pass the
+- **Backlog (`backlog`).** Load `manage-ml-backlog` only if
+  `status.skills.manage-ml-backlog` is true. Else one-line skip;
+  do not invent a Backlog. Pass the
   `backlog` rows returned by the CLI; ask the user to pick one
   `B<N>`, consume only that row into a proposal/design stem, then
   return here. Do not add a new Backlog idea in this branch.
@@ -88,26 +90,36 @@ has created the shell, then stop for explicit design approval.
 
 ## Approved-design implement loop
 
-1. `build-ml-pipeline` — declare the skrub DataOps learner. That
-   skill loads `smoke-test-ml-pipeline` after the experiment file
-   exists and **runs pytest** on `tests/smoke/test_NN_*.py`. Red
-   pytest stays in build (modify the pipeline, re-run pytest).
-   Green pytest: build reports the design, then
+1. Load `build-ml-pipeline` only if `status.skills.build-ml-pipeline`
+   is true; else one-line skip and stop — do not declare the
+   pipeline from this meta. That skill loads `smoke-test-ml-pipeline`
+   after the experiment file exists and **runs pytest** on
+   `tests/smoke/test_NN_*.py`. Red pytest stays in build (modify
+   the pipeline, re-run pytest). Green pytest: build reports the
+   design, then
    `python -m skore_skills evaluate consent --stem <stem>`
    (Evaluate / Modify / Stop on `ask`).
-2. Only if the user chose **Evaluate** and smoke is green:
-   `evaluate-ml-pipeline` — leakage-safe splitter and
+2. Only if the user chose **Evaluate** and smoke is green: load
+   `evaluate-ml-pipeline` only if `status.skills.evaluate-ml-pipeline`
+   is true — leakage-safe splitter and
    `skore.evaluate` in the experiment script. Re-run `status`
    first, then `python -m skore_skills evaluate consent --stem
    <stem>`. Consent JSON is authoritative, not the user's wording
-   alone. Missing `evaluate-ml-pipeline` → one-line skip.
-3. After a successful evaluate: `audit-ml-pipeline` if installed
-   (same stem). Missing skill → one-line skip. Re-run `status`
-   first. No report → do not invent an audit; stop.
+   alone. Missing `evaluate-ml-pipeline` → one-line skip. Do not
+   invent that skill's steps.
+3. After a successful evaluate: load `audit-ml-pipeline` only if
+   `status.skills.audit-ml-pipeline` is true (same stem). Missing
+   skill → one-line skip. Re-run `status` first. No report → do
+   not invent an audit; stop. The audit owns its deterministic
+   follow-up gate and returns only after Close audit, with the
+   digest, G-AUDIT-FINDING, locator, and optional headline.
 4. After audit — or after evaluate when audit was skipped — load
-   `manage-ml-backlog` in **record-outcome mode**, handing it the
-   normalized G-REPORT-LOCATOR and the optional audit digest or
-   headline. It writes the `JOURNAL.md` History row and design-note
+   `manage-ml-backlog` only if `status.skills.manage-ml-backlog`
+   is true, in **record-outcome mode**, handing it the
+   normalized G-REPORT-LOCATOR, optional headline, and
+   G-AUDIT-FINDING. Audit skipped →
+   `n/a — audit not run`. Else one-line skip; do not write History from this
+   meta. It writes the `JOURNAL.md` History row and design-note
    Status block, then returns; it does not rescan the Backlog or
    open the next-lever menu. Never mark `done` while smoke is red.
    Audit-skipped runs still record the locator; missing headline
@@ -146,8 +158,10 @@ symbols are written, children use
 - If `status.data_analysis` is `missing`, continue with facts the user
   stated; do not invent an exploratory data analysis report.
 - Literature-backed feature-engineering or learner-family
-  questions: load `build-ml-pipeline` (it loads
-  `research-ml-practice` if installed). Do not distill research
+  questions: load `build-ml-pipeline` only if
+  `status.skills.build-ml-pipeline` is true (it loads
+  `research-ml-practice` only if `status.skills.research-ml-practice`
+  is true). Else one-line skip. Do not distill research
   here; do not invent papers from memory.
 
 After **Stop**, or while smoke is red: skip evaluate, audit, and
@@ -167,10 +181,11 @@ After **Evaluate** (and audit if it ran), implement-loop step 4
 (record-outcome) runs first, so the journal files are on disk
 before anything is staged. The user-facing close **must** include
 the G-REPORT-LOCATOR value evaluate passed up (or
-`n/a — backend did not expose a locator`). Then the same
+`n/a — backend did not expose a locator`) and G-AUDIT-FINDING
+(`n/a — audit not run` when skipped). Then the same
 convert/site rules apply. `audit-ml-pipeline` converts `audit/<stem>.py` itself; do
 not convert it again here. The site appends that viewer to the
-experiment page as the continuation of evaluate.
+experiment design note's `## Notebooks` section after evaluation.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build`. Skip in one line otherwise.
@@ -178,7 +193,10 @@ Name a build error; do not fail the model turn.
 
 Then run
 `python -m skore_skills git end-turn --stage implement`. If JSON
-`action` is `invoke`, load `persist-ml-git` and stop; that skill
-returns to triage. Otherwise load `triage-ml-task`. Do not run
+`action` is `invoke`, load `persist-ml-git` only if
+`status.skills.persist-ml-git` is true and stop; that skill
+returns to triage. If persist is missing, name the pending
+`staged` paths and stop. Otherwise load `triage-ml-task` only if
+`status.skills.triage-ml-task` is true; else stop. Do not run
 `git commit` in this skill.
 Never mark `done` while smoke is red.

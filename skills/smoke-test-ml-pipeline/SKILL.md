@@ -131,7 +131,7 @@ AskUserQuestion for evaluate here — that gate belongs to
 ```
 Pre-flight (smoke-test-ml-pipeline):
 - [ ] Tier 1 mandatory libs importable: pytest + sklearn + skrub
-      (per `data-science-python-stack` § "Tier 1"). **Not skore** —
+      (per `skore_skills/data/python-stack.json` stage libraries). **Not skore** —
       see the Stop conditions; the smoke test is intentionally
       portable to any skrub-capable environment
 - [ ] API confirmed for skrub / sklearn symbols used in
@@ -409,10 +409,11 @@ metric problem.
   predict time, so a lag column is silently NaN. Inspect
   `learner.skb.full_report()` and look for nodes whose value at
   predict time doesn't match what fit time saw.
-- **Failure blocks `done` status.** `triage-ml-task` refuses to
-  flip an experiment to `done` until the matching smoke test
-  passes. `evaluate-ml-pipeline` also STOPs while pytest is red
-  (or the smoke file is missing on a history-dependent pipeline).
+- **Failure blocks `done` status.** `manage-ml-backlog`
+  record-outcome refuses to flip an experiment to `done` until
+  the matching smoke test passes. `evaluate-ml-pipeline` also
+  STOPs while pytest is red (or the smoke file is missing on a
+  history-dependent pipeline).
 
 ## What this skill does NOT do
 
@@ -446,7 +447,7 @@ design HITL when this skill was loaded as a sub-step.
   rule the smoke test asserts, and the post-green HITL. Smoke
   failure typically routes back there for a pipeline-shape fix.
   Pytest is the loop: red → modify pipeline → pytest again.
-- **`triage-ml-task`** — owns the iteration loop. Requires
+- **`manage-ml-backlog`** — record-outcome writes `done`. Requires
   the smoke test to pass before an experiment can flip to `done`.
 - **`evaluate-ml-pipeline`** — owns CV. Do not load it from here.
 - **`python -m skore_skills api get`** — symbol references for
@@ -456,8 +457,8 @@ design HITL when this skill was loaded as a sub-step.
   "no skore import" Stop condition above. **Cache hits first**:
   check `scratch/api/<lib>/<version>/` before WebSearching;
   cache new findings back there (per `python -m skore_skills api get` Shape 0/3).
-- **`data-science-python-stack`** — declares pytest as a Tier 1
-  mandatory dependency for any workspace using this skill.
+- **`skore_skills/data/python-stack.json`** — declares pytest as a
+  stage library for any workspace using this skill.
 - **`python -m skore_skills style`** — **must be invoked** after writing or
   editing `tests/smoke/test_NN_*.py`. Running a manager-specific ruff
   check` directly without invoking this skill silently drops the

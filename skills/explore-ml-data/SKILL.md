@@ -341,5 +341,9 @@ disk. Skip in one line otherwise. Name a build error; do not fail
 the data-analysis turn.
 
 `python -m skore_skills git end-turn --stage data_analysis`. If
-`invoke`, load `persist-ml-git`. Then load `triage-ml-task` if
-installed. No `git commit`.
+JSON `action` is `invoke`, load `persist-ml-git` only if
+`status.skills.persist-ml-git` is true and stop; that skill
+returns to triage. If persist is missing, name the pending
+`staged` paths and stop. Otherwise load `triage-ml-task` only if
+`status.skills.triage-ml-task` is true; else stop. No `git
+commit`.

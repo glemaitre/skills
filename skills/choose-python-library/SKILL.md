@@ -12,7 +12,8 @@ description: >
 # Choose Python Library
 
 1. State the job and constraints.
-2. Check `data-science-python-stack`; if it already assigns one
+2. Check `skore_skills/data/python-stack.json` (via
+   `choose-python-library`); if it already assigns one
    canonical library to the job, use it rather than reopening the
    choice.
 3. For a genuine choice, present the smallest useful option set and

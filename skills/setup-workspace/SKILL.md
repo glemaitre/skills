@@ -79,21 +79,32 @@ after listing the boxes.
 
    Same turn after persist:
 
-   - notebooks true → load `add-python-package` for `jupytext`
-     and `nbclient` (both `env route` **agent**), plus
-     `nbconvert` when site is also true — stage turns write the
-     notebook viewer with `--html`. Do not leave them as `ask`.
-     Do not convert.
-   - site true → load `add-python-package` for `mkdocs-material`
+   Load `add-python-package` only if
+   `status.skills.add-python-package` is true **and**
+   `policy.env.managed` is true. Else one-line skip: name
+   `jupytext` / `nbclient` / `nbconvert` / `mkdocs-material`; do
+   not invent `pixi add` / `uv add`; skip `site init`. Do not
+   invent that skill's steps.
+
+   When that load is allowed:
+
+   - notebooks true → `add-python-package` for `jupytext` and
+     `nbclient` (both `env route` **agent**), plus `nbconvert`
+     when site is also true — stage turns write the notebook
+     viewer with `--html`. Do not leave them as `ask`. Do not
+     convert.
+   - site true → `add-python-package` for `mkdocs-material`
      (agent), then `python -m skore_skills site init`.
 
    If either flag is already `true` or `false`, do not re-ask.
 5. If `setup-ml-project` dispatched this turn and is in this
    session, return to it; else stop. Standalone:
    `python -m skore_skills git end-turn --stage setup`. If JSON
-   `action` is `invoke`, load `persist-ml-git` when installed and
-   stop; it returns to triage. Otherwise load `triage-ml-task` when
-   installed.
+   `action` is `invoke`, load `persist-ml-git` only if
+   `status.skills.persist-ml-git` is true and stop; it returns to
+   triage. If persist is missing, name the pending `staged` paths
+   and stop. Otherwise load `triage-ml-task` only if
+   `status.skills.triage-ml-task` is true; else stop.
 
 ## Stop conditions
 

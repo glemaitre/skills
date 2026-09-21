@@ -25,8 +25,8 @@ Ordering only. Children own convert and site commands.
    `python -m skore_skills policy set notebooks true` (or `site`);
    unchecked → `false`. Do not leave them `null`. Do not write
    notebooks or site into JOURNAL; policy is the record.
-4. Load checked children if `skills` is true; missing skill →
-   one-line skip:
+4. Load each checked child only if `status.skills.<id>` is true;
+   else one-line skip. Do not invent that skill's steps:
 
    - notebooks → `export-ml-notebook` (installs toolchain if this
      is the first yes, then convert; `--html` only if the user
@@ -34,7 +34,8 @@ Ordering only. Children own convert and site commands.
    - site → `export-ml-site` (installs `mkdocs-material` if first
      yes, init if needed, then build; never convert)
 
-5. Return to `triage-ml-task` if installed.
+5. Load `triage-ml-task` only if `status.skills.triage-ml-task`
+   is true; else stop.
 
 ## Stop conditions
 

@@ -126,6 +126,8 @@
 - Audit digest for `01_baseline` exists with a headline ROC-AUC.
 - The digest contains `[Open report](https://hub.example/report/42)
   · hub · id: skore:report:cross-validation:42`.
+- G-AUDIT-FINDING is
+  `1 issue, 1 tip — SKD003 (issue), SKD010 (tip); ROC-AUC 0.86`.
 - Smoke tests passed.
 - History row for `01_baseline` is `planned`.
 - Backlog has rows `B1` and `B2`.
@@ -136,6 +138,8 @@
   headline result from the digest.
 - Copy the locator byte-for-byte into the History `Report` cell
   and design-note `Persisted report` Status line.
+- Copy G-AUDIT-FINDING byte-for-byte into the design-note
+  `Audit findings` Status line, separately from Headline result.
 - Update the rest of the design-note Status block for
   `01_baseline`.
 - Refresh the `JOURNAL.md` Status rows `Last experiment` and
@@ -150,6 +154,7 @@
   owns the close.
 - Rewrite or shorten the supplied Hub URL. Pasting the digest
   string unchanged is required, not a violation.
+- Merge the audit finding into the headline metric or Last result.
 
 ---
 
@@ -162,11 +167,14 @@
 **Assumed workspace state:**
 - `audit-ml-pipeline` is not installed, so there is no digest.
 - The user gave no headline value.
+- G-AUDIT-FINDING is `n/a — audit not run`.
 - History row for `03_calendar` is `planned`.
 
 **Must do:**
 - Skip the headline result in one line, naming the missing digest.
 - Leave the History row status unchanged.
+- Copy `n/a — audit not run` into the design note's Audit findings
+  line if the Status block is updated.
 
 **Must NOT do:**
 - Invent or estimate a metric.

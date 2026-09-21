@@ -572,3 +572,60 @@ violated.
 - Put `sample_weight` in `mark_as_X(..., split_kwargs=...)`.
 - Derive scoring weights from the unsplit raw frame.
 - Claim the DataOp scorer appears in `metrics.summarize()`.
+
+---
+
+## CASE_21 — Register a custom check before persistence
+
+**User prompt:**
+> Evaluate 08_wide_table and add a custom check that flags when
+> the test set has more than 50 features, then save the report.
+
+**Assumed workspace state:**
+- The post-smoke answer was Evaluate in this turn.
+- This is a sklearn-style estimator, not a SkrubLearner.
+- `python -m skore_skills api get` confirmed the installed
+  `skore.evaluate`, `skore.Check`, `CheckNotApplicable`, and
+  `checks.add` signatures.
+
+**Must do:**
+- Load `references/custom-checks.md`.
+- Define a named module-level `Check` subclass (not a lambda).
+- Order the implementation as `skore.evaluate(...)`, then
+  `report.checks.add(...)`, then
+  `report.checks.summarize(...)`, then `project.put(...)`.
+
+**Must NOT do:**
+- Call `project.put` before registering the custom check.
+- Replace or disable built-in SKD checks.
+- Use a lambda or nested class for the persisted check.
+- Register the check from `audit/` instead of
+  `experiments/NN_*.py`.
+
+---
+
+## CASE_22 — Do not invent a custom check
+
+**User prompt:**
+> Wire `experiments/01_baseline.py` for the baseline. Tabular
+> regression, no groups, no temporal ordering.
+
+**Assumed workspace state:**
+- `journal/01_baseline.md` approved.
+- `src/<pkg>/pipeline.py` exists with `build_learner` returning a
+  `SkrubLearner`. The X-marker has empty `split_kwargs`.
+- Matching smoke pytest is green.
+- The post-smoke answer was Evaluate in this turn.
+- The user did not ask for a custom metric or custom check.
+
+**Must do:**
+- Pick `skore.evaluate(learner, data={...}, splitter=...)` with
+  Pattern A `KFold`.
+- Trust skore metric and SKD-check defaults.
+
+**Must NOT do:**
+- Define a `Check` subclass or call `report.checks.add`.
+- Pass `scoring=` to `skore.evaluate`.
+- Call `report.metrics.add` without an explicit metric request.
+
+---

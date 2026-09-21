@@ -14,6 +14,8 @@ Markdown is the report: its figures, TableReport HTML, and existing
 converted notebooks (`<stem>.nb.html`, written only by
 `export-ml-notebook` with `notebook convert --html`) are embedded
 inline. HTML viewers have open-separately and fullscreen controls.
+Each experiment design note has one `## Notebooks` section:
+evaluation first, then audit; a missing viewer is omitted.
 The gitignored serialized Skore `reports/` directory is private
 runtime state and is never copied into the site. Only Markdown and
 already-generated notebook/HTML viewers are exported.

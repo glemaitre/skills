@@ -112,6 +112,24 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "Custom check with empty documentation_url",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The digest above is on disk at\n  `scratch/audit/05_wide_table/audit.md`.\n- `JOURNAL.md` Backlog is empty.]\n\nMine the 05_wide_table audit digest. Here's\n`scratch/audit/05_wide_table/audit.md`:\n\n```\n## Checks summary\n\n| code    | severity | description                                              | documentation_url |\n|---------|----------|----------------------------------------------------------|-------------------|\n| SKD002  | passed   | No underfitting flagged                                  | https://docs.skore.probabl.ai/c/SKD002 |\n| CSTM001 | tip      | High feature count. The dataset has 80 features.         |                   |\n\n## Metrics summary\n\n| metric | value |\n|--------|-------|\n| RMSE   | 0.179 |\n```",
+      "expected_output": "Behavioural response satisfying: - Emit one Backlog candidate for `CSTM001` and none for the `passed` row. - Cite `Source` as `audit:05_wide_table:checks.CSTM001`. - Draft `Item` from the digest title/message (high feature count / 80 features). Do not require a WebFetch of an empty URL. It must NOT: - Skip the custom check because `documentation_url` is empty. - Invent an SKD mitigation from memory instead of the digest message. - Re-open the skore Project.",
+      "files": [],
+      "expectations": [
+        "Emit one Backlog candidate for `CSTM001` and none for the `passed` row.",
+        "Cite `Source` as `audit:05_wide_table:checks.CSTM001`.",
+        "Draft `Item` from the digest title/message (high feature count / 80 features). Do not require a WebFetch of an empty URL.",
+        "The response does NOT: Skip the custom check because `documentation_url` is empty.",
+        "The response does NOT: Invent an SKD mitigation from memory instead of the digest message.",
+        "The response does NOT: Re-open the skore Project."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

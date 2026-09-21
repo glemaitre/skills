@@ -5,9 +5,10 @@ description: >
   digest** at `scratch/audit/<stem>/audit.md` (produced by
   `audit-ml-pipeline` after evaluate). For every row in the
   digest's `## Checks summary` whose `severity` is `issue` or `tip`,
-  follow the row's `documentation_url` to draft a Backlog row whose
-  `Item` is the mitigation the docs recommend. The `## Metrics
-  summary` provides context for the human summary paragraph but
+  follow the row's `documentation_url` when present (or the row
+  title and message when the URL is empty) to draft a Backlog row
+  whose `Item` is the mitigation. The `## Metrics summary`
+  provides context for the human summary paragraph but
   does not drive Backlog rows on its own. Returns the enriched
   Backlog rows + a one-paragraph summary back to
   `manage-ml-backlog`, which writes the rows into `JOURNAL.md`
@@ -33,9 +34,10 @@ description: >
   `scratch/audit/<stem>/audit.md` digest as text — do NOT re-open
   the skore Project, do NOT call `report.*` accessors. For each
   row in the `## Checks summary` section whose severity is `issue`
-  or `tip`, follow the `documentation_url` (via WebFetch) and draft
-  one Backlog row citing `audit:<stem>:checks.<code>`. Dedupe
-  against rows already in `JOURNAL.md` Backlog by source citation.
+  or `tip`, follow the `documentation_url` (via WebFetch) when it
+  is non-empty, otherwise draft `Item` from the row title and
+  message. Cite `audit:<stem>:checks.<code>`. Dedupe against
+  rows already in `JOURNAL.md` Backlog by source citation.
   Return the candidate rows + a one-paragraph human summary. The
   parent skill writes the rows to `JOURNAL.md` and re-shows the
   sourcing menu.
@@ -85,8 +87,9 @@ conversation text:
 1. **Backlog-candidate rows** — one row per actionable check from
    the digest. Each row carries:
    - `Item`: one-line experiment idea derived from the check's
-     `documentation_url` content. Phrase as an *experiment idea*,
-     not as a metric reading.
+     `documentation_url` content, or from the digest title and
+     message when that URL is empty. Phrase as an *experiment
+     idea*, not as a metric reading.
    - `Source`: `audit:<stem>:checks.<code>` (e.g.
      `audit:01_baseline:checks.SKD003`). The citation is
      load-bearing for dedup.
@@ -141,10 +144,14 @@ record — see § Stop conditions.
   produce Backlog rows on its own. Deeper diagnostic surfaces
   (residuals, feature importance, calibration, …) are not in the
   audit template and not in scope here.
-- **Follow the `documentation_url`.** For each `issue` / `tip`
-  check, fetch the linked skore docs page (via `WebFetch`) and
-  derive the Backlog `Item` from what the page recommends. Do not
-  invent mitigations from training-data memory of skore.
+- **Follow the `documentation_url` when it is present.** For each
+  `issue` / `tip` check with a non-empty URL, fetch the linked
+  page (via `WebFetch`) and derive the Backlog `Item` from what
+  the page recommends. Do not invent SKD-style mitigations from
+  training-data memory of skore. If `documentation_url` is
+  missing or empty (typical of a custom `CSTM*` check with no
+  `docs_url`), draft `Item` from the digest row's title and
+  message. Keep `Source` as `audit:<stem>:checks.<code>`.
 - **Don't pick a single "winning" finding for the user.** Emit one
   row per actionable check. The user picks via the parent's
   sourcing menu (`B<N>`). Stop after the candidate list. Forbidden
@@ -171,12 +178,17 @@ record — see § Stop conditions.
 2. **Read the digest as text.** Use the `Read` tool.
 3. **Walk the `## Checks summary` section.** For every row whose
    `severity` is `issue` or `tip`:
-   - **Follow `documentation_url`** with `WebFetch`. The page
-     describes what the check tests and what to try next.
-   - **Draft the Backlog `Item`** from the page's recommended
-     mitigations, phrased as a one-line experiment idea.
+   - If `documentation_url` is a non-empty URL, **follow it** with
+     `WebFetch`. The page describes what the check tests and what
+     to try next. Draft the Backlog `Item` from the page's
+     recommended mitigations, phrased as a one-line experiment
+     idea.
+   - If `documentation_url` is missing or empty, draft `Item`
+     from the row's title and message. Do not invent a mitigation
+     from SKD memory.
    - **Citation**: `audit:<stem>:checks.<code>` (e.g.
-     `audit:01_baseline:checks.SKD003`).
+     `audit:01_baseline:checks.SKD003` or
+     `audit:01_baseline:checks.CSTM001`).
 4. **Dedup against the existing Backlog.** Read `JOURNAL.md`
    Backlog. Drop candidates whose citation already exists.
 5. **Read the `## Metrics summary`** for context only — the

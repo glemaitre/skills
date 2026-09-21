@@ -277,8 +277,9 @@ report = skore.evaluate(
 )
 report  # bare line — jupytext-displays inline; no-op as a script
 
-# Any explicit report-level `report.metrics.add(...)` calls go here,
-# before persistence. DataOp `with_scoring` was attached in build_learner.
+# Any explicit report-level `report.metrics.add(...)` or
+# `report.checks.add(...)` calls go here, before persistence.
+# DataOp `with_scoring` was attached in build_learner.
 
 # %% [markdown]
 # ## Persist

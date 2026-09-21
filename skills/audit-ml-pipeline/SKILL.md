@@ -10,8 +10,9 @@ description: >
   markdown digest of each cell's stdout + last-expression repr to
   stdout (optionally also to a file). The digest fuels narrative work
   (the `JOURNAL.md` Status + History update, follow-up questions
-  about a past experiment, cross-experiment comparison). Stops at
-  "audit/NN_*.py is placed, executed, and the digest is available."
+  about a past experiment, cross-experiment comparison). After each
+  digest it asks a deterministic continue-or-close gate; it stops
+  after Close audit with the digest and G-AUDIT-FINDING available.
   Never calls `skore.evaluate(...)` or `project.put(...)`.
 
   TRIGGER — any of:
@@ -39,6 +40,9 @@ description: >
   the package name + the literal Project init block copied from
   `experiments/<stem>.py`. Execute via
   `python -m skore_skills cells run audit/<stem>.py`.
+  Derive G-AUDIT-FINDING from that digest, then ask the fixed
+  Additional report view / Custom query / Custom plot / Close audit
+  gate. Additional work reruns the same file and gate.
   **Read the Stop conditions and emit the Pre-flight
   checklist before any write or shell command.** Always invoke
   `python -m skore_skills api get` for skore symbol signatures — never write them from
@@ -61,8 +65,9 @@ reading the digest. Read-only against the skore Project.
 
 The implement loop dispatches audit **after evaluate and before
 record-outcome**. The digest carries the checks summary and metrics
-summary; `manage-ml-backlog` record-outcome consumes it and never
-dispatches audit back.
+summary. G-AUDIT-FINDING is a separate normalized finding derived
+from that digest. `manage-ml-backlog` record-outcome consumes both
+and never dispatches audit back.
 
 ## Where things live — visual map
 
@@ -166,6 +171,11 @@ conditions for the three-consumer rule.
   agent tools (ruff / ipython / ipykernel).** Install gate fires regardless.
 - **Post-hoc audit — required before ending the turn.** Walk every
   pre-flight row; surface unfilled Evidence cells.
+- **The post-audit gate is mandatory.** After the first digest and
+  every refresh, ask Additional report view / Custom query /
+  Custom plot / Close audit in that exact order unless the user
+  already explicitly closed the audit. No convert, site build,
+  git close, record-outcome, or dispatcher return before Close.
 
 ## Forbidden shortcuts
 
@@ -222,6 +232,10 @@ Pre-flight (audit-ml-pipeline):
 - [ ] Execution command shape confirmed:
         python -m skore_skills cells run audit/<stem>.py [scratch/audit/<stem>/audit.md]
       Evidence: command emitted in the response before running
+- [ ] G-AUDIT-FINDING derived from the executed digest
+      Evidence: issue/tip counts + ordered codes + optional metric
+                context | explicit clean-checks value
+- [ ] Post-audit gate answered: additional view | query | plot | close
 - [ ] Pre-flight re-emitted with evidence before final message.
       Evidence: this checklist appears in the end-of-turn summary.
 ```
@@ -276,7 +290,8 @@ Brief outline; full anatomy with concrete examples →
    `put`, inspect private storage, or invent a frontend URL.
 7. **Checks summary** — `report.checks.summarize().frame()`. Each row
    carries `documentation_url` — the actionable mitigation for an
-   `issue` / `tip` lives at that link.
+   `issue` / `tip` lives at that link when present (custom `CSTM*`
+   checks may leave it empty).
 8. **Metrics summary** — `report.metrics.summarize().frame()`.
 
 That's the whole template. `.frame()` is load-bearing on cells 6
@@ -289,7 +304,8 @@ The rendered digest at `scratch/audit/<stem>/audit.md` is the
 **single source of truth** that `iterate-from-skore` mines to
 populate the JOURNAL Backlog. That skill reads the digest as text,
 walks the checks + metrics sections, and follows each check's
-`documentation_url` to draft Backlog rows. It does NOT re-open the
+`documentation_url` (or the row title and message when the URL is
+empty) to draft Backlog rows. It does NOT re-open the
 Project, does NOT call `report.*` accessors, and does NOT write
 `scratch/<ts>_*.py` probes for metric extraction.
 
@@ -304,6 +320,53 @@ figure that is not a skore check plot, load `plot-ml-figure` if
 installed **before writing the cell**; never replace a skore
 check plot. Save PNG (or HTML) and leave the figure visible;
 never `plt.close` in the audit notebook.
+
+## G-AUDIT-FINDING
+
+After every successful `cells run`, derive exactly one normalized
+finding from the rendered digest. This is distinct from the
+headline metric and the persisted-report locator.
+
+1. Read `## Checks summary`. Select `issue` rows first, then `tip`
+   rows, preserving digest order within each severity.
+2. Format counts and every selected code with its severity:
+   `<I> issue(s), <T> tip(s) — <CODE> (issue), <CODE> (tip)`.
+3. When `## Metrics summary` exposes a headline metric, append one
+   short context clause copied from the digest. Do not turn that
+   metric into a finding or invent a performance judgment.
+4. No issue/tip rows →
+   `0 issues, 0 tips — automated checks surfaced no actionable finding`
+   plus optional copied metric context.
+5. Missing or errored digest →
+   `n/a — audit digest unavailable`. Do not fabricate codes,
+   counts, descriptions, or metrics.
+
+Return G-AUDIT-FINDING verbatim with the digest and
+G-REPORT-LOCATOR. `manage-ml-backlog` writes it to the design
+note's Status block. Recompute it after every added view, query,
+or plot because the digest is overwritten.
+
+## Continue auditing
+
+After the initial digest and every successful refresh, unless the
+user already said to close, **AskUserQuestion** with one pick in
+this exact order. None is recommended or preselected:
+
+| Label | Contract |
+|---|---|
+| Additional report view | Offer only task/report-compatible accessors confirmed by `python -m skore_skills api get` this turn. Omit unavailable views; never show disabled or remembered names. Ask one pick before editing. |
+| Custom query | Wait for one concrete read-only question about the loaded report. Append only the minimal accessor cells needed to answer it. |
+| Custom plot | Load `plot-ml-figure` only if `status.skills.plot-ml-figure` is true; else one-line skip and return to this gate. Append read-only plot cells and keep the figure as notebook output. |
+| Close audit | Continue to the existing dispatched or direct close. |
+
+Additional report view / Custom query / Custom plot all edit the
+same durable `audit/<stem>.py`. After an edit: run `style`, then
+`cells run` to overwrite `scratch/audit/<stem>/audit.md`, derive
+G-AUDIT-FINDING again, and re-present this same gate. Do not
+convert notebooks, build the site, run `git end-turn`,
+record-outcome, or return to the dispatcher while an additional
+step is active. The audit remains read-only: no `evaluate`, no
+`put`, and no workspace-data mutation.
 
 ## Execution contract — one command
 
@@ -320,11 +383,11 @@ created if missing). Details:
 
 If `policy.notebooks` is true and `export-ml-notebook` is
 installed, run `python -m skore_skills notebook convert
-audit/<stem>.py` after the digest, with `--html` when
+audit/<stem>.py` after **Close audit**, with `--html` when
 `policy.site` is also true. The audit has no page of its own: the
-site appends its viewer to the matching
-`journal/NN_<short_name>.md` page, after the experiment notebook,
-as the continuation of evaluate. Missing jupytext / nbclient →
+site places its viewer under the matching design note's
+`## Notebooks` section, after the evaluation notebook. Missing
+jupytext / nbclient →
 one-line skip naming `add-python-package`; do not fail the audit,
 do not `pixi add`.
 
@@ -375,21 +438,25 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 ## End of turn
 
 **Dispatched** (`model-ml-pipeline` or `manage-ml-backlog` this
-turn): return the digest, the persisted-report locator (or
+turn), after **Close audit**: return the digest, G-AUDIT-FINDING,
+the persisted-report locator (or
 `n/a — backend did not expose a locator`), and an optional
 headline to that caller. Stop. Do not run record-outcome,
 `notebook convert`, `site build`, `git end-turn`, or triage
 here — the caller owns that close. Do not paste the direct-audit
 close as a preview of what the dispatcher will run.
 
-**Direct free-text audit:** this skill owns the close. The
+**Direct free-text audit, after Close audit:** this skill owns the close. The
 digest's persisted-report locator **must** appear in the
 user-facing message (or `n/a — backend did not expose a locator`)
 before site build or `git end-turn`.
 
-Load `manage-ml-backlog` in **record-outcome mode** and hand it
-the digest, so the run reaches `journal/JOURNAL.md` History and
-the design-note Status block. That mode records and returns; it
+Load `manage-ml-backlog` in **record-outcome mode** only if
+`status.skills.manage-ml-backlog` is true and hand it
+the digest, G-AUDIT-FINDING, and locator, so the run reaches
+`journal/JOURNAL.md` History and
+the design-note Status block. Missing skill → one-line skip; do
+not write History from this skill. That mode records and returns; it
 does not re-dispatch this skill and does not open the next-lever
 menu. Never mark `done` while smoke is red. This runs **before**
 site build so the updated journal files are on disk when the site
@@ -404,8 +471,11 @@ error; do not fail the audit turn.
 Run `python -m skore_skills git end-turn --stage evaluate` — the
 audit continues the evaluate stage; there is no `audit` stage on
 that command. If JSON `action` is `invoke`, load `persist-ml-git`
-and stop; that skill returns to triage. Otherwise load
-`triage-ml-task`. Do not run `git commit` in this skill.
+only if `status.skills.persist-ml-git` is true and stop; that
+skill returns to triage. If persist is missing, name the pending
+`staged` paths and stop. Otherwise load `triage-ml-task` only if
+`status.skills.triage-ml-task` is true; else stop. Do not run
+`git commit` in this skill.
 
 ## Failure modes and recovery
 
@@ -447,7 +517,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |
 | `python -m skore_skills api get` | skore symbol lookups. Cache hits first |
 | `python -m skore_skills style` | ruff after writing/editing `audit/<stem>.py` |
-| `data-science-python-stack` | Catalogues `ipython` + `ipython` under the agent feature |
+| `choose-python-library` / `skore_skills/data/python-stack.json` | Agent tools (`ipython`, `ipykernel`) live under the agent feature |
 
 ## Templates and assets
 

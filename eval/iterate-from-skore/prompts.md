@@ -246,3 +246,44 @@ never calls `report.*` accessors.
   updated on disk this turn. A markdown table of backlog rows in
   the reply is conversation text, not a write — even if titled
   "to append" or if the user asked to skip the hand-off.
+
+---
+
+## CASE_07 — Custom check with empty documentation_url
+
+**User prompt:**
+> Mine the 05_wide_table audit digest. Here's
+> `scratch/audit/05_wide_table/audit.md`:
+>
+> ```
+> ## Checks summary
+>
+> | code    | severity | description                                              | documentation_url |
+> |---------|----------|----------------------------------------------------------|-------------------|
+> | SKD002  | passed   | No underfitting flagged                                  | https://docs.skore.probabl.ai/c/SKD002 |
+> | CSTM001 | tip      | High feature count. The dataset has 80 features.         |                   |
+>
+> ## Metrics summary
+>
+> | metric | value |
+> |--------|-------|
+> | RMSE   | 0.179 |
+> ```
+
+**Assumed workspace state:**
+- The digest above is on disk at
+  `scratch/audit/05_wide_table/audit.md`.
+- `JOURNAL.md` Backlog is empty.
+
+**Must do:**
+- Emit one Backlog candidate for `CSTM001` and none for the
+  `passed` row.
+- Cite `Source` as `audit:05_wide_table:checks.CSTM001`.
+- Draft `Item` from the digest title/message (high feature count
+  / 80 features). Do not require a WebFetch of an empty URL.
+
+**Must NOT do:**
+- Skip the custom check because `documentation_url` is empty.
+- Invent an SKD mitigation from memory instead of the digest
+  message.
+- Re-open the skore Project.

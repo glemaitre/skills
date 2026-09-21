@@ -476,6 +476,10 @@ def test_site_build_pairs_experiment_notebook(
     assert '<iframe src="01_x.nb.html"' in (docs / "01_x.md").read_text(
         encoding="utf-8"
     )
+    staged = (docs / "01_x.md").read_text(encoding="utf-8")
+    assert staged.count("## Notebooks") == 1
+    assert "### Evaluation notebook" in staged
+    assert "### Audit notebook" not in staged
     nav = (tmp_path / "_build" / "mkdocs.yml").read_text(encoding="utf-8")
     assert "01_x notebook" not in nav
 
@@ -506,7 +510,8 @@ def test_site_build_appends_audit_after_experiment_notebook(
     assert staged.index('<iframe src="01_x.nb.html"') < staged.index(
         '<iframe src="01_x.audit.nb.html"'
     )
-    assert "## Audit" in staged
+    assert staged.count("## Notebooks") == 1
+    assert staged.index("### Evaluation notebook") < staged.index("### Audit notebook")
     nav = (tmp_path / "_build" / "mkdocs.yml").read_text(encoding="utf-8")
     assert "01_x audit" not in nav
 
@@ -527,7 +532,8 @@ def test_site_build_without_audit_has_no_audit_section(
     assert result.exit_code == 0, result.output
     docs = tmp_path / "_build" / "docs"
     assert not (docs / "01_x.audit.nb.html").exists()
-    assert "## Audit" not in (docs / "01_x.md").read_text(encoding="utf-8")
+    staged = (docs / "01_x.md").read_text(encoding="utf-8")
+    assert "### Audit notebook" not in staged
 
 
 def test_site_build_audit_without_experiment_notebook(
@@ -547,7 +553,39 @@ def test_site_build_audit_without_experiment_notebook(
     docs = tmp_path / "_build" / "docs"
     staged = (docs / "01_x.md").read_text(encoding="utf-8")
     assert '<iframe src="01_x.audit.nb.html"' in staged
-    assert "## Notebook" not in staged
+    assert staged.count("## Notebooks") == 1
+    assert "### Evaluation notebook" not in staged
+    assert "### Audit notebook" in staged
+
+
+def test_inject_notebooks_reuses_authored_section_and_is_idempotent(
+    tmp_path: Path,
+) -> None:
+    """Authored notebook placeholders become one generated viewer section."""
+    experiment = tmp_path / "01_x.nb.html"
+    audit = tmp_path / "01_x.audit.nb.html"
+    experiment.write_text("<html>run</html>\n", encoding="utf-8")
+    audit.write_text("<html>audit</html>\n", encoding="utf-8")
+    page = site_mod.Page(
+        "01_x",
+        tmp_path / "01_x.md",
+        "01_x.md",
+        experiment,
+        "Experiments",
+        audit,
+    )
+    source = (
+        "# design\n\n## Notebooks\n\n### Evaluation notebook\n\n### Audit notebook\n"
+    )
+
+    once = site_mod.inject_notebook(source, page)
+    twice = site_mod.inject_notebook(once, page)
+
+    assert twice == once
+    assert once.count("## Notebooks") == 1
+    assert once.count("### Evaluation notebook") == 1
+    assert once.count("### Audit notebook") == 1
+    assert once.index("### Evaluation notebook") < once.index("### Audit notebook")
 
 
 def test_site_build_embeds_assets(

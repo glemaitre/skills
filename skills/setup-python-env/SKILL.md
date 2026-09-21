@@ -80,9 +80,12 @@ after listing the boxes.
 
 When dispatched by `setup-ml-project`, return to that caller after
 verification. Standalone, run
-`python -m skore_skills git end-turn --stage setup`; when action is
-`invoke`, load `persist-ml-git` and stop because it returns to
-triage. Otherwise load `triage-ml-task` when installed.
+`python -m skore_skills git end-turn --stage setup`. If JSON
+`action` is `invoke`, load `persist-ml-git` only if
+`status.skills.persist-ml-git` is true and stop; that skill
+returns to triage. If persist is missing, name the pending
+`staged` paths and stop. Otherwise load `triage-ml-task` only if
+`status.skills.triage-ml-task` is true; else stop.
 
 ## Three environments
 

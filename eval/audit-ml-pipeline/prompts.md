@@ -15,7 +15,10 @@
 - Confirm the report with `project.summarize()` and load it with
   `project.get(id)`.
 - Render checks and metrics into the audit digest.
-- Return the digest and normalized report locator to the caller.
+- Derive G-AUDIT-FINDING from the digest.
+- Ask Additional report view / Custom query / Custom plot / Close
+  audit in that order; return the digest, finding, and normalized
+  report locator only after Close audit.
 
 **Must NOT do:**
 - Call `skore.evaluate` or `project.put`.
@@ -56,11 +59,12 @@
 **Assumed workspace state:**
 - `model-ml-pipeline` dispatched the audit.
 - `cells run` already produced the digest.
+- The user picked Close audit at the post-audit gate.
 - Normalized locator is
   `local workspace: [reports/](../reports/) · id: local-report-id`.
 
 **Must do:**
-- Return the digest, locator, and optional headline to
+- Return the digest, G-AUDIT-FINDING, locator, and optional headline to
   `model-ml-pipeline`.
 - State that the dispatcher owns record-outcome, site, and git close.
 
@@ -89,3 +93,28 @@
 - Re-run `skore.evaluate` from audit.
 - Invent a report id, URL, metrics, or digest.
 - Mark the experiment done.
+
+---
+
+## CASE_05 — Additional audit work loops before close
+
+**User prompt:**
+> Add another audit view before we close.
+
+**Assumed workspace state:**
+- The initial audit digest exists.
+- The report API lookup confirms one task-compatible extra view.
+
+**Must do:**
+- Present Additional report view / Custom query / Custom plot /
+  Close audit in that exact order.
+- Confirm the selected accessor with `api get`, append it to the
+  same `audit/<stem>.py`, run style + cells run, and overwrite the
+  digest.
+- Recompute G-AUDIT-FINDING and present the same gate again.
+
+**Must NOT do:**
+- Guess an accessor or show unavailable disabled choices.
+- Convert notebooks, build the site, run git end-turn,
+  record-outcome, or return to the dispatcher before Close audit.
+- Call `evaluate` or `put`.

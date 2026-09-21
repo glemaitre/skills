@@ -69,9 +69,10 @@ report
 # ## Checks summary
 #
 # `report.checks.summarize().frame()` returns a DataFrame whose rows
-# each carry a `code` (e.g. `SKD003`), a `severity` (`passed` /
-# `issue` / `tip`), and a `documentation_url` — the linked page
-# describes what the check tests and what to try next.
+# each carry a `code` (e.g. `SKD003` or a custom `CSTM001`), a
+# `severity` (`passed` / `issue` / `tip`), and a
+# `documentation_url` — the linked page describes what the check
+# tests and what to try next. Custom checks may have an empty URL.
 #
 # Available on `EstimatorReport` and `CrossValidationReport` in
 # skore ≥ 0.18. Mute a noisy check via
@@ -102,8 +103,8 @@ report.checks.summarize().frame()
 report.metrics.summarize().frame()
 
 # %% [markdown]
-# ## End of audit
+# ## Core audit complete
 #
-# This file is the durable record of how the experiment's report was
-# reviewed; re-run it any time to refresh the checks and metrics
-# above.
+# Checks and metrics above are the deterministic first pass.
+# User-selected additional report views, queries, or plots are
+# appended below and remain read-only.

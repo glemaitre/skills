@@ -326,7 +326,7 @@ owns the design note and approval gate.
 - **`iterate-from-skore`** — the only sibling strategy; sources
   the next experiment by mining the previous skore report into
   the Backlog.
-- **`data-science-python-stack`** — consulted when an article
+- **`choose-python-library`** — consulted when an article
   introduces a new dependency (Stop conditions, above).
 - **`build-ml-pipeline`** / **`evaluate-ml-pipeline`** — owners
   of the files (`pipeline.py`, `experiments/NN_*.py`, …) that the

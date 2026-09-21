@@ -61,10 +61,11 @@ Install a smaller workflow pack by id when you do not need the full
 companion:
 
 ```bash
-skore skills install setup  # workspace, environment, stack, style
+skore skills install setup  # workspace, environment, git, export
 skore skills install data_analysis  # data exploration
-skore skills install model  # build, evaluate, test, smoke
-skore skills install loop   # triage, backlog, audit, sourcing
+skore skills install model  # build, evaluate, smoke, audit
+skore skills install loop   # triage, backlog, audit, sourcing, build, evaluate, smoke
+skore skills install export  # notebooks and documentation site
 ```
 
 `skore skills install ml-experimentation` remains the complete pack,
@@ -113,9 +114,11 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [triage-ml-task](skills/triage-ml-task/SKILL.md) | Own the canonical loop and ask one next-stage question. |
 | [setup-ml-project](skills/setup-ml-project/SKILL.md) | Coordinate workspace, environment, and git setup. |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
-| [setup-python-env](skills/setup-python-env/SKILL.md) | Configure dependencies, editable install, and Python code style. |
+| [setup-python-env](skills/setup-python-env/SKILL.md) | Detect the env manager, persist managed vs user-managed, and bootstrap agent tools. |
 | [setup-git](skills/setup-git/SKILL.md) | Initialize safe version control for an ML workspace. |
-| [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Coordinate build, evaluation, and smoke testing. |
+| [persist-ml-git](skills/persist-ml-git/SKILL.md) | Commit the current loop stage when git end-turn says invoke. |
+| [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Coordinate build (pytest smoke), evaluation, and audit. |
+| [export-ml-project](skills/export-ml-project/SKILL.md) | Coordinate executed notebooks and an offline MkDocs site. |
 | [choose-python-library](skills/choose-python-library/SKILL.md) | Resolve a library choice and add the selected dependency. |
 | [plot-ml-figure](skills/plot-ml-figure/SKILL.md) | Pick pandas, seaborn, plotly, or matplotlib before writing figure code. |
 
@@ -146,13 +149,10 @@ reinstall the setup pack.
 
 | Skill | Description |
 | --- | --- |
-| [setup-workspace](skills/setup-workspace/SKILL.md) | An organized workspace to keep track of experiments. |
-| [setup-python-env](skills/setup-python-env/SKILL.md) | Bootstrap the env manager and agent tools (ruff, ipython, ipykernel). |
 | [add-python-package](skills/add-python-package/SKILL.md) | Add a dependency, or ask the user when they manage the env. |
 | [choose-python-library](skills/choose-python-library/SKILL.md) | Select optional libraries without reopening fixed stack choices. |
 | [plot-ml-figure](skills/plot-ml-figure/SKILL.md) | Pick pandas, seaborn, plotly, or matplotlib before writing figure code. |
+| [export-ml-notebook](skills/export-ml-notebook/SKILL.md) | Convert a jupytext percent file into an executed notebook. |
+| [export-ml-site](skills/export-ml-site/SKILL.md) | Build an offline MkDocs documentation site from workspace markdown. |
 
-### API references
-
-| Skill | Description |
-| --- | --- |
+Canonical package policy lives in the CLI (`skore_skills/data/python-stack.json`); `choose-python-library` resolves competing libraries.

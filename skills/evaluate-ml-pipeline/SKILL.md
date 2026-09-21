@@ -8,8 +8,8 @@ description: >
   from scikit-learn's catalogue, how to consume the structural
   metadata (`groups`, `times`, …) attached at build time via
   `.skb.mark_as_X(split_kwargs=...)`. Stops at "what does the report
-  say". Defaults (metrics, plots) come from skore; only override on
-  explicit user request.
+  say". Defaults (metrics, plots, SKD checks) come from skore; only
+  override metrics or add custom checks on explicit user request.
 
   TRIGGER when: code calls `cross_val_score`, `cross_validate`,
   `classification_report`, or any handwritten metric print
@@ -66,23 +66,28 @@ read the report. The pipeline declaration is out of scope (see
   migrates. If the mode is **local** (just persisted or already
   recorded), `mkdir reports` (`exist_ok`); do not write
   `reports/README.md`. If **hub** or **mlflow**, do not create
-  `reports/`. Then load `add-python-package`, which runs
-  `python -m skore_skills env add-skore --mode <mode> --execute`.
-  That command selects conda-forge for pixi/conda and PyPI
-  requirements for other managers. Confirm the add; do not spell
-  `skore[...]` in this skill. See
+  `reports/`. Then load `add-python-package` only if
+  `status.skills.add-python-package` is true, which runs
+  `python -m skore_skills env add-skore --mode <mode> --execute`
+  (conda-forge for pixi/conda, PyPI for other managers). Confirm
+  the add; do not spell `skore[...]` in this skill. If that skill
+  is not installed, name Skore for the recorded mode and stop. Do
+  not invent that skill's steps. Do not run `env add` here. See
   `evaluate-ml-pipeline/references/g_skore_mode.md` and
   `add-python-package/references/skore_variant.md`.
   If mode is already recorded, do not re-ask.
 - **Missing dependency.** If `import skore` raises in this project's
   env, STOP. Fire G-SKORE-MODE first if `policy.skore_mode` is
-  unset, then **invoke `add-python-package`**. Surface the manager
+  unset, then load `add-python-package` only if
+  `status.skills.add-python-package` is true. If it is not
+  installed, name the package and stop. Surface the manager
   install line from that skill (or “install Skore with pixi/uv”),
   not the wrapper. Wait for confirmation if the env is unmanaged.
   **Do not drop back to `cross_val_score`, `cross_validate`,
   `classification_report`, or hand-rolled metric prints** — that
   silently rewrites this skill out of the project. See
-  `data-science-python-stack` § "Missing dependency".
+  `choose-python-library` / `skore_skills/data/python-stack.json`
+  for missing-dependency policy.
 - **Symbol from memory is forbidden.** Any new `skore` entry point
   or sklearn splitter signature must come from
   `python -m skore_skills api get <dotted>` or a matching cache
@@ -236,7 +241,8 @@ read the report. The pipeline declaration is out of scope (see
   mandates. The same override rule applies to every other
   mandatory `AskUserQuestion` in this stack —
   `add-python-package` § "Where does the package belong?",
-  `data-science-python-stack` § Tier 2 (pandas vs polars),
+  `choose-python-library` (pandas vs polars; policy in
+  `skore_skills/data/python-stack.json`),
   `manage-ml-backlog` (sourcing menu), `iterate-from-user`
   § "The entry-point AskUserQuestion". When in doubt: the user's
   approval is the gate, not the harness's instruction text.
@@ -250,7 +256,7 @@ tool call or an explicit decision documented in the response.
 ```
 Pre-flight (evaluate-ml-pipeline):
 - [ ] Tier 1 mandatory libs importable in this env: sklearn, skrub, skore
-      (per `data-science-python-stack` § "Tier 1")
+      (per `skore_skills/data/python-stack.json` stage libraries)
 - [ ] API confirmed for skore symbols (evaluate /
       report classes): <symbols>
       Evidence: python -m skore_skills api get <dotted>
@@ -469,6 +475,17 @@ API CLI is only for the signature after the name.
    report is a snapshot. Use named functions rather than lambdas so
    Project persistence keeps a callable scoring function.
 
+   On an explicit custom-check request, use
+   `references/custom-checks.md`. Subclass `skore.Check` at module
+   level in `experiments/NN_*.py`, then `report.checks.add(...)`
+   after `evaluate` (and after any requested `metrics.add`) and
+   **before** `project.put(...)`. Inspect with
+   `report.checks.summarize()`. `add` extends SKD checks; it does
+   not replace them. Do not invent checks. Do not register them
+   from `audit/` (no `put` there). Confirm `Check`,
+   `CheckNotApplicable`, and `checks.add` with
+   `python -m skore_skills api get`.
+
 5. **Custom splitter — only when sklearn doesn't have it.** Examples
    that justify one: purged-and-embargoed time-series CV (finance),
    blocked spatial CV. The contract is small: `split` +
@@ -488,9 +505,10 @@ API CLI is only for the signature after the name.
 5. Wire the splitter (see `references/metadata-routing.md`):
    Pattern A → `splitter=` on `evaluate`; Pattern B → DataOp
    `cv=` + `split_kwargs`, **omit** `splitter=`.
-6. Inspect the report; override metrics only on explicit user
-   request (`references/custom-metrics.md`).
-7. Register / compute requested custom metrics, then
+6. Inspect the report; override metrics or add custom checks only
+   on explicit user request (`references/custom-metrics.md`,
+   `references/custom-checks.md`).
+7. Register / compute requested custom metrics and checks, then
    `project.put(...)`. Never add them after persistence and assume
    the stored report changed.
 
@@ -498,8 +516,9 @@ API CLI is only for the signature after the name.
 
 - **`python -m skore_skills api get`** — every skore symbol used here. Mandatory before
   naming `evaluate`, `EstimatorReport`, `CrossValidationReport`,
-  `ComparisonReport`. Don't guess from memory. **Cache hits
-  first**: check `scratch/api/skore/<version>/` before
+  `ComparisonReport`, and — on a custom-check path — `Check`,
+  `CheckNotApplicable`, and `checks.add`. Don't guess from memory.
+  **Cache hits first**: check `scratch/api/skore/<version>/` before
   WebSearching for narrative pages; cache new findings back
   there (per `python -m skore_skills api get` Shape 0/3).
 - **`python -m skore_skills api get`** — every splitter used here. Mandatory before
@@ -567,10 +586,15 @@ When `model-ml-pipeline` dispatched this turn, return to it — the
 dispatcher owns record-outcome / convert / site / `git end-turn`.
 Otherwise this skill owns the close and runs the block below.
 
-If `audit-ml-pipeline` ran this turn, pass its digest into
-`manage-ml-backlog` **record-outcome mode**. Otherwise call that
-mode with the user's headline value, if any, so the run reaches
+If `audit-ml-pipeline` ran this turn, wait for its Close audit
+gate, then pass its digest and G-AUDIT-FINDING into
+`manage-ml-backlog` **record-outcome mode** only if
+`status.skills.manage-ml-backlog` is true. Otherwise call that
+mode with the user's headline value, if any, and
+G-AUDIT-FINDING=`n/a — audit not run`, so the run reaches
 `journal/JOURNAL.md` History and the design-note Status block.
+Missing `manage-ml-backlog` → one-line skip; do not write History
+from this skill.
 Without an audit digest, pass the user's headline value or skip in
 one line — do not invent a metric, and never mark `done` while
 smoke is red. This runs **before** convert and site build so the
@@ -583,14 +607,19 @@ experiments/<stem>.py`, with `--html` when `policy.site` is also
 true. Convert re-executes the script; say so when it is slow.
 Missing jupytext / nbclient / nbconvert → one-line skip naming
 `add-python-package`; do not fail the turn, do not `pixi add`.
+When the site is built, evaluation and audit viewers live under
+the matching design note's single `## Notebooks` section.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build`. Skip in one line otherwise.
 Name a build error; do not fail the evaluate turn.
 
 Run `python -m skore_skills git end-turn --stage evaluate`. If JSON
-`action` is `invoke`, load `persist-ml-git` and stop; that skill
-returns to triage. Otherwise load `triage-ml-task`. Do not run
+`action` is `invoke`, load `persist-ml-git` only if
+`status.skills.persist-ml-git` is true and stop; that skill
+returns to triage. If persist is missing, name the pending
+`staged` paths and stop. Otherwise load `triage-ml-task` only if
+`status.skills.triage-ml-task` is true; else stop. Do not run
 `git commit` in this skill.
 
 ## Need a package?
