@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "5555bd2b298fb1d9e312ecfa0da7593a0686a4186ff28b6712866ffd66816af3",
+  "catalog_hash": "696519c62cfa79e07e28c115856aaf3fe1c3dfb02d42e9b1f8767a984d34322d",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "1a3bbac86ab6d4325ed0d0801f48771c0a90b62ed4bae0f9a33c1a33b05294cb"
+      "hash": "f4482b4fcbdefa485a0205abdcc158e346ee73aa4ff6830a779c95f15809e217"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "fe6274d3c41967237f094dad4733d50d6c2689692adbc6d03653624eb8e0a3de"
+      "hash": "2537f54a75ac669e4fa7261ffccca9c350ad31acb9ef3310fe95690cd176a9bf"
     },
     {
       "id": "manage-ml-backlog",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "0f9c8b3fbb0a61831daaee1917813656712882e52ab1641da2bbdbde107257bf"
+      "hash": "52909b12af066174c7a15a922c5276d9d4037e7b55b188ee2388a5180035e05d"
     },
     {
       "id": "iterate-from-skore",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "a0c96a9cbaec285876d564f1e29b4beeb861bf538495cceecaab277bf9c58d68"
+      "hash": "a4fdb91672869a7b2aec383b864516b5b1b2ddaa0de0674499f78b3a9c3b8813"
     },
     {
       "id": "choose-python-library",

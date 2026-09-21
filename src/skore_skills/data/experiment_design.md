@@ -80,4 +80,5 @@ run (to interpret the headline result honestly).
   -->
 - **Approved by user on:** <date or n/a>
 - **Headline result:** <fill in after run, or `n/a — abandoned: <reason>`>
+- **Persisted report:** <backend locator after `project.put`, or `n/a — not persisted`>
 - **Implication for next iteration:** <fill in after run — what it suggests to try next. For abandonment: one line on what the abandonment teaches (e.g., "rules out monotonic-NN direction without paid GPU env")>

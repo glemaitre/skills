@@ -54,6 +54,7 @@ def test_scaffold_tree_and_no_placeholders(
     assert "Workspace decisions" not in journal
     assert "| Project / dataset |" in journal
     assert "| Variable | Value |" in journal
+    assert "| Headline result | Report | Design note |" in journal
     assert "[tool.ruff]" in pyproject
     assert '"data_analysis/**"' in pyproject
     assert 'name = "demo-pkg"' in pyproject
@@ -181,8 +182,12 @@ def test_scaffold_journal_index_and_design(
     assert result.exit_code == 0, result.output
     journal = tmp_path / "journal" / "JOURNAL.md"
     design = tmp_path / "journal" / "02_target_transform.md"
-    assert "## History" in journal.read_text(encoding="utf-8")
-    assert design.read_text(encoding="utf-8").startswith("# 02_target_transform\n")
+    journal_text = journal.read_text(encoding="utf-8")
+    design_text = design.read_text(encoding="utf-8")
+    assert "## History" in journal_text
+    assert "| Headline result | Report | Design note |" in journal_text
+    assert design_text.startswith("# 02_target_transform\n")
+    assert "- **Persisted report:**" in design_text
 
 
 def test_scaffold_journal_preserves_index_and_refuses_existing_design(

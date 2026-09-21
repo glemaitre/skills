@@ -1,11 +1,12 @@
 # Audit ML Pipeline — Cell anatomy
 
 Full anatomy of an audit-file cell: concrete right/wrong examples,
-the 7-cell template sequence, and why `.frame()` matters.
+the 8-cell template sequence, and why `.frame()` matters.
 Cross-referenced from SKILL.md § "Audit file contract — overview".
 
-The template is deliberately narrow: checks summary + metrics
-summary. The rendered digest at `scratch/audit/<stem>/audit.md`
+The template is deliberately narrow: persisted-report locator +
+checks summary + metrics summary. The rendered digest at
+`scratch/audit/<stem>/audit.md`
 is what `iterate-from-skore` reads to populate the JOURNAL
 Backlog — each row in the checks summary carries a
 `documentation_url` that drives an actionable mitigation. Do not
@@ -71,9 +72,9 @@ project.put("01_baseline", report)           # ← duplicates the row; pollutes 
   no error** — they execute silently. This is the right shape for
   setup cells (imports, `REPORT_ID = …`, etc.).
 
-## The 7-cell template sequence
+## The 8-cell template sequence
 
-The template ships with this cell sequence. All seven cells are
+The template ships with this cell sequence. All eight cells are
 task-agnostic. Leave them as-is unless a specific experiment's
 user asks for a deeper accessor.
 
@@ -105,20 +106,21 @@ user asks for a deeper accessor.
    Set `REPORT_ID` to the id of this experiment's report, then load
    it. The id comes from different sources per skore mode:
 
-   - **Hub mode**: `project.put()` prints a URL of the form
-     `https://skore.probabl.ai/<workspace>/<project>/<type-plural>/<N>`.
-     The id is `skore:report:<type-singular>:<N>` — the URL path
-     segment is the plural; the id uses the singular (drop the trailing
-     `s`). Examples: `cross-validations/42` →
+   - **Hub mode**: `project.put()` prints the exact frontend URL.
+     Preserve it as the report locator. The id is
+     `skore:report:<type-singular>:<N>` — the URL path segment is
+     plural; the id uses the singular. Examples:
+     `cross-validations/42` →
      `skore:report:cross-validation:42`; `estimators/7` →
      `skore:report:estimator:7`. Copy `<N>` and `<type-singular>` from
      the put() stdout; hardcode as `REPORT_ID`; no `summarize()` needed.
    - **Local mode**: read `summary["id"]` from the `summarize()` cell
      above, filtering to the row where `key == "<NN>_<short_name>"`.
    - **MLflow mode**: same as local — read `summary["id"]` from the
-     `summarize()` cell above, filtering to the row where
-     `key == "<NN>_<short_name>"`. (No URL is printed at `put()`;
-     the report lives as a run under the MLflow experiment.)
+     `summarize()` cell above, filtering to the newest row where
+     `key == "<NN>_<short_name>"`. Preserve an emitted MLflow run URL
+     when available; otherwise use the tracking URI + experiment id
+     + run id locator contract.
 
    ```python
    REPORT_ID = "skore:report:<type-singular>:<N>"  # hub: from put() URL
@@ -132,7 +134,15 @@ user asks for a deeper accessor.
    `checks` / `metrics` accessor API used by the next two cells,
    so the audit body is identical for both.
 
-6. **Checks summary (code cell, bare expression).**
+6. **Persisted report (markdown cell).**
+
+   Substitute `<REPORT_LOCATOR>` with evaluate's normalized
+   Markdown value. A direct audit derives it from the selected id
+   and backend contract: local workspace link, exact Hub put URL,
+   or MLflow run/tracking locator. Missing authoritative data is
+   `n/a — backend did not expose a locator`; never guess.
+
+7. **Checks summary (code cell, bare expression).**
    ```python
    report.checks.summarize().frame()
    ```
@@ -143,7 +153,7 @@ user asks for a deeper accessor.
    Verified on `CrossValidationReport` and `EstimatorReport` in
    skore ≥ 0.18.
 
-7. **Metrics summary (code cell, bare expression).**
+8. **Metrics summary (code cell, bare expression).**
    ```python
    report.metrics.summarize().frame()
    ```

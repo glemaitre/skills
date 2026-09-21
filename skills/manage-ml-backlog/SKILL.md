@@ -50,8 +50,9 @@ Run Procedure steps 1-3 and nothing else:
 2. Step 2 — read `journal/JOURNAL.md`; scaffold the index if it is
    missing.
 3. Step 3 — update the matching History row and the design-note
-   Status block from the digest. Also refresh the `JOURNAL.md`
-   Status rows `Last experiment` and `Last result`.
+   Status block from the digest, including its normalized persisted
+   report locator. Also refresh the `JOURNAL.md` Status rows `Last
+   experiment` and `Last result`.
 
 Then return to the caller. Skip step 4 (Backlog rescan) and step 5
 (the next-lever triage menu) — the caller did not ask what to try
@@ -64,7 +65,10 @@ this skill's End of turn either: the caller owns convert / site /
 
 The Procedure guards still bind. Never mark `done` while smoke is
 red, and never invent a metric — no digest and no user-supplied
-value means a one-line skip, not a guess.
+value means a one-line skip, not a guess. Never construct a missing
+backend URL. Record `n/a — backend did not expose a locator` in
+both markdown destinations when the digest has no authoritative
+locator.
 
 ## Procedure
 
@@ -76,13 +80,19 @@ value means a one-line skip, not a guess.
    Status, Data understanding, History, and Backlog. If that
    command cannot run this turn, name it and stop. After the file
    exists, edit the existing History and Backlog tables (columns:
-   Stem, Intent, Status, Headline result, Design note; and #,
-   Item, Source). Stable `B<N>` indices. Do not renumber on
-   removal.
+   Stem, Intent, Status, Headline result, Report, Design note; and
+   #, Item, Source). A planned History row uses `n/a` in Report.
+   Stable `B<N>` indices. Do not renumber on removal.
 3. If recording a run: copy the headline metric from the audit
    digest or the user's value. Do not invent numbers. Update the
    matching History row (`planned` → `done` only if smoke passed).
-   Update the design-note Status block the same way.
+   Copy the digest's persisted-report locator into the History
+   `Report` cell and the design note's `Persisted report` Status
+   line. Preserve the normalized Markdown value byte-for-byte. If
+   the digest has none, write
+   `n/a — backend did not expose a locator` in both places; do not
+   derive or guess a URL. Update the rest of the design-note Status
+   block the same way.
 4. Scan Backlog. Resolve rows the run answered or killed. Add at
    most a few next-lever options (`skore:<stem>`, `user`,
    `my-pick:<stem>`).

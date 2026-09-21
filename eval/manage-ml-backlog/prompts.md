@@ -124,6 +124,8 @@
 
 **Assumed workspace state:**
 - Audit digest for `01_baseline` exists with a headline ROC-AUC.
+- The digest contains `[Open report](https://hub.example/report/42)
+  · hub · id: skore:report:cross-validation:42`.
 - Smoke tests passed.
 - History row for `01_baseline` is `planned`.
 - Backlog has rows `B1` and `B2`.
@@ -132,7 +134,10 @@
 - Name `python -m skore_skills status`.
 - Flip the `01_baseline` History row to `done` and copy the
   headline result from the digest.
-- Update the design-note Status block for `01_baseline`.
+- Copy the locator byte-for-byte into the History `Report` cell
+  and design-note `Persisted report` Status line.
+- Update the rest of the design-note Status block for
+  `01_baseline`.
 - Refresh the `JOURNAL.md` Status rows `Last experiment` and
   `Last result`.
 - Return to the caller after recording.
@@ -143,6 +148,7 @@
 - Dispatch `audit-ml-pipeline`.
 - Run `site build` or `git end-turn --stage backlog` — the caller
   owns the close.
+- Reconstruct or normalize the supplied Hub URL.
 
 ---
 
@@ -165,3 +171,24 @@
 - Invent or estimate a metric.
 - Mark the row `done` without a result.
 - Ask the next-lever triage question.
+
+---
+
+## CASE_08 — Missing backend locator is explicit
+
+**User prompt:**
+> (record-outcome mode with a valid headline but no persisted
+> report locator in the digest)
+
+**Assumed workspace state:**
+- Smoke passed and the digest has a headline metric.
+- The backend did not emit a URL or locator.
+
+**Must do:**
+- Record `n/a — backend did not expose a locator` in both the
+  History `Report` cell and design-note `Persisted report` line.
+- Continue recording the valid headline result.
+
+**Must NOT do:**
+- Guess a Hub, MLflow, or local artifact URL.
+- Omit the Report cell from the History row.

@@ -242,6 +242,7 @@ Template: `templates/audit.py`.
 | `<SKORE_PROJECT_INIT>` | The full Project init block (including any preceding `skore.login(...)` call for hub mode), copied **byte-identical** from `experiments/<stem>.py` |
 | `<project-name>` | The `name=` argument from `experiments/<stem>.py` (read it; don't invent) |
 | `<hub-workspace>` | Hub-mode only. Copy from the `workspace=` argument in `experiments/<stem>.py` |
+| `<REPORT_LOCATOR>` | The normalized post-put locator handed off by evaluate. If absent, derive it from the selected id and backend rules below; never guess a URL |
 
 `<SKORE_PROJECT_INIT>` and `<project-name>` are the most error-prone
 substitutions: the audit must open the same Project the experiment
@@ -266,10 +267,18 @@ Brief outline; full anatomy with concrete examples →
    → `cross-validation`, `estimators` → `estimator`; local **and
    mlflow**: read `summary["id"]` for the matching key row), then
    `report = project.get(REPORT_ID)`; then `report`.
-6. **Checks summary** — `report.checks.summarize().frame()`. Each row
+6. **Persisted report** — substitute the exact normalized locator
+   from evaluate. For a direct audit, use the selected `REPORT_ID`
+   and `policy.skore_mode`: local links `../reports/`; Hub uses the
+   exact saved `put` URL (or a clearly labeled project link);
+   MLflow uses an emitted run URL or records tracking URI +
+   experiment id + run id. If no authoritative locator exists,
+   write `n/a — backend did not expose a locator`. Do not call
+   `put`, inspect private storage, or invent a frontend URL.
+7. **Checks summary** — `report.checks.summarize().frame()`. Each row
    carries `documentation_url` — the actionable mitigation for an
    `issue` / `tip` lives at that link.
-7. **Metrics summary** — `report.metrics.summarize().frame()`.
+8. **Metrics summary** — `report.metrics.summarize().frame()`.
 
 That's the whole template. `.frame()` is load-bearing on cells 6
 and 7 — without it the digest shows `<…Display object at 0x…>`.
@@ -285,8 +294,9 @@ walks the checks + metrics sections, and follows each check's
 Project, does NOT call `report.*` accessors, and does NOT write
 `scratch/<ts>_*.py` probes for metric extraction.
 
-The contract is deliberately narrow: checks (with their doc URLs)
-+ metrics summary. Do not extend the template with per-task
+The contract is deliberately narrow: persisted-report locator +
+checks (with their doc URLs) + metrics summary. Do not extend the
+template with per-task
 accessors (residuals, confusion matrices, feature importances,
 calibration plots, …) unless the user asks for one explicitly —
 the actionable mitigations come from the check pages, not from
@@ -369,6 +379,10 @@ When `model-ml-pipeline` or `manage-ml-backlog` dispatched this
 turn, return to that caller — it owns record-outcome / convert /
 site / `git end-turn`. On a direct free-text audit this skill owns
 the close and runs the block below.
+
+The digest's persisted-report locator **must** appear in the
+user-facing message (or `n/a — backend did not expose a locator`)
+before site build or `git end-turn`.
 
 Load `manage-ml-backlog` in **record-outcome mode** and hand it
 the digest, so the run reaches `journal/JOURNAL.md` History and

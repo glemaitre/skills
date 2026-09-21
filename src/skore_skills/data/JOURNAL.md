@@ -38,9 +38,9 @@ One row per experiment, in chronological order. Newest at the bottom.
 Status values: planned | approved | running | done | abandoned.
 -->
 
-| Stem | Intent (one line) | Status | Headline result | Design note |
-|---|---|---|---|---|
-| <!-- e.g. `01_baseline` --> | <!-- "tabular_pipeline on raw features" --> | <!-- done --> | <!-- "ROC-AUC 0.86 ± 0.01" --> | <!-- [design note](01_baseline.md) --> |
+| Stem | Intent (one line) | Status | Headline result | Report | Design note |
+|---|---|---|---|---|---|
+| <!-- e.g. `01_baseline` --> | <!-- "tabular_pipeline on raw features" --> | <!-- done --> | <!-- "ROC-AUC 0.86 ± 0.01" --> | <!-- [Open report](URL) · backend · id: ID; `n/a` while planned --> | <!-- [design note](01_baseline.md) --> |
 
 ## Backlog
 

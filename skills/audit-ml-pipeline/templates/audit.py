@@ -38,9 +38,7 @@ summary
 # %% [markdown]
 # ## Load the report
 #
-# **Hub mode** — `project.put()` prints a URL of the form:
-#
-#   `https://skore.probabl.ai/<hub-workspace>/<project>/<type-plural>/<N>`
+# **Hub mode** — `project.put()` prints the exact frontend URL.
 #
 # The report id is `skore:report:<type-singular>:<N>`.  The URL path
 # segment is the plural; the id uses the singular (drop the trailing
@@ -52,16 +50,20 @@ summary
 # Copy `<N>` and `<type-singular>` from the experiment's stdout and
 # set `REPORT_ID` below — no `summarize()` traversal needed.
 #
-# **Local mode** — `project.put()` does not print a URL.  Read the
-# `"id"` column value from the `summary` DataFrame above for the row
-# whose `"key"` matches this experiment's stem, and set `REPORT_ID` to
-# that value.
+# **Local and MLflow modes** — read the `"id"` column value from the
+# `summary` DataFrame above for the newest row whose `"key"` matches
+# this experiment's stem, and set `REPORT_ID` to that value.
 
 # %%
-REPORT_ID = "skore:report:<type-singular>:<N>"  # hub: from put() URL (plural→singular, e.g. cross-validations→cross-validation, estimators→estimator); local: from summary["id"]
+REPORT_ID = "skore:report:<type-singular>:<N>"  # hub: from put() URL (plural→singular); local/mlflow: newest matching summary["id"]
 
 report = project.get(REPORT_ID)
 report
+
+# %% [markdown]
+# ## Persisted report
+#
+# <REPORT_LOCATOR>
 
 # %% [markdown]
 # ## Checks summary

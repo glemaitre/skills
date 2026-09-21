@@ -184,6 +184,25 @@ names and MLflow tracking URIs live in the experiment's
 `<SKORE_PROJECT_INIT>` block, not in JOURNAL. On later sessions,
 read `status.policy.skore_mode` and skip re-asking.
 
+## Post-put report locator
+
+`Project.put(key, report)` returns `None` in every mode. After it
+succeeds, preserve stdout and use the newest matching-key row from
+`project.summarize().frame()` as the source of the report id. Store
+one normalized Markdown locator in the design note and JOURNAL:
+
+| Mode | Locator |
+|---|---|
+| local | `local workspace: [reports/](../reports/) · id: <id>`; the user-facing message also gives the resolved absolute `reports/` path |
+| hub | Exact `Consult your report at …` URL printed by `put`, plus the id. If older Skore prints no report URL, link the Hub project landing page and label it as a project link |
+| mlflow | Exact emitted `View run …` URL when available; otherwise the standard run URL only for HTTP(S) tracking. Non-HTTP or nonstandard tracking records URI + experiment id + run id as text |
+
+Do not synthesize Hub report URLs: the frontend URL is backend
+owned. Do not link local serialized report files: their layout is
+private. Do not turn `file:`, `sqlite:`, or `databricks` tracking
+URIs into guessed browser URLs. A missing locator is
+`n/a — backend did not expose a locator`, never an invented URL.
+
 ## Switching mid-project
 
 See the SKILL.md Stop condition "Switching skore mode mid-project

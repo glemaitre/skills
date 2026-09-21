@@ -312,8 +312,11 @@ violated.
 - `export-ml-notebook` and `export-ml-site` are installed.
 
 **Must do:**
+- Include the G-REPORT-LOCATOR value (or
+  `n/a — backend did not expose a locator`) in the user-facing
+  close before convert.
 - Load `manage-ml-backlog` in record-outcome mode before the
-  convert, since no audit ran this turn.
+  convert, since no audit ran this turn, and hand it the locator.
 - Name `python -m skore_skills notebook convert
   experiments/01_baseline.py --html` after the evaluation.
 - Name `python -m skore_skills site build` after the convert.
@@ -321,6 +324,8 @@ violated.
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
+- Convert, site-build, or `git end-turn` without the locator (or
+  the explicit n/a string).
 - End the turn without convert or site build while both gates are
   true.
 - Run `site build` before the journal is recorded.
@@ -340,11 +345,89 @@ violated.
 - `policy.notebooks` and `policy.site` are both true.
 
 **Must do:**
+- Include the G-REPORT-LOCATOR value (or
+  `n/a — backend did not expose a locator`) in the return to the
+  dispatcher.
 - Return to `model-ml-pipeline` after the evaluation.
 - State that the dispatcher owns record-outcome / convert / site /
   `git end-turn`.
 
 **Must NOT do:**
+- Drop the locator because the dispatcher owns convert.
 - Run `notebook convert`, `site build`, or `git end-turn` here.
 - Load `manage-ml-backlog` here.
 - Load `triage-ml-task` directly.
+
+---
+
+## CASE_13 — Local put records workspace locator
+
+**User prompt:**
+> Evaluate and save 01_baseline locally.
+
+**Assumed workspace state:**
+- Smoke is green and `policy.skore_mode` is `local`.
+- `project.put("01_baseline", report)` succeeds.
+- The newest matching summary row has id `local-report-id`.
+
+**Must do:**
+- Read `project.summarize().frame()` after the successful put and
+  select the newest matching-key row.
+- Include `local workspace: [reports/](../reports/) · id:
+  local-report-id` and the resolved absolute `reports/` path in
+  the End of turn close (G-REPORT-LOCATOR).
+- Pass that locator to audit / record-outcome.
+
+**Must NOT do:**
+- Treat the return from `put` as the report id.
+- Link an internal serialized report file.
+- Announce a locator before `put` succeeds.
+- Convert, site-build, or `git end-turn` without the locator.
+
+---
+
+## CASE_14 — Hub put preserves its exact report URL
+
+**User prompt:**
+> Evaluate and upload 02_encoder to Skore Hub.
+
+**Assumed workspace state:**
+- Smoke is green and `policy.skore_mode` is `hub`.
+- Successful `put` stdout contains
+  `Consult your report at https://hub.example/direct-report`.
+- The matching report id is
+  `skore:report:cross-validation:42`.
+
+**Must do:**
+- Preserve the exact stdout URL.
+- Include `[Open report](https://hub.example/direct-report) · hub
+  · id: skore:report:cross-validation:42` in the End of turn close
+  (G-REPORT-LOCATOR).
+- Pass that exact Markdown locator downstream.
+
+**Must NOT do:**
+- Construct a Hub report URL from workspace/project/type.
+- Drop the report id.
+- Convert, site-build, or `git end-turn` without the locator.
+
+---
+
+## CASE_15 — MLflow non-HTTP locator is not a browser URL
+
+**User prompt:**
+> Evaluate 03_features into our file-backed MLflow project.
+
+**Assumed workspace state:**
+- Smoke is green and `policy.skore_mode` is `mlflow`.
+- `tracking_uri` is `file:./mlruns`; put emits no run URL.
+- Summary identifies experiment `7` and run `abc123`.
+
+**Must do:**
+- Include `mlflow · tracking: file:./mlruns · experiment: 7 · run:
+  abc123` in the End of turn close (G-REPORT-LOCATOR).
+- Pass that locator downstream.
+
+**Must NOT do:**
+- Invent an HTTP URL for the file store.
+- Treat `file:./mlruns` as a clickable run page.
+- Convert, site-build, or `git end-turn` without the locator.

@@ -145,8 +145,10 @@ fail the turn.
 
 After **Evaluate** (and audit if it ran), implement-loop step 4
 (record-outcome) runs first, so the journal files are on disk
-before anything is staged. Then the same convert/site rules
-apply. `audit-ml-pipeline` converts `audit/<stem>.py` itself; do
+before anything is staged. The user-facing close **must** include
+the G-REPORT-LOCATOR value evaluate passed up (or
+`n/a — backend did not expose a locator`). Then the same
+convert/site rules apply. `audit-ml-pipeline` converts `audit/<stem>.py` itself; do
 not convert it again here. The site appends that viewer to the
 experiment page as the continuation of evaluate.
 

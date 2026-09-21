@@ -174,6 +174,30 @@ read the report. The pipeline declaration is out of scope (see
   by `key`". Never substitute by re-running `evaluate` + `put`.
   See `python -m skore_skills api get` § "Lookup failure ≠ artifact missing" for the
   general registry-lookup discipline.
+- **Record a backend locator after every successful `put`.**
+  `Project.put(...)` returns `None`; never treat its return value as
+  an id or URL. Preserve its stdout, then read
+  `project.summarize().frame()`, select the matching key, and take
+  the newest row by `date`. The selected report id and the recorded
+  `policy.skore_mode` produce one normalized Markdown value:
+  - local — `local workspace: [reports/](../reports/) · id: <id>`;
+    also surface the resolved absolute `reports/` path to the user.
+    Do not link a private serialized artifact.
+  - hub — use the exact `Consult your report at …` URL emitted by
+    `put`: `[Open report](<url>) · hub · id: <id>`. Do not construct
+    a report URL from frontend path conventions. If the installed
+    Skore emits no URL, use the Hub project landing page and label
+    it `Open project`, not `Open report`.
+  - mlflow — use an exact emitted `View run …` URL when present. If
+    absent and `tracking_uri` is HTTP(S), use the standard
+    `/#/experiments/<experiment-id>/runs/<run-id>` URL after
+    resolving the experiment id. For `file:`, `sqlite:`,
+    `databricks`, or any nonstandard URI without an emitted URL,
+    record `mlflow · tracking: <uri> · experiment: <id> · run:
+    <run-id>` without inventing a browser link.
+  Never announce or write a locator before `put` succeeds. Include
+  it in the user-facing evaluation result and hand the same value
+  to `audit-ml-pipeline` / `manage-ml-backlog` record-outcome.
 - **The time-ordered splitter AskUserQuestion is non-skippable,
   even under harness-level "no clarifying questions"
   instructions.** When the data is temporal, the four-option
@@ -212,6 +236,8 @@ Pre-flight (evaluate-ml-pipeline):
       `experiments/NN_*.py`".
       Evidence: Write experiments/<NN>_<name>.py (this turn) |
                 "the call already lives in an existing experiments/ file"
+- [ ] Post-put locator source: <local summary | exact Hub stdout |
+      exact MLflow stdout | MLflow summary + HTTP tracking URI>
 - [ ] API confirmed for sklearn splitter: <name>
       Evidence: python -m skore_skills api get <dotted>
                 | Read scratch/api/sklearn/<version>/cv_splitters.md
@@ -470,6 +496,17 @@ API CLI is only for the signature after the name.
   summary.
 
 ## End of turn
+
+**G-REPORT-LOCATOR.** After a successful `put`, this step is
+mandatory and runs first — before returning to the dispatcher,
+record-outcome, convert, site build, or `git end-turn`. Include the
+normalized locator in the user-facing result (local: also the
+resolved absolute `reports/` path). Missing locator is the explicit
+string `n/a — backend did not expose a locator`, never silence.
+Hand the same value to `audit-ml-pipeline` / `manage-ml-backlog`
+record-outcome. When returning to `model-ml-pipeline`, pass it up;
+do not drop it because the dispatcher owns convert. Do not invent a
+URL here — the after-`put` rule above is the only source.
 
 When `model-ml-pipeline` dispatched this turn, return to it — the
 dispatcher owns record-outcome / convert / site / `git end-turn`.
