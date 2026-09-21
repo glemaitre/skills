@@ -10,7 +10,7 @@ platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
 # The maintenance scripts in tools/ only need the standard library;
 # pin a recent Python so behaviour is consistent across contributors
 # and CI.
-python = ">=3.11,<3.14"
+python = ">=3.11,<3.15"
 
 [pypi-dependencies]
 skore-skills = { path = ".", editable = true }
@@ -89,7 +89,7 @@ matplotlib = "*"
 scikit-learn = "*"
 skrub = "==0.10.1"
 cloudpickle = "*"
-joblib = "<1.5"
+joblib = ">=1.5"
 ruff = "*"
 pandas = "*"
 
@@ -114,9 +114,13 @@ python = "3.12.*"
 [feature.py313.dependencies]
 python = "3.13.*"
 
+[feature.py314.dependencies]
+python = "3.14.*"
+
 [environments]
 eval = { features = ["eval"] }
 lint = { features = ["lint"] }
 test-py311 = { features = ["test", "py311"] }
 test-py312 = { features = ["test", "py312"] }
 test-py313 = { features = ["test", "py313"] }
+test-py314 = { features = ["test", "py314"] }
