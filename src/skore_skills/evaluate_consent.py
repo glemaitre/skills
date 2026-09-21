@@ -40,9 +40,7 @@ def _is_real_locator(value: str) -> bool:
     lowered = text.lower()
     if lowered == "n/a" or lowered.startswith("n/a"):
         return False
-    if text.startswith("<") and text.endswith(">"):
-        return False
-    return True
+    return not (text.startswith("<") and text.endswith(">"))
 
 
 def _history_report(root: Path, stem: str) -> str:

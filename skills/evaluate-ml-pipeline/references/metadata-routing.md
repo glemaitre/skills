@@ -9,6 +9,10 @@ in `evaluate-ml-pipeline` rule 3). These patterns only say **where
 that object is passed**. Confirm signatures with
 `python -m skore_skills api get`.
 
+This document routes cross-validation metadata only. Custom metric
+kwargs such as `sample_weight` follow
+`references/custom-metrics.md`; never put them in `split_kwargs`.
+
 skrub `mark_as_X`:
 https://skrub-data.org/stable/reference/generated/skrub.DataOp.skb.mark_as_X.html
 

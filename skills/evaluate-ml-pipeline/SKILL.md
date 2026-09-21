@@ -450,8 +450,24 @@ API CLI is only for the signature after the name.
    automatically (regression: MSE/RMSE/MAE/R²; binary: accuracy,
    precision, recall, F1, ROC-AUC; multiclass: macro/micro variants;
    multilabel: per-label + averages). Override only when the user
-   says so — e.g., "use RMSE", "report ROC-AUC". Don't pre-emptively
-   pin metrics or pass a `scoring=...` argument unless asked.
+   says so — e.g., "use RMSE", "report ROC-AUC". Do not pass a
+   `scoring=...` argument to `skore.evaluate`; it has no such
+   parameter.
+
+   On an explicit custom-metric request, use
+   `references/custom-metrics.md`:
+
+   - sklearn-style report metric → `skore.evaluate`, then
+     `report.metrics.add(...)`, inspect with `metrics.summarize`;
+   - `SkrubLearner` metric with DataOp-derived kwargs such as
+     `sample_weight` → return to `build-ml-pipeline` to attach
+     `.skb.with_scoring(...)` on the prediction node, then inspect
+     with `report.metrics.score()`.
+
+   Metric kwargs are not CV `split_kwargs`. Register and compute
+   every requested metric **before** `project.put(...)`; the stored
+   report is a snapshot. Use named functions rather than lambdas so
+   Project persistence keeps a callable scoring function.
 
 5. **Custom splitter — only when sklearn doesn't have it.** Examples
    that justify one: purged-and-embargoed time-series CV (finance),
@@ -473,7 +489,10 @@ API CLI is only for the signature after the name.
    Pattern A → `splitter=` on `evaluate`; Pattern B → DataOp
    `cv=` + `split_kwargs`, **omit** `splitter=`.
 6. Inspect the report; override metrics only on explicit user
-   request.
+   request (`references/custom-metrics.md`).
+7. Register / compute requested custom metrics, then
+   `project.put(...)`. Never add them after persistence and assume
+   the stored report changed.
 
 ## Companion skills
 

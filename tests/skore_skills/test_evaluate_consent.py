@@ -27,15 +27,15 @@ def test_first_eval_asks_when_report_is_placeholder(tmp_path: Path) -> None:
     _write(
         tmp_path / "journal" / "JOURNAL.md",
         "## History\n\n"
-        "| Stem | Intent (one line) | Status | Headline result | Report | Design note |\n"
+        "| Stem | Intent (one line) | Status | Headline result | "
+        "Report | Design note |\n"
         "|---|---|---|---|---|---|\n"
         f"| `{stem}` | try a new model | planned | n/a | n/a | "
         f"[design](./{stem}.md) |\n",
     )
     _write(
         tmp_path / "journal" / f"{stem}.md",
-        "## Status\n\n"
-        "- **Persisted report:** n/a — not persisted\n",
+        "## Status\n\n- **Persisted report:** n/a — not persisted\n",
     )
 
     payload = evaluate_consent(tmp_path, stem)
@@ -54,7 +54,8 @@ def test_history_locator_is_proceed(tmp_path: Path) -> None:
     _write(
         tmp_path / "journal" / "JOURNAL.md",
         "## History\n\n"
-        "| Stem | Intent (one line) | Status | Headline result | Report | Design note |\n"
+        "| Stem | Intent (one line) | Status | Headline result | "
+        "Report | Design note |\n"
         "|---|---|---|---|---|---|\n"
         f"| `{stem}` | try a new model | done | 0.81 | "
         "[Open report](https://hub.example/report/42) | "
@@ -92,7 +93,8 @@ def test_missing_smoke_is_stop_even_with_locator(tmp_path: Path) -> None:
     _write(
         tmp_path / "journal" / "JOURNAL.md",
         "## History\n\n"
-        "| Stem | Intent (one line) | Status | Headline result | Report | Design note |\n"
+        "| Stem | Intent (one line) | Status | Headline result | "
+        "Report | Design note |\n"
         "|---|---|---|---|---|---|\n"
         f"| `{stem}` | try a new model | done | 0.81 | "
         "[Open report](https://hub.example/report/42) | note |\n",

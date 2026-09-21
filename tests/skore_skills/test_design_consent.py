@@ -20,9 +20,7 @@ def _write(path: Path, text: str = "") -> None:
 def _note(root: Path, stem: str, state: str) -> None:
     _write(
         root / "journal" / f"{stem}.md",
-        "## Status\n\n"
-        f"- **State:** {state}\n"
-        "- **Approved by user on:** n/a\n",
+        f"## Status\n\n- **State:** {state}\n- **Approved by user on:** n/a\n",
     )
 
 

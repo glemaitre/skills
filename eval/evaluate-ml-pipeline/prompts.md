@@ -512,3 +512,63 @@ violated.
 **Must NOT do:**
 - Treat the first-run request as re-evaluation.
 - Write or execute `skore.evaluate` before the gate answer.
+
+---
+
+## CASE_19 — Register report custom metric before persistence
+
+**User prompt:**
+> Evaluate 06_classifier with an F2 score using beta=2, show it,
+> and save the report.
+
+**Assumed workspace state:**
+- The post-smoke answer was Evaluate in this turn.
+- This is a sklearn-style classifier, not a SkrubLearner.
+- `python -m skore_skills api get` confirmed the installed
+  `skore.evaluate`, `make_scorer`, and metric-registry signatures.
+
+**Must do:**
+- Load `references/custom-metrics.md` and use the report-registry
+  route.
+- Define a named scorer with `make_scorer(..., beta=2)`.
+- Order the implementation as `skore.evaluate(...)`, then
+  `report.metrics.add(...)`, then
+  `report.metrics.summarize(...)`, then `project.put(...)`.
+
+**Must NOT do:**
+- Pass `scoring=` to `skore.evaluate`.
+- Call `project.put` before registering and computing the F2
+  metric.
+- Use a lambda for the persisted metric.
+
+---
+
+## CASE_20 — Route weighted Skrub scoring through the DataOp
+
+**User prompt:**
+> Evaluate 07_grouped with weighted MAE. Customer groups must stay
+> disjoint and `sample_weight` is a column in the input table.
+
+**Assumed workspace state:**
+- The post-smoke answer was Evaluate in this turn.
+- The learner is a SkrubLearner whose X marker already has
+  `cv=GroupKFold()` and
+  `split_kwargs={"groups": data["customer_id"]}`.
+- `python -m skore_skills api get` confirmed the installed
+  `with_scoring`, `make_scorer`, and `skore.evaluate` signatures.
+
+**Must do:**
+- Route back through build to derive `sample_weight` from the
+  marked/aligned X DataOp and attach
+  `.skb.with_scoring(..., kwargs={"sample_weight": ...})` after
+  prediction and before `.skb.make_learner()`.
+- Keep Pattern B: call `skore.evaluate(learner, data={...})`
+  without `splitter=`.
+- Inspect the custom scorer with `report.metrics.score()`, then
+  call `project.put(...)`.
+
+**Must NOT do:**
+- Pass `scoring=` to `skore.evaluate`.
+- Put `sample_weight` in `mark_as_X(..., split_kwargs=...)`.
+- Derive scoring weights from the unsplit raw frame.
+- Claim the DataOp scorer appears in `metrics.summarize()`.

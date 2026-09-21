@@ -334,6 +334,43 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 19,
+      "title": "Register report custom metric before persistence",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The post-smoke answer was Evaluate in this turn.\n- This is a sklearn-style classifier, not a SkrubLearner.\n- `python -m skore_skills api get` confirmed the installed\n  `skore.evaluate`, `make_scorer`, and metric-registry signatures.]\n\nEvaluate 06_classifier with an F2 score using beta=2, show it,\nand save the report.",
+      "expected_output": "Behavioural response satisfying: - Load `references/custom-metrics.md` and use the report-registry route. - Define a named scorer with `make_scorer(..., beta=2)`. - Order the implementation as `skore.evaluate(...)`, then `report.metrics.add(...)`, then `report.metrics.summarize(...)`, then `project.put(...)`. It must NOT: - Pass `scoring=` to `skore.evaluate`. - Call `project.put` before registering and computing the F2 metric. - Use a lambda for the persisted metric.",
+      "files": [],
+      "expectations": [
+        "Load `references/custom-metrics.md` and use the report-registry route.",
+        "Define a named scorer with `make_scorer(..., beta=2)`.",
+        "Order the implementation as `skore.evaluate(...)`, then `report.metrics.add(...)`, then `report.metrics.summarize(...)`, then `project.put(...)`.",
+        "The response does NOT: Pass `scoring=` to `skore.evaluate`.",
+        "The response does NOT: Call `project.put` before registering and computing the F2 metric.",
+        "The response does NOT: Use a lambda for the persisted metric."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 20,
+      "title": "Route weighted Skrub scoring through the DataOp",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The post-smoke answer was Evaluate in this turn.\n- The learner is a SkrubLearner whose X marker already has\n  `cv=GroupKFold()` and\n  `split_kwargs={\"groups\": data[\"customer_id\"]}`.\n- `python -m skore_skills api get` confirmed the installed\n  `with_scoring`, `make_scorer`, and `skore.evaluate` signatures.]\n\nEvaluate 07_grouped with weighted MAE. Customer groups must stay\ndisjoint and `sample_weight` is a column in the input table.",
+      "expected_output": "Behavioural response satisfying: - Route back through build to derive `sample_weight` from the marked/aligned X DataOp and attach `.skb.with_scoring(..., kwargs={\"sample_weight\": ...})` after prediction and before `.skb.make_learner()`. - Keep Pattern B: call `skore.evaluate(learner, data={...})` without `splitter=`. - Inspect the custom scorer with `report.metrics.score()`, then call `project.put(...)`. It must NOT: - Pass `scoring=` to `skore.evaluate`. - Put `sample_weight` in `mark_as_X(..., split_kwargs=...)`. - Derive scoring weights from the unsplit raw frame.",
+      "files": [],
+      "expectations": [
+        "Route back through build to derive `sample_weight` from the marked/aligned X DataOp and attach `.skb.with_scoring(..., kwargs={\"sample_weight\": ...})` after prediction and before `.skb.make_learner()`.",
+        "Keep Pattern B: call `skore.evaluate(learner, data={...})` without `splitter=`.",
+        "Inspect the custom scorer with `report.metrics.score()`, then call `project.put(...)`.",
+        "The response does NOT: Pass `scoring=` to `skore.evaluate`.",
+        "The response does NOT: Put `sample_weight` in `mark_as_X(..., split_kwargs=...)`.",
+        "The response does NOT: Derive scoring weights from the unsplit raw frame.",
+        "The response does NOT: Claim the DataOp scorer appears in `metrics.summarize()`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

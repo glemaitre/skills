@@ -420,6 +420,13 @@ Look up symbols with `api get`. Code: `references/common_patterns.md`.
 6. Custom transformer — only if no built-in and the op is
    stateful (`BaseEstimator` + `TransformerMixin`). Stateless →
    `apply_func`.
+7. Custom DataOp scoring — on explicit request, attach
+   `.skb.with_scoring(...)` after prediction and before
+   `.skb.make_learner()`. Derive row-aligned metric kwargs from the
+   marked X DataOp; keep chained `with_scoring` calls adjacent at
+   the graph tail. Evaluate owns `metrics.score()` inspection and
+   `Project.put` persistence; see evaluate's
+   `references/custom-metrics.md`.
 
 ## Companion skills
 
@@ -442,3 +449,5 @@ Look up symbols with `api get`. Code: `references/common_patterns.md`.
 - `references/common_patterns.md` — tabular shapes with code.
 - `evaluate-ml-pipeline/references/metadata-routing.md` — Pattern
   A vs B (where `splitter=` vs DataOp `cv=` + `split_kwargs`).
+- `evaluate-ml-pipeline/references/custom-metrics.md` — report
+  registry vs DataOp scoring, metric kwargs, and persistence order.

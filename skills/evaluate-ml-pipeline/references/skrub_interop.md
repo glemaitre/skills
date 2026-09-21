@@ -119,6 +119,20 @@ Confirm the exact dispatch rules via `python -m skore_skills api get`
 (`inspect.signature(skore.evaluate)` + the docstring) against the
 installed skore version — the dispatch table can evolve.
 
+## Custom metrics on a SkrubLearner
+
+When a custom metric needs DataOp-derived metadata such as
+per-row sample weights, attach it to the prediction node with
+`.skb.with_scoring(...)` before `.skb.make_learner()`. The metric
+kwargs must be DataOps aligned with the marked X rows. They are
+not CV `split_kwargs`.
+
+After `skore.evaluate`, inspect these scorers through
+`report.metrics.score()`. They do not become custom rows in
+`report.metrics.summarize()`. For sklearn-style report registry
+metrics, including the required ordering before `Project.put`,
+see `references/custom-metrics.md`.
+
 ## Persisting to the Project store
 
 Every report goes under a **stable key** in the workspace's
@@ -262,6 +276,9 @@ report = skore.evaluate(
     splitter=TimeSeriesSplit(n_splits=5, gap=12),
 )
 report  # bare line — jupytext-displays inline; no-op as a script
+
+# Any explicit report-level `report.metrics.add(...)` calls go here,
+# before persistence. DataOp `with_scoring` was attached in build_learner.
 
 # %% [markdown]
 # ## Persist

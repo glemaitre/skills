@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "9f53b0b9eb4d8974234e9d9c2fec3c5f4717b4cd384c0d9f92cdc9b6e9930cc7",
+  "catalog_hash": "d054579b32cd985387fa1d9ff369301b20a61cf205d8f86325f74d3d9eb0e54c",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "e1771dc57c384e4c4898fc6c01210c28408945390c2c99310502d956fbc2693a"
+      "hash": "7e48b71c964231e1a92adbb6af82e1d825126af11d5b474747cbfe35aac35fc7"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "5e0c0ad09b35d7d1dcf5add861700b560774d3e5055eb508b0964437d1c5fbb1"
+      "hash": "f3865624617322515febb52442b79ed1caaafbf1b6a1d06c950e8e3cfd0bf802"
     },
     {
       "id": "smoke-test-ml-pipeline",
