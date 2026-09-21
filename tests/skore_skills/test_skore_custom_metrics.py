@@ -5,10 +5,10 @@ from __future__ import annotations
 import pandas as pd
 import skore
 import skrub
-from skore import Project
 from sklearn.dummy import DummyRegressor
 from sklearn.metrics import make_scorer, mean_absolute_error
 from sklearn.model_selection import GroupKFold, KFold
+from skore import Project
 
 N_SPLITS = 2
 
@@ -37,9 +37,7 @@ def _frame(*, n: int = 20, n_groups: int = 4) -> pd.DataFrame:
 
 
 def _report_metric_frame(report: object) -> pd.DataFrame:
-    return report.metrics.summarize(
-        metric=["custom_mae", "scaled_mae"]
-    ).frame()
+    return report.metrics.summarize(metric=["custom_mae", "scaled_mae"]).frame()
 
 
 def test_report_metrics_survive_local_project_round_trip(tmp_path) -> None:

@@ -11,7 +11,7 @@ import pytest
 from click.testing import CliRunner
 
 from skore_skills.cli import cli
-from skore_skills.env import install_argv, load_stack_policy
+from skore_skills.env import _venv_bin, install_argv, load_stack_policy
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "envs"
 
@@ -585,7 +585,7 @@ def test_env_agent_removed() -> None:
         ),
         (
             "pip-venv",
-            "python -m venv .venv && .venv/bin/pip install -r requirements.txt",
+            f"python -m venv .venv && {_venv_bin('pip')} install -r requirements.txt",
         ),
     ],
 )
@@ -1051,7 +1051,7 @@ def test_add_skore_rejects_invalid_mode_library(tmp_path: Path) -> None:
         ("poetry", ["poetry", "run", "python"]),
         ("hatch", ["hatch", "run", "dev:python"]),
         ("conda", ["conda", "run", "-n", "workspace-dev", "python"]),
-        ("pip-venv", [".venv/bin/python"]),
+        ("pip-venv", [_venv_bin("python")]),
     ],
 )
 def test_dev_run_argv_per_manager(
@@ -1462,7 +1462,7 @@ def test_env_graphviz_dot_c_permission_message(
     result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
     assert result.exit_code != 0
     assert DOT_C_ADMIN in result.output
-    assert "sudo" not in result.output.lower()
+    assert not any(argv and argv[0] == "sudo" for argv in seen)
 
 
 def test_env_graphviz_unmanaged_prints_json(

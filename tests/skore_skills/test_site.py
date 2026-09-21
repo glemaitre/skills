@@ -108,7 +108,9 @@ def test_site_build_runs_mkdocs(
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["site", "build"])
     assert result.exit_code == 0, result.output
-    assert seen == [["mkdocs", "build", "--config-file", "_build/mkdocs.yml"]]
+    assert seen == [
+        ["mkdocs", "build", "--config-file", site_mod.GENERATED_CONFIG.as_posix()]
+    ]
     assert (tmp_path / "mkdocs.yml").read_text(encoding="utf-8") == "hand-written\n"
     generated = (tmp_path / "_build" / "mkdocs.yml").read_text(encoding="utf-8")
     assert 'site_name: "claim_predictor"' in generated

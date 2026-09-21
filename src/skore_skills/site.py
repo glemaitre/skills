@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import html
 import json
-import os
 import re
 import shutil
 import subprocess
@@ -465,7 +464,7 @@ def build_site(root: Path) -> str:
     write_generated_config(root, pages, stub_home=stub_home)
     try:
         completed = subprocess.run(
-            ["mkdocs", "build", "--config-file", os.fspath(GENERATED_CONFIG)],
+            ["mkdocs", "build", "--config-file", GENERATED_CONFIG.as_posix()],
             cwd=root,
             check=False,
             capture_output=True,
