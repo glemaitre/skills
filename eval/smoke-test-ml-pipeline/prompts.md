@@ -19,6 +19,13 @@ violated.
 - `tests/smoke/test_02_load_forecast.py` is an empty scaffold.
 
 **Must do:**
+- Before writing/running the test, give a 1–3 sentence preview:
+  local fit/predict on a small real-data slice, the exact
+  row-count assertion, `tests/smoke/test_02_load_forecast.py`,
+  and the `smoke run` command.
+- Distinguish this diagnostic slice from full CV and say timing
+  depends on the loader, feature graph, and learner; do not invent
+  a minute estimate.
 - Wire the **hard assertion**:
   `assert len(predictions) == n_predict_grid_rows`.
 - Build the predict env-dict with **no pre-history buffer** — only
@@ -32,6 +39,7 @@ violated.
 - Run `python -m skore_skills smoke run --stem 02_load_forecast`.
 
 **Must NOT do:**
+- Say the smoke test performs full-dataset cross-validation.
 - Synthesize a fake DataFrame fixture.
 - Import `skore` / `skore.Project` in the test.
 - Wrap the predictor or add NaN-handling to make the test pass.

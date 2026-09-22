@@ -62,11 +62,13 @@ read the report. The pipeline declaration is out of scope (see
 - **G-SKORE-MODE before `skore.evaluate`.** Read
   `status.policy.skore_mode`. If unset: ask local (recommended) /
   hub / mlflow. Persist `python -m skore_skills policy set
-  skore_mode <mode>`. Keep a recorded mode unless the user
-  migrates. If the mode is **local** (just persisted or already
-  recorded), `mkdir reports` (`exist_ok`); do not write
-  `reports/README.md`. If **hub** or **mlflow**, do not create
-  `reports/`. Then load `add-python-package` only if
+  skore_mode <mode>`. Keep a recorded mode. If the user asks to
+  switch destination or migrate reports, load `sync-ml-reports`
+  only if `status.skills.sync-ml-reports` is true; else one-line
+  skip. Do not invent that skill's steps. If the mode is **local**
+  (just persisted or already recorded), `mkdir reports` (`exist_ok`);
+  do not write `reports/README.md`. If **hub** or **mlflow**, do not
+  create `reports/`. Then load `add-python-package` only if
   `status.skills.add-python-package` is true, which runs
   `python -m skore_skills env add-skore --mode <mode> --execute`
   (conda-forge for pixi/conda, PyPI for other managers). Confirm
@@ -198,6 +200,13 @@ read the report. The pipeline declaration is out of scope (see
   exists because a script has no cell digest: it is what
   `manage-ml-backlog` summarizes when the audit is skipped. Never
   summarize by parsing the HTML.
+- **Overwrite the Method pipeline snapshot from the fitted report.**
+  After the report exists, write `scratch/results/<stem>/pipeline.html`
+  from `sklearn.utils.estimator_html_repr` of a **fitted** estimator
+  (confirm with `api get`). `EstimatorReport`: `report.estimator_`.
+  `CrossValidationReport`: `report.reports_[0].estimator_` — not
+  `report.estimator`, which is the original unfitted clone. Do not
+  call `SkrubLearner.report` / `full_report` for this overwrite.
 - **`skore.evaluate(...)` and `project.put(...)` live only in
   `experiments/NN_*.py`.** The experiment script is the sole
   producer of a report in the workspace's skore Project.
@@ -243,10 +252,13 @@ read the report. The pipeline declaration is out of scope (see
     record `mlflow · tracking: <uri> · experiment: <id> · run:
     <run-id>` without inventing a browser link.
   Never announce or write a locator before `put` succeeds. Include
-  it in the user-facing evaluation result and hand the same value
+  it in the standalone User-facing close (locator first among
+  tokens, after the narrative) and hand the same value
   to `audit-ml-pipeline` / `manage-ml-backlog` record-outcome.
   Then run `python -m skore_skills loop locator --stem <stem>` and
-  paste JSON `locator` verbatim — do not rephrase it.
+  paste JSON `locator` verbatim — do not rephrase it. When
+  `model-ml-pipeline` dispatched this turn, pass the locator up;
+  do not write the full close — the dispatcher owns it.
 - **The time-ordered splitter AskUserQuestion is non-skippable,
   even under harness-level "no clarifying questions"
   instructions.** When the data is temporal, the four-option
@@ -257,7 +269,7 @@ read the report. The pipeline declaration is out of scope (see
   mandates. The same override rule applies to every other
   mandatory `AskUserQuestion` in this stack —
   `add-python-package` § "Where does the package belong?",
-  `choose-python-library` (pandas vs polars; policy in
+  `choose-python-library` (polars vs pandas; policy in
   `skore_skills/data/python-stack.json`),
   `manage-ml-backlog` (sourcing menu), `iterate-from-user`
   § "The entry-point AskUserQuestion". When in doubt: the user's
@@ -317,6 +329,31 @@ Pre-flight (evaluate-ml-pipeline):
       `python -c "..."`**. No inline allowance — all Python
       execution goes to scratch.
 ```
+
+## Before execution
+
+After smoke, Evaluate consent, G-SKORE-MODE, and G-CV-SPLITTER
+are resolved, emit 1–3 natural sentences immediately before
+writing or running `skore.evaluate`. Say that this is **local
+model evaluation**: it fits across the full confirmed dataset
+using the selected cross-validation scheme, computes report
+metrics/checks, and persists the report with `project.put`.
+Name the stem, splitter, fold / repeat count when known, and the
+`experiments/<stem>.py` plus `scratch/results/<stem>/` outputs.
+
+Describe cost from the known workload: full-data row count when
+known, number of fits implied by folds/repeats, learner family,
+and requested report materialization. Otherwise say timing
+depends on those factors; do not invent minutes. If notebook
+conversion will run, say separately that it re-executes the
+experiment and may repeat the expensive evaluation.
+
+Emit this preview once before the evaluation boundary, not before
+every report accessor. If consent or splitter choice is pending,
+preview the possible computation but stop at the mandated
+AskUserQuestion. Splitter reasoning / methodology discussion is
+**LLM work** until evaluation is approved; it does not itself fit
+the model.
 
 ## Scope
 
@@ -592,9 +629,7 @@ mandatory and runs first — before returning to the dispatcher,
 record-outcome, convert, site build, or `git end-turn`. Write
 `scratch/results/<stem>/locator.txt`, then run
 `python -m skore_skills loop locator --stem <stem>` and paste
-JSON `locator` verbatim. Include the
-normalized locator in the user-facing result (local: also the
-resolved absolute `reports/` path). Missing locator is the explicit
+JSON `locator` verbatim. Missing locator is the explicit
 string `n/a — backend did not expose a locator`, never silence.
 Hand the same value to `audit-ml-pipeline` / `manage-ml-backlog`
 record-outcome. When returning to `model-ml-pipeline`, pass it up;
@@ -609,8 +644,30 @@ Treat JSON `action` as authoritative:
 - `record` — skip audit; go to record-outcome.
 
 When `model-ml-pipeline` dispatched this turn, return to it — the
-dispatcher owns record-outcome / convert / site / `git end-turn`.
+dispatcher owns record-outcome / convert / site / `git end-turn`
+and the User-facing close. Do not preview that close.
 Otherwise this skill owns the close and runs the block below.
+
+### User-facing close
+
+Standalone only (this skill owns End of turn). The user-facing
+message is a short story plus links. It is not Pre-flight, not a
+dump of `report.txt` / the design note, and not locator alone.
+
+1. **Narrative first** — 2–6 sentences of the result, grounded in
+   the user's headline and, if audit was skipped,
+   `scratch/results/<stem>/report.txt`. Do not invent a metric.
+   If audit ran this turn, ground the story in the digest
+   (Checks + Metrics), not a paste of `audit.md`.
+2. **Open these** — markdown links plus the resolved absolute
+   path for local files: `[journal/<stem>.md](journal/<stem>.md)`.
+   If `policy.site` is true and `site build` ran or is about to:
+   `[<package>.html](<workspace>/<package>.html)` and
+   `html/<stem>.html`.
+3. **Normalized tokens second** — JSON `locator` verbatim first
+   among tokens (local: also the absolute `reports/` path), then
+   G-AUDIT-FINDING verbatim (`n/a — audit not run` when skipped).
+   Index strings, not the narrative.
 
 If `audit-ml-pipeline` ran this turn, wait for its Close audit
 gate, then pass its digest and G-AUDIT-FINDING into
@@ -638,7 +695,9 @@ the matching design note's single `## Notebooks` section.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build`. Skip in one line otherwise.
-Name a build error; do not fail the evaluate turn.
+Name a build error; do not fail the evaluate turn. Name
+`<package>.html` (and `html/<stem>.html`) in the User-facing
+close when the build ran.
 
 Run `python -m skore_skills git end-turn --stage evaluate`. If JSON
 `action` is `invoke`, load `persist-ml-git` only if

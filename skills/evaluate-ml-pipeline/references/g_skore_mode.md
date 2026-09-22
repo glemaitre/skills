@@ -205,26 +205,13 @@ URIs into guessed browser URLs. A missing locator is
 
 ## Switching mid-project
 
-See the SKILL.md Stop condition "Switching skore mode mid-project
-is forbidden by default". The short version: switching orphans
-reports in the prior store (no built-in migration in skore between
-modes).
-
-Procedure:
-
-1. Fire `AskUserQuestion` surfacing the migration burden:
-   "Existing reports under <prior mode> will become inaccessible
-   from this workspace. Proceed anyway? (y / n / migrate manually
-   first)".
-2. Only on explicit user confirmation, run
-   `python -m skore_skills policy set skore_mode <mode>`.
-3. Rewrite **every** `<SKORE_PROJECT_INIT>` block in `experiments/`
-   AND `audit/`.
-4. Update the install via `add-python-package` and
-   `env add-skore --mode <mode> --execute`.
-5. Document the switch in `JOURNAL.md` History as a horizontal
-   divider (same shape as goal pivots — see `manage-ml-backlog`
-   § Maintenance modes).
+Do not silently change a recorded mode. If the user asks to
+switch destination or migrate existing reports, load
+**`sync-ml-reports`** when that skill is installed (it runs
+`skore sync`, then — on switch intent — `policy set`, Project
+init rewrite, extras, and a JOURNAL History divider). If that
+skill is missing, one-line skip; do not invent `skore sync` or
+`Project.sync` from this reference.
 
 ## Anatomy of the substitution
 

@@ -70,7 +70,8 @@ next.
 Do not dispatch `audit-ml-pipeline` in this mode; the digest is
 already in hand and dispatching would bounce back here. Do not run
 this skill's End of turn either: the caller owns convert / site /
-`git end-turn`.
+`git end-turn` and the User-facing close. This mode writes
+History; it does not replace the caller's chat close.
 
 The Procedure guards still bind. Never mark `done` while smoke is
 red, and never invent a metric — no digest and no user-supplied

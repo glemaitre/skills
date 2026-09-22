@@ -662,6 +662,58 @@ def test_inject_results_skips_missing_section_and_missing_html(
     assert "One issue." in injected
 
 
+def test_inject_results_embeds_pipeline_under_method(tmp_path: Path) -> None:
+    """Method ``results-embed: pipeline`` gets the construct-time snapshot."""
+    stem = "01_x"
+    results = tmp_path / "scratch" / "results" / stem
+    results.mkdir(parents=True)
+    (results / "pipeline.html").write_text("<html>pipeline</html>\n", encoding="utf-8")
+    page = site_mod.Page(
+        stem,
+        tmp_path / f"{stem}.md",
+        f"{stem}.md",
+        None,
+        "Experiments",
+        None,
+    )
+    source = (
+        "# design\n\n## Method\n\n"
+        "Ridge on the skrub graph.\n"
+        "<!-- results-embed: pipeline -->\n\n"
+        "## Risks\n\nLeakage.\n"
+    )
+    once = site_mod.inject_results(source, page, tmp_path)
+    twice = site_mod.inject_results(once, page, tmp_path)
+    assert twice == once
+    assert "Ridge on the skrub graph." in once
+    assert once.index("Ridge on the skrub graph.") < once.index(
+        '<iframe src="01_x.pipeline.html"'
+    )
+    assert once.count('<iframe src="01_x.pipeline.html"') == 1
+    assert "data-skore-autosize" in once
+    assert "## Risks" in once
+
+
+def test_inject_results_skips_method_without_pipeline_marker(
+    tmp_path: Path,
+) -> None:
+    """A pipeline.html file is not injected into Method without the marker."""
+    stem = "01_x"
+    results = tmp_path / "scratch" / "results" / stem
+    results.mkdir(parents=True)
+    (results / "pipeline.html").write_text("<html>pipeline</html>\n", encoding="utf-8")
+    page = site_mod.Page(
+        stem,
+        tmp_path / f"{stem}.md",
+        f"{stem}.md",
+        None,
+        "Experiments",
+        None,
+    )
+    source = "# design\n\n## Method\n\nRidge.\n\n## Risks\n\nLeakage.\n"
+    assert site_mod.inject_results(source, page, tmp_path) == source
+
+
 def test_inject_results_embeds_extra_slug_from_comment(
     tmp_path: Path,
 ) -> None:

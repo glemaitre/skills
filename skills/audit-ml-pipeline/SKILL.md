@@ -243,6 +243,30 @@ Pre-flight (audit-ml-pipeline):
       Evidence: this checklist appears in the end-of-turn summary.
 ```
 
+## Before execution
+
+After the four-way pairing, report lookup, agent feature, and API
+checks are satisfied, emit 1–3 natural sentences immediately
+before writing or running `audit/<stem>.py`. Say that this is
+**local read-only report materialization**, not retraining: it
+opens the persisted Skore report, renders checks / metrics /
+available views, and writes the digest under
+`scratch/audit/<stem>/` plus HTML viewers under
+`scratch/results/<stem>/`. Name the exact `cells run` command.
+
+Describe cost from facts: report loading and requested view
+rendering, not model fits or full CV. Unless an observed duration
+is already available, say timing depends on report size and
+selected views and do not invent minutes. Emit this preview once
+for the initial audit; refresh it only when Additional report
+view / Custom query / Custom plot materially changes the work.
+The run pauses at the existing post-audit gate before close.
+
+Questions about what the report means are **LLM narrative work**
+over the digest; they do not call `evaluate` or `put`. If any
+mandatory gate is pending, preview the possible audit but do not
+write or execute it.
+
 ## Audit file contract — overview
 
 The audit file is **jupytext percent format** (`# %%`). Filename:
@@ -484,10 +508,28 @@ close as a preview of what the dispatcher will run.
 
 **Direct free-text audit, after Close audit:** this skill owns the close. Run
 `python -m skore_skills loop artifacts --stem <stem>` (`record`
-expected) and `loop locator --stem <stem>`. The
-JSON `locator` **must** appear in the
-user-facing message
+expected) and `loop locator --stem <stem>`. Then User-facing
+close. The JSON `locator` **must** appear in that message
 before site build or `git end-turn`.
+
+### User-facing close
+
+Direct free-text only. The user-facing message is a short story
+plus links. It is not Pre-flight, not a dump of
+`scratch/audit/<stem>/audit.md`, and not finding/locator alone.
+Dispatched audit never writes this block.
+
+1. **Narrative first** — 2–6 sentences from Checks + Metrics in
+   the digest (issues/tips that matter, headline metric). Do not
+   invent a metric. Do not paste the digest wholesale.
+2. **Open these** — markdown links plus the resolved absolute
+   path for local files: `[journal/<stem>.md](journal/<stem>.md)`.
+   If `policy.site` is true and `site build` ran or is about to:
+   `[<package>.html](<workspace>/<package>.html)` and
+   `html/<stem>.html`.
+3. **Normalized tokens second** — JSON `locator` verbatim first
+   among tokens (local: also the absolute `reports/` path), then
+   G-AUDIT-FINDING verbatim. Index strings, not the narrative.
 
 Load `manage-ml-backlog` in **record-outcome mode** only if
 `status.skills.manage-ml-backlog` is true and hand it
@@ -504,7 +546,8 @@ The `notebook convert` for `audit/<stem>.py` already ran above.
 If `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` so the audit viewer reaches
 the experiment page. Skip in one line otherwise. Name a build
-error; do not fail the audit turn.
+error; do not fail the audit turn. Name `<package>.html` (and
+`html/<stem>.html`) in the User-facing close when the build ran.
 
 Run `python -m skore_skills git end-turn --stage evaluate` — the
 audit continues the evaluate stage; there is no `audit` stage on

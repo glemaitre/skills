@@ -17,7 +17,8 @@
 - Name `python -m skore_skills status`.
 - AskUserQuestion listing installed entry skills
   (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
-  `manage-ml-backlog`, `export-ml-project` if installed). One pick.
+  `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports` if
+  installed). One pick.
 - Name `explore-ml-data` as the recommended next stage; do not
   auto-load it.
 - Do not treat the missing `.skore` as an empty project despite
@@ -311,4 +312,23 @@
 
 **Must NOT do:**
 - Load `model-ml-pipeline` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_16 — Certain report sync loads sync-ml-reports
+
+**User prompt:**
+> Push our skore reports to Hub.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.sync-ml-reports` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `sync-ml-reports` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `evaluate-ml-pipeline` as the certain skill.
 - Ask which entry skill to run.

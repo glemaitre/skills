@@ -15,6 +15,10 @@
 - Name `python -m skore_skills status`.
 - Resume the approved stem directly; do not show the starting
   choices menu.
+- Preview the broad sequence as local pipeline preparation, small
+  real-data smoke fit/predict, optional full-dataset evaluation,
+  then read-only audit; leave each detailed compute preview to
+  its child skill and do not invent minute estimates.
 - Dispatch `build-ml-pipeline` (do not load
   `smoke-test-ml-pipeline` as a sibling of evaluate).
 - Treat smoke as a **step of build** that runs
@@ -27,6 +31,8 @@
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
+- Duplicate detailed build / smoke / evaluate / audit previews
+  from the dispatcher.
 - Load `smoke-test-ml-pipeline` as a sibling dispatcher step.
 - Write `skore.evaluate` or load `evaluate-ml-pipeline` /
   `audit-ml-pipeline` before the Evaluate HITL pick.
@@ -75,8 +81,10 @@
 **Must do:**
 - Dispatch `build-ml-pipeline` (`smoke run` inside build).
 - Name the post-smoke HITL before evaluate.
-- Name `python -m skore_skills site build` after the implement
-  loop, before git end-turn.
+- Name `python -m skore_skills site build` after the unfitted
+  `pipeline.html` snapshot (before Evaluate is fine) so Method
+  shows the diagram, and again after the implement loop before
+  git end-turn.
 - Name `python -m skore_skills git end-turn --stage implement`.
 
 **Must NOT do:**
@@ -209,11 +217,14 @@
 - The user selected Discuss the next step.
 
 **Must do:**
+- Preview this route as LLM discussion over recorded project
+  facts, with no model fit, smoke test, or CV before confirmation.
 - Discuss what to learn, why now, and what changes.
 - Once an idea is agreed, summarize it and ask the user to
   confirm before creating/populating a design note.
 
 **Must NOT do:**
+- Claim local model computation is running during the discussion.
 - Force the article/resource/free-text entry menu.
 - Emit a proposal or model code before confirmation.
 
@@ -252,6 +263,9 @@
 - Run evaluate, then audit, then load `manage-ml-backlog` in
   record-outcome mode with the audit digest.
 - Record before `notebook convert` and `site build`.
+- Write 2–6 sentences from the digest, link `journal/01_baseline.md`,
+  name `<package>.html` and `html/01_baseline.html`, and include
+  locator plus G-AUDIT-FINDING in the user-facing close.
 - Name `python -m skore_skills git end-turn --stage implement`
   last.
 
@@ -276,7 +290,9 @@
 **Must do:**
 - Pass the exact locator to `manage-ml-backlog` record-outcome even
   though audit was skipped.
-- Include the same locator in the user-facing close.
+- Write 2–6 sentences of the result and link `journal/<stem>.md`.
+- Include the same locator in the user-facing close (first among
+  tokens) and G-AUDIT-FINDING `n/a — audit not run`.
 - Record before convert, site build, and git end-turn.
 
 **Must NOT do:**

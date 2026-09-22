@@ -82,6 +82,30 @@ note.
   confirmation create/populate the design note and seek approval.
   If no idea is agreed, return to the entry choices.
 
+## Before execution
+
+This dispatcher labels the next kind of work but does not
+duplicate a child's detailed preview.
+
+- For `discuss`, proposal shaping, or literature-backed design
+  work, emit 1–3 natural sentences saying this is **LLM
+  discussion/research** over recorded project facts, with no
+  model fit, smoke test, or CV. Name any scratch research note or
+  design note that may be written and stop at confirmation.
+- For an approved implementation, say which child comes next and
+  the broad sequence: local pipeline preparation → small
+  real-data smoke fit/predict → optional full-dataset evaluation
+  → read-only audit. Then let `build-ml-pipeline`,
+  `smoke-test-ml-pipeline`, `evaluate-ml-pipeline`, and
+  `audit-ml-pipeline` each own the single detailed Before
+  execution preview at its actual compute boundary.
+
+Do not invent minute estimates at dispatcher level. Name a known
+duration only when explicit measured evidence is available;
+otherwise leave cost details to the child that knows data scope,
+folds, and selected views. Pending proposal/design approval may
+preview the sequence but never starts local work.
+
 If the design-note shell is missing, this turn only names
 `python -m skore_skills scaffold --journal --stem <NN_short>`
 and stops. Do not fill Question / Motivation / Method / Risks
@@ -99,7 +123,12 @@ has created the shell, then stop for explicit design approval.
    `proceed`: build reports the
    design, then
    `python -m skore_skills evaluate consent --stem <stem>`
-   (Evaluate / Modify / Stop on `ask`).
+   (Evaluate / Modify / Stop on `ask`). Build also writes the
+   unfitted `scratch/results/<stem>/pipeline.html` and, when
+   `policy.site` is true, runs `site build` so Method shows the
+   diagram **before** Evaluate. Do not convert
+   `experiments/<stem>.py` at that point if it already contains
+   `skore.evaluate`.
 2. Only if the user chose **Evaluate** and `smoke run` is `proceed`: load
    `evaluate-ml-pipeline` only if `status.skills.evaluate-ml-pipeline`
    is true — leakage-safe splitter and
@@ -186,17 +215,41 @@ fail the turn.
 
 After **Evaluate** (and audit if it ran), implement-loop step 4
 (record-outcome) runs first, so the journal files are on disk
-before anything is staged. The user-facing close **must** include
-the G-REPORT-LOCATOR value evaluate passed up (or
-`n/a — backend did not expose a locator`) and G-AUDIT-FINDING
-(`n/a — audit not run` when skipped). Then the same
-convert/site rules apply. `audit-ml-pipeline` converts `audit/<stem>.py` itself; do
-not convert it again here. The site appends that viewer to the
-experiment design note's `## Notebooks` section after evaluation.
+before anything is staged. This dispatcher owns the User-facing
+close. Children return locator / digest / finding and do not
+preview this close.
+
+### User-facing close
+
+The user-facing message is a short story plus links. It is not
+Pre-flight, not a dump of the digest or design note, and not
+locator/finding alone.
+
+1. **Narrative first** — 2–6 sentences of the result, grounded in
+   the audit digest when present (Checks + Metrics), else the
+   user's headline / `report.txt`. Do not invent a metric.
+2. **Open these** — markdown links plus the resolved absolute
+   path for local files: `[journal/<stem>.md](journal/<stem>.md)`.
+   If `policy.site` is true and `site build` ran or is about to:
+   `[<package>.html](<workspace>/<package>.html)` and
+   `html/<stem>.html`.
+3. **Normalized tokens second** — G-REPORT-LOCATOR evaluate
+   passed up (or `n/a — backend did not expose a locator`) first
+   among tokens, then G-AUDIT-FINDING (`n/a — audit not run`
+   when skipped). Index strings, not the narrative.
+
+Then the same convert/site rules apply. `audit-ml-pipeline`
+converts `audit/<stem>.py` itself; do not convert it again here.
+The site appends that viewer to the experiment design note's
+`## Notebooks` section after evaluation.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
-`python -m skore_skills site build`. Skip in one line otherwise.
-Name a build error; do not fail the model turn.
+`python -m skore_skills site build` so the fitted Method pipeline
+diagram (and Results) replace the construct-time snapshot. Skip in
+one line otherwise.
+Name a build error; do not fail the model turn. Name
+`<package>.html` (and `html/<stem>.html`) in the User-facing
+close when the build ran.
 
 Then run
 `python -m skore_skills git end-turn --stage implement`. If JSON

@@ -60,7 +60,9 @@ assumed journal / experiment / package facts; no `<FILL_…>`)
 and that invocation. Saying this turn cannot execute pytest is
 fine; instructing the user to run it is not. Do not
 AskUserQuestion for evaluate here — that gate belongs to
-`build-ml-pipeline` after `smoke run` is `proceed`.
+`build-ml-pipeline` after `smoke run` is `proceed`. After
+green, the parent owns the User-facing close (narrative +
+links); this skill does not narrate the pipeline.
 
 ## Stop conditions — read before anything else
 
@@ -128,6 +130,26 @@ AskUserQuestion for evaluate here — that gate belongs to
   `filterwarnings = [...]` in `pytest.ini` /
   `pyproject.toml` — unless the user explicitly asks. See
   `python -m skore_skills style` § Stop conditions.
+
+## Before execution
+
+After design / script pairing and pytest availability are
+confirmed, emit 1–3 natural sentences before the test-file write.
+Say that this is a **local real-data smoke computation**: it will
+fit the declared learner on a small real-data slice, predict a
+disjoint slice with no pre-history buffer, and check exact output
+row count plus the optional soft metric. Name
+`tests/smoke/test_<stem>.py` and the exact `smoke run` command.
+
+Explain that this slice is intentionally much smaller than
+full-dataset cross-validation, but its runtime still depends on
+the loader, feature graph, and learner. Do not promise minutes
+unless a measured duration is already available, and never
+replace real data with synthetic rows to make the estimate
+shorter. Emit this preview once, not once per pytest action.
+If a mandatory gate is pending, preview the possible test but do
+not write or run it. This skill performs no LLM research and no
+full evaluation.
 
 ## Pre-flight — emit this checklist as visible text before any test code
 

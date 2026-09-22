@@ -18,9 +18,10 @@ Each experiment design note has one `## Notebooks` section:
 evaluation first, then audit; a missing viewer is omitted.
 Derived HTML and PNG viewers under `scratch/results/<stem>/`
 (report, checks, metrics, plus extra Display slugs) may be copied
-into the staged docs and embedded under `## Results` when that
-section exists. Core headings are Report overview / Checks /
-Metrics; extra slugs use `<!-- results-embed: <slug> -->`.
+into the staged docs. Core Results headings are Report overview /
+Checks / Metrics. Extra slugs use `<!-- results-embed: <slug> -->`
+under `## Results` **or** `## Method` (`pipeline` is the Method
+diagram: unfitted after construct, fitted after evaluate).
 Only Markdown and already-generated notebook/HTML viewers are
 exported. The gitignored serialized Skore `reports/` directory is
 private runtime state and is never copied into the site.
@@ -43,6 +44,9 @@ left rail beside a 1200px report column. Mobile uses a drawer.
    `notebook convert`. Name a build error; the markdown sources
    remain the record. Tell the user to open `<package>.html` at
    the workspace root (`status.package`; double-click; no server).
+   Stage owners that just ran `site build` must name that
+   launcher (and the stage page: `html/data_analysis.html` or
+   `html/<stem>.html`) in the same User-facing close.
 
 ## Stop conditions
 

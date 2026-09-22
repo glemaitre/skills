@@ -14,7 +14,8 @@
         "Propose a `build_learner` function returning `predictions.skb.make_learner()` (not a `Pipeline` object).",
         "The response does NOT: Write `from sklearn.pipeline import Pipeline` as a live import in `pipeline.py`.",
         "The response does NOT: Return a `Pipeline([(\"scaler\", StandardScaler()), ...])` object from `build_learner` / `build_pipeline`. A docstring that only names the forbidden equivalent is not a violation.",
-        "The response does NOT: Use `skrub.X(...)` / `skrub.y(...)` as graph roots."
+        "The response does NOT: Use `skrub.X(...)` / `skrub.y(...)` as graph roots.",
+        "The response does NOT: Call `learner.report(...)` or `full_report` to snapshot the Method diagram (that fits; use `_repr_html_` / `estimator_html_repr`)."
       ],
       "tools": false,
       "sandbox": [],
@@ -179,12 +180,16 @@
       "id": 10,
       "title": "After declaration, smoke run then HITL",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved `journal/01_baseline.md`.\n- Experiment shell `experiments/01_baseline.py` exists after\n  the declaration.\n- Workspace is scaffolded.]\n\nThe design is approved. Declare the learner and stop before\nfull-dataset CV.",
-      "expected_output": "Behavioural response satisfying: - Load `smoke-test-ml-pipeline` after the declaration. - Run `python -m skore_skills smoke run --stem 01_baseline` after the smoke file exists. - After `smoke run` JSON `proceed`, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset). It must NOT: - Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed. - Skip `smoke run` and jump to CV.",
+      "expected_output": "Behavioural response satisfying: - After design consent and before declaration, give a 1\u20133 sentence preview: local preparation of an unfitted learner, experiment Method cells, and pipeline snapshot, followed by smoke. - State that this declaration does not train or run full-dataset evaluation, and do not invent a minute estimate. - Load `smoke-test-ml-pipeline` after the declaration. It must NOT: - Present the declaration itself as model training or CV. - Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed. - Skip `smoke run` and jump to CV.",
       "files": [],
       "expectations": [
+        "After design consent and before declaration, give a 1\u20133 sentence preview: local preparation of an unfitted learner, experiment Method cells, and pipeline snapshot, followed by smoke.",
+        "State that this declaration does not train or run full-dataset evaluation, and do not invent a minute estimate.",
         "Load `smoke-test-ml-pipeline` after the declaration.",
         "Run `python -m skore_skills smoke run --stem 01_baseline` after the smoke file exists.",
+        "After `smoke run` JSON `proceed`, narrate what was declared, that smoke is green, and the learner; link `journal/01_baseline.md` and `experiments/01_baseline.py` before the Evaluate menu.",
         "After `smoke run` JSON `proceed`, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset).",
+        "The response does NOT: Present the declaration itself as model training or CV.",
         "The response does NOT: Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed.",
         "The response does NOT: Skip `smoke run` and jump to CV."
       ],

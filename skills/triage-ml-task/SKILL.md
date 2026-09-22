@@ -39,6 +39,7 @@ route and ask. Do not execute another skill's methodology.
    | notebook viewer on the site / executed report | `export-ml-notebook` (`--html`) |
    | website / mkdocs / documentation site | `export-ml-site` |
    | export (generic) | `export-ml-project` |
+   | sync / migrate reports / switch skore mode / upload reports to hub or mlflow | `sync-ml-reports` |
    | set up / bootstrap this project (generic) | `setup-ml-project` |
    | research / literature / “is this leakage” on the table | `explore-ml-data` (even if `data_analysis` is present). Do not load `research-ml-practice`. |
    | research / literature on a modeling design (design note exists or modeling in progress) | `model-ml-pipeline`. Do not load `research-ml-practice`. |
@@ -68,8 +69,9 @@ route and ask. Do not execute another skill's methodology.
 
    Offer an entry only if `status.skills.<id>` is true:
    `setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
-   `manage-ml-backlog`, `export-ml-project`. If none of those ids
-   are true, say so in one line; do not invent a menu.
+   `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports`.
+   If none of those ids are true, say so in one line; do not
+   invent a menu.
 
    Do not put `evaluate-ml-pipeline` or `audit-ml-pipeline` on this
    board (certain requests still load them).

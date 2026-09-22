@@ -22,6 +22,14 @@ violated.
   `scratch/api/skore/0.18.0/evaluate.md`.
 
 **Must do:**
+- After all evaluation gates and before writing/running
+  `skore.evaluate`, give a 1–3 sentence preview: local
+  full-dataset CV with the selected splitter, report persistence,
+  and the `experiments/01_baseline.py` /
+  `scratch/results/01_baseline/` outputs.
+- Name the fold count when known; otherwise explain that timing
+  depends on rows, folds/repeats, and learner cost. Do not invent
+  a minute estimate.
 - Pick **`skore.evaluate(learner, data={...}, splitter=...)`** as
   the entry point (not `cross_val_score`, not `cross_validate`).
 - Map empty `split_kwargs` + IID → **`KFold`** per the mapping table
@@ -37,10 +45,14 @@ violated.
   `report._repr_html_()`, `report.txt` from `repr(report)`, and
   `locator.txt` with the normalized G-REPORT-LOCATOR in
   `experiments/01_baseline.py` after the bare `report` display.
+- Overwrite `scratch/results/01_baseline/pipeline.html` from a
+  fitted `estimator_` (`reports_[0].estimator_` on a CV report),
+  not `SkrubLearner.report`.
 - Name `python -m skore_skills loop locator --stem 01_baseline` and
   `python -m skore_skills loop artifacts --stem 01_baseline`.
 
 **Must NOT do:**
+- Present splitter reasoning alone as model fitting.
 - Recommend `cross_val_score`, `cross_validate`,
   `classification_report`, or hand-rolled `print(mean_squared_error(...))`.
 - Default to `StratifiedKFold` (forbidden — compresses across-fold
@@ -326,9 +338,13 @@ violated.
 - `export-ml-notebook` and `export-ml-site` are installed.
 
 **Must do:**
+- Write 2–6 sentences of the evaluation result and link
+  `journal/01_baseline.md`.
+- Name `<package>.html` and `html/01_baseline.html` in the
+  user-facing close after site build.
 - Include the G-REPORT-LOCATOR value (or
   `n/a — backend did not expose a locator`) in the user-facing
-  close before convert.
+  close before convert (first among tokens, after the narrative).
 - Load `manage-ml-backlog` in record-outcome mode before the
   convert, since no audit ran this turn, and hand it the locator.
 - Name `python -m skore_skills notebook convert
@@ -368,6 +384,8 @@ violated.
 
 **Must NOT do:**
 - Drop the locator because the dispatcher owns convert.
+- Write the User-facing close (narrative + Open these) here;
+  the dispatcher owns it.
 - Run `notebook convert`, `site build`, or `git end-turn` here.
 - Load `manage-ml-backlog` here.
 - Load `triage-ml-task` directly.
@@ -484,7 +502,10 @@ violated.
 - Notebooks and site are enabled.
 
 **Must do:**
-- After `put`, surface G-REPORT-LOCATOR first.
+- After `put`, write a 2–6 sentence narrative, link
+  `journal/<stem>.md`, then surface G-REPORT-LOCATOR first among
+  tokens. Name `<package>.html` and `html/<stem>.html` when site
+  build ran.
 - Run audit when available, then record-outcome with locator and
   optional digest/headline.
 - Order the remaining close as notebook convert, site build, then
@@ -510,6 +531,8 @@ violated.
 - The user has not yet chosen Evaluate at the post-smoke gate.
 
 **Must do:**
+- Preview the possible full-dataset CV and its cost drivers, but
+  state that no local evaluation starts until the gate is answered.
 - Present Evaluate (Recommended) / Modify / Stop before the first
   evaluation.
 - Explain that an explicit re-evaluation request for an existing

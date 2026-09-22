@@ -12,10 +12,13 @@ Lifecycle:
   abandoned → discarded; record a one-line reason on State
 
 The four content sections (Question, Motivation, Method, Risks) are
-fixed once approved; only the Status block and generated notebook
-viewers change afterwards. There is no "Success criteria" section —
-judge the result once it is in. Site build places the exported
-evaluation and audit viewers under Notebooks below.
+fixed once approved; only the Status block, generated notebook
+viewers, and the Method pipeline embed change afterwards. There is
+no "Success criteria" section — judge the result once it is in.
+Site build places the exported evaluation and audit viewers under
+Notebooks below. The Method ``<!-- results-embed: pipeline -->``
+marker is durable; ``scratch/results/<stem>/pipeline.html`` may
+refresh after declaration (unfitted) and after evaluate (fitted).
 -->
 
 ## Question / hypothesis
@@ -45,7 +48,8 @@ this, or the backlog item being promoted.
 
 <!--
 What changes versus the previous experiment, in prose. Which file in
-src/<pkg>/ is touched? State intent, not code.
+src/<pkg>/ is touched? State intent, not code. Prose stays frozen
+after approval. The pipeline embed below may refresh.
 -->
 
 - **Files touched:** <e.g., `src/<pkg>/features.py`, `src/<pkg>/pipeline.py`>
@@ -53,6 +57,7 @@ src/<pkg>/ is touched? State intent, not code.
 - **Cross-validation:** decided at the evaluation step, data-driven
   from the data's structure (groups / time ordering) — not fixed here.
 - **Out of scope for this experiment:** <what we are deliberately not changing>
+- **Pipeline:** <!-- results-embed: pipeline -->
 
 ## Risks / things that could invalidate the result
 

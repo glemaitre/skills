@@ -261,10 +261,20 @@ project = skore.Project(
 )  # local-mode form; G-SKORE-MODE is owned by `evaluate-ml-pipeline`
 
 # %% [markdown]
+# ## Method
+#
+# Unfitted learner diagram (sklearn HTML). After evaluate, the same
+# `pipeline.html` is overwritten from a fitted fold.
+
+# %% [markdown]
 # ## Learner
 
 # %%
 learner = build_learner(data_dir_preview=DATA_DIR)
+_results = PROJECT_ROOT / "scratch" / "results" / "01_baseline"
+_results.mkdir(parents=True, exist_ok=True)
+(_results / "pipeline.html").write_text(learner._repr_html_(), encoding="utf-8")
+learner
 
 # %% [markdown]
 # ## Evaluate
@@ -290,6 +300,8 @@ _results.mkdir(parents=True, exist_ok=True)
     "local workspace: [reports/](../reports/) · id: <id>",
     encoding="utf-8",
 )
+fitted = report.reports_[0].estimator_
+(_results / "pipeline.html").write_text(fitted._repr_html_(), encoding="utf-8")
 
 # %% [markdown]
 # ## Persist

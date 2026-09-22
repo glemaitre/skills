@@ -11,10 +11,14 @@
 - `data_analysis/data_analysis.md` was just written.
 
 **Must do:**
+- Write 2–6 sentences of EDA findings (shape / target /
+  leakage or duplicates that shape modelling).
+- Link `data_analysis/data_analysis.md`.
 - Name `python -m skore_skills git end-turn --stage data_analysis`.
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
+- Paste the full `data_analysis.md` into chat.
 - Run `git commit` in this skill.
 - Run `git push`.
 
@@ -106,6 +110,12 @@
 - User chose **run** for G-DATA-ANALYSIS.
 
 **Must do:**
+- Before writing or running the notebook, give a 1–3 sentence
+  preview: local full-table profiling plus duplicate / target /
+  bivariate / leakage work; name the `data_analysis/` and
+  `scratch/data_analysis/` outputs.
+- Say timing depends on table size, family count, and requested
+  plots; do not invent a minute estimate.
 - Write `data_analysis/data_analysis_<slug>.html` (not under `data/`).
 - End overview cells on `TableReport` (or the frame), not on a
   json/dict digest.
@@ -118,6 +128,7 @@
   and extras under `scratch/data_analysis/extras.json`.
 
 **Must NOT do:**
+- Describe this EDA execution as model training or smoke testing.
 - Put unique-ratio / column-dict / `report.json()` cells in
   `data_analysis/data_analysis.py`.
 - Write HTML under `data/`.
@@ -159,12 +170,17 @@
 - `jupytext`, `nbclient`, and `nbconvert` are installed.
 
 **Must do:**
+- Write 2–6 sentences of EDA findings and link
+  `data_analysis/data_analysis.md`.
+- Name `<package>.html` and `html/data_analysis.html` in the
+  user-facing close.
 - Name `python -m skore_skills notebook convert
   data_analysis/data_analysis.py --html` before site build.
 - Name `python -m skore_skills site build` before git end-turn.
 - Name `python -m skore_skills git end-turn --stage data_analysis`.
 
 **Must NOT do:**
+- Paste the full `data_analysis.md` into chat.
 - Fail the data-analysis turn if site build errors; name the error.
 - Run `cells run` as a substitute for convert.
 - Run `git commit` in this skill.
@@ -181,10 +197,14 @@
 - `policy.site` is false.
 
 **Must do:**
+- Write 2–6 sentences of EDA findings and link
+  `data_analysis/data_analysis.md`.
 - Skip site build in one line.
 - Name `python -m skore_skills git end-turn --stage data_analysis`.
 
 **Must NOT do:**
+- Name `<package>.html` or `html/data_analysis.html` as if the
+  site was built.
 - Run `python -m skore_skills site build`.
 
 ---
@@ -334,10 +354,13 @@
 **Must do:**
 - AskUserQuestion keep exploring vs close (neither option
   recommended or preselected).
+- After Close, write 2–6 sentences of findings and link
+  `data_analysis/data_analysis.md`.
 - Name `python -m skore_skills git end-turn --stage data_analysis`
   after Close.
 
 **Must NOT do:**
+- Paste the full `data_analysis.md` into chat.
 - Load `add-python-package` for sklearn / scipy / statsmodels.
 
 ---
@@ -379,6 +402,9 @@
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**
+- Preview Automatic exploration as LLM research over the recorded
+  EDA that may write a scratch note, with no model fitting or
+  testing before the measurement-choice board.
 - Load `research-ml-practice` with the named leakage concern
   (skip the canned extra-analysis survey).
 - Summarize the scratch note in chat (what is happening + why

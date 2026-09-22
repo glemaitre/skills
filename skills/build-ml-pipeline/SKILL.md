@@ -59,6 +59,29 @@ other rows (lag, rolling, group-agg, side join, `drop_nulls` on a
 shifted col). **Layers 1 / 2 / 3** = sources / grid + marker /
 features after the marker.
 
+## Before execution
+
+After `design consent` is `proceed`, emit 1–3 natural sentences
+immediately before the first declaration write. Say that this is
+**local preparation**, not training or full evaluation: the turn
+will write the skrub DataOps `build_learner`, update the
+experiment Method cells, render an **unfitted** pipeline snapshot,
+and then hand off to a real-data smoke test. Name the stem and the
+main `src/<pkg>/`, `experiments/<stem>.py`, and
+`scratch/results/<stem>/pipeline.html` outputs.
+
+Describe cost from facts, not guesses. Declaration and unfitted
+rendering should be distinguished from the later fit/predict
+smoke and full-dataset cross-validation. Do not promise minutes
+unless a measured duration is already available. Emit this
+preview once; refresh it only when a structural edit materially
+changes the work. If approval is pending, preview the possible
+work but do not write model code.
+
+Research or open design discussion is **LLM work**: say that it
+will reason over the design / sources and stop for confirmation;
+it does not fit or test a model.
+
 ## Procedure
 
 1. `python -m skore_skills status`. Missing scaffold → setup/triage
@@ -66,12 +89,33 @@ features after the marker.
    <stem>`. Treat JSON `action` as authoritative. `ask` / `stop`
    → do not declare the pipeline ("build it" is not approval).
    `proceed` continues. Missing data contract → S0.
-2. Emit Pre-flight; tick only with evidence from this turn.
+2. Emit Before execution, then Pre-flight; tick only with
+   evidence from this turn.
 3. Declare `build_learner` under `src/<pkg>/` (Rule 1–3). Confirm
    new symbols with `python -m skore_skills api get`. After edits,
    `python -m skore_skills style`. Probes go to `scratch/` via the
    composed-dev Python from `env verify` (no inline `python -c`,
    no warning filters unless the user asks).
+   Then snapshot the **unfitted** learner — no fit, no
+   `SkrubLearner.report`, no `full_report`, no `.skb.eval`. Confirm
+   `sklearn.utils.estimator_html_repr` (or the learner's
+   `_repr_html_`) with `api get`. Write
+   `scratch/results/<stem>/pipeline.html` from that HTML. Ensure
+   `journal/<stem>.md` Method contains
+   `<!-- results-embed: pipeline -->` (add the line if the note
+   predates the marker). Add or update `experiments/<stem>.py`
+   Method cells: markdown + a code cell that builds the unfitted
+   `build_learner()`, writes the same HTML path, and leaves
+   `learner` as the last expression. Do **not** add
+   `skore.evaluate` / `project.put` here. Optional:
+   `DataOp.skb.draw_graph()` to `pipeline.svg` only if
+   `python -m skore_skills env graphviz` is healthy; otherwise
+   skip Graphviz in one line. If `policy.site` is true and
+   `export-ml-site` is installed, run
+   `python -m skore_skills site build` so Method shows the
+   diagram before Evaluate. Skip in one line otherwise. Do not
+   `notebook convert` if the experiment file already contains
+   `skore.evaluate`.
 4. When `experiments/NN_*.py` exists with the matching stem, load
    `smoke-test-ml-pipeline` only if
    `status.skills.smoke-test-ml-pipeline` is true. Missing skill →
@@ -81,9 +125,8 @@ features after the marker.
    `action` as authoritative. `stop` / `red` / `smoke_missing` →
    fix topology here; do not loosen the assertion; do not
    evaluate. Do not claim pytest is green without this command.
-5. `smoke run` `proceed`: report stem, Method / Status.headline, and the
-   learner. Then run
-   `python -m skore_skills evaluate consent --stem <stem>`.
+5. `smoke run` `proceed`: User-facing close (checkpoint), then
+   run `python -m skore_skills evaluate consent --stem <stem>`.
    Treat JSON `action` as authoritative.
    - `ask` — **AskUserQuestion** (single choice), in order:
      **Evaluate (Recommended)** / **Modify** / **Stop**, then
@@ -100,6 +143,29 @@ features after the marker.
 
 Do not load evaluate before Evaluate on `ask` (or `proceed`).
 Re-emit Pre-flight with evidence before the final message.
+
+### User-facing close
+
+Checkpoint after `smoke run` `proceed`, before the Evaluate
+menu. The user-facing message is a short story plus links. It
+is not Pre-flight, not a dump of the design note, and not
+stem/headline/learner alone.
+
+1. **Narrative first** — 2–6 sentences: what was declared, that
+   smoke is green, the learner. Ground in Method. Do not invent
+   a CV metric. No Skore locator yet (`put` has not run).
+2. **Open these** — markdown links plus the resolved absolute
+   path for local files:
+   `[journal/<stem>.md](journal/<stem>.md)` and
+   `[experiments/<stem>.py](experiments/<stem>.py)`. If
+   `policy.site` is true and `site build` ran this turn:
+   `[<package>.html](<workspace>/<package>.html)` and
+   `html/<stem>.html`.
+3. **Normalized tokens second** — none (no G-REPORT-LOCATOR /
+   G-AUDIT-FINDING).
+
+This skill owns the checkpoint. `smoke-test-ml-pipeline` does
+not narrate after green.
 
 ## Entry contracts
 
@@ -258,6 +324,7 @@ Layer 3: features take X + history as references.
 | `skore.evaluate(learner, X, y, ...)` | SkrubLearner takes `data={...}` |
 | Bare `sklearn.Pipeline` as top-level | Rule 1 |
 | Inline composed-dev `python -c` | Write `scratch/<ts>_*.py` |
+| `learner.report(...)` / `full_report` / `.skb.eval` for Method | Those **fit**. Use `estimator_html_repr` / `_repr_html_` |
 
 ## Pre-flight — emit before any code
 
@@ -447,6 +514,8 @@ Look up symbols with `api get`. Code: `references/common_patterns.md`.
 | `add-python-package` | Missing `skrub` / sklearn / Graphviz companions |
 | `research-ml-practice` | Load if installed on FE / transform / leakage. Abstract the **problem class**, not the table name. Summarize `scratch/research/<slug>.md`. AskUserQuestion `allow_multiple` on **`declare`** rows that do not violate stops. `measure` → revisit EDA; do not edit `data_analysis.py`. Declaring id handling does **not** wire Pattern B — no `cv=` / `split_kwargs` / `GroupKFold` until grouping is an approved Method choice. `evaluate` → name `evaluate-ml-pipeline`. `confirm` → ask the user. Missing skill → one-line skip |
 | `python -m skore_skills style` | After writing/editing `pipeline.py` / `features.py` / `data.py` |
+| `python -m skore_skills env graphviz` | Optional DataOp SVG via `draw_graph`; not required for Method HTML |
+| `python -m skore_skills site build` | After the unfitted `pipeline.html` snapshot when `policy.site` |
 
 ## References (load on demand)
 

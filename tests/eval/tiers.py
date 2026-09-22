@@ -35,6 +35,7 @@ SKILL_TIER: dict[str, str] = {
     "export-ml-notebook": "medium",
     "export-ml-site": "medium",
     "export-ml-project": "medium",
+    "sync-ml-reports": "medium",
 }
 
 

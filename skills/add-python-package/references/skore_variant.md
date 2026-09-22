@@ -32,6 +32,8 @@ constraint.
 - Using PATH or Skore CLI provenance to choose the package source.
   Only the project manager manifest selects it.
 
-When the user changes mode, reconfirm the migration and rerun
-`env add-skore --mode <new-mode> --execute`. Existing reports remain
-on their prior backend until manually migrated.
+When the user changes mode, load `sync-ml-reports` if installed
+(that skill owns `skore sync` and the policy/init rewrite). This
+skill only reruns `env add-skore --mode <new-mode> --execute` when
+that parent asks for the destination extra. Do not migrate reports
+here.

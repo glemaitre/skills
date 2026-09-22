@@ -12,6 +12,12 @@
 - `evaluate-ml-pipeline` dispatched this audit.
 
 **Must do:**
+- Before writing/running the audit, give a 1–3 sentence preview:
+  local read-only loading of the persisted report, checks /
+  metrics / view rendering, and the audit digest / HTML outputs.
+- State explicitly that audit does not retrain or re-evaluate the
+  model; timing depends on report size and requested views, with
+  no invented minute estimate.
 - Confirm the report with `project.summarize()` and load it with
   `project.get(id)`.
 - Render checks and metrics into the audit digest.
@@ -27,6 +33,7 @@
   `loop locator` JSON only after Close audit.
 
 **Must NOT do:**
+- Describe audit as model training or full CV.
 - Call `skore.evaluate` or `project.put`.
 - Require the experiment to be `done` before audit.
 - Dispatch record-outcome before producing the digest.
@@ -46,13 +53,17 @@
 **Must do:**
 - Run `python -m skore_skills loop artifacts --stem 03_*`
   (`record` expected) and `loop locator --stem 03_*`.
-- Surface JSON `locator` verbatim.
+- Write 2–6 sentences from Checks + Metrics in the digest and
+  link `journal/03_*.md`.
+- Surface JSON `locator` verbatim (first among tokens, after the
+  narrative) and G-AUDIT-FINDING verbatim.
 - Run audit, then call `manage-ml-backlog` record-outcome with the
   digest and locator.
 - Build the site only after record-outcome when enabled.
 - Close with `git end-turn --stage evaluate`.
 
 **Must NOT do:**
+- Paste `scratch/audit/<stem>/audit.md` wholesale into chat.
 - Open the next-lever menu from record-outcome mode.
 - Call record-outcome before audit.
 - Run `git commit`.
@@ -78,6 +89,8 @@
 - State that the dispatcher owns record-outcome, site, and git close.
 
 **Must NOT do:**
+- Write the User-facing close (narrative + Open these) here;
+  the dispatcher owns it.
 - Run `git end-turn` or `persist-ml-git` from this skill (naming
   them as the **dispatcher's** close is allowed).
 - Load `triage-ml-task` from this skill.
@@ -117,6 +130,9 @@
   that method.
 
 **Must do:**
+- Refresh the execution preview for the selected view because it
+  materially changes report rendering; do not repeat it before
+  every style / cells command.
 - Present Additional report view / Custom query / Custom plot /
   Close audit in that exact order.
 - Offer only accessor names from this turn's `Displays` groups — not

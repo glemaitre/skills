@@ -159,6 +159,31 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 Tick, then run the matching step. Re-emit the checklist with
 evidence. End of turn only after Close.
 
+## Before execution
+
+After G-DATA-ANALYSIS, G-TABULAR, target, families, and IPython
+are resolved, emit 1–3 natural sentences immediately before the
+first notebook write / `cells run`. Say that this is **local
+computation**: it profiles the confirmed full table family or
+families, runs duplicate / target / bivariate / leakage analyses
+that apply, and writes `data_analysis/` HTML / figures plus
+`scratch/data_analysis/` JSON facts. Name the data scope and the
+report paths; do not dump Pre-flight as the explanation.
+
+Describe cost from facts, not guesses. TableReport and requested
+plots scale with table size and number of families; unless a
+measured duration is already available, say timing depends on
+those inputs and do not invent minutes. Emit this preview once,
+not before every cell command; refresh it only when a newly
+selected extra materially changes the work.
+
+Automatic exploration / a methodology discussion is **LLM
+research**, not model fitting or testing: say that it will reason
+over the recorded EDA, may write a scratch research note, and
+will stop at a measurement-choice board before local analysis.
+If a mandatory gate is pending, preview the possible work but do
+not write or execute the notebook.
+
 ## Procedure (run path)
 
 1. Resolve `<TARGET>` / `<TASK>` (`classification` | `regression`
@@ -214,10 +239,9 @@ evidence. End of turn only after Close.
    the turn (“EDA is done”, “close the turn”): **AskUserQuestion**
    one pick. Neither option is recommended or preselected. After
    the first md, always ask (including when triage sent you here).
-   Close → End of turn. Do not rewrite `data_analysis.md` on
-   Close. If chat restates findings, duplicate / target /
-   leakage stay in Modelling implications, not only Open
-   questions.
+   Close → End of turn (User-facing close). Do not rewrite
+   `data_analysis.md` on Close. Duplicate / target / leakage stay
+   in Modelling implications, not only Open questions.
 
 If the original prompt already named extras (e.g. PCA), include
 those cells in step 1 and do not re-ask that extra.
@@ -328,6 +352,29 @@ Run this block **only after Close** (or when the user already
 closed the turn). Keep exploring never reaches here. Do not
 rewrite `data_analysis.md` in this block.
 
+### User-facing close
+
+The user-facing message is a short story plus links. It is not
+Pre-flight, not a dump of markdown, and not JOURNAL table cells
+alone.
+
+1. **Narrative first** — 2–6 sentences of findings for this
+   stage, grounded in Modelling implications / the JSON facts
+   (shape, target, leakage or duplicates that shape modelling).
+   Do not invent columns. Do not paste `data_analysis.md`.
+2. **Open these** — markdown links plus the resolved absolute
+   path for local files (TUI clickability):
+   `[data_analysis/data_analysis.md](data_analysis/data_analysis.md)`.
+   If `policy.site` is true and `site build` ran or is about to:
+   `[<package>.html](<workspace>/<package>.html)` and
+   `html/data_analysis.html`. No Skore locator on this stage.
+3. **Normalized tokens second** — none for EDA (no
+   G-REPORT-LOCATOR / G-AUDIT-FINDING).
+
+This skill owns the close. Keep exploring stays a 1–2 sentence
+summary (optional md link); it never reaches convert / site /
+`git end-turn`.
+
 If `policy.notebooks` is true, `export-ml-notebook` is installed,
 run `python -m skore_skills notebook convert
 data_analysis/data_analysis.py`, with `--html` when `policy.site`
@@ -338,7 +385,9 @@ do not fail the turn, do not `pixi add`.
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` after durable files are on
 disk. Skip in one line otherwise. Name a build error; do not fail
-the data-analysis turn.
+the data-analysis turn. Name `<package>.html` and
+`html/data_analysis.html` in the User-facing close when the
+build ran.
 
 `python -m skore_skills git end-turn --stage data_analysis`. If
 JSON `action` is `invoke`, load `persist-ml-git` only if

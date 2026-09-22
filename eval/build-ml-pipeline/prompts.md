@@ -48,6 +48,8 @@ violated. 18 cases; Must-NOT is all-or-nothing.
   from `build_learner` / `build_pipeline`. A docstring that only
   names the forbidden equivalent is not a violation.
 - Use `skrub.X(...)` / `skrub.y(...)` as graph roots.
+- Call `learner.report(...)` or `full_report` to snapshot the Method
+  diagram (that fits; use `_repr_html_` / `estimator_html_repr`).
 
 ---
 
@@ -310,14 +312,24 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 - Workspace is scaffolded.
 
 **Must do:**
+- After design consent and before declaration, give a 1–3 sentence
+  preview: local preparation of an unfitted learner, experiment
+  Method cells, and pipeline snapshot, followed by smoke.
+- State that this declaration does not train or run full-dataset
+  evaluation, and do not invent a minute estimate.
 - Load `smoke-test-ml-pipeline` after the declaration.
 - Run `python -m skore_skills smoke run --stem 01_baseline`
   after the smoke file exists.
+- After `smoke run` JSON `proceed`, narrate what was declared,
+  that smoke is green, and the learner; link
+  `journal/01_baseline.md` and `experiments/01_baseline.py`
+  before the Evaluate menu.
 - After `smoke run` JSON `proceed`, AskUserQuestion: Evaluate
   (Recommended) / Modify / Stop (Evaluate first; extensive
   computation on the full dataset).
 
 **Must NOT do:**
+- Present the declaration itself as model training or CV.
 - Author a `skore.evaluate(...)` call site before that
   AskUserQuestion. Naming it in a docstring or "not written
   now" sentence is allowed.

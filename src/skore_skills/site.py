@@ -35,6 +35,9 @@ NOTEBOOKS_SECTION = re.compile(
 RESULTS_SECTION = re.compile(
     r"(?ms)^## Results\s*\n.*?(?=^## |\Z)",
 )
+METHOD_SECTION = re.compile(
+    r"(?ms)^## Method\s*\n.*?(?=^## |\Z)",
+)
 RESULT_ITEMS = (
     ("report", "Report overview"),
     ("checks", "Checks"),
@@ -371,10 +374,12 @@ def _append_after_embed_marker(section: str, slug: str, embed: str) -> str:
         (item for item in pattern.finditer(section) if marker in item.group(1)),
         None,
     )
-    if match is None:
+    if match is not None:
+        body = match.group(1).rstrip() + f"\n\n{embed}\n\n"
+        return section[: match.start()] + body + section[match.end() :]
+    if marker not in section:
         return section
-    body = match.group(1).rstrip() + f"\n\n{embed}\n\n"
-    return section[: match.start()] + body + section[match.end() :]
+    return section.replace(marker, f"{marker}\n\n{embed}\n", 1)
 
 
 def _result_embed(root: Path, stem: str, slug: str, title: str) -> str | None:
@@ -391,27 +396,12 @@ def _result_embed(root: Path, stem: str, slug: str, title: str) -> str | None:
     return None
 
 
-def inject_results(text: str, page: Page, root: Path) -> str:
-    """Embed scratch report HTML under an authored Results section."""
-    if page.section != "Experiments":
-        return text
-    match = RESULTS_SECTION.search(text)
-    if match is None:
-        return text
-    section = match.group(0)
-    stem = Path(page.dest_name).stem
-    for kind, heading in RESULT_ITEMS:
-        embed = _result_embed(root, stem, kind, f"{page.title} {heading.lower()}")
-        if embed is None:
-            continue
-        name = result_dest(stem, kind)
-        if f'src="{name}"' in section:
-            continue
-        section = _append_under_heading(section, heading, embed)
+def _inject_marked_embeds(section: str, root: Path, stem: str, title: str) -> str:
+    """Append scratch snapshots after ``results-embed`` comments in ``section``."""
     for slug in RESULT_EMBED.findall(section):
         if slug in CORE_RESULT_KINDS:
             continue
-        embed = _result_embed(root, stem, slug, f"{page.title} {slug}")
+        embed = _result_embed(root, stem, slug, f"{title} {slug}")
         if embed is None:
             continue
         names = [
@@ -421,6 +411,31 @@ def inject_results(text: str, page: Page, root: Path) -> str:
         if any(f'src="{name}"' in section or f"]({name})" in section for name in names):
             continue
         section = _append_after_embed_marker(section, slug, embed)
+    return section
+
+
+def inject_results(text: str, page: Page, root: Path) -> str:
+    """Embed scratch snapshots under Method and Results on experiment pages."""
+    if page.section != "Experiments":
+        return text
+    stem = Path(page.dest_name).stem
+    method = METHOD_SECTION.search(text)
+    if method is not None:
+        section = _inject_marked_embeds(method.group(0), root, stem, page.title)
+        text = text[: method.start()] + section + text[method.end() :]
+    match = RESULTS_SECTION.search(text)
+    if match is None:
+        return text
+    section = match.group(0)
+    for kind, heading in RESULT_ITEMS:
+        embed = _result_embed(root, stem, kind, f"{page.title} {heading.lower()}")
+        if embed is None:
+            continue
+        name = result_dest(stem, kind)
+        if f'src="{name}"' in section:
+            continue
+        section = _append_under_heading(section, heading, embed)
+    section = _inject_marked_embeds(section, root, stem, page.title)
     return text[: match.start()] + section + text[match.end() :]
 
 

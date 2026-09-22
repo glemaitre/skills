@@ -119,6 +119,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [persist-ml-git](skills/persist-ml-git/SKILL.md) | Commit the current loop stage when git end-turn says invoke. |
 | [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Coordinate build (pytest smoke), evaluation, and audit. |
 | [export-ml-project](skills/export-ml-project/SKILL.md) | Coordinate executed notebooks and an offline MkDocs site. |
+| [sync-ml-reports](skills/sync-ml-reports/SKILL.md) | Copy skore reports between local, Hub, and MLflow, and optionally switch the upload destination. |
 | [choose-python-library](skills/choose-python-library/SKILL.md) | Resolve a library choice and add the selected dependency. |
 | [plot-ml-figure](skills/plot-ml-figure/SKILL.md) | Pick pandas, seaborn, plotly, or matplotlib before writing figure code. |
 
