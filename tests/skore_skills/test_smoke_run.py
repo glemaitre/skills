@@ -36,7 +36,10 @@ def test_empty_stem_raises() -> None:
 
 
 def test_green_pytest_is_proceed(tmp_path: Path) -> None:
-    _write(tmp_path / "tests" / "smoke" / "test_01_ok.py", "def test_ok():\n    assert True\n")
+    _write(
+        tmp_path / "tests" / "smoke" / "test_01_ok.py",
+        "def test_ok():\n    assert True\n",
+    )
     payload, code = run_smoke(tmp_path, "01_ok")
     assert code == 0
     assert payload["action"] == "proceed"
@@ -71,11 +74,12 @@ def test_cli_prints_json_when_missing(
     assert payload["reason"] == "smoke_missing"
 
 
-def test_cli_green(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_cli_green(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    _write(tmp_path / "tests" / "smoke" / "test_01_ok.py", "def test_ok():\n    assert True\n")
+    _write(
+        tmp_path / "tests" / "smoke" / "test_01_ok.py",
+        "def test_ok():\n    assert True\n",
+    )
     result = CliRunner().invoke(cli, ["smoke", "run", "--stem", "01_ok"])
     assert result.exit_code == 0, result.output
     payload = _payload(result.output)

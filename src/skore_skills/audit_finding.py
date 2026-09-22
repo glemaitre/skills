@@ -76,9 +76,7 @@ def format_finding(issues: list[str], tips: list[str], metric: str | None) -> st
     else:
         parts = [f"{code} (issue)" for code in issues]
         parts.extend(f"{code} (tip)" for code in tips)
-        text = (
-            f"{len(issues)} issue(s), {len(tips)} tip(s) — " + ", ".join(parts)
-        )
+        text = f"{len(issues)} issue(s), {len(tips)} tip(s) — " + ", ".join(parts)
     if metric:
         text = f"{text}; {metric}"
     return text
