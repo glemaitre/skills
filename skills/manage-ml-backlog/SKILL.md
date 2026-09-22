@@ -43,7 +43,12 @@ When `model-ml-pipeline`, `evaluate-ml-pipeline`, or
 G-REPORT-LOCATOR, optional headline, and G-AUDIT-FINDING. This is
 the only path that records an outcome without a full backlog turn.
 Audit may have been skipped; the locator remains required and the
-finding becomes `n/a — audit not run`.
+finding becomes `n/a — audit not run`. If the caller omitted the
+locator, run `python -m skore_skills loop locator --stem <stem>`
+and paste JSON `locator`. If it omitted the finding, run
+`python -m skore_skills audit finding --stem <stem>` (`stop` →
+`n/a — audit not run` / `n/a — audit digest unavailable`). Do not
+rephrase either string.
 
 Run Procedure steps 1-3 and nothing else:
 

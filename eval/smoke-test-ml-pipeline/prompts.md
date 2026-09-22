@@ -29,7 +29,7 @@ violated.
   pointing to the design note).
 - Mention NOT importing `skore` in the test file (test must run
   in any skrub-capable env).
-- Run pytest on `tests/smoke/test_02_load_forecast.py`.
+- Run `python -m skore_skills smoke run --stem 02_load_forecast`.
 
 **Must NOT do:**
 - Synthesize a fake DataFrame fixture.
@@ -218,11 +218,10 @@ violated.
 **Must do:**
 - Write a complete `tests/smoke/test_01_baseline.py` using those
   facts (hardcoded `0.42`, package `pricing`, no `<FILL_…>`).
-- Name the exact `pytest tests/smoke/test_01_baseline.py`
-  invocation.
+- Name `python -m skore_skills smoke run --stem 01_baseline`.
 
 **Must NOT do:**
-- Tell the user or CI to run pytest. Naming the invocation and
+- Tell the user or CI to run pytest. Naming `smoke run` and
   noting a no-tools turn cannot execute it is allowed.
 - AskUserQuestion Evaluate (Recommended) / Modify / Stop (that gate is build's).
 - Write `skore.evaluate`.

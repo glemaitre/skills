@@ -286,6 +286,10 @@ _results = PROJECT_ROOT / "scratch" / "results" / "01_baseline"
 _results.mkdir(parents=True, exist_ok=True)
 (_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
 (_results / "report.txt").write_text(repr(report), encoding="utf-8")
+(_results / "locator.txt").write_text(
+    "local workspace: [reports/](../reports/) · id: <id>",
+    encoding="utf-8",
+)
 
 # %% [markdown]
 # ## Persist

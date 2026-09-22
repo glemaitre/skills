@@ -19,10 +19,12 @@
   the bare Display last on checks and metrics, with no text snapshot.
 - Print a `help()` tree per namespace for the Additional report view
   menu.
-- Derive G-AUDIT-FINDING from the digest.
+- Derive G-AUDIT-FINDING by running
+  `python -m skore_skills audit finding --stem <stem>` and pasting
+  JSON `finding` verbatim.
 - Ask Additional report view / Custom query / Custom plot / Close
-  audit in that order; return the digest, finding, and normalized
-  report locator only after Close audit.
+  audit in that order; return the digest, JSON `finding`, and
+  `loop locator` JSON only after Close audit.
 
 **Must NOT do:**
 - Call `skore.evaluate` or `project.put`.
@@ -42,7 +44,9 @@
 - The report exists and smoke is green.
 
 **Must do:**
-- Surface the normalized persisted-report locator.
+- Run `python -m skore_skills loop artifacts --stem 03_*`
+  (`record` expected) and `loop locator --stem 03_*`.
+- Surface JSON `locator` verbatim.
 - Run audit, then call `manage-ml-backlog` record-outcome with the
   digest and locator.
 - Build the site only after record-outcome when enabled.
@@ -68,7 +72,8 @@
   `local workspace: [reports/](../reports/) · id: local-report-id`.
 
 **Must do:**
-- Return the digest, G-AUDIT-FINDING, locator, and optional headline to
+- Return the digest, G-AUDIT-FINDING from `audit finding`, locator
+  from `loop locator`, and optional headline to
   `model-ml-pipeline`.
 - State that the dispatcher owns record-outcome, site, and git close.
 
@@ -120,7 +125,7 @@
   `## Core audit complete` on the same `audit/<stem>.py`, write
   `scratch/results/<stem>/<slug>.html`, leave the bare Display last,
   run style + cells run, and overwrite the digest.
-- Recompute G-AUDIT-FINDING from checks and metrics only and
+- Recompute G-AUDIT-FINDING with `audit finding --stem <stem>` and
   present the same gate again.
 
 **Must NOT do:**

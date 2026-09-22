@@ -177,16 +177,16 @@
     },
     {
       "id": 10,
-      "title": "After declaration, pytest smoke then HITL",
+      "title": "After declaration, smoke run then HITL",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved `journal/01_baseline.md`.\n- Experiment shell `experiments/01_baseline.py` exists after\n  the declaration.\n- Workspace is scaffolded.]\n\nThe design is approved. Declare the learner and stop before\nfull-dataset CV.",
-      "expected_output": "Behavioural response satisfying: - Load `smoke-test-ml-pipeline` after the declaration. - Treat pytest on `tests/smoke/test_01_baseline.py` as the way to modify the pipeline. - After green smoke, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset). It must NOT: - Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed. - Skip pytest and jump to CV.",
+      "expected_output": "Behavioural response satisfying: - Load `smoke-test-ml-pipeline` after the declaration. - Run `python -m skore_skills smoke run --stem 01_baseline` after the smoke file exists. - After `smoke run` JSON `proceed`, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset). It must NOT: - Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed. - Skip `smoke run` and jump to CV.",
       "files": [],
       "expectations": [
         "Load `smoke-test-ml-pipeline` after the declaration.",
-        "Treat pytest on `tests/smoke/test_01_baseline.py` as the way to modify the pipeline.",
-        "After green smoke, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset).",
+        "Run `python -m skore_skills smoke run --stem 01_baseline` after the smoke file exists.",
+        "After `smoke run` JSON `proceed`, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset).",
         "The response does NOT: Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed.",
-        "The response does NOT: Skip pytest and jump to CV."
+        "The response does NOT: Skip `smoke run` and jump to CV."
       ],
       "tools": false,
       "sandbox": [],
@@ -196,15 +196,15 @@
       "id": 11,
       "title": "Dummy remains an operational predictor",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The approved Method names a dummy predictor.\n- No prior model exists.]\n\nImplement the approved dummy-predictor design for this\nclassification task.",
-      "expected_output": "Behavioural response satisfying: - Use `DummyClassifier` as the predictor in the skrub DataOps graph and name `api get` for its installed signature. - Continue to pytest smoke and the normal Evaluate (Recommended) / Modify / Stop gate. - State that this validates the operational path, not predictive value. It must NOT: - Substitute a stronger estimator. - Add domain feature engineering. - Skip pytest because the predictor is trivial.",
+      "expected_output": "Behavioural response satisfying: - Use `DummyClassifier` as the predictor in the skrub DataOps graph and name `api get` for its installed signature. - Continue to `smoke run` and the normal Evaluate (Recommended) / Modify / Stop gate. - State that this validates the operational path, not predictive value. It must NOT: - Substitute a stronger estimator. - Add domain feature engineering. - Skip `smoke run` because the predictor is trivial.",
       "files": [],
       "expectations": [
         "Use `DummyClassifier` as the predictor in the skrub DataOps graph and name `api get` for its installed signature.",
-        "Continue to pytest smoke and the normal Evaluate (Recommended) / Modify / Stop gate.",
+        "Continue to `smoke run` and the normal Evaluate (Recommended) / Modify / Stop gate.",
         "State that this validates the operational path, not predictive value.",
         "The response does NOT: Substitute a stronger estimator.",
         "The response does NOT: Add domain feature engineering.",
-        "The response does NOT: Skip pytest because the predictor is trivial."
+        "The response does NOT: Skip `smoke run` because the predictor is trivial."
       ],
       "tools": false,
       "sandbox": [],

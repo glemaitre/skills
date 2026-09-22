@@ -93,13 +93,14 @@ has created the shell, then stop for explicit design approval.
 1. Load `build-ml-pipeline` only if `status.skills.build-ml-pipeline`
    is true; else one-line skip and stop — do not declare the
    pipeline from this meta. That skill loads `smoke-test-ml-pipeline`
-   after the experiment file exists and **runs pytest** on
-   `tests/smoke/test_NN_*.py`. Red pytest stays in build (modify
-   the pipeline, re-run pytest). Green pytest: build reports the
+   after the experiment file exists and runs
+   `python -m skore_skills smoke run --stem <stem>`. JSON `stop`
+   stays in build (modify the pipeline, re-run `smoke run`).
+   `proceed`: build reports the
    design, then
    `python -m skore_skills evaluate consent --stem <stem>`
    (Evaluate / Modify / Stop on `ask`).
-2. Only if the user chose **Evaluate** and smoke is green: load
+2. Only if the user chose **Evaluate** and `smoke run` is `proceed`: load
    `evaluate-ml-pipeline` only if `status.skills.evaluate-ml-pipeline`
    is true — leakage-safe splitter and
    `skore.evaluate` in the experiment script. Re-run `status`
@@ -107,22 +108,27 @@ has created the shell, then stop for explicit design approval.
    <stem>`. Consent JSON is authoritative, not the user's wording
    alone. Missing `evaluate-ml-pipeline` → one-line skip. Do not
    invent that skill's steps.
-3. After a successful evaluate: load `audit-ml-pipeline` only if
+3. After a successful evaluate: run
+   `python -m skore_skills loop artifacts --stem <stem>`. `audit` →
+   load `audit-ml-pipeline` only if
    `status.skills.audit-ml-pipeline` is true (same stem). Missing
-   skill → one-line skip. Re-run `status` first. No report → do
-   not invent an audit; stop. The audit owns its deterministic
+   skill → one-line skip. `evaluate_incomplete` / `stop` → do
+   not invent an audit. The audit owns its deterministic
    follow-up gate and returns only after Close audit, with the
-   digest, G-AUDIT-FINDING, locator, and optional headline.
-4. After audit — or after evaluate when audit was skipped — load
+   digest, G-AUDIT-FINDING from `audit finding`, locator, and
+   optional headline.
+4. After audit — or after evaluate when artifacts JSON is `record`
+   or audit was skipped — load
    `manage-ml-backlog` only if `status.skills.manage-ml-backlog`
    is true, in **record-outcome mode**, handing it the
-   normalized G-REPORT-LOCATOR, optional headline, and
-   G-AUDIT-FINDING. Audit skipped →
-   `n/a — audit not run`. Else one-line skip; do not write History from this
+   JSON locator from `loop locator --stem <stem>`, optional headline, and
+   G-AUDIT-FINDING from `audit finding` (or
+   `n/a — audit not run`). Else one-line skip; do not write History from this
    meta. It writes the `JOURNAL.md` History row and design-note
    Status block plus `## Results` from the digest text,
    then returns; it does not rescan the Backlog or
-   open the next-lever menu. Never mark `done` while smoke is red.
+   open the next-lever menu. Never mark `done` while `smoke run`
+   is `stop`.
    Audit-skipped runs still record the locator; missing headline
    becomes `n/a`, never an invented metric. The Evaluate
    branch's visible close is that dispatch sequence. Do not claim
@@ -149,11 +155,11 @@ symbols are written, children use
   "the user asked to build" as approval.
 - Preserve identical stems across design, experiment, smoke, audit.
 - Do not replace skrub DataOps with bare sklearn Pipeline.
-- Do not persist a result as done while smoke tests fail.
+- Do not persist a result as done while `smoke run` is `stop`.
 - Do not load evaluate (or write `skore.evaluate`) before the
   post-smoke HITL answer is Evaluate (`evaluate consent` `ask`),
   except `proceed` for a stem that already has a persisted report,
-  or while pytest is red.
+  or while `smoke run` is `stop`.
 - Do not load `smoke-test-ml-pipeline` from this dispatcher.
 - Do not duplicate child-skill methodology in this dispatcher.
 - If `status.data_analysis` is `missing`, continue with facts the user

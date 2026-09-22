@@ -34,8 +34,11 @@ violated.
   the end of the turn.
 - If that command returns `invoke`, load `persist-ml-git`.
 - Write `scratch/results/01_baseline/report.html` from
-  `report._repr_html_()` and `report.txt` from `repr(report)` in
+  `report._repr_html_()`, `report.txt` from `repr(report)`, and
+  `locator.txt` with the normalized G-REPORT-LOCATOR in
   `experiments/01_baseline.py` after the bare `report` display.
+- Name `python -m skore_skills loop locator --stem 01_baseline` and
+  `python -m skore_skills loop artifacts --stem 01_baseline`.
 
 **Must NOT do:**
 - Recommend `cross_val_score`, `cross_validate`,

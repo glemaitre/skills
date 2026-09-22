@@ -109,8 +109,6 @@ def test_available_returns_a_list_of_names(report: object, namespace: str) -> No
 
 
 @pytest.mark.parametrize("namespace", ["inspection", "data"])
-def test_available_is_absent_on_some_namespaces(
-    report: object, namespace: str
-) -> None:
+def test_available_is_absent_on_some_namespaces(report: object, namespace: str) -> None:
     """Discovery must fall back to ``help()`` where ``available()`` is missing."""
     assert not hasattr(getattr(report, namespace), "available")

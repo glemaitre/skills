@@ -20,6 +20,9 @@ def test_help_exits_zero() -> None:
     assert "python -m skore_skills" in result.output
     assert "notebook" in result.output
     assert "site" in result.output
+    assert "smoke" in result.output
+    assert "audit" in result.output
+    assert "loop" in result.output
 
 
 def test_version_matches_package() -> None:

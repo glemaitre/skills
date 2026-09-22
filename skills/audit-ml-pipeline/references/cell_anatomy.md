@@ -132,6 +132,7 @@ the user picks a name from the `help()` trees.
    _results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
    _results.mkdir(parents=True, exist_ok=True)
    (_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
+   (_results / "locator.txt").write_text("<REPORT_LOCATOR>", encoding="utf-8")
    report
    ```
    Confirm `_repr_html_` with `api get`. The HTML is for the site
@@ -219,22 +220,10 @@ after each append.
 
 ## Digest-to-finding contract
 
-G-AUDIT-FINDING is derived after every digest run:
-
-1. Collect checks under `Issues:`, then under `Tips:`, preserving
-   their order within each section. Codes are `[SKD003]` tokens.
-2. Report counts and each code/severity:
-   `<I> issue(s), <T> tip(s) — <CODE> (issue), <CODE> (tip)`.
-3. Append a short headline metric clause only when that value is
-   present in the metrics summary.
-4. With no `Issues:` / `Tips:` lines, use
-   `0 issues, 0 tips — automated checks surfaced no actionable finding`.
-5. With a missing or errored digest, use
-   `n/a — audit digest unavailable`.
-
-The finding is not the headline result. It is handed separately to
-record-outcome and copied verbatim into the design note's Status
-block. Extra Display cells do not change G-AUDIT-FINDING.
+After every digest run, execute
+`python -m skore_skills audit finding --stem <stem>` and paste
+JSON `finding` verbatim. Do not re-derive the string by hand.
+Extra Display cells do not change G-AUDIT-FINDING.
 
 ## Why the bare Display is the right last expression
 

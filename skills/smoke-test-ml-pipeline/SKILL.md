@@ -32,8 +32,9 @@ description: >
 
   HOW TO USE: run `status` first. Read the matching experiment's
   `journal/NN_*.md` and `experiments/NN_*.py` for env-dict keys.
-  Write or update `tests/smoke/test_NN_*.py`, then **run pytest**
-  on that file. Red pytest is the signal to modify the pipeline
+  Write or update `tests/smoke/test_NN_*.py`, then run
+  `python -m skore_skills smoke run --stem <stem>`. Red JSON is the
+  signal to modify the pipeline
   in `build-ml-pipeline`; do not loosen the assertion. Do not
   write the design note or run CV.
 ---
@@ -48,16 +49,18 @@ user-visible content is the complete test file in a fenced block
 (`assert len(predictions) == n_predict_grid_rows`, predict env
 with no pre-history buffer, real `data/` source, soft assertion
 with the CV-mean hardcoded as a literal, no `skore` import).
-Then **run pytest** on that file. Do not stop at a plan or leave
+Then **run** `python -m skore_skills smoke run --stem
+<NN>_<short_name>`. Treat JSON `action` as authoritative. Do not
+stop at a plan or leave
 the file only in a thinking channel. Never tell the user or CI
-to run pytest later. Name the exact
-`pytest tests/smoke/test_NN_<short_name>.py` invocation. A
+to run pytest later. Name that exact
+`smoke run` command. A
 no-tools harness still gets a **complete** test file (use
 assumed journal / experiment / package facts; no `<FILL_…>`)
 and that invocation. Saying this turn cannot execute pytest is
 fine; instructing the user to run it is not. Do not
 AskUserQuestion for evaluate here — that gate belongs to
-`build-ml-pipeline` after pytest is green.
+`build-ml-pipeline` after `smoke run` is `proceed`.
 
 ## Stop conditions — read before anything else
 
@@ -411,8 +414,8 @@ metric problem.
   predict time doesn't match what fit time saw.
 - **Failure blocks `done` status.** `manage-ml-backlog`
   record-outcome refuses to flip an experiment to `done` until
-  the matching smoke test passes. `evaluate-ml-pipeline` also
-  STOPs while pytest is red (or the smoke file is missing on a
+  the matching smoke test passes.   `evaluate-ml-pipeline` also
+  STOPs while `smoke run` is `stop` (or the smoke file is missing on a
   history-dependent pipeline).
 
 ## What this skill does NOT do
@@ -427,18 +430,19 @@ metric problem.
   structural; the soft assertion is a sanity bound, not a
   performance target. Performance judgment is the user's, per
   `triage-ml-task`'s rule that the user judges results.
-- Ask Evaluate (Recommended) / Modify / Stop. After pytest, return to
+- Ask Evaluate (Recommended) / Modify / Stop. After `smoke run`, return to
   `build-ml-pipeline` (parent) or report pass/fail on a
   direct debug request.
 
 ## Run pytest
 
 This is the executable proof. After the test file is written or
-updated, run pytest on `tests/smoke/test_NN_<short_name>.py`
-(project composed dev environment, using the manager reported by
-`python -m skore_skills env detect`). Red
-pytest → route to `build-ml-pipeline` to modify the pipeline;
-do not start evaluate. Green pytest → return to build for the
+updated, run `python -m skore_skills smoke run --stem
+<NN>_<short_name>`. It streams pytest on
+`tests/smoke/test_NN_<short_name>.py` then prints JSON. Do not
+claim green without `action: proceed`. `stop` / `red` → route to
+`build-ml-pipeline` to modify the pipeline;
+do not start evaluate. `proceed` → return to build for the
 design HITL when this skill was loaded as a sub-step.
 
 ## Companion skills
@@ -446,7 +450,7 @@ design HITL when this skill was loaded as a sub-step.
 - **`build-ml-pipeline`** — parent. Owns the X-marker placement
   rule the smoke test asserts, and the post-green HITL. Smoke
   failure typically routes back there for a pipeline-shape fix.
-  Pytest is the loop: red → modify pipeline → pytest again.
+  Pytest is the loop: `smoke run` red → modify pipeline → `smoke run` again.
 - **`manage-ml-backlog`** — record-outcome writes `done`. Requires
   the smoke test to pass before an experiment can flip to `done`.
 - **`evaluate-ml-pipeline`** — owns CV. Do not load it from here.

@@ -164,10 +164,11 @@ read the report. The pipeline declaration is out of scope (see
   silently drops cold-start rows when handed a fresh
   `learner.predict(env₂)`. The structural check that catches this
   is the smoke test owned by `smoke-test-ml-pipeline` (loaded
-  from `build-ml-pipeline`, **run with pytest**) — required
+  from `build-ml-pipeline`, **run with**
+  `python -m skore_skills smoke run --stem <stem>`) — required
   before CV for any pipeline that has a backward shift, lag,
   rolling window, target shift, or join with side history. If
-  pytest is red or the smoke file is missing for such a
+  `smoke run` JSON is `stop` or the smoke file is missing for such a
   pipeline, STOP (see the smoke-not-green Stop condition).
   Do not produce a CV report "anyway".
 - **All Python execution goes to `scratch/`.** Every Python
@@ -189,7 +190,8 @@ read the report. The pipeline declaration is out of scope (see
   requested `metrics.add` / `checks.add`, write
   `report._repr_html_()` to `scratch/results/<stem>/report.html`
   and `repr(report)` to `scratch/results/<stem>/report.txt` using
-  `PROJECT_ROOT`. Confirm `_repr_html_` with
+  `PROJECT_ROOT`. After forming G-REPORT-LOCATOR, write that exact
+  string to `scratch/results/<stem>/locator.txt`. Confirm `_repr_html_` with
   `python -m skore_skills api get`. This is display output only —
   never `evaluate` or `put` from scratch. The `.html` is what site
   build embeds under the design note's Results section. The `.txt`
@@ -243,6 +245,8 @@ read the report. The pipeline declaration is out of scope (see
   Never announce or write a locator before `put` succeeds. Include
   it in the user-facing evaluation result and hand the same value
   to `audit-ml-pipeline` / `manage-ml-backlog` record-outcome.
+  Then run `python -m skore_skills loop locator --stem <stem>` and
+  paste JSON `locator` verbatim — do not rephrase it.
 - **The time-ordered splitter AskUserQuestion is non-skippable,
   even under harness-level "no clarifying questions"
   instructions.** When the data is temporal, the four-option
@@ -585,7 +589,10 @@ API CLI is only for the signature after the name.
 
 **G-REPORT-LOCATOR.** After a successful `put`, this step is
 mandatory and runs first — before returning to the dispatcher,
-record-outcome, convert, site build, or `git end-turn`. Include the
+record-outcome, convert, site build, or `git end-turn`. Write
+`scratch/results/<stem>/locator.txt`, then run
+`python -m skore_skills loop locator --stem <stem>` and paste
+JSON `locator` verbatim. Include the
 normalized locator in the user-facing result (local: also the
 resolved absolute `reports/` path). Missing locator is the explicit
 string `n/a — backend did not expose a locator`, never silence.
@@ -593,6 +600,13 @@ Hand the same value to `audit-ml-pipeline` / `manage-ml-backlog`
 record-outcome. When returning to `model-ml-pipeline`, pass it up;
 do not drop it because the dispatcher owns convert. Do not invent a
 URL here — the after-`put` rule above is the only source.
+
+Then run `python -m skore_skills loop artifacts --stem <stem>`.
+Treat JSON `action` as authoritative:
+- `stop` / `evaluate_incomplete` — do not dispatch audit or
+  record-outcome; name the missing file.
+- `audit` — load `audit-ml-pipeline` when that skill is installed.
+- `record` — skip audit; go to record-outcome.
 
 When `model-ml-pipeline` dispatched this turn, return to it — the
 dispatcher owns record-outcome / convert / site / `git end-turn`.

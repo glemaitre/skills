@@ -217,6 +217,94 @@ def design_consent_cmd(stem: str) -> None:
         raise click.UsageError(str(exc)) from exc
 
 
+@cli.group("smoke")
+def smoke_group() -> None:
+    """Run the per-stem smoke pytest gate."""
+
+
+@smoke_group.command("run")
+@click.option("--stem", required=True, help="Experiment stem, e.g. 01_baseline.")
+def smoke_run_cmd(stem: str) -> None:
+    """Stream pytest for ``tests/smoke/test_<stem>.py``, then print JSON."""
+    from skore_skills.smoke import render_smoke, run_smoke
+
+    forwarded = ["smoke", "run", "--stem", stem]
+    _reexec_library_command(forwarded)
+    try:
+        payload, code = run_smoke(Path.cwd(), stem)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+    click.echo(render_smoke(payload), nl=False)
+    if code:
+        raise SystemExit(code)
+
+
+@cli.group("audit")
+def audit_group() -> None:
+    """Deterministic audit-digest helpers."""
+
+
+@audit_group.command("finding")
+@click.argument(
+    "digest",
+    required=False,
+    type=click.Path(dir_okay=False, path_type=Path),
+)
+@click.option(
+    "--stem", help="Use scratch/audit/<stem>/audit.md when DIGEST is omitted."
+)
+def audit_finding_cmd(digest: Path | None, stem: str | None) -> None:
+    """Print G-AUDIT-FINDING JSON from a digest. Does not open the Project."""
+    from skore_skills.audit_finding import (
+        audit_finding,
+        default_digest,
+        render_audit_finding,
+    )
+
+    if digest is not None:
+        path = digest
+    elif not stem:
+        raise click.UsageError("provide DIGEST or --stem")
+    else:
+        path = default_digest(Path.cwd(), stem.strip())
+    click.echo(render_audit_finding(audit_finding(path)), nl=False)
+    if not path.is_file():
+        raise SystemExit(1)
+
+
+@cli.group("loop")
+def loop_group() -> None:
+    """Filesystem close-gates for evaluate and audit."""
+
+
+@loop_group.command("artifacts")
+@click.option("--stem", required=True, help="Experiment stem, e.g. 01_baseline.")
+def loop_artifacts_cmd(stem: str) -> None:
+    """Print which close step is due from files on disk."""
+    from skore_skills.loop import loop_artifacts, render_loop
+
+    try:
+        payload = loop_artifacts(Path.cwd(), stem)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+    click.echo(render_loop(payload), nl=False)
+    if payload["action"] == "stop":
+        raise SystemExit(1)
+
+
+@loop_group.command("locator")
+@click.option("--stem", required=True, help="Experiment stem, e.g. 01_baseline.")
+def loop_locator_cmd(stem: str) -> None:
+    """Print the persisted-report locator from scratch or the audit file."""
+    from skore_skills.loop import loop_locator, render_loop
+
+    try:
+        payload = loop_locator(Path.cwd(), stem)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+    click.echo(render_loop(payload), nl=False)
+
+
 @cli.group("check")
 def check_group() -> None:
     """Yes/no checks over workspace facts."""

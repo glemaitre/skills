@@ -61,6 +61,7 @@ report = project.get(REPORT_ID)
 _results = PROJECT_ROOT / "scratch" / "results" / "<NN>_<short_name>"
 _results.mkdir(parents=True, exist_ok=True)
 (_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
+(_results / "locator.txt").write_text("<REPORT_LOCATOR>", encoding="utf-8")
 report
 
 # %% [markdown]

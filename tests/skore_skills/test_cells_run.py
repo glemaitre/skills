@@ -4,12 +4,16 @@ from __future__ import annotations
 
 import importlib
 import os
+import subprocess
+import sys
+import textwrap
 from pathlib import Path
 
 from click.testing import CliRunner
 
 from skore_skills import cells
 from skore_skills.cli import cli
+from skore_skills.env import IN_DEV_ENV
 
 FIXTURE = Path(__file__).parent / "fixtures" / "tiny_notebook.py"
 
@@ -48,6 +52,69 @@ def test_cells_run_hides_the_editor_marker(tmp_path: Path, monkeypatch) -> None:
     cells.run(src, dest)
 
     assert "None" in dest.read_text(encoding="utf-8")
+
+
+def test_cells_run_checks_summarize_does_not_hang_under_vscode_pid(
+    tmp_path: Path,
+) -> None:
+    """Issue 61: checks under ``run_cell`` plus ``VSCODE_PID`` must finish.
+
+    A fresh subprocess imports ``cells`` before skore, matching Cursor's
+    launch shape. In-process pytest can already have built skore's jupyter
+    Console, so this path cannot be covered by ``cells.run`` in the test
+    process.
+    """
+    src = tmp_path / "audit.py"
+    src.write_text(
+        textwrap.dedent(
+            """\
+            # %%
+            import pandas as pd
+            import skore
+            from sklearn.dummy import DummyRegressor
+            from sklearn.model_selection import KFold
+
+            frame = pd.DataFrame(
+                {
+                    "x": list(range(30)),
+                    "z": [float(i % 7) for i in range(30)],
+                    "y": [float(i % 5) for i in range(30)],
+                }
+            )
+            report = skore.evaluate(
+                DummyRegressor(),
+                frame[["x", "z"]],
+                frame["y"],
+                splitter=KFold(n_splits=2),
+            )
+
+            # %%
+            checks = report.checks.summarize()
+            html = checks._repr_html_()
+            assert html.lstrip().startswith("<")
+            checks
+
+            # %%
+            checks.frame()
+            """
+        ),
+        encoding="utf-8",
+    )
+    env = os.environ.copy()
+    env["VSCODE_PID"] = "1"
+    env[IN_DEV_ENV] = "1"
+    completed = subprocess.run(
+        [sys.executable, "-m", "skore_skills", "cells", "run", str(src)],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=60,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "issue(s)" in completed.stdout
+    assert "SKD" in completed.stdout
+    assert " object at 0x" not in completed.stdout
 
 
 def test_cells_run_missing_file() -> None:

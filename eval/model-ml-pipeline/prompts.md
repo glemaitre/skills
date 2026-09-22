@@ -17,7 +17,8 @@
   choices menu.
 - Dispatch `build-ml-pipeline` (do not load
   `smoke-test-ml-pipeline` as a sibling of evaluate).
-- Treat smoke as a **step of build** that **runs pytest**.
+- Treat smoke as a **step of build** that runs
+  `python -m skore_skills smoke run --stem <stem>`.
 - Name the post-smoke AskUserQuestion (Evaluate (Recommended) /
   Modify / Stop) before full-dataset evaluation.
 - Preserve the matching experiment stem.
@@ -72,7 +73,7 @@
 - `export-ml-site` is installed.
 
 **Must do:**
-- Dispatch `build-ml-pipeline` (smoke + pytest inside build).
+- Dispatch `build-ml-pipeline` (`smoke run` inside build).
 - Name the post-smoke HITL before evaluate.
 - Name `python -m skore_skills site build` after the implement
   loop, before git end-turn.
@@ -99,7 +100,7 @@
 - `jupytext`, `nbclient`, and `nbconvert` are installed.
 
 **Must do:**
-- Dispatch `build-ml-pipeline` (smoke + pytest inside build).
+- Dispatch `build-ml-pipeline` (`smoke run` inside build).
 - Name `python -m skore_skills notebook convert
   experiments/01_baseline.py --html` after the implement loop,
   before site build.
@@ -125,8 +126,8 @@
 - `tests/smoke/test_01_baseline.py` fails pytest (row count).
 
 **Must do:**
-- Stay with `build-ml-pipeline` / pytest smoke to fix topology.
-- Name that smoke is a build step run with pytest.
+- Stay with `build-ml-pipeline` / `smoke run` to fix topology.
+- Name that JSON `stop` keeps the loop in build.
 
 **Must NOT do:**
 - Load `evaluate-ml-pipeline` or write `skore.evaluate`.

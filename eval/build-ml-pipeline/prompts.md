@@ -297,7 +297,7 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 
 ---
 
-## CASE_10 — After declaration, pytest smoke then HITL
+## CASE_10 — After declaration, smoke run then HITL
 
 **User prompt:**
 > The design is approved. Declare the learner and stop before
@@ -311,17 +311,17 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 
 **Must do:**
 - Load `smoke-test-ml-pipeline` after the declaration.
-- Treat pytest on `tests/smoke/test_01_baseline.py` as the way
-  to modify the pipeline.
-- After green smoke, AskUserQuestion: Evaluate (Recommended) /
-  Modify / Stop (Evaluate first; extensive computation on the
-  full dataset).
+- Run `python -m skore_skills smoke run --stem 01_baseline`
+  after the smoke file exists.
+- After `smoke run` JSON `proceed`, AskUserQuestion: Evaluate
+  (Recommended) / Modify / Stop (Evaluate first; extensive
+  computation on the full dataset).
 
 **Must NOT do:**
 - Author a `skore.evaluate(...)` call site before that
   AskUserQuestion. Naming it in a docstring or "not written
   now" sentence is allowed.
-- Skip pytest and jump to CV.
+- Skip `smoke run` and jump to CV.
 
 ---
 
@@ -338,7 +338,7 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 **Must do:**
 - Use `DummyClassifier` as the predictor in the skrub DataOps
   graph and name `api get` for its installed signature.
-- Continue to pytest smoke and the normal Evaluate
+- Continue to `smoke run` and the normal Evaluate
   (Recommended) / Modify / Stop gate.
 - State that this validates the operational path, not predictive
   value.
@@ -346,7 +346,7 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 **Must NOT do:**
 - Substitute a stronger estimator.
 - Add domain feature engineering.
-- Skip pytest because the predictor is trivial.
+- Skip `smoke run` because the predictor is trivial.
 
 ---
 

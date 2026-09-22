@@ -74,22 +74,25 @@ features after the marker.
    no warning filters unless the user asks).
 4. When `experiments/NN_*.py` exists with the matching stem, load
    `smoke-test-ml-pipeline` only if
-   `status.skills.smoke-test-ml-pipeline` is true and **run pytest**
-   on `tests/smoke/test_NN_<short_name>.py`. Missing skill →
-   one-line skip; do not invent the pytest file. Red → fix
-   topology here; do not loosen the assertion; do not evaluate.
-5. Green pytest: report stem, Method / Status.headline, and the
+   `status.skills.smoke-test-ml-pipeline` is true. Missing skill →
+   one-line skip; do not invent the pytest file. After the smoke
+   file exists, run
+   `python -m skore_skills smoke run --stem <stem>`. Treat JSON
+   `action` as authoritative. `stop` / `red` / `smoke_missing` →
+   fix topology here; do not loosen the assertion; do not
+   evaluate. Do not claim pytest is green without this command.
+5. `smoke run` `proceed`: report stem, Method / Status.headline, and the
    learner. Then run
    `python -m skore_skills evaluate consent --stem <stem>`.
    Treat JSON `action` as authoritative.
    - `ask` — **AskUserQuestion** (single choice), in order:
      **Evaluate (Recommended)** / **Modify** / **Stop**, then
-     **stop**. Do not write `skore.evaluate(...)`. Green pytest
-     is not Evaluate. If the user answers **Evaluate**, load
+     **stop**. Do not write `skore.evaluate(...)`. `smoke run`
+     `proceed` is not Evaluate. If the user answers **Evaluate**, load
      `evaluate-ml-pipeline` only if
      `status.skills.evaluate-ml-pipeline` is true (or return to
      `model-ml-pipeline` if that is the caller). Missing skill →
-     one-line skip. **Modify** — edit, then pytest again.
+     one-line skip. **Modify** — edit, then `smoke run` again.
      **Stop** — end this skill. No `skore.evaluate`.
    - `proceed` — skip the post-smoke menu; load evaluate / return
      to model for re-eval.
@@ -438,8 +441,9 @@ Look up symbols with `api get`. Code: `references/common_patterns.md`.
 | Skill | Relationship |
 |---|---|
 | `python -m skore_skills api get` | Symbol lookup; cache hits first |
-| `evaluate-ml-pipeline` | `skore.evaluate` and CV choice after green pytest + `evaluate consent` (Evaluate HITL on `ask`). Pattern A/B: `references/metadata-routing.md` |
-| `smoke-test-ml-pipeline` | Sub-step. Load only if `status.skills.smoke-test-ml-pipeline` is true. Writes and **runs pytest** on `tests/smoke/test_NN_*.py`. Missing skill → one-line skip; do not invent the pytest file |
+| `evaluate-ml-pipeline` | `skore.evaluate` and CV choice after `smoke run` `proceed` + `evaluate consent` (Evaluate HITL on `ask`). Pattern A/B: `references/metadata-routing.md` |
+| `smoke-test-ml-pipeline` | Sub-step. Load only if `status.skills.smoke-test-ml-pipeline` is true. Writes `tests/smoke/test_NN_*.py`. Missing skill → one-line skip; do not invent the pytest file |
+| `python -m skore_skills smoke run` | After the smoke file exists. JSON `proceed` / `stop` is the only green/red signal |
 | `add-python-package` | Missing `skrub` / sklearn / Graphviz companions |
 | `research-ml-practice` | Load if installed on FE / transform / leakage. Abstract the **problem class**, not the table name. Summarize `scratch/research/<slug>.md`. AskUserQuestion `allow_multiple` on **`declare`** rows that do not violate stops. `measure` → revisit EDA; do not edit `data_analysis.py`. Declaring id handling does **not** wire Pattern B — no `cv=` / `split_kwargs` / `GroupKFold` until grouping is an approved Method choice. `evaluate` → name `evaluate-ml-pipeline`. `confirm` → ask the user. Missing skill → one-line skip |
 | `python -m skore_skills style` | After writing/editing `pipeline.py` / `features.py` / `data.py` |

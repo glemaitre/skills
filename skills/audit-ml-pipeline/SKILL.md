@@ -283,8 +283,10 @@ Brief outline; full anatomy with concrete examples →
    → `cross-validation`, `estimators` → `estimator`; local **and
    mlflow**: read `summary["id"]` for the matching key row), then
    `report = project.get(REPORT_ID)`. Write `report._repr_html_()`
-   to `scratch/results/<stem>/report.html` (confirm `_repr_html_`
-   with `api get`), then `report` as the last expression.
+   to `scratch/results/<stem>/report.html` and the normalized
+   locator to `scratch/results/<stem>/locator.txt` (confirm
+   `_repr_html_` with `api get`), then `report` as the last
+   expression.
 6. **Persisted report** — substitute the exact normalized locator
    from evaluate. For a direct audit, use the selected `REPORT_ID`
    and `policy.skore_mode`: local links `../reports/`; Hub uses the
@@ -340,30 +342,18 @@ visible; never `plt.close` in the audit notebook.
 
 ## G-AUDIT-FINDING
 
-After every successful `cells run`, derive exactly one normalized
-finding from the rendered digest. This is distinct from the
-headline metric and the persisted-report locator.
+After every successful `cells run`, run
+`python -m skore_skills audit finding --stem <stem>` (or pass the
+digest path). Paste JSON `finding` **verbatim**. Do not rewrite
+codes, counts, or the metric clause. Missing digest → JSON
+`finding` is `n/a — audit digest unavailable`.
 
-1. Read `## Checks summary`. Take lines under `Issues:` first,
-   then `Tips:`, preserving digest order within each section.
-   Ignore Passed / Not Applicable / skipped / ignored. The code is
-   the `[SKD003]` token on each line.
-2. Format counts and every selected code with its severity:
-   `<I> issue(s), <T> tip(s) — <CODE> (issue), <CODE> (tip)`.
-3. When `## Metrics summary` exposes a headline metric, append one
-   short context clause copied from the digest. Do not turn that
-   metric into a finding or invent a performance judgment.
-4. No `Issues:` / `Tips:` lines →
-   `0 issues, 0 tips — automated checks surfaced no actionable finding`
-   plus optional copied metric context.
-5. Missing or errored digest →
-   `n/a — audit digest unavailable`. Do not fabricate codes,
-   counts, descriptions, or metrics.
-
-Extra Display cells do not change G-AUDIT-FINDING.
+Extra Display cells do not change G-AUDIT-FINDING (re-run the
+command; it still reads only checks + metrics).
 
 Return G-AUDIT-FINDING verbatim with the digest and
-G-REPORT-LOCATOR. `manage-ml-backlog` writes it to the design
+G-REPORT-LOCATOR from `python -m skore_skills loop locator --stem
+<stem>`. `manage-ml-backlog` writes the finding to the design
 note's Status block. Recompute it after every added view, query,
 or plot because the digest is overwritten.
 
@@ -384,6 +374,7 @@ Additional report view / Custom query / Custom plot all edit the
 same durable `audit/<stem>.py`, **below** `## Core audit complete`.
 After an edit: run `style`, then `cells run` to overwrite
 `scratch/audit/<stem>/audit.md`, derive G-AUDIT-FINDING again
+with `python -m skore_skills audit finding --stem <stem>`
 (from checks + metrics only), and re-present this same gate. Do
 not convert notebooks, build the site, run `git end-turn`,
 record-outcome, or return to the dispatcher while an additional
@@ -414,12 +405,11 @@ cell that produced it.
 ## Execution contract — one command
 
 ```bash
-python -m skore_skills cells run audit/<stem>.py
+python -m skore_skills cells run audit/<stem>.py scratch/audit/<stem>/audit.md
+python -m skore_skills audit finding --stem <stem>
 ```
 
-The CLI streams the digest to stdout. Pass a second arg
-`scratch/audit/<stem>/audit.md` to also write to a file (parent
-created if missing). Details:
+Paste JSON `finding` verbatim. The CLI streams the digest to stdout when the dest arg is omitted; the second arg also writes the file. Details:
 `python -m skore_skills cells run --help`.
 
 ### Executed notebook
@@ -473,7 +463,9 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 
 | Callee | Why |
 |---|---|
-| `python -m skore_skills api get` | Every skore symbol (`Project`, `project.summarize`, `project.get`, `report.checks.summarize`, `report.metrics.summarize`, `_repr_html_`). Cache hits first |
+| `python -m skore_skills audit finding` | After `cells run`. Paste JSON `finding` verbatim |
+| `python -m skore_skills loop locator` | G-REPORT-LOCATOR from `locator.txt` or the audit file |
+| `python -m skore_skills loop artifacts` | Direct-audit close: `record` before site / `git end-turn` |
 | `add-python-package` | When `ipython` is missing |
 | `manage-ml-backlog` (record-outcome mode) | End of turn on a direct free-text audit — hands over the digest so the History row and design-note Status block get written |
 | `python -m skore_skills style` | After writing / editing `audit/<stem>.py` — bundled `ruff.toml` carries `audit/**` per-file ignores; also contextualizes the header to name the audited experiment and strips workflow/process prose |
@@ -481,17 +473,20 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 ## End of turn
 
 **Dispatched** (`model-ml-pipeline` or `manage-ml-backlog` this
-turn), after **Close audit**: return the digest, G-AUDIT-FINDING,
-the persisted-report locator (or
-`n/a — backend did not expose a locator`), and an optional
+turn), after **Close audit**: run
+`python -m skore_skills audit finding --stem <stem>` and
+`python -m skore_skills loop locator --stem <stem>`. Return the
+digest, JSON `finding`, JSON `locator`, and an optional
 headline to that caller. Stop. Do not run record-outcome,
 `notebook convert`, `site build`, `git end-turn`, or triage
 here — the caller owns that close. Do not paste the direct-audit
 close as a preview of what the dispatcher will run.
 
-**Direct free-text audit, after Close audit:** this skill owns the close. The
-digest's persisted-report locator **must** appear in the
-user-facing message (or `n/a — backend did not expose a locator`)
+**Direct free-text audit, after Close audit:** this skill owns the close. Run
+`python -m skore_skills loop artifacts --stem <stem>` (`record`
+expected) and `loop locator --stem <stem>`. The
+JSON `locator` **must** appear in the
+user-facing message
 before site build or `git end-turn`.
 
 Load `manage-ml-backlog` in **record-outcome mode** only if
