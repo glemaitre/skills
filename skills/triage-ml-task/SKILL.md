@@ -12,6 +12,12 @@ description: >
 This is the session owner. Stage skills do the work; you only
 route and ask. Do not execute another skill's methodology.
 
+Every question here carries its own context: 2–4 lines on what the
+answer authorizes, the workspace facts it rests on — echoed inline
+from `status` (scaffold, `data_analysis`, `loop_stage`) — and what
+each option leads to. A file link is an addition, never the
+context.
+
 ## Procedure
 
 1. Run `python -m skore_skills status`. Read `skills`, `data_analysis`,

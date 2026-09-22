@@ -12,10 +12,11 @@ description: >
 # Choose Python Library
 
 1. State the job and constraints.
-2. Check `skore_skills/data/python-stack.json` (via
-   `choose-python-library`); if it already assigns one
-   canonical library to the job, use it rather than reopening the
-   choice.
+2. Run `python -m skore_skills env stack`. A job listed under
+   `competing` is a genuine choice; anything the policy already
+   fixes (`mandatory`, `stage`, `export`) is settled — use it
+   rather than reopening the choice. Do not read the packaged
+   JSON file directly; it lives inside the installed package.
 3. For a genuine choice, present the smallest useful option set and
    ask the user. Do not pick silently.
 4. After the user chooses, load `add-python-package` when
@@ -26,7 +27,8 @@ description: >
    load `plot-ml-figure` if installed; do not present matplotlib
    vs seaborn vs plotly.
 5. Confirm symbols with `python -m skore_skills api get <dotted>`
-   before writing calls.
+   before writing calls. Scope for one package is
+   `python -m skore_skills env route <pkg>`, not a guess.
 
 ## Stop conditions
 

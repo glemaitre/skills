@@ -292,6 +292,9 @@
 - Run `git end-turn` before the user picks Close.
 - Leave classification / no-target branches (`if TASK`,
   `if TARGET is None`) in the notebook.
+- Write skill ids, `skore_skills`, `cells run`, or "generated from
+  …" process notes into `data_analysis/data_analysis.py` /
+  `data_analysis.md` markdown or `#` comments.
 - Call `plt.close` or `import matplotlib.pyplot` for these
   figures.
 - Loop over columns with a trailing `g` (that is not displayed).
@@ -372,19 +375,26 @@
 
 **Assumed workspace state:**
 - `data_analysis/data_analysis.md` was just written.
+- `policy.site` is true.
+- `export-ml-site` is installed.
 - User picks **Keep exploring the data**.
 
 **Must do:**
-- AskUserQuestion four picks, none recommended: Choose
-  additional pre-defined option; Provide a query to extend the
-  exploration; Automatic exploration related to the data and
-  problem; Describe a plot.
+- Name `python -m skore_skills site build` after the md and
+  before keep exploring vs close.
+- Name `<package>.html` and `html/data_analysis.html`.
+- After **Keep exploring**, AskUserQuestion four picks, none
+  recommended: Choose additional pre-defined option; Provide a
+  query to extend the exploration; Automatic exploration related
+  to the data and problem; Describe a plot.
 - Stay in `explore-ml-data`.
 
 **Must NOT do:**
 - Name `python -m skore_skills git end-turn`.
 - Invent a domain-specific checklist skill or `references/domains/`.
-- Run `python -m skore_skills site build` on keep exploring.
+- Run `python -m skore_skills site build` again on the four-pick
+  extras board.
+- Run `notebook convert` before Close.
 - Say “extra-analyses” or “standard extra analysis” on that
   board.
 
@@ -629,3 +639,30 @@
 - AskUserQuestion grouping (Use a proposed grouping / Profile
   every file separately / I will describe the grouping).
 - Append join-coverage cells.
+
+---
+
+## CASE_25 — Site on rebuilds before keep vs close
+
+**User prompt:**
+> Explore the California housing CSV. Target is MedHouseVal.
+
+**Assumed workspace state:**
+- Scaffold exists. G-TABULAR is `pandas`.
+- User chose **run** for G-DATA-ANALYSIS.
+- IPython is available.
+- `policy.site` is true.
+- `export-ml-site` is installed.
+
+**Must do:**
+- After `data_analysis.md` and JOURNAL, name
+  `python -m skore_skills site build`.
+- Name `<package>.html` and `html/data_analysis.html`.
+- Then AskUserQuestion keep exploring vs close (neither option
+  recommended or preselected).
+
+**Must NOT do:**
+- Run `notebook convert` or `git end-turn` before the user picks
+  Close.
+- Fail the keep-vs-close gate if site build errors; name the
+  error.

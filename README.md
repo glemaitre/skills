@@ -156,4 +156,4 @@ reinstall the setup pack.
 | [export-ml-notebook](skills/export-ml-notebook/SKILL.md) | Convert a jupytext percent file into an executed notebook. |
 | [export-ml-site](skills/export-ml-site/SKILL.md) | Build an offline MkDocs documentation site from workspace markdown. |
 
-Canonical package policy lives in the CLI (`skore_skills/data/python-stack.json`); `choose-python-library` resolves competing libraries.
+Canonical package policy lives in the CLI; print it with `python -m skore_skills env stack`. `choose-python-library` resolves competing libraries.

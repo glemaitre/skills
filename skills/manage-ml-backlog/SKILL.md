@@ -16,13 +16,32 @@ Replace iterate-as-cadence. Do not own setup, exploratory data
 analysis, build, smoke,
 evaluate, or audit methodology.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+JOURNAL rows, design-note Status / Results, and `#` comments
+describe **this** experiment's outcome — not the skills framework,
+the CLI, or the command that produced an output.
+`<!-- results-embed: … -->` is a site marker. Authoring hints stay
+in this skill. `style` is ruff only.
+
+The CLI writes JOURNAL with four sections in order: Status, Data
+understanding, History, Backlog. History and Backlog start as
+header-only tables. Column contracts stay here (Stem, Intent,
+Status, Headline result, Report, Design note; `#`, Item, Source).
+Do not put those contracts back into HTML comments in the file.
+
 ## Model-entry selection mode
 
 When `model-ml-pipeline` calls with the `backlog` array from
 `python -m skore_skills model choices`:
 
 1. Present exactly those `B<N>` rows in their returned order and
-   AskUserQuestion for one pick. Do not rescan into a different
+   AskUserQuestion for one pick. Carry each row's Item and Source
+   as the option context, and say in 2–4 lines what the pick
+   authorizes (a Proposal, then a design note to approve) and what
+   it does not (no model code yet). A file link is an addition,
+   never the context. Do not rescan into a different
    menu and do not add an idea.
 2. Turn the selected row's Item + Source into a Proposal. Ask only
    for missing shaping facts; do not invent a Method from a
@@ -142,7 +161,14 @@ locator.
    one-line skip; do not invent that skill's steps. Returned
    candidates/proposals are written by this parent, not by
    either sourcing child.
-5. Ask whether to draft from the refreshed Backlog or stop. When a
+5. After History / Backlog / Results markdown is on disk, if
+   `policy.site` is true and `export-ml-site` is installed, run
+   `python -m skore_skills site build` (skip in one line
+   otherwise; name a build error; do not fail the gate). Link
+   `journal/JOURNAL.md` plus `<package>.html` when the build
+   ran. Do not `notebook convert` or `git end-turn` on this
+   preview. Then ask whether to draft from the refreshed Backlog
+   or stop. When a
    row is selected, return it to `model-ml-pipeline`, which can
    create its design-note shell with
    `python -m skore_skills scaffold --journal --stem <NN_short_name>`.

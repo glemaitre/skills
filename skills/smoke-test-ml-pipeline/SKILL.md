@@ -156,7 +156,7 @@ full evaluation.
 ```
 Pre-flight (smoke-test-ml-pipeline):
 - [ ] Tier 1 mandatory libs importable: pytest + sklearn + skrub
-      (per `skore_skills/data/python-stack.json` stage libraries). **Not skore** —
+      (stage libraries per `python -m skore_skills env stack`). **Not skore** —
       see the Stop conditions; the smoke test is intentionally
       portable to any skrub-capable environment
 - [ ] API confirmed for skrub / sklearn symbols used in
@@ -483,7 +483,7 @@ design HITL when this skill was loaded as a sub-step.
   "no skore import" Stop condition above. **Cache hits first**:
   check `scratch/api/<lib>/<version>/` before WebSearching;
   cache new findings back there (per `python -m skore_skills api get` Shape 0/3).
-- **`skore_skills/data/python-stack.json`** — declares pytest as a
+- **`python -m skore_skills env stack`** — declares pytest as a
   stage library for any workspace using this skill.
 - **`python -m skore_skills style`** — **must be invoked** after writing or
   editing `tests/smoke/test_NN_*.py`. Running a manager-specific ruff

@@ -1,8 +1,8 @@
 # %% [markdown]
 # ## Second-frame drift
 #
-# A second confirmed family that shares column names.
-# Do not invent a holdout split. Disjoint schemas: omit this file.
+# Null rates and medians on columns shared with a second table.
+# Not a holdout split.
 
 # %%
 OTHER = <OTHER_FRAME>

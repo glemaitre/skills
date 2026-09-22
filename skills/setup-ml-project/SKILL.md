@@ -28,8 +28,11 @@ after listing the boxes.
 
 1. Run `python -m skore_skills status`. `status.skills` is a
    per-id dict, never a boolean.
-2. **AskUserQuestion** with `allow_multiple`. Include a box only
-   when **that** id is true:
+2. **AskUserQuestion** with `allow_multiple`. Say first, in 2–4
+   lines, what the answer authorizes (which pieces run, in which
+   order) and the `status` facts each box rests on — detected
+   manager, `has_src`, git presence. A file link is an addition,
+   never the context. Include a box only when **that** id is true:
 
    - Python environment (`setup-python-env`)
    - Workspace layout (`setup-workspace`)

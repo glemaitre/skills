@@ -30,7 +30,12 @@ only when the user asked to. Do not evaluate, audit, or invent
    `status.skills.evaluate-ml-pipeline` is true and the user
    asked to evaluate; else one-line skip.
 
-3. **AskUserQuestion** for any answer not already in the request:
+3. **AskUserQuestion** for any answer not already in the request.
+   Ahead of each question, state in 2–4 lines what the answer
+   authorizes — which reports move where, whether `skore_mode` and
+   the Project init lines get rewritten — and the facts it rests
+   on: the current mode, the discovered report count, the
+   endpoint. A file link is an addition, never the context.
 
    - **Intent.** Switch default destination (sync, then persist
      `skore_mode` and rewrite every Project init) vs copy only

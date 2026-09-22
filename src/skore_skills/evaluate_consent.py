@@ -7,6 +7,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from skore_skills.gate_context import design_context
+
 _HISTORY_SECTION = re.compile(r"^## History\s*$", re.MULTILINE)
 _PERSISTED_REPORT = re.compile(
     r"^\s*-\s*\*\*Persisted report:\*\*\s*(.+?)\s*$",
@@ -93,11 +95,19 @@ def evaluate_consent(root: Path, stem: str) -> dict[str, Any]:
     ):
         return {"stem": cleaned, "action": "proceed", "reason": "persisted_report"}
 
+    note = design_context(root, cleaned)
     return {
         "stem": cleaned,
         "action": "ask",
         "reason": "first_eval",
         "choices": list(_ASK_CHOICES),
+        "context": {
+            "note": note["note"],
+            "question": note["question"],
+            "experiment": f"experiments/{cleaned}.py",
+            "smoke": f"tests/smoke/test_{cleaned}.py",
+            "persisted_report": "none",
+        },
     }
 
 

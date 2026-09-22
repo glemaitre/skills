@@ -52,6 +52,15 @@ Declare a skrub DataOps graph from source to predictor. Then smoke
 (pytest) and the design HITL. Do not fit, split, tune, persist, or
 evaluate here.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Experiment markdown, design-note Method text, and `#` comments
+describe **this** pipeline — not the skills framework, the CLI, or
+the command that produced an output. `<!-- results-embed: … -->` is
+a site marker. Authoring hints stay in this skill. `style` is ruff
+only.
+
 **Terms.** **X marker** = `.skb.mark_as_X()` (predict-time slice).
 **Predict grid** = rows to score (IID: the loaded frame; panels:
 `(group, time)`). **Cross-row step** = output for a row reads
@@ -81,6 +90,21 @@ work but do not write model code.
 Research or open design discussion is **LLM work**: say that it
 will reason over the design / sources and stop for confirmation;
 it does not fit or test a model.
+
+## Gate context
+
+Every question that gates work carries its own context. Before
+asking, state in 2–4 lines what the answer authorizes, the facts
+it rests on — echoed inline — and what each option does. A file
+link is an addition, never the context.
+
+`evaluate consent` `ask` returns a `context` with `question`,
+`experiment`, `smoke`, and `persisted_report`: quote the design
+question and what evaluation would now run on the full dataset
+before the Evaluate / Modify / Stop menu. For the grouping and
+research questions below, the facts are this turn's evidence —
+the column names, the distilled finding — so name them in the
+question instead of pointing at a file.
 
 ## Procedure
 
@@ -128,7 +152,8 @@ it does not fit or test a model.
 5. `smoke run` `proceed`: User-facing close (checkpoint), then
    run `python -m skore_skills evaluate consent --stem <stem>`.
    Treat JSON `action` as authoritative.
-   - `ask` — **AskUserQuestion** (single choice), in order:
+   - `ask` — render that JSON `context` inline (§ Gate context),
+     then **AskUserQuestion** (single choice), in order:
      **Evaluate (Recommended)** / **Modify** / **Stop**, then
      **stop**. Do not write `skore.evaluate(...)`. `smoke run`
      `proceed` is not Evaluate. If the user answers **Evaluate**, load
@@ -428,7 +453,9 @@ Refuse integer `cv` and unsupported time metadata in prose. Do not
 paste forbidden `mark_as_X(...)` / `cv=5` / `times=` into headings
 or “what I did not write” fences.
 
-Ask when grouping is plausible (load-bearing tokens):
+Ask when grouping is plausible (load-bearing tokens), naming the
+columns that triggered the question and what grouping would change
+(§ Gate context):
 
 ```
 AskUserQuestion: grouping intended? anything ending in `_id`,
@@ -515,7 +542,7 @@ Look up symbols with `api get`. Code: `references/common_patterns.md`.
 | `research-ml-practice` | Load if installed on FE / transform / leakage. Abstract the **problem class**, not the table name. Summarize `scratch/research/<slug>.md`. AskUserQuestion `allow_multiple` on **`declare`** rows that do not violate stops. `measure` → revisit EDA; do not edit `data_analysis.py`. Declaring id handling does **not** wire Pattern B — no `cv=` / `split_kwargs` / `GroupKFold` until grouping is an approved Method choice. `evaluate` → name `evaluate-ml-pipeline`. `confirm` → ask the user. Missing skill → one-line skip |
 | `python -m skore_skills style` | After writing/editing `pipeline.py` / `features.py` / `data.py` |
 | `python -m skore_skills env graphviz` | Optional DataOp SVG via `draw_graph`; not required for Method HTML |
-| `python -m skore_skills site build` | After the unfitted `pipeline.html` snapshot when `policy.site` |
+| `python -m skore_skills site build` | After the unfitted `pipeline.html` snapshot when `policy.site`, **before** the Evaluate HITL (preview-before-MD-HITL; see `export-ml-site`) |
 
 ## References (load on demand)
 

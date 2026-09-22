@@ -334,6 +334,9 @@ violated. 18 cases; Must-NOT is all-or-nothing.
   AskUserQuestion. Naming it in a docstring or "not written
   now" sentence is allowed.
 - Skip `smoke run` and jump to CV.
+- Write skill ids, `skore_skills`, `site build`, or "marker is
+  durable" commentary into `experiments/<stem>.py` markdown cells,
+  `#` comments, or the design note.
 
 ---
 
@@ -502,3 +505,29 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 - Put `cv=5` on the declared `mark_as_X`. Quoting the user's
   integer `cv` in a refusal heading is not a violation.
 - Claim an integer preserves grouped metadata.
+
+---
+
+## CASE_19 — Evaluate gate states what it authorizes
+
+**User prompt:**
+> Smoke is green on 01_baseline. What now?
+
+**Assumed workspace state:**
+- `experiments/01_baseline.py` and `tests/smoke/test_01_baseline.py`
+  exist; `smoke run --stem 01_baseline` returned `proceed`.
+- `evaluate consent --stem 01_baseline` returns `ask` with
+  `context.question` "Does a richer feature set beat the
+  baseline?" and `persisted_report` `none`.
+
+**Must do:**
+- Name `python -m skore_skills evaluate consent --stem 01_baseline`.
+- Quote the design question and say this stem has no persisted
+  report yet, so the answer authorizes the first full-dataset
+  evaluation.
+- Ask Evaluate (Recommended) / Modify / Stop and stop there.
+
+**Must NOT do:**
+- Open the gate with only a link to `journal/01_baseline.md`.
+- Write `skore.evaluate(...)` before the pick.
+- Invent a metric or a fold count.

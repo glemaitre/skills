@@ -33,7 +33,7 @@ report
 # ## Duplicate rows
 #
 # Exact duplicates inflate counts and can leak across a later split.
-# Do not drop rows here — cleaning belongs in the pipeline.
+# Cleaning belongs in the pipeline, not by dropping rows here.
 
 # %%
 n_dup = int(FRAME.duplicated().sum())

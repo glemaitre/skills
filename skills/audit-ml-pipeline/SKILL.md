@@ -55,6 +55,15 @@ Per-experiment, human-readable, agent-executable narrative of a skore
 report — produced by **executing** a bare-expression `# %%` file and
 reading the digest. Read-only against the skore Project.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Audit markdown and `#` comments describe **this** report's findings
+— not the skills framework, the CLI, or the command that produced
+an output. Do not put API tutorials, version floors, or locator
+recipes in `audit/<stem>.py`. `<!-- results-embed: … -->` is a site
+marker. Authoring hints stay in this skill. `style` is ruff only.
+
 ## Next-step pointers
 
 | Came here from… | After audit, next is… |
@@ -385,7 +394,13 @@ or plot because the digest is overwritten.
 
 After the initial digest and every successful refresh, unless the
 user already said to close, **AskUserQuestion** with one pick in
-this exact order. None is recommended or preselected:
+this exact order. None is recommended or preselected.
+
+**Gate context.** Ahead of the question, state in 2–4 lines what
+the answer authorizes and the facts it rests on — echoed inline
+from this turn's digest (the checks and metrics just read, the
+Display names the trees actually list) — plus what each option
+does. A file link is an addition, never the context.
 
 | Label | Contract |
 |---|---|
@@ -492,7 +507,7 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 | `python -m skore_skills loop artifacts` | Direct-audit close: `record` before site / `git end-turn` |
 | `add-python-package` | When `ipython` is missing |
 | `manage-ml-backlog` (record-outcome mode) | End of turn on a direct free-text audit — hands over the digest so the History row and design-note Status block get written |
-| `python -m skore_skills style` | After writing / editing `audit/<stem>.py` — bundled `ruff.toml` carries `audit/**` per-file ignores; also contextualizes the header to name the audited experiment and strips workflow/process prose |
+| `python -m skore_skills style` | After writing / editing `audit/<stem>.py` — bundled `ruff.toml` carries `audit/**` per-file ignores. Ruff only; it does not rewrite comments. Do not write workflow/process prose in the audit file |
 
 ## End of turn
 
@@ -599,7 +614,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | `python -m skore_skills api get` | skore symbol lookups, including `help` and extra Display methods. Cache hits first |
 | `plot-ml-figure` | Custom plot gate only when the `help()` trees have no Display |
 | `python -m skore_skills style` | ruff after writing/editing `audit/<stem>.py` |
-| `choose-python-library` / `skore_skills/data/python-stack.json` | Agent tools (`ipython`, `ipykernel`) live under the agent feature |
+| `choose-python-library` / `python -m skore_skills env stack` | Agent tools (`ipython`, `ipykernel`) live under the agent feature |
 
 ## Templates and assets
 

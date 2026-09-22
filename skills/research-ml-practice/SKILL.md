@@ -39,8 +39,10 @@ summary. Do not `git end-turn`.
      “survey extra analyses” → **survey**.
    - Neither → if JOURNAL and an EDA report exist, run the
      canned survey; else **AskUserQuestion** for a named
-     concern. Do not start a **depth** search with an empty
-     concern.
+     concern, stating the modality and stage inferred this turn
+     and that the answer only drives a literature search, no
+     code. A file link is an addition, never the context. Do not
+     start a **depth** search with an empty concern.
 2. **Abstract the problem class** before any query
    (`references/search.md`). JOURNAL and EDA are context, not
    the answer list and not search keywords for the table’s

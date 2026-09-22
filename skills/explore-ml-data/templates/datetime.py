@@ -1,9 +1,8 @@
 # %% [markdown]
 # ## Datetime checks
 #
-# Light checks only — ADF / ACF / seasonal decomposition are extras.
-# Include the relplot only when TARGET is numeric.
-# For a further family, copy this block and use FRAME_<OTHER_SLUG>.
+# Timestamp span, monotonicity, and duplicate times — not a full
+# seasonal decomposition.
 
 # %%
 datetime_cols = list(FRAME.select_dtypes(include=["datetime", "datetimetz"]).columns)

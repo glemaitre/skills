@@ -525,6 +525,16 @@ def env_route(package: str) -> None:
     click.echo(json.dumps(payload, indent=2))
 
 
+@env_group.command("stack")
+def env_stack() -> None:
+    """Print the packaged canonical-package policy as JSON."""
+    import json
+
+    from skore_skills.env import load_stack_policy
+
+    click.echo(json.dumps(load_stack_policy(), indent=2))
+
+
 @env_group.command("graphviz")
 @click.option(
     "--execute",

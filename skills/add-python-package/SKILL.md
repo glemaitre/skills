@@ -61,7 +61,11 @@ after listing the boxes.
 
 4. If `managed` is false: **do not** `--execute`. Run print-only
    `env add` (or `env add --editable`, or `env add-skore --mode
-   <mode>`) to obtain the manager line. Ask with two options:
+   <mode>`) to obtain the manager line. Every ask in this skill
+   carries its context inline: name the package(s), the manager
+   and env the command would touch, which skill asked for them,
+   and what each option does. A file link is an addition, never
+   the context. Ask with two options:
 
    1. **I will handle it** (default) — name the package(s) and
       **show that stdout** (e.g. `pixi add pandas`). Do not wait;

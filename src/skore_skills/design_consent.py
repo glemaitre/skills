@@ -7,6 +7,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from skore_skills.gate_context import design_context
+
 _STATE = re.compile(r"^\s*-\s*\*\*State:\*\*\s*(.+?)\s*$", re.MULTILINE)
 _PROCEED_STATES = frozenset({"approved", "running", "done"})
 _ASK_CHOICES = ["approve", "modify", "stop"]
@@ -47,6 +49,7 @@ def design_consent(root: Path, stem: str) -> dict[str, Any]:
         "action": "ask",
         "reason": "first_approval",
         "choices": list(_ASK_CHOICES),
+        "context": design_context(root, cleaned),
     }
 
 

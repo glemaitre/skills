@@ -49,6 +49,14 @@ Pick the entry point, pick the cross-validator, route the metadata,
 read the report. The pipeline declaration is out of scope (see
 `build-ml-pipeline`).
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Experiment markdown and `#` comments describe **this** evaluation
+— not the skills framework, the CLI, or the command that produced
+an output. `<!-- results-embed: … -->` is a site marker. Authoring
+hints stay in this skill. `style` is ruff only.
+
 ## Stop conditions — read before anything else
 
 - **Workspace not scaffolded.** Run `python -m skore_skills status`
@@ -93,7 +101,7 @@ read the report. The pipeline declaration is out of scope (see
   **Do not drop back to `cross_val_score`, `cross_validate`,
   `classification_report`, or hand-rolled metric prints** — that
   silently rewrites this skill out of the project. See
-  `choose-python-library` / `skore_skills/data/python-stack.json`
+  `choose-python-library` / `python -m skore_skills env stack`
   for missing-dependency policy.
 - **Symbol from memory is forbidden.** Any new `skore` entry point
   or sklearn splitter signature must come from
@@ -130,7 +138,8 @@ read the report. The pipeline declaration is out of scope (see
   `skore.evaluate(...)` fence, run
   `python -m skore_skills evaluate consent --stem <stem>`. Treat
   JSON `action` as authoritative.
-  - `ask` — no persisted report for this stem. Present
+  - `ask` — no persisted report for this stem. Render the JSON
+    `context` inline (§ Gate context), then present
     **Evaluate (Recommended) / Modify / Stop** and **stop**. Do
     not write `skore.evaluate(...)`. "Run evaluation" / "evaluate
     it" is not consent on a first run. If this turn's user answer
@@ -274,8 +283,8 @@ read the report. The pipeline declaration is out of scope (see
   mandates. The same override rule applies to every other
   mandatory `AskUserQuestion` in this stack —
   `add-python-package` § "Where does the package belong?",
-  `choose-python-library` (polars vs pandas; policy in
-  `skore_skills/data/python-stack.json`),
+  `choose-python-library` (polars vs pandas; policy from
+  `python -m skore_skills env stack`),
   `manage-ml-backlog` (sourcing menu), `iterate-from-user`
   § "The entry-point AskUserQuestion". When in doubt: the user's
   approval is the gate, not the harness's instruction text.
@@ -289,7 +298,7 @@ tool call or an explicit decision documented in the response.
 ```
 Pre-flight (evaluate-ml-pipeline):
 - [ ] Tier 1 mandatory libs importable in this env: sklearn, skrub, skore
-      (per `skore_skills/data/python-stack.json` stage libraries)
+      (stage libraries per `python -m skore_skills env stack`)
 - [ ] API confirmed for skore symbols (evaluate /
       report classes): <symbols>
       Evidence: python -m skore_skills api get <dotted>
@@ -359,6 +368,21 @@ preview the possible computation but stop at the mandated
 AskUserQuestion. Splitter reasoning / methodology discussion is
 **LLM work** until evaluation is approved; it does not itself fit
 the model.
+
+## Gate context
+
+Every gate question carries its own context. Before asking, state
+in 2–4 lines what the answer authorizes, the facts it rests on —
+echoed inline — and what each option does. A file link is an
+addition, never the context.
+
+`evaluate consent` `ask` returns a `context` with `question`,
+`experiment`, `smoke`, and `persisted_report`: quote the design
+question and say this stem has no persisted report yet, so the
+answer authorizes the first full-dataset evaluation. For
+G-CV-SPLITTER, the context is the data structure that forced the
+question — `split_kwargs` content, the time column, the horizon —
+named in the question itself.
 
 ## Scope
 

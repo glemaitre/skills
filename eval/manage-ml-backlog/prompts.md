@@ -75,6 +75,7 @@
 > The 01_baseline run finished. Record it.
 
 **Assumed workspace state:**
+- This is a full backlog turn, not record-outcome dispatch.
 - Audit digest exists with a headline ROC-AUC.
 - Smoke tests passed.
 - History row for `01_baseline` is `running`.
@@ -83,12 +84,17 @@
 
 **Must do:**
 - Copy the headline result into the History row.
-- Name `python -m skore_skills site build` before git end-turn.
+- Name `python -m skore_skills site build` after History / Backlog
+  / Results markdown is on disk and before asking whether to draft
+  from the refreshed Backlog or stop.
+- Name `<package>.html`.
+- Name `python -m skore_skills site build` before git end-turn
+  (a second build at End of turn is fine).
 - Name `python -m skore_skills git end-turn --stage backlog`.
 
 **Must NOT do:**
 - Fail the backlog turn if site build errors.
-- Run `notebook convert`.
+- Run `notebook convert` on the preview rebuild.
 - Run `git commit` in this skill or `git push`.
 
 ---

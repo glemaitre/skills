@@ -22,6 +22,14 @@ description: >
 
 Decide where artifacts live. Do not design an experiment here.
 
+## Human-facing prose
+
+Details: `references/human_facing_prose.md`. Scaffolded design
+notes, JOURNAL, and folder READMEs describe **this** workspace's
+analysis — not the skills framework, the CLI, or the command that
+produced an output. `<!-- results-embed: … -->` is a site marker.
+Authoring hints stay in this skill. `style` is ruff only.
+
 ## Detection
 
 - `src/` or `journal/` present → **existing**. Reuse names and
@@ -47,7 +55,11 @@ after listing the boxes.
 
 1. If fresh or manager-only, resolve **G-PKG-NAME** only via the
    `AskUserQuestion` tool (the `src/<pkg>/` import name; folder
-   name as the default option). “You pick” / “go fast” does not
+   name as the default option). Each ask in this skill states in
+   2–4 lines what the answer authorizes — the scaffolded tree, the
+   persisted policy key, the toolchain a gate implies — and the
+   detected facts it rests on; a file link is an addition, never
+   the context. “You pick” / “go fast” does not
    resolve it. Do not confirm in prose instead of the tool. A
    matching `[project] name` + `src/<pkg>/` already resolves it —
    do not re-ask. Persist the resolved import name with

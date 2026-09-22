@@ -1,8 +1,8 @@
 # %% [markdown]
 # ## Join keys / coverage
 #
-# Diagnostic only. Do not write a joined frame. Do not treat the
-# merge as the dataset. No TableReport on the join.
+# Shared keys and coverage between two tables — diagnostic, not a
+# modelling table.
 
 # %%
 left = FRAME

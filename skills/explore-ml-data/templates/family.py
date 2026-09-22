@@ -1,7 +1,7 @@
 # %% [markdown]
 # ## Table overview: <OTHER_SLUG>
 #
-# A further confirmed family. Load shards in memory only.
+# Another table in this dataset.
 
 # %%
 RAW_<OTHER_SLUG> = <LOAD_OTHER>
@@ -22,7 +22,7 @@ report_<OTHER_SLUG>
 # %% [markdown]
 # ## Duplicate rows: <OTHER_SLUG>
 #
-# Do not drop rows here — cleaning belongs in the pipeline.
+# Cleaning belongs in the pipeline, not by dropping rows here.
 
 # %%
 n_dup_<OTHER_SLUG> = int(FRAME_<OTHER_SLUG>.duplicated().sum())

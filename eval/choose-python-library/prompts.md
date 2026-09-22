@@ -13,6 +13,8 @@
 - `add-python-package` is installed (`status.skills` true).
 
 **Must do:**
+- Name `python -m skore_skills env stack` before presenting the
+  choice; do not read the packaged JSON file.
 - Present the smallest useful comparison and ask the user to choose.
 - After a choice, load `add-python-package` rather than calling
   `env add` directly.

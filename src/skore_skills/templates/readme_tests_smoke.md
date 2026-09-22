@@ -1,4 +1,4 @@
 # `tests/smoke/`
 
-Smoke tests paired with `experiments/NN_short.py`. Run on the
-default env after a pipeline change.
+Smoke tests paired with `experiments/NN_short.py`. They check that
+the declared learner loads and predicts on a small real slice.

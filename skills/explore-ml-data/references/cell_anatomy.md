@@ -6,7 +6,12 @@ the procedure; this file is the split.
 
 ## Human — `data_analysis/data_analysis.py`
 
-Markdown cells describe **this dataset's analysis**, not the repo.
+Markdown cells describe **this dataset's analysis**, not the repo
+and not the CLI. Authoring hints (which template to append, when
+to omit drift, glance vs implications) stay in this file and
+SKILL.md — never as HTML comments in `data_analysis.md` or as
+`#` procedure in the notebook.
+
 Last expressions are rich objects or small summary frames: the
 frame (`RAW`), `skrub.TableReport(...)`, duplicate/target/leakage
 tables, bivariate column lists, **and live figures**. `write_html`
@@ -25,9 +30,12 @@ further family: `templates/family.py`. Append
 `templates/target_regression.py` or
 `templates/target_classification.py` after the target is known;
 append `templates/datetime.py` / `templates/drift.py` only when
-those data exist (datetime per family; drift only when two
-families share column names). Join coverage is Keep exploring
-only (`templates/join_coverage.py`). Do not leave `if TARGET` /
+those data exist (datetime per family; include the datetime
+relplot only when TARGET is numeric; copy the datetime block per
+family with `FRAME_<OTHER_SLUG>`; drift only when two
+families share column names — omit on disjoint schemas). Join coverage is Keep exploring
+only (`templates/join_coverage.py`: diagnostic coverage, do not
+write a joined frame or TableReport on the join). Do not leave `if TARGET` /
 `if TASK` / `OTHER = None` / empty datetime loops / “skip this
 cell” in the notebook. Load `plot-ml-figure` before figure cells. Save each
 PNG, then leave the figure/grid as the cell output — never

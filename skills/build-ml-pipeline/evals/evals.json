@@ -191,7 +191,8 @@
         "After `smoke run` JSON `proceed`, AskUserQuestion: Evaluate (Recommended) / Modify / Stop (Evaluate first; extensive computation on the full dataset).",
         "The response does NOT: Present the declaration itself as model training or CV.",
         "The response does NOT: Author a `skore.evaluate(...)` call site before that AskUserQuestion. Naming it in a docstring or \"not written now\" sentence is allowed.",
-        "The response does NOT: Skip `smoke run` and jump to CV."
+        "The response does NOT: Skip `smoke run` and jump to CV.",
+        "The response does NOT: Write skill ids, `skore_skills`, `site build`, or \"marker is durable\" commentary into `experiments/<stem>.py` markdown cells, `#` comments, or the design note."
       ],
       "tools": false,
       "sandbox": [],
@@ -325,6 +326,24 @@
         "Use the approved concrete group-aware cross-validator.",
         "The response does NOT: Put `cv=5` on the declared `mark_as_X`. Quoting the user's integer `cv` in a refusal heading is not a violation.",
         "The response does NOT: Claim an integer preserves grouped metadata."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 19,
+      "title": "Evaluate gate states what it authorizes",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `experiments/01_baseline.py` and `tests/smoke/test_01_baseline.py`\n  exist; `smoke run --stem 01_baseline` returned `proceed`.\n- `evaluate consent --stem 01_baseline` returns `ask` with\n  `context.question` \"Does a richer feature set beat the\n  baseline?\" and `persisted_report` `none`.]\n\nSmoke is green on 01_baseline. What now?",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills evaluate consent --stem 01_baseline`. - Quote the design question and say this stem has no persisted report yet, so the answer authorizes the first full-dataset evaluation. - Ask Evaluate (Recommended) / Modify / Stop and stop there. It must NOT: - Open the gate with only a link to `journal/01_baseline.md`. - Write `skore.evaluate(...)` before the pick. - Invent a metric or a fold count.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills evaluate consent --stem 01_baseline`.",
+        "Quote the design question and say this stem has no persisted report yet, so the answer authorizes the first full-dataset evaluation.",
+        "Ask Evaluate (Recommended) / Modify / Stop and stop there.",
+        "The response does NOT: Open the gate with only a link to `journal/01_baseline.md`.",
+        "The response does NOT: Write `skore.evaluate(...)` before the pick.",
+        "The response does NOT: Invent a metric or a fold count."
       ],
       "tools": false,
       "sandbox": [],

@@ -15,7 +15,10 @@ Ordering only. Children own convert and site commands.
 
 1. `python -m skore_skills status`. Read `policy.notebooks`,
    `policy.site`, and `skills`.
-2. **AskUserQuestion** with `allow_multiple`:
+2. **AskUserQuestion** with `allow_multiple`. Say first, in 2–4
+   lines, what each box authorizes (toolchain installs, convert
+   re-execution, a built site) and that both answers persist as
+   policy. A file link is an addition, never the context.
 
    - Executed notebooks — preselected iff `policy.notebooks` is
      true

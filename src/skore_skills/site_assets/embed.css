@@ -1,0 +1,75 @@
+/* Baseline for the standalone documents `site build` stages behind the
+   report viewers. Loaded in the document head, and again inside the
+   shadow root when a fragment does not ship one of its own. Fragments
+   inherit their typography from the host page, so without this they
+   render in the browser default serif. */
+
+@font-face {
+  font-family: Geist;
+  src: url("fonts/GeistVF.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: GeistMono;
+  src: url("fonts/GeistMonoVF.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root,
+:host {
+  --skore-gray-100: #f3f4f6;
+  --skore-gray-200: #e5e7eb;
+  --skore-gray-600: #4b5563;
+  --skore-gray-900: #111827;
+  --skore-text-font: Geist, sans-serif;
+  --skore-code-font: GeistMono, monospace;
+}
+
+body {
+  margin: 0;
+  padding: 1rem;
+  color: var(--skore-gray-900);
+  font: 16px/1.5 var(--skore-text-font);
+  background: #fff;
+}
+
+code {
+  font-family: var(--skore-code-font);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* pandas emits `border="1"` and no styling of its own. */
+table.dataframe {
+  font-size: 0.875rem;
+  border: 1px solid var(--skore-gray-200);
+  border-collapse: collapse;
+}
+
+table.dataframe th,
+table.dataframe td {
+  padding: 0.375rem 0.75rem;
+  text-align: right;
+  border: 0;
+  border-bottom: 1px solid var(--skore-gray-200);
+}
+
+table.dataframe thead th {
+  font-weight: 600;
+  background: var(--skore-gray-100);
+}
+
+table.dataframe tbody th {
+  font-weight: 500;
+  text-align: left;
+}
+
+p[role="note"] {
+  margin: 0.75rem 0 0;
+  color: var(--skore-gray-600);
+  font-size: 0.875rem;
+}

@@ -17,9 +17,8 @@ g
 # %% [markdown]
 # ## Feature vs target
 #
-# Only vs TARGET. If there are more than 12 other columns, keep the
-# ones most associated with the target (numeric Pearson) or the first
-# 12. Do not pairplot the whole frame.
+# A readable subset of features versus the target (numeric Pearson
+# when many columns), not every pairwise plot. Cap at 12 columns.
 
 # %%
 BIVARIATE_CAP = 12
@@ -57,7 +56,7 @@ g
 # %% [markdown]
 # ## Leakage candidates
 #
-# Flags only — not a train/test split. Splitter choice is a later gate.
+# Flags only — not a train/test split.
 
 # %%
 leakage_flags: list[str] = []

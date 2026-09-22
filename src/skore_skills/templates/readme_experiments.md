@@ -1,5 +1,5 @@
 # `experiments/`
 
 One `# %%` script per approved design note, same stem as
-`journal/NN_short.md`. Created after the note is approved, not at
-scaffold time. Do not persist reports from here until evaluate.
+`journal/NN_short.md`. Each script declares or evaluates that
+experiment's learner.

@@ -8,5 +8,5 @@ description: >
 # Folded into `choose-python-library`
 
 This skill id is deprecated for one release. Load
-`choose-python-library`; canonical package policy is also available
-to the CLI in `skore_skills/data/python-stack.json`.
+`choose-python-library`; canonical package policy is printed by
+`python -m skore_skills env stack`.

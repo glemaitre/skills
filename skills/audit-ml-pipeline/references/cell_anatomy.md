@@ -13,6 +13,12 @@ and `## Metrics summary`. Do not name extra Display headings
 like those two. Per-task accessors are appended after the user
 picks Additional report view from names in the trees.
 
+Markdown cells in `templates/audit.py` name the experiment and
+interpret **this** report. Hub vs local id mapping, `put()` URL
+plural→singular, `summarize(ignore=…)`, version floors, and
+`help()`-as-menu recipes stay in this file and SKILL.md — never in
+the audit notebook comments.
+
 ## Concrete cell examples — right vs wrong
 
 A well-formed audit cell ends with a **bare expression**. A

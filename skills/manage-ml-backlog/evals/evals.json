@@ -56,15 +56,17 @@
     {
       "id": 4,
       "title": "Site on rebuilds after backlog",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Audit digest exists with a headline ROC-AUC.\n- Smoke tests passed.\n- History row for `01_baseline` is `running`.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nThe 01_baseline run finished. Record it.",
-      "expected_output": "Behavioural response satisfying: - Copy the headline result into the History row. - Name `python -m skore_skills site build` before git end-turn. - Name `python -m skore_skills git end-turn --stage backlog`. It must NOT: - Fail the backlog turn if site build errors. - Run `notebook convert`. - Run `git commit` in this skill or `git push`.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- This is a full backlog turn, not record-outcome dispatch.\n- Audit digest exists with a headline ROC-AUC.\n- Smoke tests passed.\n- History row for `01_baseline` is `running`.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nThe 01_baseline run finished. Record it.",
+      "expected_output": "Behavioural response satisfying: - Copy the headline result into the History row. - Name `python -m skore_skills site build` after History / Backlog / Results markdown is on disk and before asking whether to draft from the refreshed Backlog or stop. - Name `<package>.html`. It must NOT: - Fail the backlog turn if site build errors. - Run `notebook convert` on the preview rebuild. - Run `git commit` in this skill or `git push`.",
       "files": [],
       "expectations": [
         "Copy the headline result into the History row.",
-        "Name `python -m skore_skills site build` before git end-turn.",
+        "Name `python -m skore_skills site build` after History / Backlog / Results markdown is on disk and before asking whether to draft from the refreshed Backlog or stop.",
+        "Name `<package>.html`.",
+        "Name `python -m skore_skills site build` before git end-turn (a second build at End of turn is fine).",
         "Name `python -m skore_skills git end-turn --stage backlog`.",
         "The response does NOT: Fail the backlog turn if site build errors.",
-        "The response does NOT: Run `notebook convert`.",
+        "The response does NOT: Run `notebook convert` on the preview rebuild.",
         "The response does NOT: Run `git commit` in this skill or `git push`."
       ],
       "tools": false,

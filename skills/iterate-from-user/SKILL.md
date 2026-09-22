@@ -145,6 +145,13 @@ Use the canonical `AskUserQuestion` UI; only fall back to plain-
 text enumeration if it is genuinely unavailable in the current
 session.
 
+**Gate context.** This question and the later synthesis-
+confirmation gate each carry their own context: 2–4 lines on what
+the answer authorizes, the facts it rests on — echoed inline, for
+the confirmation gate the quoted claim and the three shaping
+answers — and what each option does. A file link is an addition,
+never the context.
+
 **Exception — pre-resolved entry point.** When
 `manage-ml-backlog` dispatches here after free-text handling
 at the sourcing-menu level has already resolved the branch (the

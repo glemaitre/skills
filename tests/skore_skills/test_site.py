@@ -342,6 +342,114 @@ def test_with_height_reporter_without_body() -> None:
     assert "skore-embed-height" in reported
 
 
+def test_as_embed_document_hosts_a_bare_fragment_in_a_shadow_root() -> None:
+    """A pandas table carries no styles, so give it a root and the baseline."""
+    staged = site_mod.as_embed_document(
+        '<table class="dataframe"><tr><th>R²</th></tr></table>'
+    )
+    assert staged.startswith("<!DOCTYPE html>")
+    assert '<meta charset="utf-8">' in staged
+    assert 'href="assets/skore/embed.css"' in staged
+    assert 'attachShadow({ mode: "open" })' in staged
+    assert staged.index(f'<template id="{site_mod.EMBED_TEMPLATE_ID}">') < staged.index(
+        '<table class="dataframe">'
+    )
+    assert "skore-embed-height" in staged
+
+
+def test_as_embed_document_leaves_a_skore_report_in_the_light_dom() -> None:
+    """skore hosts its own root; nesting it in a second one blanks the card."""
+    fragment = (
+        '<div id="skore-report-1-wrapper">\n'
+        '<template id="skore-report-1-template"><style>.container {}</style>'
+        "</template>\n"
+        '<div id="skore-report-1"></div>\n'
+        "</div>\n"
+        '<script>skoreInitEstimatorReport("skore-report-1");</script>\n'
+    )
+    staged = site_mod.as_embed_document(fragment)
+    assert staged.startswith("<!DOCTYPE html>")
+    assert 'href="assets/skore/embed.css"' in staged
+    assert fragment in staged
+    assert site_mod.EMBED_HOST_ID not in staged
+    assert "attachShadow" not in staged
+
+
+def test_as_embed_document_keeps_a_scripted_fragment_reachable() -> None:
+    """``estimator_html_repr`` resolves its container through ``document``."""
+    fragment = (
+        "<style>.sk-global {}</style><body>"
+        '<div id="sk-container-id-1">tree</div>'
+        "<script>forceTheme('sk-container-id-1');</script>\n"
+    )
+    staged = site_mod.as_embed_document(fragment)
+    assert staged.count("<!DOCTYPE html>") == 1
+    assert "<template" not in staged
+    assert "attachShadow" not in staged
+    assert staged.index("forceTheme('sk-container-id-1');") < staged.index(
+        "skore-embed-height"
+    )
+
+
+def test_as_embed_document_leaves_a_whole_document_alone() -> None:
+    """skrub ``write_html`` output already is a document; only size it."""
+    document = "<!doctype html>\n<html><body>report</body></html>\n"
+    staged = site_mod.as_embed_document(document)
+    assert "<!DOCTYPE html>" not in staged
+    assert "assets/skore/embed.css" not in staged
+    assert staged.index("skore-embed-height") < staged.index("</body>")
+
+
+def test_site_build_wraps_fragment_results_in_a_document(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Staged ``_repr_html_`` fragments are served as UTF-8 documents."""
+    _scaffold(tmp_path)
+    (tmp_path / "journal" / "01_x.md").write_text(
+        "# design\n\n## Results\n\n### Metrics\n\nMAE 3421.\n\n## Notebooks\n",
+        encoding="utf-8",
+    )
+    results = tmp_path / "scratch" / "results" / "01_x"
+    results.mkdir(parents=True)
+    (results / "metrics.html").write_text(
+        '<table class="dataframe"><tr><th>R²</th></tr></table>', encoding="utf-8"
+    )
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    docs = tmp_path / "_build" / "docs"
+    staged = (docs / "01_x.metrics.html").read_text(encoding="utf-8")
+    assert staged.startswith("<!DOCTYPE html>")
+    assert '<meta charset="utf-8">' in staged
+    assert "R²" in staged
+    assert (docs / "assets" / "skore" / "embed.css").is_file()
+
+
+def test_site_build_wraps_fragment_data_analysis_html(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Plot HTML next to ``data_analysis.md`` goes through the same shell."""
+    (tmp_path / "src").mkdir()
+    (tmp_path / "data_analysis").mkdir()
+    (tmp_path / "data_analysis" / "data_analysis.md").write_text(
+        "# report\n", encoding="utf-8"
+    )
+    (tmp_path / "data_analysis" / "target_distribution.html").write_text(
+        '<div class="plotly-graph-div"></div>', encoding="utf-8"
+    )
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    staged = (tmp_path / "_build" / "docs" / "target_distribution.html").read_text(
+        encoding="utf-8"
+    )
+    assert staged.startswith("<!DOCTYPE html>")
+    assert '<meta charset="utf-8">' in staged
+    assert "skore-embed-height" in staged
+
+
 def test_site_build_autosizes_report_but_not_notebook(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

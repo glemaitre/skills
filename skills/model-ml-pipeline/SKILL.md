@@ -15,6 +15,27 @@ description: >
 This meta skill owns selection and ordering, not child methodology.
 Do not load `smoke-test-ml-pipeline` as a sibling of evaluate.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Design notes, JOURNAL text, and `#` comments describe **this**
+experiment — not the skills framework, the CLI, or the command that
+produced an output. `<!-- results-embed: … -->` is a site marker.
+Authoring hints stay in this skill. `style` is ruff only.
+
+## Design note shell
+
+`python -m skore_skills scaffold --journal --stem <NN_short>` writes
+`journal/<stem>.md`. Do not recreate it from memory. Fill Question,
+Motivation, Method, and Risks as science (what to learn, why now,
+what changes, what could invalidate the result). Status lifecycle:
+`planned` → `approved` → `running` → `done` | `abandoned`. Those
+four content sections freeze after approval; only Status, generated
+notebook viewers, and the Method `<!-- results-embed: pipeline -->`
+embed change afterwards. Abandoned: one-line reason on State;
+Headline result `n/a — abandoned: <reason>`. There is no "Success
+criteria" section. Keep `## Notebooks` with Evaluation then Audit.
+
 ## Entry routing — deterministic
 
 1. Run `python -m skore_skills status`. If `has_src` and
@@ -25,10 +46,17 @@ Do not load `smoke-test-ml-pipeline` as a sibling of evaluate.
    current design, run
    `python -m skore_skills design consent --stem <stem>`. Treat
    JSON `action` as authoritative. `proceed` → resume that stem
-   directly; do not ask how to start again. `ask` → show the note
-   and **stop** for approval; do not write code. `stop` → missing
+   directly; do not ask how to start again. `ask` → render the
+   JSON `context` inline (see Gate context). If `policy.site` is
+   true and `export-ml-site` is installed, run
+   `python -m skore_skills site build` first (skip in one line
+   otherwise; name a build error; do not fail the gate). Link
+   `journal/<stem>.md` plus `<package>.html` and
+   `html/<stem>.html` when the build ran, then **stop** for
+   approval; do not write code. `stop` → missing
    note: name `scaffold --journal --stem` (or abandoned: explain
    and do not implement). Do not infer approval from "build it".
+   Missing shell: no `site build`, no fill from memory.
 3. Otherwise run `python -m skore_skills model choices`. Treat its
    JSON as authoritative. Present exactly `choices[]`, in returned
    order, in one single-choice **AskUserQuestion**:
@@ -38,11 +66,33 @@ Do not load `smoke-test-ml-pipeline` as a sibling of evaluate.
    - `backlog` → **Pick from the Backlog**
    - `discuss` → **Discuss the next step**
 
+   Carry each choice's JSON `reason` as its description so the user
+   reads why it is on offer.
+
 Do not add a disabled choice, infer availability yourself, or
 reorder the list. In particular: no dummy / standard baseline when
 `model_stems` is non-empty; no EDA proposal unless
 `data_analysis` is `present`; no Backlog option when `backlog` is
 empty. Discussion is always present.
+
+## Gate context
+
+Every approval question carries its own context. Before asking,
+state in 2–4 lines what the answer authorizes, the facts it rests
+on — echoed inline — and what each option does. A file link is an
+addition, never the context: "read `journal/<stem>.md` and
+approve" is not an approval request.
+
+On `design consent` `ask`, the JSON `context` holds those facts:
+`question`, `source`, `files_touched`, `change`, and up to two
+`risks`. Quote them in the message (question and planned change
+first, then the risks the user may push back on). After the note
+is populated, rebuild the site per `export-ml-site` § Preview
+before markdown-review gates **before** asking **Approve** /
+**Modify** / **Stop**. Link `note` next to them, not instead of
+them. An empty field means the note does not state that fact: say
+the note is not ready for approval and offer to populate it;
+never fill it from memory. Do not `site build` an empty shell.
 
 ## Choice contracts
 
@@ -110,7 +160,8 @@ If the design-note shell is missing, this turn only names
 `python -m skore_skills scaffold --journal --stem <NN_short>`
 and stops. Do not fill Question / Motivation / Method / Risks
 from memory. Populate those sections only after that command
-has created the shell, then stop for explicit design approval.
+has created the shell, then preview `site build` if
+`policy.site` and stop for explicit design approval.
 
 ## Approved-design implement loop
 
@@ -123,7 +174,8 @@ has created the shell, then stop for explicit design approval.
    `proceed`: build reports the
    design, then
    `python -m skore_skills evaluate consent --stem <stem>`
-   (Evaluate / Modify / Stop on `ask`). Build also writes the
+   (Evaluate / Modify / Stop on `ask`, with that JSON `context`
+   rendered inline per § Gate context). Build also writes the
    unfitted `scratch/results/<stem>/pipeline.html` and, when
    `policy.site` is true, runs `site build` so Method shows the
    diagram **before** Evaluate. Do not convert
@@ -179,10 +231,13 @@ symbols are written, children use
   `python -m skore_skills scaffold --journal --stem
   <NN_short>` and stops. Do not recreate or fill the template
   from memory. Populate Question / Motivation / Method / Risks
-  only after that command has created the shell, then stop for
-  user approval.
+  only after that command has created the shell, then preview
+  `site build` if `policy.site` and stop for user approval.
+  Do not `site build` before the shell exists.
 - Require `design consent` `proceed` before code. Do not treat
   "the user asked to build" as approval.
+- Do not open an approval gate whose only context is a file path;
+  render the `context` facts inline (§ Gate context).
 - Preserve identical stems across design, experiment, smoke, audit.
 - Do not replace skrub DataOps with bare sklearn Pipeline.
 - Do not persist a result as done while `smoke run` is `stop`.

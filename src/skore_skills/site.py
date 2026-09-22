@@ -71,6 +71,37 @@ HEIGHT_REPORTER = """<script>
 })();
 </script>
 """
+EMBED_STYLESHEET = (STAGED_ASSETS / "embed.css").as_posix()
+EMBED_HOST_ID = "skore-embed-host"
+EMBED_TEMPLATE_ID = "skore-embed-template"
+# A ``_repr_html_`` fragment inherits its typography from whatever page
+# holds it. Alone in a viewer it would inherit nothing, so wrap it in a
+# document that carries the charset and the site font.
+EMBED_DOCUMENT = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{stylesheet}">
+</head>
+<body>
+{body}{reporter}</body>
+</html>
+"""
+# Fragments without a shadow root of their own get one here, so the
+# baseline stylesheet and the fragment's own rules cannot collide.
+EMBED_SHADOW_HOST = """<div id="{host}"></div>
+<template id="{template}">
+<link rel="stylesheet" href="{stylesheet}">
+{fragment}</template>
+<script>
+(() => {{
+  const host = document.getElementById("{host}");
+  const template = document.getElementById("{template}");
+  host.attachShadow({{ mode: "open" }}).append(template.content.cloneNode(true));
+}})();
+</script>
+"""
 
 
 @dataclass(frozen=True)
@@ -447,6 +478,49 @@ def with_height_reporter(text: str) -> str:
     return text[:index] + HEIGHT_REPORTER + text[index:]
 
 
+def is_document(text: str) -> bool:
+    """Whether ``text`` is a whole HTML document rather than a fragment.
+
+    ``<body>`` is not a marker: ``estimator_html_repr`` emits one in the
+    middle of its fragment.
+    """
+    head = text[:2048].lower()
+    return "<!doctype" in head or "<html" in head
+
+
+def carries_shadow_host(text: str) -> bool:
+    """Whether ``text`` already attaches a shadow root of its own.
+
+    skore report and checks reprs ship a ``<template>`` holding their
+    styles plus the ``skoreInit`` call that hosts it.
+    """
+    return "<template id=" in text and "skoreInit" in text
+
+
+def as_embed_document(text: str) -> str:
+    """Return ``text`` as a self-contained document sized for its viewer.
+
+    A fragment that neither hosts its own shadow root nor runs scripts is
+    moved into one. The rest stay in the light DOM: skore and sklearn
+    resolve their containers through ``document``, which a shadow root
+    would hide from them, and scripts cloned out of a ``<template>`` never
+    run at all.
+    """
+    if is_document(text):
+        return with_height_reporter(text)
+    body = text if text.endswith("\n") else f"{text}\n"
+    if not carries_shadow_host(text) and "<script" not in text:
+        body = EMBED_SHADOW_HOST.format(
+            host=EMBED_HOST_ID,
+            template=EMBED_TEMPLATE_ID,
+            stylesheet=EMBED_STYLESHEET,
+            fragment=body,
+        )
+    return EMBED_DOCUMENT.format(
+        stylesheet=EMBED_STYLESHEET, body=body, reporter=HEIGHT_REPORTER
+    )
+
+
 def _copy_data_analysis_assets(root: Path, docs: Path) -> None:
     analysis = root / "data_analysis"
     if not analysis.is_dir():
@@ -456,7 +530,7 @@ def _copy_data_analysis_assets(root: Path, docs: Path) -> None:
             continue
         if path.suffix.lower() == ".html":
             (docs / path.name).write_text(
-                with_height_reporter(path.read_text(encoding="utf-8")),
+                as_embed_document(path.read_text(encoding="utf-8")),
                 encoding="utf-8",
             )
         elif path.suffix.lower() in ASSET_SUFFIXES:
@@ -477,7 +551,7 @@ def _copy_result_html(root: Path, docs: Path, page: Page) -> None:
         dest = docs / f"{stem}.{path.stem}{suffix}"
         if suffix == ".html":
             dest.write_text(
-                with_height_reporter(path.read_text(encoding="utf-8")),
+                as_embed_document(path.read_text(encoding="utf-8")),
                 encoding="utf-8",
             )
         elif suffix in RESULT_IMAGE_SUFFIXES:

@@ -20,7 +20,15 @@ def _write(path: Path, text: str = "") -> None:
 def _note(root: Path, stem: str, state: str) -> None:
     _write(
         root / "journal" / f"{stem}.md",
-        f"## Status\n\n- **State:** {state}\n- **Approved by user on:** n/a\n",
+        "## Question / hypothesis\n\n"
+        "Does a richer feature set beat the baseline?\n\n"
+        "## Method\n\n"
+        "- **Files touched:** `src/pkg/features.py`\n"
+        "- **Change versus baseline:** add rolling aggregates\n\n"
+        "## Risks / things that could invalidate the result\n\n"
+        "- the rolling window may leak future rows\n\n"
+        "## Status\n\n"
+        f"- **State:** {state}\n- **Approved by user on:** n/a\n",
     )
 
 
@@ -35,6 +43,14 @@ def test_planned_asks_for_approval(tmp_path: Path) -> None:
         "action": "ask",
         "reason": "first_approval",
         "choices": ["approve", "modify", "stop"],
+        "context": {
+            "note": f"journal/{stem}.md",
+            "question": "Does a richer feature set beat the baseline?",
+            "source": "",
+            "files_touched": "`src/pkg/features.py`",
+            "change": "add rolling aggregates",
+            "risks": ["the rolling window may leak future rows"],
+        },
     }
 
 
@@ -50,6 +66,28 @@ def test_approved_is_proceed(tmp_path: Path) -> None:
         "reason": "approved",
     }
     assert "choices" not in payload
+    assert "context" not in payload
+
+
+def test_ask_context_is_empty_on_an_unpopulated_note(tmp_path: Path) -> None:
+    stem = "06_shell"
+    _write(
+        tmp_path / "journal" / f"{stem}.md",
+        "## Question / hypothesis\n\n<!-- One sentence. -->\n\n"
+        "## Status\n\n- **State:** planned\n",
+    )
+
+    payload = design_consent(tmp_path, stem)
+
+    assert payload["action"] == "ask"
+    assert payload["context"] == {
+        "note": f"journal/{stem}.md",
+        "question": "",
+        "source": "",
+        "files_touched": "",
+        "change": "",
+        "risks": [],
+    }
 
 
 @pytest.mark.parametrize("state", ["running", "done"])

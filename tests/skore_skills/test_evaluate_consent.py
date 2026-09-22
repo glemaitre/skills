@@ -35,6 +35,8 @@ def test_first_eval_asks_when_report_is_placeholder(tmp_path: Path) -> None:
     )
     _write(
         tmp_path / "journal" / f"{stem}.md",
+        "## Question / hypothesis\n\n"
+        "Does the new model beat the baseline?\n\n"
         "## Status\n\n- **Persisted report:** n/a — not persisted\n",
     )
 
@@ -45,6 +47,13 @@ def test_first_eval_asks_when_report_is_placeholder(tmp_path: Path) -> None:
         "action": "ask",
         "reason": "first_eval",
         "choices": ["evaluate", "modify", "stop"],
+        "context": {
+            "note": f"journal/{stem}.md",
+            "question": "Does the new model beat the baseline?",
+            "experiment": f"experiments/{stem}.py",
+            "smoke": f"tests/smoke/test_{stem}.py",
+            "persisted_report": "none",
+        },
     }
 
 
@@ -70,6 +79,7 @@ def test_history_locator_is_proceed(tmp_path: Path) -> None:
         "reason": "persisted_report",
     }
     assert "choices" not in payload
+    assert "context" not in payload
 
 
 def test_design_note_locator_is_proceed(tmp_path: Path) -> None:
@@ -117,6 +127,8 @@ def test_missing_stem_with_smoke_is_ask(tmp_path: Path) -> None:
 
     assert payload["action"] == "ask"
     assert payload["reason"] == "first_eval"
+    assert payload["context"]["note"] == ""
+    assert payload["context"]["smoke"] == f"tests/smoke/test_{stem}.py"
 
 
 def test_empty_stem_raises() -> None:

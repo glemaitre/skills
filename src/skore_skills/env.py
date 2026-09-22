@@ -449,17 +449,16 @@ def skore_requirements(manager: str, mode: str) -> list[str]:
     return packages
 
 
-def editable_argv(manager: str, package: str) -> list[str] | None:
+def editable_argv(manager: str, package: str, *, root: Path) -> list[str] | None:
     """Return the editable-install argv, or None if unsupported."""
+    pixi_spec = f"{package} @ {root.resolve().as_uri()}"
     commands: dict[str, list[str]] = {
         "pixi": [
             "pixi",
             "add",
             "--pypi",
-            package,
-            "--path",
-            ".",
             "--editable",
+            pixi_spec,
         ],
         "uv": ["uv", "add", "--editable", "."],
         "poetry": ["poetry", "add", "--editable", "."],
@@ -864,7 +863,7 @@ def add_editable(root: Path, *, execute: bool = False) -> tuple[str, int]:
     if not name:
         return NO_PACKAGE + "\n", 1
     assert manager is not None
-    argv = editable_argv(manager, name)
+    argv = editable_argv(manager, name, root=root)
     if argv is None:
         return EDITABLE_UNSUPPORTED.format(manager=manager) + "\n", 1
     rendered = " ".join(argv) + "\n"

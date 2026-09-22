@@ -203,6 +203,7 @@
         "The response does NOT: Train/test split the raw table.",
         "The response does NOT: Run `git end-turn` before the user picks Close.",
         "The response does NOT: Leave classification / no-target branches (`if TASK`, `if TARGET is None`) in the notebook.",
+        "The response does NOT: Write skill ids, `skore_skills`, `cells run`, or \"generated from \u2026\" process notes into `data_analysis/data_analysis.py` / `data_analysis.md` markdown or `#` comments.",
         "The response does NOT: Call `plt.close` or `import matplotlib.pyplot` for these figures.",
         "The response does NOT: Loop over columns with a trailing `g` (that is not displayed).",
         "The response does NOT: AskUserQuestion grouping when only one data file is in play."
@@ -264,15 +265,18 @@
     {
       "id": 15,
       "title": "Keep exploring does not end the turn",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- User picks **Keep exploring the data**.]\n\nExplore the dataset. Target is MedHouseVal.",
-      "expected_output": "Behavioural response satisfying: - AskUserQuestion four picks, none recommended: Choose additional pre-defined option; Provide a query to extend the exploration; Automatic exploration related to the data and problem; Describe a plot. - Stay in `explore-ml-data`. It must NOT: - Name `python -m skore_skills git end-turn`. - Invent a domain-specific checklist skill or `references/domains/`. - Run `python -m skore_skills site build` on keep exploring.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.md` was just written.\n- `policy.site` is true.\n- `export-ml-site` is installed.\n- User picks **Keep exploring the data**.]\n\nExplore the dataset. Target is MedHouseVal.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills site build` after the md and before keep exploring vs close. - Name `<package>.html` and `html/data_analysis.html`. - After **Keep exploring**, AskUserQuestion four picks, none recommended: Choose additional pre-defined option; Provide a query to extend the exploration; Automatic exploration related to the data and problem; Describe a plot. It must NOT: - Name `python -m skore_skills git end-turn`. - Invent a domain-specific checklist skill or `references/domains/`. - Run `python -m skore_skills site build` again on the four-pick extras board.",
       "files": [],
       "expectations": [
-        "AskUserQuestion four picks, none recommended: Choose additional pre-defined option; Provide a query to extend the exploration; Automatic exploration related to the data and problem; Describe a plot.",
+        "Name `python -m skore_skills site build` after the md and before keep exploring vs close.",
+        "Name `<package>.html` and `html/data_analysis.html`.",
+        "After **Keep exploring**, AskUserQuestion four picks, none recommended: Choose additional pre-defined option; Provide a query to extend the exploration; Automatic exploration related to the data and problem; Describe a plot.",
         "Stay in `explore-ml-data`.",
         "The response does NOT: Name `python -m skore_skills git end-turn`.",
         "The response does NOT: Invent a domain-specific checklist skill or `references/domains/`.",
-        "The response does NOT: Run `python -m skore_skills site build` on keep exploring.",
+        "The response does NOT: Run `python -m skore_skills site build` again on the four-pick extras board.",
+        "The response does NOT: Run `notebook convert` before Close.",
         "The response does NOT: Say \u201cextra-analyses\u201d or \u201cstandard extra analysis\u201d on that board."
       ],
       "tools": false,
@@ -434,6 +438,23 @@
         "Write `data_analysis/data_analysis.py` without an AskUserQuestion grouping board.",
         "The response does NOT: AskUserQuestion grouping (Use a proposed grouping / Profile every file separately / I will describe the grouping).",
         "The response does NOT: Append join-coverage cells."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 25,
+      "title": "Site on rebuilds before keep vs close",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffold exists. G-TABULAR is `pandas`.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nExplore the California housing CSV. Target is MedHouseVal.",
+      "expected_output": "Behavioural response satisfying: - After `data_analysis.md` and JOURNAL, name `python -m skore_skills site build`. - Name `<package>.html` and `html/data_analysis.html`. - Then AskUserQuestion keep exploring vs close (neither option recommended or preselected). It must NOT: - Run `notebook convert` or `git end-turn` before the user picks Close. - Fail the keep-vs-close gate if site build errors; name the error.",
+      "files": [],
+      "expectations": [
+        "After `data_analysis.md` and JOURNAL, name `python -m skore_skills site build`.",
+        "Name `<package>.html` and `html/data_analysis.html`.",
+        "Then AskUserQuestion keep exploring vs close (neither option recommended or preselected).",
+        "The response does NOT: Run `notebook convert` or `git end-turn` before the user picks Close.",
+        "The response does NOT: Fail the keep-vs-close gate if site build errors; name the error."
       ],
       "tools": false,
       "sandbox": [],

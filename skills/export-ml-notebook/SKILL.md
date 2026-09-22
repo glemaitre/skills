@@ -24,7 +24,11 @@ conversions, other sources, and the gate itself.
 1. `python -m skore_skills status`. Read `policy.notebooks` and
    `skills`.
 2. If `policy.notebooks` is `null`: AskUserQuestion executed
-   notebooks on/off (default off). Persist `true`/`false`. If
+   notebooks on/off (default off). Say in 2–4 lines what the
+   answer authorizes — re-executing percent files into notebooks
+   on every relevant turn, the `jupytext` / `nbclient` installs it
+   implies, the persisted policy key — before asking; a file link
+   is an addition, never the context. Persist `true`/`false`. If
    true, load `add-python-package` for `jupytext` and `nbclient`
    (agent). If false, stop.
 3. If `policy.notebooks` is false: say the gate is off; offer to

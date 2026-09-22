@@ -38,6 +38,9 @@
 - Require the experiment to be `done` before audit.
 - Dispatch record-outcome before producing the digest.
 - Write the journal directly.
+- Write skill ids, `skore_skills`, `cells run`, or API-tutorial
+  prose (version floors, `summarize(ignore=…)`, hub locator
+  recipes) into `audit/<stem>.py` markdown cells or `#` comments.
 
 ---
 

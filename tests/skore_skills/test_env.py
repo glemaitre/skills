@@ -9,6 +9,7 @@ from typing import Any
 
 import pytest
 from click.testing import CliRunner
+from packaging.requirements import Requirement
 
 from skore_skills.cli import cli
 from skore_skills.env import _venv_bin, install_argv, load_stack_policy
@@ -151,6 +152,16 @@ def test_env_add_named_package_not_substituted(
     policy = load_stack_policy()
     assert "forbidden_substitutes" not in policy
     assert "ruff" in policy["mandatory"]
+
+
+def test_env_stack_prints_policy() -> None:
+    """``env stack`` prints the packaged policy, including competing jobs."""
+    result = CliRunner().invoke(cli, ["env", "stack"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["competing"]["tabular"] == ["pandas", "polars"]
+    assert "pytest" in payload["stage"]
+    assert payload == load_stack_policy()
 
 
 def test_env_add_ambiguous_refuses(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -676,8 +687,19 @@ def test_env_route_named_booster_is_default() -> None:
     assert "HistGradientBoosting" not in result.output
 
 
+def _pixi_editable_spec(root: Path, package: str) -> str:
+    return f"{package} @ {root.resolve().as_uri()}"
+
+
+def _assert_pixi_editable_spec(spec: str, *, root: Path, package: str) -> None:
+    requirement = Requirement(spec)
+    assert requirement.name == package
+    assert requirement.url == root.resolve().as_uri()
+    assert requirement.url.startswith("file:")
+
+
 def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Editable pixi add uses ``--pypi pkg --path . --editable``."""
+    """Editable pixi add uses a PEP 508 ``file:`` URL, not ``--path .``."""
     (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
     (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
     (tmp_path / "pyproject.toml").write_text(
@@ -687,13 +709,17 @@ def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.chdir(tmp_path)
     result = CliRunner().invoke(cli, ["env", "add", "--editable"])
     assert result.exit_code == 0, result.output
-    assert result.output.strip() == "pixi add --pypi demo-pkg --path . --editable"
+    prefix = "pixi add --pypi --editable "
+    assert result.output.startswith(prefix)
+    spec = result.output.removeprefix(prefix).strip()
+    _assert_pixi_editable_spec(spec, root=tmp_path, package="demo-pkg")
+    assert "--path" not in result.output
 
 
 def test_env_add_editable_pixi_execute(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """``--execute`` runs the pixi editable argv, including ``--path``."""
+    """``--execute`` runs the pixi editable argv with a ``file:`` spec."""
     from skore_skills import env as env_mod
 
     (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
@@ -716,7 +742,9 @@ def test_env_add_editable_pixi_execute(
     monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
     result = CliRunner().invoke(cli, ["env", "add", "--editable", "--execute"])
     assert result.exit_code == 0, result.output
-    assert seen == [["pixi", "add", "--pypi", "demo-pkg", "--path", ".", "--editable"]]
+    spec = _pixi_editable_spec(tmp_path, "demo-pkg")
+    assert seen == [["pixi", "add", "--pypi", "--editable", spec]]
+    _assert_pixi_editable_spec(spec, root=tmp_path, package="demo-pkg")
 
 
 @pytest.mark.parametrize(

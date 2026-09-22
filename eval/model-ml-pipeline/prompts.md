@@ -66,6 +66,7 @@
 - Write model or experiment code before the design note is approved.
 - Recreate or fill the design-note shape from memory when the CLI
   command did not run this turn.
+- Run `python -m skore_skills site build` before the shell exists.
 
 ---
 
@@ -300,3 +301,85 @@
 - Drop the locator because there is no audit digest.
 - Invent a headline metric.
 - Open the next-lever Backlog menu.
+
+---
+
+## CASE_13 — Design approval states the note's facts inline
+
+**User prompt:**
+> Build a dummy predictor to check the pipeline runs.
+
+**Assumed workspace state:**
+- Scaffolded workspace; no prior experiment.
+- `journal/01_dummy.md` exists with State `planned`, question
+  "Does the loading and fit/predict path work end to end?",
+  Files touched `src/pkg/pipeline.py`, change "first pipeline; a
+  DummyClassifier inside the skrub DataOps declaration", and the
+  risk "the dummy adds no predictive value; it only proves the
+  path".
+- `python -m skore_skills design consent --stem 01_dummy` returns
+  `action` `ask` with those facts in its JSON `context`.
+
+**Must do:**
+- Name `python -m skore_skills design consent --stem 01_dummy`.
+- State the design question, the planned change and files touched,
+  and the recorded risk in the approval message itself.
+- Ask Approve / Modify / Stop and stop there.
+
+**Must NOT do:**
+- Ask for approval by only pointing at `journal/01_dummy.md`
+  without stating what the note says.
+- Write model, experiment, or pytest code before approval.
+- Invent a question, method, or risk the note does not state.
+
+---
+
+## CASE_14 — Unpopulated design note is not ready for approval
+
+**User prompt:**
+> The note for 02_target_transform is created. Approve and build it.
+
+**Assumed workspace state:**
+- `journal/02_target_transform.md` is the scaffolded shell: State
+  `planned`, every content section still a template comment.
+- `design consent --stem 02_target_transform` returns `ask` with
+  every `context` field empty.
+
+**Must do:**
+- Say the note states no question, method change, or risk yet, so
+  it is not ready for approval.
+- Offer to populate Question / Motivation / Method / Risks first.
+
+**Must NOT do:**
+- Treat "approve and build it" as design approval.
+- Fill the note's sections from memory as if they were recorded.
+- Write model or experiment code.
+- Run `python -m skore_skills site build` on an empty shell.
+
+---
+
+## CASE_15 — Site on rebuilds before design approval
+
+**User prompt:**
+> Build a dummy predictor to check the pipeline runs.
+
+**Assumed workspace state:**
+- Scaffolded workspace; no prior experiment.
+- `journal/01_dummy.md` was just populated (State `planned`) with
+  question, files touched, planned change, and a recorded risk.
+- `python -m skore_skills design consent --stem 01_dummy` returns
+  `action` `ask` with those facts in its JSON `context`.
+- `policy.site` is true.
+- `export-ml-site` is installed.
+
+**Must do:**
+- Name `python -m skore_skills site build` after the note is
+  populated and before Approve / Modify / Stop.
+- Name `<package>.html` and `html/01_dummy.html`.
+- State the design question, planned change, and recorded risk
+  inline, then ask Approve / Modify / Stop and stop there.
+
+**Must NOT do:**
+- Write model, experiment, or pytest code before approval.
+- Run `notebook convert` or `git end-turn` on this preview rebuild.
+- Fail the approval gate if site build errors; name the error.

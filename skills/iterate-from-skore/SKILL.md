@@ -157,7 +157,10 @@ record — see § Stop conditions.
   `audit:<stem>:checks.<code>`.
 - **Don't pick a single "winning" finding for the user.** Emit one
   row per actionable check. The user picks via the parent's
-  sourcing menu (`B<N>`). Stop after the candidate list. Forbidden
+  sourcing menu (`B<N>`), so each returned row carries the check
+  code, its message, and what the row would try — the pick is made
+  from that text, not from a link to the digest. Stop after the
+  candidate list. Forbidden
   closers: "highest-leverage," "run X next," "combined into one
   experiment." Close with the parent `B<N>` pick only.
 - **Dedup against existing Backlog rows by `Source` citation.**

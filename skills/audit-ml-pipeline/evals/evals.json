@@ -20,7 +20,8 @@
         "The response does NOT: Call `skore.evaluate` or `project.put`.",
         "The response does NOT: Require the experiment to be `done` before audit.",
         "The response does NOT: Dispatch record-outcome before producing the digest.",
-        "The response does NOT: Write the journal directly."
+        "The response does NOT: Write the journal directly.",
+        "The response does NOT: Write skill ids, `skore_skills`, `cells run`, or API-tutorial prose (version floors, `summarize(ignore=\u2026)`, hub locator recipes) into `audit/<stem>.py` markdown cells or `#` comments."
       ],
       "tools": false,
       "sandbox": [],

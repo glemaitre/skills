@@ -34,13 +34,14 @@
       "id": 2,
       "title": "Missing design note stops before code",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The Backlog choice is confirmed with stem `02_target_transform`.\n- `journal/02_target_transform.md` does not exist.]\n\nImplement experiment 02 for the selected target transform.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills scaffold --journal --stem 02_target_transform` to create the packaged design-note shell. - State that Question, Motivation, Method, and Risks are filled only after that command creates the shell, then stop for user approval. It must NOT: - Write model or experiment code before the design note is approved. - Recreate or fill the design-note shape from memory when the CLI command did not run this turn.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills scaffold --journal --stem 02_target_transform` to create the packaged design-note shell. - State that Question, Motivation, Method, and Risks are filled only after that command creates the shell, then stop for user approval. It must NOT: - Write model or experiment code before the design note is approved. - Recreate or fill the design-note shape from memory when the CLI command did not run this turn. - Run `python -m skore_skills site build` before the shell exists.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills scaffold --journal --stem 02_target_transform` to create the packaged design-note shell.",
         "State that Question, Motivation, Method, and Risks are filled only after that command creates the shell, then stop for user approval.",
         "The response does NOT: Write model or experiment code before the design note is approved.",
-        "The response does NOT: Recreate or fill the design-note shape from memory when the CLI command did not run this turn."
+        "The response does NOT: Recreate or fill the design-note shape from memory when the CLI command did not run this turn.",
+        "The response does NOT: Run `python -m skore_skills site build` before the shell exists."
       ],
       "tools": false,
       "sandbox": [],
@@ -219,6 +220,60 @@
         "The response does NOT: Drop the locator because there is no audit digest.",
         "The response does NOT: Invent a headline metric.",
         "The response does NOT: Open the next-lever Backlog menu."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 13,
+      "title": "Design approval states the note's facts inline",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace; no prior experiment.\n- `journal/01_dummy.md` exists with State `planned`, question\n  \"Does the loading and fit/predict path work end to end?\",\n  Files touched `src/pkg/pipeline.py`, change \"first pipeline; a\n  DummyClassifier inside the skrub DataOps declaration\", and the\n  risk \"the dummy adds no predictive value; it only proves the\n  path\".\n- `python -m skore_skills design consent --stem 01_dummy` returns\n  `action` `ask` with those facts in its JSON `context`.]\n\nBuild a dummy predictor to check the pipeline runs.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills design consent --stem 01_dummy`. - State the design question, the planned change and files touched, and the recorded risk in the approval message itself. - Ask Approve / Modify / Stop and stop there. It must NOT: - Ask for approval by only pointing at `journal/01_dummy.md` without stating what the note says. - Write model, experiment, or pytest code before approval. - Invent a question, method, or risk the note does not state.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills design consent --stem 01_dummy`.",
+        "State the design question, the planned change and files touched, and the recorded risk in the approval message itself.",
+        "Ask Approve / Modify / Stop and stop there.",
+        "The response does NOT: Ask for approval by only pointing at `journal/01_dummy.md` without stating what the note says.",
+        "The response does NOT: Write model, experiment, or pytest code before approval.",
+        "The response does NOT: Invent a question, method, or risk the note does not state."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 14,
+      "title": "Unpopulated design note is not ready for approval",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_target_transform.md` is the scaffolded shell: State\n  `planned`, every content section still a template comment.\n- `design consent --stem 02_target_transform` returns `ask` with\n  every `context` field empty.]\n\nThe note for 02_target_transform is created. Approve and build it.",
+      "expected_output": "Behavioural response satisfying: - Say the note states no question, method change, or risk yet, so it is not ready for approval. - Offer to populate Question / Motivation / Method / Risks first. It must NOT: - Treat \"approve and build it\" as design approval. - Fill the note's sections from memory as if they were recorded. - Write model or experiment code.",
+      "files": [],
+      "expectations": [
+        "Say the note states no question, method change, or risk yet, so it is not ready for approval.",
+        "Offer to populate Question / Motivation / Method / Risks first.",
+        "The response does NOT: Treat \"approve and build it\" as design approval.",
+        "The response does NOT: Fill the note's sections from memory as if they were recorded.",
+        "The response does NOT: Write model or experiment code.",
+        "The response does NOT: Run `python -m skore_skills site build` on an empty shell."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 15,
+      "title": "Site on rebuilds before design approval",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace; no prior experiment.\n- `journal/01_dummy.md` was just populated (State `planned`) with\n  question, files touched, planned change, and a recorded risk.\n- `python -m skore_skills design consent --stem 01_dummy` returns\n  `action` `ask` with those facts in its JSON `context`.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nBuild a dummy predictor to check the pipeline runs.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills site build` after the note is populated and before Approve / Modify / Stop. - Name `<package>.html` and `html/01_dummy.html`. - State the design question, planned change, and recorded risk inline, then ask Approve / Modify / Stop and stop there. It must NOT: - Write model, experiment, or pytest code before approval. - Run `notebook convert` or `git end-turn` on this preview rebuild. - Fail the approval gate if site build errors; name the error.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills site build` after the note is populated and before Approve / Modify / Stop.",
+        "Name `<package>.html` and `html/01_dummy.html`.",
+        "State the design question, planned change, and recorded risk inline, then ask Approve / Modify / Stop and stop there.",
+        "The response does NOT: Write model, experiment, or pytest code before approval.",
+        "The response does NOT: Run `notebook convert` or `git end-turn` on this preview rebuild.",
+        "The response does NOT: Fail the approval gate if site build errors; name the error."
       ],
       "tools": false,
       "sandbox": [],

@@ -41,6 +41,15 @@ One project-level exploratory data analysis: a notebook the user
 can open, HTML reports, a short `data_analysis.md` that embeds
 them, and a JOURNAL index row.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Notebook markdown, `data_analysis.md`, JOURNAL text, and `#`
+comments describe **this** dataset — not the skills framework, the
+CLI, or the command that produced an output. `<!-- results-embed:
+… -->` is a site marker. Authoring hints stay in this skill.
+`style` is ruff only.
+
 ## Artifacts
 
 | Path | Audience |
@@ -81,6 +90,11 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   board. Cleaning belongs in `build-ml-pipeline`.
 - **Deliverables under `data_analysis/`.** Raw load may point
   anywhere.
+- **Every ask carries its context.** Before any AskUserQuestion in
+  this skill, state in 2–4 lines what the answer authorizes, the
+  facts it rests on — echoed inline, e.g. the file names, the
+  candidate columns, the proposed family slugs — and what each
+  option does. A file link is an addition, never the context.
 - **G-DATA-ANALYSIS run | skip.** AskUserQuestion. "Go fast" does
   not skip. Skip → JOURNAL Status row `skipped — <date>` and stop.
   Do not run `site build` on skip.
@@ -152,6 +166,7 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 - [ ] scratch/data_analysis/facts.py → <slug>.json per family
       + extras.json
 - [ ] Author data_analysis.md + JOURNAL
+- [ ] Preview `site build` if `policy.site` (skip on G-DATA-ANALYSIS skip)
 - [ ] AskUserQuestion keep exploring vs close (skip if user
       already closed the turn)
 ```
@@ -236,12 +251,19 @@ not write or execute the notebook.
    Skip path: Status row only. Do not convert or `git end-turn` on
    skip.
 6. **Keep exploring vs close** — unless the user already closed
-   the turn (“EDA is done”, “close the turn”): **AskUserQuestion**
-   one pick. Neither option is recommended or preselected. After
-   the first md, always ask (including when triage sent you here).
-   Close → End of turn (User-facing close). Do not rewrite
-   `data_analysis.md` on Close. Duplicate / target / leakage stay
-   in Modelling implications, not only Open questions.
+   the turn (“EDA is done”, “close the turn”): if `policy.site`
+   is true and `export-ml-site` is installed, run
+   `python -m skore_skills site build` first (skip in one line
+   otherwise; name a build error; do not fail the gate). Link
+   `data_analysis/data_analysis.md` plus `<package>.html` and
+   `html/data_analysis.html` when the build ran. Do not
+   `notebook convert` or `git end-turn` on this preview. Then
+   **AskUserQuestion** one pick. Neither option is recommended
+   or preselected. After the first md, always ask (including
+   when triage sent you here). Close → End of turn
+   (User-facing close). Do not rewrite `data_analysis.md` on
+   Close. Duplicate / target / leakage stay in Modelling
+   implications, not only Open questions.
 
 If the original prompt already named extras (e.g. PCA), include
 those cells in step 1 and do not re-ask that extra.
@@ -267,7 +289,8 @@ then leave the figure/grid as the cell output.
 
 ## Keep exploring
 
-No convert, no site build, no `git end-turn`.
+No convert, no `git end-turn`. Do not run a **second** `site
+build` on this four-pick extras menu until the md is rewritten.
 
 1. **AskUserQuestion** one pick, none recommended. Do not say
    “extra-analyses” or “standard extra analysis” **anywhere
@@ -327,8 +350,9 @@ No convert, no site build, no `git end-turn`.
    append cells.
 6. Picks that change the `.py`: `style`, `cells run`, refresh
    facts, rewrite `data_analysis.md` from JSON/PNGs/HTML
-   (implications from **results**). Then re-ask keep vs close
-   (run path step 6). Do not invent domain checklists.
+   (implications from **results**). Then preview `site build` if
+   `policy.site` and re-ask keep vs close (run path step 6). Do
+   not invent domain checklists.
 
 ## Dispatch
 
@@ -372,7 +396,7 @@ alone.
    G-REPORT-LOCATOR / G-AUDIT-FINDING).
 
 This skill owns the close. Keep exploring stays a 1–2 sentence
-summary (optional md link); it never reaches convert / site /
+summary (optional md / site link); it never reaches convert /
 `git end-turn`.
 
 If `policy.notebooks` is true, `export-ml-notebook` is installed,

@@ -30,13 +30,18 @@ after listing the boxes.
    `git config`.
 3. Run `python -m skore_skills git ignore-merge`.
 4. If JSON `ambiguous_dotfiles` is non-empty, ask once which hidden
-   paths to keep tracked. Then re-run
+   paths to keep tracked, listing those exact paths in the question
+   and saying that the rest get ignored. Then re-run
    `python -m skore_skills git ignore-merge --decide` plus
    `--keep <path>` for each chosen path (no `--keep` if they keep
    none). Do not re-ask names gone from the next JSON. Never
    `--keep` `.env` or `.skore`.
 5. If `policy.git.autocommit` is `null`, ask **once**: should later
-   stages persist with `git commit` (`on`) or never (`off`)? Persist
+   stages persist with `git commit` (`on`) or never (`off`)? State
+   in 2–4 lines what the answer authorizes — commits at the end of
+   later stages, starting with the first commit this turn — and
+   which paths stay ignored; a file link is an addition, never the
+   context. Persist
    with `python -m skore_skills policy set git.autocommit on` or
    `off`. That answer is also consent for the first commit.
 6. If autocommit is `on` and this repo has no HEAD yet, run

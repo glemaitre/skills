@@ -33,7 +33,11 @@ left rail beside a 1200px report column. Mobile uses a drawer.
 
 1. `python -m skore_skills status`. Read `policy.site`.
 2. If `policy.site` is `null`: AskUserQuestion documentation site
-   on/off (default off). Persist. If true, load
+   on/off (default off). Say in 2–4 lines what the answer
+   authorizes — the `mkdocs-material` install, `site init`, and a
+   rebuilt `<package>.html` on later turns — plus what each option
+   does; a file link is an addition, never the context. Persist.
+   If true, load
    `add-python-package` for `mkdocs-material` (agent) then
    `python -m skore_skills site init`. If false, stop.
 3. If `policy.site` is false: say the gate is off; offer to turn
@@ -47,6 +51,25 @@ left rail beside a 1200px report column. Mobile uses a drawer.
    Stage owners that just ran `site build` must name that
    launcher (and the stage page: `html/data_analysis.html` or
    `html/<stem>.html`) in the same User-facing close.
+
+## Preview before markdown-review gates
+
+Stage owners that just wrote durable markdown and will ask the
+user to approve or continue must rebuild the site **before**
+that AskUserQuestion / consent stop — not only at End of turn.
+
+1. If `policy.site` is true and this skill is installed, run
+   `python -m skore_skills site build`. Skip in one line
+   otherwise. Name a build error; do not fail the gate.
+2. In the same message as the gate, **Open these**: the `.md`
+   path, plus `<package>.html` and the stage page
+   (`html/<stem>.html`, `html/data_analysis.html`, or the home
+   page for `JOURNAL.md`) when the build ran. A file link is an
+   addition, never the context.
+3. Do **not** `notebook convert`, `git end-turn`, or `git commit`
+   on this preview rebuild. Do not re-run `site init`.
+4. Convert + a later `site build` remain End of turn after the
+   user **closes** the stage.
 
 ## Stop conditions
 

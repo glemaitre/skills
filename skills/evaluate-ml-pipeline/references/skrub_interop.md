@@ -258,13 +258,13 @@ project = skore.Project(
     name="load-forecast",
     mode="local",
     workspace=str(PROJECT_ROOT / "reports"),
-)  # local-mode form; G-SKORE-MODE is owned by `evaluate-ml-pipeline`
+)
 
 # %% [markdown]
 # ## Method
 #
-# Unfitted learner diagram (sklearn HTML). After evaluate, the same
-# `pipeline.html` is overwritten from a fitted fold.
+# Unfitted learner. After fitting, the same diagram reflects a
+# fitted fold.
 
 # %% [markdown]
 # ## Learner
@@ -285,10 +285,9 @@ report = skore.evaluate(
     data={"data_dir": str(DATA_DIR)},
     splitter=TimeSeriesSplit(n_splits=5, gap=12),
 )
-report  # bare line — jupytext-displays inline; no-op as a script
+report
 
-# Any explicit report-level `report.metrics.add(...)` or
-# `report.checks.add(...)` calls go here, before persistence.
+# Custom metrics or checks register here, before the report is stored.
 # DataOp `with_scoring` was attached in build_learner.
 
 # %%
