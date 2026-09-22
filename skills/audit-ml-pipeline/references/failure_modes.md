@@ -14,10 +14,12 @@ Lookup shape is wrong: `get` is by id, not by key.
   singular — drop the trailing `s`, e.g. `cross-validations` →
   `cross-validation`, `estimators` → `estimator`). If the audit
   file's `REPORT_ID` is wrong, update it from the correct URL.
-- **Local mode**: `summarize()` returns a DataFrame with a flat
-  `RangeIndex` and an `"id"` column — read
-  `summary.loc[summary["key"] == "<NN>_<short_name>", "id"].iloc[0]`
-  and set it as `REPORT_ID`.
+- **Local mode**: `summarize()` is a Display. Bind
+  `frame = summary.frame()`, then
+  `frame.loc[frame["key"] == "<NN>_<short_name>", "id"].iloc[0]`
+  and set it as `REPORT_ID`. The core template leaves `summary`
+  as the last expression so the digest shows the Display;
+  `.frame()` is for lookup, not for replacing that last line.
 
 Never substitute by re-running `evaluate` + `put`. See `python -m skore_skills api get`
 § "Lookup failure ≠ artifact missing".

@@ -6,7 +6,7 @@
 
 ## Motivation
 
-- **Sourcing strategy:** <user | my-pick | audit:<stem>:checks.<code> | backlog:B<N>>
+- **Sourcing strategy:** <user | skore | my-pick | audit:<stem>:checks.<code> | backlog:B<N>>
 - **Source(s):**
   - <e.g. issue #42 / "Paper Title" (year) URL — "exact claim" /
     a check from the 01_baseline report + its documentation_url /

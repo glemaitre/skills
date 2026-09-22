@@ -17,8 +17,8 @@
 - Name `python -m skore_skills status`.
 - Copy the headline result, locator, and G-AUDIT-FINDING into
   History / the design-note Status block.
-- Rescan the Backlog, then ask whether to draft from the
-  refreshed Backlog or stop. Do not ask triage which lever to take.
+- Rescan the Backlog, then ask the sourcing menu (`skore` /
+  `user` / `B<N>` / `stop`). Do not ask triage which lever to take.
 - Name `python -m skore_skills git end-turn --stage backlog`.
 - If that command returns `invoke`, load `persist-ml-git`.
 
@@ -38,8 +38,8 @@
 - One `done` History row and two Backlog rows `B1`, `B2`.
 
 **Must do:**
-- Surface Backlog options and ask whether to draft from the
-  Backlog or stop.
+- Surface the sourcing menu (`skore` / `user` / `B<N>` / `stop`)
+  with the Backlog rows visible.
 
 **Must NOT do:**
 - Silently pick `B1`.
@@ -84,9 +84,10 @@
 
 **Must do:**
 - Copy the headline result into the History row.
-- Name `python -m skore_skills site build` after History / Backlog
-  / Results markdown is on disk and before asking whether to draft
   from the refreshed Backlog or stop.
+- Name `python -m skore_skills site build` after History / Backlog
+  / Results markdown is on disk and before asking the sourcing
+  menu (`skore` / `user` / `B<N>` / `stop`).
 - Name `<package>.html`.
 - Name `python -m skore_skills site build` before git end-turn
   (a second build at End of turn is fine).

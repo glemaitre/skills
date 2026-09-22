@@ -123,10 +123,13 @@ the user picks a name from the `help()` trees.
      `skore:report:cross-validation:42`; `estimators/7` →
      `skore:report:estimator:7`. Copy `<N>` and `<type-singular>` from
      the put() stdout; hardcode as `REPORT_ID`; no `summarize()` needed.
-   - **Local mode**: read `summary["id"]` from the `summarize()` cell
-     above, filtering to the row where `key == "<NN>_<short_name>"`.
-   - **MLflow mode**: same as local — read `summary["id"]` from the
-     `summarize()` cell above, filtering to the newest row where
+   - **Local mode**: `summarize()` last-expression is a Display.
+     Bind `frame = summary.frame()`, then
+     `frame.loc[frame["key"] == "<NN>_<short_name>", "id"].iloc[0]`.
+     Do not treat the Display as a dict (`summary["id"]`). Keep
+     `summary` as the cell's last expression.
+   - **MLflow mode**: same as local — read `"id"` from
+     `summary.frame()`, filtering to the newest row where
      `key == "<NN>_<short_name>"`. Preserve an emitted MLflow run URL
      when available; otherwise use the tracking URI + experiment id
      + run id locator contract.

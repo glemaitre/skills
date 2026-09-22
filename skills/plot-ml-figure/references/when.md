@@ -23,7 +23,7 @@ when the caller is explore):
 <iframe src="interactive_scatter.html" width="100%" height="640"></iframe>
 ```
 
-Do not overwrite `data_analysis_<table>.html`. Do not use a CDN.
+Do not overwrite `data_analysis_<slug>.html`. Do not use a CDN.
 
 ## seaborn
 

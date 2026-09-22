@@ -169,8 +169,8 @@ violated.
 > pre-resolved.
 
 **Assumed workspace state:**
-- Parent (`triage-ml-task`) already collected the URL via
-  its sourcing-menu free-text handler.
+- Parent (`manage-ml-backlog`) already collected the URL via
+  its sourcing-menu `user` pick (resource-link).
 
 **Must do:**
 - Recognise the pre-resolved entry-point dispatch (skip the inner

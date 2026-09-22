@@ -207,9 +207,11 @@ has created the shell, then preview `site build` if
    G-AUDIT-FINDING from `audit finding` (or
    `n/a — audit not run`). Else one-line skip; do not write History from this
    meta. It writes the `JOURNAL.md` History row and design-note
-   Status block plus `## Results` from the digest text,
+   Status block plus `## Results` from the digest text
+   (`### Report overview`, then `### Checks` / `### Metrics` when
+   those sections exist — required for site injection),
    then returns; it does not rescan the Backlog or
-   open the next-lever menu. Never mark `done` while `smoke run`
+   open the sourcing menu. Never mark `done` while `smoke run`
    is `stop`.
    Audit-skipped runs still record the locator; missing headline
    becomes `n/a`, never an invented metric. The Evaluate
@@ -259,7 +261,9 @@ symbols are written, children use
 After **Stop**, or while smoke is red: skip evaluate, audit, and
 record-outcome. This is an explicit no-result close: do not mark
 the experiment done, but still perform the conversion/site steps
-below when applicable, then run `git end-turn` and return to triage.
+below when applicable, then run
+`python -m skore_skills git end-turn --stage implement` and return
+to triage.
 If `policy.notebooks` is true and `export-ml-notebook` is
 installed, run
 `python -m skore_skills notebook convert experiments/<stem>.py`

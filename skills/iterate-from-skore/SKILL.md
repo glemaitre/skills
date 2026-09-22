@@ -12,8 +12,9 @@ description: >
   does not drive Backlog rows on its own. Returns the enriched
   Backlog rows + a one-paragraph summary back to
   `manage-ml-backlog`, which writes the rows into `JOURNAL.md`
-  and re-presents the sourcing menu so the user can promote a
-  `B<N>` row. Stops at "Backlog enriched, summary returned"; never
+  and re-presents its sourcing menu (`skore` / `user` / `B<N>` /
+  `stop`) so the user can promote a `B<N>` row. Stops at "Backlog
+  enriched, summary returned"; never
   writes a per-experiment design note, never picks the "winning"
   finding — the user picks via `B<N>`.
 
@@ -39,8 +40,8 @@ description: >
   Cite `audit:<stem>:checks.<code>`. Dedupe against
   rows already in `JOURNAL.md` Backlog by source citation.
   Return the candidate rows + a one-paragraph human summary. The
-  parent skill writes the rows to `JOURNAL.md` and re-shows the
-  sourcing menu.
+  parent skill writes the rows to `JOURNAL.md` and re-shows its
+  sourcing menu (`skore` / `user` / `B<N>` / `stop`).
 ---
 
 # Iterate from skore
@@ -49,8 +50,9 @@ Source: the audit digest at `scratch/audit/<stem>/audit.md`,
 produced by `audit-ml-pipeline` after evaluate.
 Output: a set of **Backlog-candidate rows** + a short human
 summary, handed back to `manage-ml-backlog`. The parent skill
-writes the rows to `JOURNAL.md` Backlog and re-presents the
-sourcing menu so the user can promote one via `B<N>`.
+writes the rows to `JOURNAL.md` Backlog and re-presents its
+sourcing menu (`skore` / `user` / `B<N>` / `stop`) so the user can
+promote one via `B<N>`.
 
 ## What this skill consumes
 
@@ -111,8 +113,9 @@ findings; 2 were already in Backlog from prior mining").
 If the digest's checks summary has no `Issues:` / `Tips:` lines
 (only Passed / Not Applicable), return zero candidate rows and a summary that says so
 explicitly: "the report looks clean on the checks surface; no
-actionable findings on this turn." The parent will note this in
-`JOURNAL.md` Status and the user picks `user` next.
+actionable findings on this turn." The parent notes this and
+re-presents the sourcing menu; the user may pick `user`, a `B<N>`
+row, or `stop`.
 
 ### Inaccessible-digest fallback
 
@@ -223,9 +226,10 @@ Summary:
 1. Writes the candidate rows into `JOURNAL.md` Backlog with stable
    `B<N>` indices appended at the end.
 2. Surfaces the summary verbatim to the user.
-3. Re-presents the sourcing menu with the enriched Backlog visible
-   so the user can pick a `B<N>` row directly or pick `user` if
-   the findings prompt a different direction.
+3. Re-presents the sourcing menu (`skore` / `user` / `B<N>` /
+   `stop`) with the enriched Backlog visible so the user can pick
+   a `B<N>` row or `user` if the findings prompt a different
+   direction.
 
 ## Companion skills
 
@@ -239,8 +243,8 @@ Summary:
   but have opposite directions: `audit-ml-pipeline` opens the
   Project and renders the digest (write side); `iterate-from-skore`
   consumes the digest as text and follows the check doc URLs (read
-  side). Narrative reads of a past report also route here, not to
-  evaluate.
+  side). Narrative reads of a past report route to
+  `audit-ml-pipeline`, not to evaluate and not to this skill.
 - **`evaluate-ml-pipeline`** — run evaluation / CV on a learner;
   not used by this skill.
 - **`iterate-from-user`** — the sibling sourcing strategy; sources

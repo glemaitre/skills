@@ -216,8 +216,11 @@ hints stay in this skill. `style` is ruff only.
   summarize by parsing the HTML.
 - **Overwrite the Method pipeline snapshot from the fitted report.**
   After the report exists, write `scratch/results/<stem>/pipeline.html`
-  from `sklearn.utils.estimator_html_repr` of a **fitted** estimator
-  (confirm with `api get`). `EstimatorReport`: `report.estimator_`.
+  from a **fitted** estimator. Confirm
+  `sklearn.utils.estimator_html_repr` (or the fitted object's
+  `_repr_html_`) with `api get`. Prefer `_repr_html_` when the
+  fitted object defines it (skrub DataOps graph); otherwise
+  `estimator_html_repr`. `EstimatorReport`: `report.estimator_`.
   `CrossValidationReport`: `report.reports_[0].estimator_` — not
   `report.estimator`, which is the original unfitted clone. Do not
   call `SkrubLearner.report` / `full_report` for this overwrite.
@@ -390,7 +393,8 @@ named in the question itself.
   cross-validator, wiring `split_kwargs` into the splitter, reading
   the report, deciding when to escalate to explicit report classes.
 - **Out of scope:** pipeline declaration, hyperparameter search,
-  persistence, serving, multi-run tracking.
+  serving, multi-run tracking. `project.put` and the locator are
+  in scope (snapshot the report; do not own Hub/MLflow architecture).
 
 ## Core rules
 
@@ -616,19 +620,21 @@ API CLI is only for the signature after the name.
 - **`smoke-test-ml-pipeline`** — the structural check CV cannot
   do by construction: predict on a *different* env-dict from the
   one used at fit, assert the prediction count matches the
-  predict-grid row count exactly. Required alongside CV for any
-  pipeline with a history-dependent step. The CV report and the
-  smoke test are independent artifacts — both must be in place
-  before an experiment can flip to `done`.
+  predict-grid row count exactly. Owns `tests/` layout and the
+  stem pairing. Required alongside CV for any pipeline with a
+  history-dependent step. The CV report and the smoke test are
+  independent artifacts — both must be in place before an
+  experiment can flip to `done`.
 - **`audit-ml-pipeline`** — read-only consumer of the report
   this skill's `skore.evaluate(...)` produced. The experiment
   script puts the report; the audit file loads it via
   `project.summarize()` → `project.get(id)` and renders a
   markdown digest for the agent (no `evaluate`, no `put`).
-  Fires after successful evaluate and before record-outcome; its
-  digest is an input to `manage-ml-backlog`.
-- **`smoke-test-ml-pipeline`** — router for `tests/`. Owns layout and
-  the stem pairing between an experiment and its smoke test.
+  On a **standalone** evaluate, or when `loop artifacts` returns
+  `audit`, it fires after successful evaluate and before
+  record-outcome. When `model-ml-pipeline` dispatched this turn,
+  do not load it — the dispatcher owns `loop artifacts` and
+  audit. Its digest is an input to `manage-ml-backlog`.
 - **`add-python-package`** — detection + install commands for the
   project's environment manager (pixi / uv / poetry / hatch / conda
   / pip+venv). **Invoke whenever** the Stop condition on

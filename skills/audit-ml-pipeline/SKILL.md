@@ -84,7 +84,8 @@ and never dispatches audit back.
 |---|---|---|---|
 | `audit/<NN>_<short_name>.py` | **Durable** (in git) | This skill, once per experiment | The bare-expression cells. Source of truth. Can be opened as a notebook in JupyterLab / VS Code for the rich HTML view |
 | `scratch/audit/<stem>/audit.md` | Ephemeral (gitignored), optional | `cells run` when given a 2nd arg | Per-cell markdown digest: source + stdout + last-expression `repr`. Same content as stdout |
-| `scratch/results/<stem>/*.html` `.png` | Ephemeral (gitignored) | Audit (and evaluate for `report.*`) cells | Per-item viewers the site embeds under `## Results`. The digest already carries the text, so no `.txt` is written here |
+| `scratch/results/<stem>/report.html` `report.txt` `locator.txt` `pipeline.html` | Ephemeral (gitignored) | Evaluate (`experiments/<stem>.py`) | Full-report viewer, text fallback, locator, fitted Method diagram |
+| `scratch/results/<stem>/checks.html` `metrics.html` and extra `<slug>.html` / `.png` | Ephemeral (gitignored) | Audit cells | Per-item viewers the site embeds under `## Results`. The digest already carries the text, so no extra `.txt` is written here |
 | Stdout from `cells run` | Captured by the bash tool | CLI (always) | Streamed digest — the agent reads this directly from the tool output |
 
 **Mnemonic:** `audit/` is *source* (in git); `scratch/audit/` and
@@ -552,7 +553,7 @@ the digest, G-AUDIT-FINDING, and locator, so the run reaches
 `journal/JOURNAL.md` History and
 the design-note Status block. Missing skill → one-line skip; do
 not write History from this skill. That mode records and returns; it
-does not re-dispatch this skill and does not open the next-lever
+does not re-dispatch this skill and does not open the sourcing
 menu. Never mark `done` while smoke is red. This runs **before**
 site build so the updated journal files are on disk when the site
 is staged and `git end-turn` stages the turn.

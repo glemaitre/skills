@@ -9,8 +9,8 @@ The skills help you:
 - evaluate and store your results so you can easily audit and get insights from them
 - connect your agent to [Skore Hub](https://skore.probabl.ai/) to get a comprehensive view of
   your experiments and results
-- iterate on your next experiments using insights from Skore diagnostics and your own
-  feedback
+- iterate on your next experiments from a Skore audit digest (a
+  separate backlog turn) and from your own feedback
 - organize your workspace according to best practices for data science projects
   (e.g. cookiecutter template)
 
@@ -64,7 +64,7 @@ companion:
 skore skills install setup  # workspace, environment, git, export
 skore skills install data_analysis  # data exploration
 skore skills install model  # build, evaluate, smoke, audit
-skore skills install loop   # triage, explore, model, build, smoke, evaluate, audit, backlog, export
+skore skills install loop   # triage, explore, model, backlog, export, plus build/smoke/evaluate/audit as model children
 skore skills install export  # notebooks and documentation site
 ```
 
@@ -120,8 +120,6 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Coordinate build (pytest smoke), evaluation, and audit. |
 | [export-ml-project](skills/export-ml-project/SKILL.md) | Coordinate executed notebooks and an offline MkDocs site. |
 | [sync-ml-reports](skills/sync-ml-reports/SKILL.md) | Copy skore reports between local, Hub, and MLflow, and optionally switch the upload destination. |
-| [choose-python-library](skills/choose-python-library/SKILL.md) | Resolve a library choice and add the selected dependency. |
-| [plot-ml-figure](skills/plot-ml-figure/SKILL.md) | Pick pandas, seaborn, plotly, or matplotlib before writing figure code. |
 
 ### ML pipeline lifecycle
 
@@ -131,7 +129,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [research-ml-practice](skills/research-ml-practice/SKILL.md) | Literature research for an ML methodology concern. |
 | [build-ml-pipeline](skills/build-ml-pipeline/SKILL.md) | Build a machine learning pipeline from the data source to the learner, including multi-tables engineering. |
 | [evaluate-ml-pipeline](skills/evaluate-ml-pipeline/SKILL.md) | Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics. |
-| [smoke-test-ml-pipeline](skills/smoke-test-ml-pipeline/SKILL.md) | Stress test your machine learning pipeline on future data to make sure it works. |
+| [smoke-test-ml-pipeline](skills/smoke-test-ml-pipeline/SKILL.md) | Structural pytest: prediction count must match the predict-grid row count. |
 | [audit-ml-pipeline](skills/audit-ml-pipeline/SKILL.md) | Once testing and the experiment are done, audit the model by loading a skore report and investigate. |
 
 ### Iteration loop
@@ -139,7 +137,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | Skill | Description |
 | --- | --- |
 | [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md) | Record experiment outcomes and next-lever backlog rows. |
-| [iterate-from-skore](skills/iterate-from-skore/SKILL.md) | Use skore to run diagnostics and checks that can be reported and addressed in the next experiment. |
+| [iterate-from-skore](skills/iterate-from-skore/SKILL.md) | Mine the audit digest into Backlog rows. |
 | [iterate-from-user](skills/iterate-from-user/SKILL.md) | As a user, be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo). |
 
 ### Workspace and tooling
@@ -151,7 +149,7 @@ reinstall the setup pack.
 | Skill | Description |
 | --- | --- |
 | [add-python-package](skills/add-python-package/SKILL.md) | Add a dependency, or ask the user when they manage the env. |
-| [choose-python-library](skills/choose-python-library/SKILL.md) | Select optional libraries without reopening fixed stack choices. |
+| [choose-python-library](skills/choose-python-library/SKILL.md) | Resolve a library choice and add the selected dependency. |
 | [plot-ml-figure](skills/plot-ml-figure/SKILL.md) | Pick pandas, seaborn, plotly, or matplotlib before writing figure code. |
 | [export-ml-notebook](skills/export-ml-notebook/SKILL.md) | Convert a jupytext percent file into an executed notebook. |
 | [export-ml-site](skills/export-ml-site/SKILL.md) | Build an offline MkDocs documentation site from workspace markdown. |

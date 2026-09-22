@@ -26,7 +26,10 @@ BANNED = (
     re.compile(r"notebook\s+convert", re.I),
     re.compile(r"marker is durable", re.I),
     re.compile(r"scratch/results"),
-    *(re.compile(rf"(?<![\w-]){re.escape(skill_id)}(?![\w-])") for skill_id in SKILL_IDS),
+    *(
+        re.compile(rf"(?<![\w-]){re.escape(skill_id)}(?![\w-])")
+        for skill_id in SKILL_IDS
+    ),
 )
 
 EXCLUDE_NAMES = frozenset({"facts.py"})
@@ -37,11 +40,15 @@ def _template_paths() -> list[Path]:
         REPO / "src" / "skore_skills" / "data" / "experiment_design.md",
         REPO / "src" / "skore_skills" / "data" / "JOURNAL.md",
     ]
-    paths.extend(sorted((REPO / "src" / "skore_skills" / "templates").glob("readme_*.md")))
+    paths.extend(
+        sorted((REPO / "src" / "skore_skills" / "templates").glob("readme_*.md"))
+    )
     for folder in sorted((REPO / "skills").glob("*/templates")):
-        for path in sorted(folder.glob("*")):
-            if path.suffix in {".py", ".md"} and path.name not in EXCLUDE_NAMES:
-                paths.append(path)
+        paths.extend(
+            path
+            for path in sorted(folder.glob("*"))
+            if path.suffix in {".py", ".md"} and path.name not in EXCLUDE_NAMES
+        )
     return paths
 
 
@@ -64,7 +71,9 @@ def _python_comment_bodies(text: str) -> Iterator[str]:
             yield match.group("body")
 
 
-@pytest.mark.parametrize("path", _template_paths(), ids=lambda path: str(path.relative_to(REPO)))
+@pytest.mark.parametrize(
+    "path", _template_paths(), ids=lambda path: str(path.relative_to(REPO))
+)
 def test_user_bound_templates_are_data_science_prose(path: Path) -> None:
     """Notebook/markdown templates omit CLI, skill ids, and HTML authoring hints."""
     text = path.read_text(encoding="utf-8")

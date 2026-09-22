@@ -83,8 +83,7 @@ Run Procedure steps 1-3 and nothing else:
    between Status and Notebooks from digest text, not HTML.
 
 Then return to the caller. Skip step 4 (Backlog rescan) and step 5
-(the next-lever triage menu) — the caller did not ask what to try
-next.
+(the sourcing menu) — the caller did not ask what to try next.
 
 Do not dispatch `audit-ml-pipeline` in this mode; the digest is
 already in hand and dispatching would bounce back here. Do not run
@@ -151,28 +150,34 @@ locator.
    `*.html`, and do not paste iframes (site build injects those). If
    no subsection has a source, skip the Results section.
 4. Perform a full Backlog rescan. Resolve rows the run answered or
-   killed, preserving stable indices. Then route sourcing explicitly:
-   report-derived ideas → load `iterate-from-skore` only if
-   `status.skills.iterate-from-skore` is true; user proposals →
-   load `iterate-from-user` only if
-   `status.skills.iterate-from-user` is true; an existing row or
-   stop → `model-ml-pipeline` only if
-   `status.skills.model-ml-pipeline` is true. Missing child →
-   one-line skip; do not invent that skill's steps. Returned
-   candidates/proposals are written by this parent, not by
-   either sourcing child.
+   killed, preserving stable indices.
 5. After History / Backlog / Results markdown is on disk, if
    `policy.site` is true and `export-ml-site` is installed, run
    `python -m skore_skills site build` (skip in one line
    otherwise; name a build error; do not fail the gate). Link
    `journal/JOURNAL.md` plus `<package>.html` when the build
    ran. Do not `notebook convert` or `git end-turn` on this
-   preview. Then ask whether to draft from the refreshed Backlog
-   or stop. When a
-   row is selected, return it to `model-ml-pipeline`, which can
-   create its design-note shell with
+   preview. Then fire one single-choice **AskUserQuestion** — the
+   sourcing menu — with these options in this order (omit a child
+   whose `status.skills.<id>` is false; say so in one line; do not
+   invent that skill's steps):
+   - **`skore`** — Mine the latest audit digest into Backlog rows.
+     Load `iterate-from-skore`.
+   - **`user`** — Propose from an article, resource, or free text.
+     Load `iterate-from-user`.
+   - Each current `B<N>` row (Item + Source as the option
+     description) — return that row to `model-ml-pipeline`.
+   - **`stop`** — End the backlog turn; no new design note.
+
+   After `iterate-from-skore` or `iterate-from-user` returns,
+   write the candidates/proposals into `JOURNAL.md` yourself, then
+   re-present this same sourcing menu (enriched Backlog visible).
+   When a `B<N>` row is selected, return it to
+   `model-ml-pipeline`, which can create its design-note shell with
    `python -m skore_skills scaffold --journal --stem <NN_short_name>`.
-   Do not draft that template in this backlog turn.
+   Do not draft that template in this backlog turn. Returned
+   candidates/proposals are written by this parent, not by either
+   sourcing child.
 
 ## Stop conditions
 

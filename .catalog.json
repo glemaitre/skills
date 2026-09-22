@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "ce5cb9caee08d2ad1d600a4ed48d098b9d54dc85ce6133372d014cb1cb7ff87e",
+  "catalog_hash": "8b93fe0f18d751265c1edee31b726da6a9cf224aa72d796989535dc2703c76ea",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,13 +30,13 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b8292a3793e557a88d7322b09e65a0e35cd780305ccab3439f43eaeec47fb72c"
+      "hash": "7bfb50667654248fdcc103169b9edcb11812ab066b89f7e9a48335a825adb3e8"
     },
     {
       "id": "smoke-test-ml-pipeline",
       "path": "skills/smoke-test-ml-pipeline",
       "title": "Smoke Test ML Pipeline",
-      "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
+      "summary": "Structural pytest: prediction count must match the predict-grid row count.",
       "category": "methodology",
       "subcategory": null,
       "hash": "ead2f12bc7f7bed660ffd9272acdb8f8b8b3215f588b284a016db1094049b3dc"
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "a3fbb6bbcf7913040ae99d1d91be66ba7ed3c0c6ff51541ab03bb3c904703c8e"
+      "hash": "7604c028ebde97a0ae37751504ec8cd52e4646c4e6ddd00a723064e2a0fb5bac"
     },
     {
       "id": "manage-ml-backlog",
@@ -57,16 +57,16 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "5621df659ce4baaaa2066af16199f889067a9f87b5ab19845b903211f0e1379f"
+      "hash": "ff13ee5301f70c892d0f44301af6ecfb13939f158733174e87befee15c8a8543"
     },
     {
       "id": "iterate-from-skore",
       "path": "skills/iterate-from-skore",
       "title": "Iterate from Skore",
-      "summary": "Use skore to run diagnostics and checks that can be reported and addressed in the next experiment.",
+      "summary": "Mine the audit digest into Backlog rows.",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "0fb51940414857e6ffb4e7eac4ab566c214800e75b7e0f6f71091445096926ac"
+      "hash": "81d7a6e3c38fdd128506232369f49fa390e84fd419f9aa8291c5c0598ec7a468"
     },
     {
       "id": "iterate-from-user",
@@ -75,7 +75,7 @@
       "summary": "As a user be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo).",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "83d13598466ff2c7e3c0419519d421751eed0f4df2cf8dafde9f5bfc8c3ae59c"
+      "hash": "792c9e93ff6e7f4d8c1901a63138a873300618d25db7779686be1fb75570fe84"
     },
     {
       "id": "organize-ml-workspace",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "e2f4c9cafc3db7a519854b922f37046ad1756333d8469faf7fa4e74e2c4b82f9"
+      "hash": "2a6953f4f8b6f9bd8f27610efb7ba6aa89839c1b558303b6968cd1dcbc27bea6"
     },
     {
       "id": "choose-python-library",
@@ -156,7 +156,7 @@
       "summary": "Pick pandas, seaborn, plotly, or matplotlib before writing figure code.",
       "category": "action",
       "subcategory": null,
-      "hash": "c81512f0dd35eebf69be73a204d2e7c2afa5bfce22ea48e3f811840273de29c3"
+      "hash": "41825f7b873c8686888f0ef28394989b0c67b2a8695aa03c7c7dbdc7bb48110f"
     },
     {
       "id": "research-ml-practice",
@@ -165,7 +165,7 @@
       "summary": "Literature research for an ML methodology concern.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "df5394cb8751c02ef17574a4680698379f05e9c8f21f6550e58a8c2478035edc"
+      "hash": "b1f583ccba424c6cdcf58ee842d36029d8c0e6873db963445983c4f69102b08c"
     },
     {
       "id": "add-python-package",
@@ -295,7 +295,7 @@
     {
       "id": "loop",
       "title": "Iterate on ML Experiments",
-      "summary": "Triage the loop, build, smoke-test, evaluate, audit reports, and manage the experiment backlog.",
+      "summary": "Triage the loop, explore, model (build/smoke/evaluate/audit as children), manage the backlog, and export.",
       "includes": [
         "triage-ml-task",
         "model-ml-pipeline",
@@ -312,6 +312,7 @@
         "add-python-package",
         "persist-ml-git",
         "explore-ml-data",
+        "choose-python-library",
         "export-ml-project",
         "export-ml-notebook",
         "export-ml-site"

@@ -300,6 +300,9 @@ _results.mkdir(parents=True, exist_ok=True)
     encoding="utf-8",
 )
 fitted = report.reports_[0].estimator_
+# Prefer `_repr_html_` when the fitted object defines it (DataOps
+# graph); else `sklearn.utils.estimator_html_repr`. Confirm with
+# `api get`. Do not call `SkrubLearner.report` / `full_report`.
 (_results / "pipeline.html").write_text(fitted._repr_html_(), encoding="utf-8")
 
 # %% [markdown]
@@ -343,6 +346,6 @@ version — the kwargs differ between `EstimatorReport` (uses
   choice, Pattern A vs B (`references/metadata-routing.md`).
 - `iterate-from-skore` — reads the audit digest at
   `scratch/audit/<stem>/audit.md` (produced by `audit-ml-pipeline`)
-  and converts each `issue` / `tip` row from the report's
-  `checks.summarize()` into a Backlog candidate, following the
-  check's `documentation_url` for the mitigation.
+  and converts each `Issues:` / `Tips:` line in `## Checks summary`
+  into a Backlog candidate, following the check's documentation
+  URL for the mitigation.

@@ -120,8 +120,8 @@ never calls `report.*` accessors.
 - Return **zero** Backlog candidate rows.
 - Summary states explicitly that the checks surface is clean; no
   actionable findings on this turn.
-- Hand back to `triage-ml-task` so the parent re-presents the
-  sourcing menu (user will likely pick `user`).
+- Hand back to `manage-ml-backlog` so the parent re-presents the
+  sourcing menu (`skore` / `user` / `B<N>` / `stop`).
 
 **Must NOT do:**
 - Manufacture findings to "have something to say".

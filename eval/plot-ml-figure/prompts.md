@@ -67,7 +67,7 @@
 
 **Must NOT do:**
 - Use seaborn-only for this interactive request.
-- Overwrite `data_analysis_<table>.html`.
+- Overwrite `data_analysis_<slug>.html`.
 - Add kaleido unless the user asked to export a static image.
 - Start a Dash app.
 - Use `include_plotlyjs="cdn"`.

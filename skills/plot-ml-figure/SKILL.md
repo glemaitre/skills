@@ -29,7 +29,7 @@ Details: `references/when.md`.
    Plotly Express. Write `<caller-figure-dir>/<slug>.html` with
    `include_plotlyjs=True` (inline, offline). `explore-ml-data`
    uses `data_analysis/`. Do not overwrite that caller’s owned
-   HTML (e.g. `data_analysis_<table>.html`). The caller embeds
+   HTML (e.g. `data_analysis_<slug>.html`). The caller embeds
    `<iframe src="<slug>.html" width="100%" height="640"></iframe>`
    in **its** markdown beside the implication. Do not add kaleido
    unless the user asked to export a static image. No Dash. Do

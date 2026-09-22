@@ -50,9 +50,11 @@ summary. Do not `git end-turn`.
 3. Run the matching search loop (`references/search.md`).
    Fetch primary pages. Follow up per promising extra if the
    first pass is thin or single-sourced.
-4. Write `scratch/research/` using the matching template
-   (survey: `survey-<slug>.md`; depth: `<slug>.md` with lanes).
-   Gitignored.
+4. Write `scratch/research/` using the matching structure in
+   `references/search.md` (survey: `survey-<slug>.md`; depth:
+   `<slug>.md` with lanes). There is no `templates/` directory
+   in this skill — copy the markdown skeleton from that
+   reference. Gitignored.
 5. Return to the caller: scratch path and a one- or two-sentence
    finding. Name that candidates are laned (`measure` /
    `declare` / `evaluate` / `confirm`). Chat is **path + those
