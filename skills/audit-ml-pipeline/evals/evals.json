@@ -5,11 +5,13 @@
       "id": 1,
       "title": "Audit is read-only and returns a digest",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The design is approved, smoke is green, and the persisted report exists.\n- `evaluate-ml-pipeline` dispatched this audit.]\n\nAudit experiment 02 after evaluation.",
-      "expected_output": "Behavioural response satisfying: - Confirm the report with `project.summarize()` and load it with `project.get(id)`. - Render checks and metrics into the audit digest. - Derive G-AUDIT-FINDING from the digest. It must NOT: - Call `skore.evaluate` or `project.put`. - Require the experiment to be `done` before audit. - Dispatch record-outcome before producing the digest.",
+      "expected_output": "Behavioural response satisfying: - Confirm the report with `project.summarize()` and load it with `project.get(id)`. - Render checks and metrics into the audit digest. - Write `scratch/results/<stem>/{report,checks,metrics}.html`; leave the bare Display last on checks and metrics, with no text snapshot. It must NOT: - Call `skore.evaluate` or `project.put`. - Require the experiment to be `done` before audit. - Dispatch record-outcome before producing the digest.",
       "files": [],
       "expectations": [
         "Confirm the report with `project.summarize()` and load it with `project.get(id)`.",
         "Render checks and metrics into the audit digest.",
+        "Write `scratch/results/<stem>/{report,checks,metrics}.html`; leave the bare Display last on checks and metrics, with no text snapshot.",
+        "Print a `help()` tree per namespace for the Additional report view menu.",
         "Derive G-AUDIT-FINDING from the digest.",
         "Ask Additional report view / Custom query / Custom plot / Close audit in that order; return the digest, finding, and normalized report locator only after Close audit.",
         "The response does NOT: Call `skore.evaluate` or `project.put`.",
@@ -77,16 +79,18 @@
     {
       "id": 5,
       "title": "Additional audit work loops before close",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The initial audit digest exists.\n- The report API lookup confirms one task-compatible extra view.]\n\nAdd another audit view before we close.",
-      "expected_output": "Behavioural response satisfying: - Present Additional report view / Custom query / Custom plot / Close audit in that exact order. - Confirm the selected accessor with `api get`, append it to the same `audit/<stem>.py`, run style + cells run, and overwrite the digest. - Recompute G-AUDIT-FINDING and present the same gate again. It must NOT: - Guess an accessor or show unavailable disabled choices. - Convert notebooks, build the site, run git end-turn, record-outcome, or return to the dispatcher before Close audit. - Call `evaluate` or `put`.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The initial audit digest exists, including a `help()` tree per\n  namespace.\n- A tree's `Displays` group lists one extra view; `api get` confirms\n  that method.]\n\nAdd another audit view before we close.",
+      "expected_output": "Behavioural response satisfying: - Present Additional report view / Custom query / Custom plot / Close audit in that exact order. - Offer only accessor names from this turn's `Displays` groups \u2014 not a remembered Display catalog. - Confirm the selected accessor with `api get`, append it below `## Core audit complete` on the same `audit/<stem>.py`, write `scratch/results/<stem>/<slug>.html`, leave the bare Display last, run style + cells run, and overwrite the digest. It must NOT: - Guess an accessor or show unavailable disabled choices. - Convert notebooks, build the site, run git end-turn, record-outcome, or return to the dispatcher before Close audit. - Call `evaluate` or `put`.",
       "files": [],
       "expectations": [
         "Present Additional report view / Custom query / Custom plot / Close audit in that exact order.",
-        "Confirm the selected accessor with `api get`, append it to the same `audit/<stem>.py`, run style + cells run, and overwrite the digest.",
-        "Recompute G-AUDIT-FINDING and present the same gate again.",
+        "Offer only accessor names from this turn's `Displays` groups \u2014 not a remembered Display catalog.",
+        "Confirm the selected accessor with `api get`, append it below `## Core audit complete` on the same `audit/<stem>.py`, write `scratch/results/<stem>/<slug>.html`, leave the bare Display last, run style + cells run, and overwrite the digest.",
+        "Recompute G-AUDIT-FINDING from checks and metrics only and present the same gate again.",
         "The response does NOT: Guess an accessor or show unavailable disabled choices.",
         "The response does NOT: Convert notebooks, build the site, run git end-turn, record-outcome, or return to the dispatcher before Close audit.",
-        "The response does NOT: Call `evaluate` or `put`."
+        "The response does NOT: Call `evaluate` or `put`.",
+        "The response does NOT: Name ROC / confusion_matrix / permutation_importance from docs memory when they are absent from this turn's `help()` trees."
       ],
       "tools": false,
       "sandbox": [],

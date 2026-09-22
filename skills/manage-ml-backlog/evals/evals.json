@@ -94,7 +94,7 @@
     {
       "id": 6,
       "title": "Record-outcome mode writes the journal and returns",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Audit digest for `01_baseline` exists with a headline ROC-AUC.\n- The digest contains `[Open report](https://hub.example/report/42)\n  \u00b7 hub \u00b7 id: skore:report:cross-validation:42`.\n- G-AUDIT-FINDING is\n  `1 issue, 1 tip \u2014 SKD003 (issue), SKD010 (tip); ROC-AUC 0.86`.\n- Smoke tests passed.\n- History row for `01_baseline` is `planned`.\n- Backlog has rows `B1` and `B2`.]\n\n(dispatched by `audit-ml-pipeline` at end of turn, in\nrecord-outcome mode, with the digest in hand)",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Audit digest for `01_baseline` exists with a headline ROC-AUC.\n- The digest contains `[Open report](https://hub.example/report/42)\n  \u00b7 hub \u00b7 id: skore:report:cross-validation:42`.\n- G-AUDIT-FINDING is\n  `1 issue, 1 tip \u2014 SKD003 (issue), SKD010 (tip); ROC-AUC 0.86`.\n- The digest has an extra `## ROC curve` cell from a `roc` Display,\n  with `scratch/results/01_baseline/roc.html` beside it.\n- Smoke tests passed.\n- History row for `01_baseline` is `planned`.\n- Backlog has rows `B1` and `B2`.]\n\n(dispatched by `audit-ml-pipeline` at end of turn, in\nrecord-outcome mode, with the digest in hand)",
       "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Flip the `01_baseline` History row to `done` and copy the headline result from the digest. - Copy the locator byte-for-byte into the History `Report` cell and design-note `Persisted report` Status line. It must NOT: - Rescan the Backlog or add/resolve `B1` / `B2` rows. - Ask the next-lever triage question. - Dispatch `audit-ml-pipeline`.",
       "files": [],
       "expectations": [
@@ -102,6 +102,8 @@
         "Flip the `01_baseline` History row to `done` and copy the headline result from the digest.",
         "Copy the locator byte-for-byte into the History `Report` cell and design-note `Persisted report` Status line.",
         "Copy G-AUDIT-FINDING byte-for-byte into the design-note `Audit findings` Status line, separately from Headline result.",
+        "Insert `## Results` with Report overview, then Checks, then Metrics, summarizing from the digest \u2014 not from HTML.",
+        "After Metrics, add a `###` subsection for `roc` with `<!-- results-embed: roc -->`, summarizing from that digest cell.",
         "Update the rest of the design-note Status block for `01_baseline`.",
         "Refresh the `JOURNAL.md` Status rows `Last experiment` and `Last result`.",
         "Return to the caller after recording.",
@@ -110,7 +112,9 @@
         "The response does NOT: Dispatch `audit-ml-pipeline`.",
         "The response does NOT: Run `site build` or `git end-turn --stage backlog` \u2014 the caller owns the close.",
         "The response does NOT: Rewrite or shorten the supplied Hub URL. Pasting the digest string unchanged is required, not a violation.",
-        "The response does NOT: Merge the audit finding into the headline metric or Last result."
+        "The response does NOT: Merge the audit finding into the headline metric or Last result.",
+        "The response does NOT: Parse `scratch/results/` HTML when writing `## Results`.",
+        "The response does NOT: Invent extra Display subsections without a matching digest cell."
       ],
       "tools": false,
       "sandbox": [],
@@ -126,9 +130,11 @@
         "Skip the headline result in one line, naming the missing digest.",
         "Leave the History row status unchanged.",
         "Copy `n/a \u2014 audit not run` into the design note's Audit findings line if the Status block is updated.",
+        "If writing `## Results`, include Report overview only when `scratch/results/03_calendar/report.txt` exists. Do not invent Checks or Metrics subsections.",
         "The response does NOT: Invent or estimate a metric.",
         "The response does NOT: Mark the row `done` without a result.",
-        "The response does NOT: Ask the next-lever triage question."
+        "The response does NOT: Ask the next-lever triage question.",
+        "The response does NOT: Parse report HTML to fill Results."
       ],
       "tools": false,
       "sandbox": [],

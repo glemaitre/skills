@@ -213,6 +213,7 @@ def test_scaffold_journal_index_and_design(
     assert design_text.index("### Evaluation notebook") < design_text.index(
         "### Audit notebook"
     )
+    assert "## Results" not in design_text
 
 
 def test_scaffold_journal_preserves_index_and_refuses_existing_design(

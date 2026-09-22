@@ -590,6 +590,248 @@ def test_inject_notebooks_reuses_authored_section_and_is_idempotent(
     assert once.index("### Evaluation notebook") < once.index("### Audit notebook")
 
 
+def test_inject_results_appends_embeds_after_prose_and_is_idempotent(
+    tmp_path: Path,
+) -> None:
+    """Authored Results prose is kept; viewers are inserted once."""
+    stem = "01_x"
+    results = tmp_path / "scratch" / "results" / stem
+    results.mkdir(parents=True)
+    (results / "report.html").write_text("<html>report</html>\n", encoding="utf-8")
+    (results / "checks.html").write_text("<html>checks</html>\n", encoding="utf-8")
+    (results / "metrics.html").write_text("<html>metrics</html>\n", encoding="utf-8")
+    page = site_mod.Page(
+        stem,
+        tmp_path / f"{stem}.md",
+        f"{stem}.md",
+        None,
+        "Experiments",
+        None,
+    )
+    source = (
+        "# design\n\n## Results\n\n"
+        "### Report overview\n\nThe CV report for Ridge.\n\n"
+        "### Checks\n\nOne issue (SKD003).\n\n"
+        "### Metrics\n\nMAE 3421.\n\n"
+        "## Notebooks\n"
+    )
+
+    once = site_mod.inject_results(source, page, tmp_path)
+    twice = site_mod.inject_results(once, page, tmp_path)
+
+    assert twice == once
+    assert "The CV report for Ridge." in once
+    assert "One issue (SKD003)." in once
+    assert "MAE 3421." in once
+    assert once.index("The CV report for Ridge.") < once.index(
+        '<iframe src="01_x.report.html"'
+    )
+    assert once.index("### Checks") < once.index("### Metrics")
+    assert once.count('<iframe src="01_x.report.html"') == 1
+    assert "data-skore-autosize" in once
+
+
+def test_inject_results_skips_missing_section_and_missing_html(
+    tmp_path: Path,
+) -> None:
+    """No Results heading stays unchanged; missing HTML leaves prose."""
+    page = site_mod.Page(
+        "01_x",
+        tmp_path / "01_x.md",
+        "01_x.md",
+        None,
+        "Experiments",
+        None,
+    )
+    no_section = "# design\n\n## Notebooks\n"
+    assert site_mod.inject_results(no_section, page, tmp_path) == no_section
+
+    (tmp_path / "scratch" / "results" / "01_x").mkdir(parents=True)
+    (tmp_path / "scratch" / "results" / "01_x" / "report.html").write_text(
+        "<html>report</html>\n", encoding="utf-8"
+    )
+    source = (
+        "# design\n\n## Results\n\n"
+        "### Report overview\n\nThe CV report.\n\n"
+        "### Checks\n\nOne issue.\n\n"
+        "## Notebooks\n"
+    )
+    injected = site_mod.inject_results(source, page, tmp_path)
+    assert '<iframe src="01_x.report.html"' in injected
+    assert '<iframe src="01_x.checks.html"' not in injected
+    assert "One issue." in injected
+
+
+def test_inject_results_embeds_extra_slug_from_comment(
+    tmp_path: Path,
+) -> None:
+    """Extra Display HTML lands after the results-embed marker."""
+    stem = "01_x"
+    results = tmp_path / "scratch" / "results" / stem
+    results.mkdir(parents=True)
+    (results / "roc.html").write_text("<html>roc</html>\n", encoding="utf-8")
+    page = site_mod.Page(
+        stem,
+        tmp_path / f"{stem}.md",
+        f"{stem}.md",
+        None,
+        "Experiments",
+        None,
+    )
+    source = (
+        "# design\n\n## Results\n\n"
+        "### Report overview\n\nThe CV report.\n\n"
+        "### ROC curve\n<!-- results-embed: roc -->\n\n"
+        "Fold 3 is weak.\n\n"
+        "## Notebooks\n"
+    )
+    once = site_mod.inject_results(source, page, tmp_path)
+    twice = site_mod.inject_results(once, page, tmp_path)
+    assert twice == once
+    assert "Fold 3 is weak." in once
+    assert once.index("Fold 3 is weak.") < once.index('<iframe src="01_x.roc.html"')
+    assert once.count('<iframe src="01_x.roc.html"') == 1
+    assert "data-skore-autosize" in once
+
+
+def test_inject_results_embeds_extra_slug_png(
+    tmp_path: Path,
+) -> None:
+    """A matplotlib-style Display snapshot becomes a markdown image."""
+    stem = "01_x"
+    results = tmp_path / "scratch" / "results" / stem
+    results.mkdir(parents=True)
+    (results / "prediction_error.png").write_bytes(b"png")
+    page = site_mod.Page(
+        stem,
+        tmp_path / f"{stem}.md",
+        f"{stem}.md",
+        None,
+        "Experiments",
+        None,
+    )
+    source = (
+        "# design\n\n## Results\n\n"
+        "### Prediction error\n<!-- results-embed: prediction_error -->\n\n"
+        "Residuals fan out.\n\n"
+        "## Notebooks\n"
+    )
+    injected = site_mod.inject_results(source, page, tmp_path)
+    assert "![01_x prediction_error](01_x.prediction_error.png)" in injected
+    assert injected.index("Residuals fan out.") < injected.index(
+        "01_x.prediction_error.png"
+    )
+
+
+def test_inject_results_copies_unmarked_slug_without_injecting(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Scratch HTML without a results-embed comment is not injected."""
+    _scaffold(tmp_path)
+    (tmp_path / "journal" / "01_x.md").write_text(
+        "# design\n\n## Results\n\n"
+        "### Report overview\n\nRidge CV report.\n\n"
+        "## Notebooks\n",
+        encoding="utf-8",
+    )
+    results = tmp_path / "scratch" / "results" / "01_x"
+    results.mkdir(parents=True)
+    (results / "report.html").write_text("<html>report</html>\n", encoding="utf-8")
+    (results / "roc.html").write_text("<html>roc</html>\n", encoding="utf-8")
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    docs = tmp_path / "_build" / "docs"
+    staged = (docs / "01_x.md").read_text(encoding="utf-8")
+    assert '<iframe src="01_x.report.html"' in staged
+    assert '<iframe src="01_x.roc.html"' not in staged
+    assert (docs / "01_x.roc.html").is_file()
+
+
+def test_site_build_embeds_eval_only_results(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Evaluation snapshots embed under Report overview only."""
+    _scaffold(tmp_path)
+    (tmp_path / "journal" / "01_x.md").write_text(
+        "# design\n\n## Results\n\n"
+        "### Report overview\n\nRidge CV report.\n\n"
+        "## Notebooks\n",
+        encoding="utf-8",
+    )
+    results = tmp_path / "scratch" / "results" / "01_x"
+    results.mkdir(parents=True)
+    (results / "report.html").write_text("<html>report</html>\n", encoding="utf-8")
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    docs = tmp_path / "_build" / "docs"
+    staged = (docs / "01_x.md").read_text(encoding="utf-8")
+    assert "Ridge CV report." in staged
+    assert '<iframe src="01_x.report.html"' in staged
+    assert "### Checks" not in staged
+    assert "### Metrics" not in staged
+    copied = (docs / "01_x.report.html").read_text(encoding="utf-8")
+    assert "<html>report</html>" in copied
+    assert "skore-embed-height" in copied
+
+
+def test_site_build_embeds_audit_results_in_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Checks then metrics follow the report overview embed."""
+    _scaffold(tmp_path)
+    (tmp_path / "journal" / "01_x.md").write_text(
+        "# design\n\n## Results\n\n"
+        "### Report overview\n\nRidge CV report.\n\n"
+        "### Checks\n\nOne issue (SKD003).\n\n"
+        "### Metrics\n\nMAE 3421.\n\n"
+        "## Notebooks\n",
+        encoding="utf-8",
+    )
+    results = tmp_path / "scratch" / "results" / "01_x"
+    results.mkdir(parents=True)
+    (results / "report.html").write_text("<html>report</html>\n", encoding="utf-8")
+    (results / "checks.html").write_text("<html>checks</html>\n", encoding="utf-8")
+    (results / "metrics.html").write_text("<html>metrics</html>\n", encoding="utf-8")
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    staged = (tmp_path / "_build" / "docs" / "01_x.md").read_text(encoding="utf-8")
+    assert staged.index("### Report overview") < staged.index("### Checks")
+    assert staged.index("### Checks") < staged.index("### Metrics")
+    assert staged.index("One issue (SKD003).") < staged.index(
+        '<iframe src="01_x.checks.html"'
+    )
+    assert staged.index('<iframe src="01_x.checks.html"') < staged.index(
+        '<iframe src="01_x.metrics.html"'
+    )
+
+
+def test_site_build_without_results_section_skips_scratch_html(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Template notes without Results do not gain a Results heading."""
+    _scaffold(tmp_path)
+    (tmp_path / "journal" / "01_x.md").write_text(
+        "# design\n\n## Notebooks\n", encoding="utf-8"
+    )
+    results = tmp_path / "scratch" / "results" / "01_x"
+    results.mkdir(parents=True)
+    (results / "report.html").write_text("<html>report</html>\n", encoding="utf-8")
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    staged = (tmp_path / "_build" / "docs" / "01_x.md").read_text(encoding="utf-8")
+    assert "## Results" not in staged
+    assert '<iframe src="01_x.report.html"' not in staged
+    assert (tmp_path / "_build" / "docs" / "01_x.report.html").is_file()
+
+
 def test_site_build_embeds_assets(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

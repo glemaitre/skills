@@ -33,6 +33,9 @@ violated.
 - Name `python -m skore_skills git end-turn --stage evaluate` at
   the end of the turn.
 - If that command returns `invoke`, load `persist-ml-git`.
+- Write `scratch/results/01_baseline/report.html` from
+  `report._repr_html_()` and `report.txt` from `repr(report)` in
+  `experiments/01_baseline.py` after the bare `report` display.
 
 **Must NOT do:**
 - Recommend `cross_val_score`, `cross_validate`,

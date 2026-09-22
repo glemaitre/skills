@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "fd207df86fe8a8dcab33deed4c0767c499bb8313a9b7d36c84fc13cb56e896f7",
+  "catalog_hash": "fe471e74199a85b94711d52ab6129da69d9b397d81c4f4955a40d7dd0104c947",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "c5049ec95490eb0dbaef9abaf5f3e823b12d5a47804c4ba1e07c6a58227c98bd"
+      "hash": "d9e43d95461621635bf5bf89b60de00cfe9cb73d2488b815bedeb356ce76d412"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "3cf95252ca61125eb8825b924a68ff71b95ee1f774d6e2c89806d8a3858123e3"
+      "hash": "23463e49bcc1c83421e2cf44ec10ec645fd17675c82fd4edcbea2e46e8d2173a"
     },
     {
       "id": "manage-ml-backlog",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "2e549a439d8f490470e544ce1562ca551a9ab6ddbebf675e251bf9b2800500db"
+      "hash": "2354c0b9afa16a79c2f2dbc6491d18496def9e5459c2037b46705c8df2c8adb4"
     },
     {
       "id": "iterate-from-skore",
@@ -66,7 +66,7 @@
       "summary": "Use skore to run diagnostics and checks that can be reported and addressed in the next experiment.",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "1a80d251563b7c77cfc95a379e586884d5a3dac2dbe02d5e7b5c367e0a5d4f89"
+      "hash": "443436843b3fe8d85b222a3040fdd553b9192600c311f9816f32be2447e1fcef"
     },
     {
       "id": "iterate-from-user",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "3186ad497795247f4030384fcf3f7e358db43e10f3be00bec0e47725520686c4"
+      "hash": "05d0bf96c49e1a009c4eb11a47eea98368db504fc4f67c038ca7d735b6b1c168"
     },
     {
       "id": "choose-python-library",
@@ -210,7 +210,7 @@
       "summary": "Initialize and build an offline MkDocs documentation site from workspace markdown.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "61dac46c154954de99926eb0c9616f4625b75e416b48f408ceaf54cd6fa4b2c5"
+      "hash": "6dfe795eac17bd1fc1a0fb627e8349d46b98152a1798b11532b5b3533de1d74c"
     },
     {
       "id": "export-ml-project",

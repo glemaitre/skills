@@ -58,6 +58,9 @@ summary
 REPORT_ID = "skore:report:<type-singular>:<N>"  # hub: from put() URL (plural→singular); local/mlflow: newest matching summary["id"]
 
 report = project.get(REPORT_ID)
+_results = PROJECT_ROOT / "scratch" / "results" / "<NN>_<short_name>"
+_results.mkdir(parents=True, exist_ok=True)
+(_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
 report
 
 # %% [markdown]
@@ -68,25 +71,29 @@ report
 # %% [markdown]
 # ## Checks summary
 #
-# `report.checks.summarize().frame()` returns a DataFrame whose rows
-# each carry a `code` (e.g. `SKD003` or a custom `CSTM001`), a
-# `severity` (`passed` / `issue` / `tip`), and a
-# `documentation_url` — the linked page describes what the check
-# tests and what to try next. Custom checks may have an empty URL.
+# `report.checks.summarize()` groups every check by severity
+# (`issue` / `tip` / `passed` / not applicable). Each line carries a
+# `code` (e.g. `SKD003` or a custom `CSTM001`) and, for the
+# actionable ones, the documentation URL describing what the check
+# tests and what to try next. Custom checks may have no URL.
 #
 # Available on `EstimatorReport` and `CrossValidationReport` in
 # skore ≥ 0.18. Mute a noisy check via
-# `report.checks.summarize(ignore=['<code>']).frame()`.
+# `report.checks.summarize(ignore=['<code>'])`.
 #
 # Docs: https://docs.skore.probabl.ai/0.18/user_guide/automated_checks.html
 
 # %%
-report.checks.summarize().frame()
+checks = report.checks.summarize()
+_results = PROJECT_ROOT / "scratch" / "results" / "<NN>_<short_name>"
+_results.mkdir(parents=True, exist_ok=True)
+(_results / "checks.html").write_text(checks._repr_html_(), encoding="utf-8")
+checks
 
 # %% [markdown]
 # ## Metrics summary
 #
-# `report.metrics.summarize().frame()` covers task-appropriate
+# `report.metrics.summarize()` covers task-appropriate
 # defaults in one call:
 #
 # - regression: RMSE / MAE / R² + fit/predict timings,
@@ -100,11 +107,31 @@ report.checks.summarize().frame()
 # findings come from the checks section above.
 
 # %%
-report.metrics.summarize().frame()
+metrics = report.metrics.summarize()
+_results = PROJECT_ROOT / "scratch" / "results" / "<NN>_<short_name>"
+_results.mkdir(parents=True, exist_ok=True)
+(_results / "metrics.html").write_text(metrics._repr_html_(), encoding="utf-8")
+metrics
+
+# %% [markdown]
+# ## Available report accessors
+#
+# `help()` prints one tree per namespace, ending in a `Displays`
+# group. That printed tree is this turn's menu: Additional report
+# view offers only names it lists, never a remembered Display
+# catalogue. The list is task-dependent — a regression report has
+# no `roc`. Namespaces missing on this report are skipped.
+
+# %%
+for _name in ("metrics", "checks", "inspection", "data"):
+    _namespace = getattr(report, _name, None)
+    if callable(getattr(_namespace, "help", None)):
+        _namespace.help()
 
 # %% [markdown]
 # ## Core audit complete
 #
 # Checks and metrics above are the deterministic first pass.
 # User-selected additional report views, queries, or plots are
-# appended below and remain read-only.
+# appended below and remain read-only. Discover names from the
+# accessors tree; confirm each with `api get` before calling it.

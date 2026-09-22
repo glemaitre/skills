@@ -32,6 +32,17 @@ RAW_IFRAME = re.compile(r'<iframe[^>]+src="([^"]+)"[^>]*>\s*</iframe>', re.IGNOR
 NOTEBOOKS_SECTION = re.compile(
     r"(?ms)^## Notebooks\s*\n.*?(?=^## |\Z)",
 )
+RESULTS_SECTION = re.compile(
+    r"(?ms)^## Results\s*\n.*?(?=^## |\Z)",
+)
+RESULT_ITEMS = (
+    ("report", "Report overview"),
+    ("checks", "Checks"),
+    ("metrics", "Metrics"),
+)
+RESULT_EMBED = re.compile(r"<!--\s*results-embed:\s*([A-Za-z0-9_-]+)\s*-->")
+CORE_RESULT_KINDS = {kind for kind, _heading in RESULT_ITEMS}
+RESULT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".svg", ".gif"}
 # Staged report pages measure themselves and post their height up, so the
 # viewer fits the report exactly. Reading the document from the parent is
 # blocked under ``file://``; postMessage is not. Measure the body box, not
@@ -84,6 +95,21 @@ def notebook_dest(page: Page) -> str:
 def audit_dest(page: Page) -> str:
     """Return the staged file name of the audit notebook for ``page``."""
     return f"{Path(page.dest_name).stem}.audit.nb.html"
+
+
+def result_dest(stem: str, kind: str, suffix: str = ".html") -> str:
+    """Return the staged file name of a Results viewer."""
+    if not suffix.startswith("."):
+        suffix = f".{suffix}"
+    return f"{stem}.{kind}{suffix}"
+
+
+def result_source(
+    root: Path, stem: str, kind: str, suffix: str = ".html"
+) -> Path | None:
+    """Return the scratch snapshot when it exists."""
+    path = root / "scratch" / "results" / stem / f"{kind}{suffix}"
+    return path if path.is_file() else None
 
 
 def collect_pages(root: Path) -> list[Page]:
@@ -325,6 +351,79 @@ def inject_notebook(text: str, page: Page) -> str:
     return text
 
 
+def _append_under_heading(section: str, heading: str, embed: str) -> str:
+    """Append an embed after the prose of one Results subsection."""
+    pattern = re.compile(
+        rf"(?ms)^(### {re.escape(heading)}\n.*?)(?=^### |\Z)",
+    )
+    match = pattern.search(section)
+    if match is None:
+        return section
+    body = match.group(1).rstrip() + f"\n\n{embed}\n\n"
+    return section[: match.start()] + body + section[match.end() :]
+
+
+def _append_after_embed_marker(section: str, slug: str, embed: str) -> str:
+    """Append an embed in the subsection that marks ``slug``."""
+    marker = f"<!-- results-embed: {slug} -->"
+    pattern = re.compile(r"(?ms)^(### .+\n.*?)(?=^### |\Z)")
+    match = next(
+        (item for item in pattern.finditer(section) if marker in item.group(1)),
+        None,
+    )
+    if match is None:
+        return section
+    body = match.group(1).rstrip() + f"\n\n{embed}\n\n"
+    return section[: match.start()] + body + section[match.end() :]
+
+
+def _result_embed(root: Path, stem: str, slug: str, title: str) -> str | None:
+    """Return an HTML or image embed for a scratch snapshot."""
+    html = result_source(root, stem, slug, ".html")
+    if html is not None:
+        name = result_dest(stem, slug, ".html")
+        return render_embed(name, title, autosize=True)
+    for suffix in RESULT_IMAGE_SUFFIXES:
+        image = result_source(root, stem, slug, suffix)
+        if image is not None:
+            name = result_dest(stem, slug, suffix)
+            return f"![{title}]({name})"
+    return None
+
+
+def inject_results(text: str, page: Page, root: Path) -> str:
+    """Embed scratch report HTML under an authored Results section."""
+    if page.section != "Experiments":
+        return text
+    match = RESULTS_SECTION.search(text)
+    if match is None:
+        return text
+    section = match.group(0)
+    stem = Path(page.dest_name).stem
+    for kind, heading in RESULT_ITEMS:
+        embed = _result_embed(root, stem, kind, f"{page.title} {heading.lower()}")
+        if embed is None:
+            continue
+        name = result_dest(stem, kind)
+        if f'src="{name}"' in section:
+            continue
+        section = _append_under_heading(section, heading, embed)
+    for slug in RESULT_EMBED.findall(section):
+        if slug in CORE_RESULT_KINDS:
+            continue
+        embed = _result_embed(root, stem, slug, f"{page.title} {slug}")
+        if embed is None:
+            continue
+        names = [
+            result_dest(stem, slug, ".html"),
+            *(result_dest(stem, slug, suffix) for suffix in RESULT_IMAGE_SUFFIXES),
+        ]
+        if any(f'src="{name}"' in section or f"]({name})" in section for name in names):
+            continue
+        section = _append_after_embed_marker(section, slug, embed)
+    return text[: match.start()] + section + text[match.end() :]
+
+
 def with_height_reporter(text: str) -> str:
     """Return report HTML that posts its content height to the viewer."""
     index = text.lower().rfind("</body>")
@@ -347,6 +446,27 @@ def _copy_data_analysis_assets(root: Path, docs: Path) -> None:
             )
         elif path.suffix.lower() in ASSET_SUFFIXES:
             shutil.copy2(path, docs / path.name)
+
+
+def _copy_result_html(root: Path, docs: Path, page: Page) -> None:
+    if page.section != "Experiments":
+        return
+    stem = Path(page.dest_name).stem
+    directory = root / "scratch" / "results" / stem
+    if not directory.is_dir():
+        return
+    for path in directory.iterdir():
+        if not path.is_file():
+            continue
+        suffix = path.suffix.lower()
+        dest = docs / f"{stem}.{path.stem}{suffix}"
+        if suffix == ".html":
+            dest.write_text(
+                with_height_reporter(path.read_text(encoding="utf-8")),
+                encoding="utf-8",
+            )
+        elif suffix in RESULT_IMAGE_SUFFIXES:
+            shutil.copy2(path, dest)
 
 
 def _write_stub_index(docs: Path) -> bool:
@@ -410,12 +530,13 @@ def stage_docs(root: Path) -> tuple[Path, list[Page], bool]:
         text = rewrite_markdown_links(
             page.source.read_text(encoding="utf-8"), dest_names
         )
-        text = inject_notebook(embed_assets(text), page)
+        text = inject_results(inject_notebook(embed_assets(text), page), page, root)
         (docs / page.dest_name).write_text(text, encoding="utf-8")
         if page.notebook is not None:
             _copy_notebook(page.notebook, docs / notebook_dest(page))
         if page.audit is not None:
             _copy_notebook(page.audit, docs / audit_dest(page))
+        _copy_result_html(root, docs, page)
     _copy_data_analysis_assets(root, docs)
     _copy_site_assets(docs)
     stub_home = _write_stub_index(docs)

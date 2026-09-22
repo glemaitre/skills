@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import importlib
+import os
 from pathlib import Path
 
 from click.testing import CliRunner
 
+from skore_skills import cells
 from skore_skills.cli import cli
 
 FIXTURE = Path(__file__).parent / "fixtures" / "tiny_notebook.py"
@@ -22,6 +25,29 @@ def test_cells_run_digest_and_dest(tmp_path: Path) -> None:
     assert "ValueError" in result.output
     assert dest.is_file()
     assert dest.read_text(encoding="utf-8") == result.output
+
+
+def test_cells_run_hides_the_editor_marker(tmp_path: Path, monkeypatch) -> None:
+    """skore renders through rich's jupyter path when VSCODE_PID is visible.
+
+    InteractiveShell also sets ``sys.ps1``, so skore reads the runner as
+    notebook-like and writes displays through ``rich.jupyter.display``,
+    which re-enters the redirected stdout and recurses until the process
+    hangs. Cells must never see the marker.
+    """
+    monkeypatch.setenv("VSCODE_PID", "4321")
+    importlib.reload(cells)
+    assert "VSCODE_PID" not in os.environ
+
+    src = tmp_path / "nb.py"
+    src.write_text(
+        '# %%\nimport os\nprint(os.environ.get("VSCODE_PID"))\n',
+        encoding="utf-8",
+    )
+    dest = tmp_path / "out.md"
+    cells.run(src, dest)
+
+    assert "None" in dest.read_text(encoding="utf-8")
 
 
 def test_cells_run_missing_file() -> None:

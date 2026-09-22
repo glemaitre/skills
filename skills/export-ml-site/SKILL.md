@@ -16,9 +16,14 @@ converted notebooks (`<stem>.nb.html`, written only by
 inline. HTML viewers have open-separately and fullscreen controls.
 Each experiment design note has one `## Notebooks` section:
 evaluation first, then audit; a missing viewer is omitted.
-The gitignored serialized Skore `reports/` directory is private
-runtime state and is never copied into the site. Only Markdown and
-already-generated notebook/HTML viewers are exported.
+Derived HTML and PNG viewers under `scratch/results/<stem>/`
+(report, checks, metrics, plus extra Display slugs) may be copied
+into the staged docs and embedded under `## Results` when that
+section exists. Core headings are Report overview / Checks /
+Metrics; extra slugs use `<!-- results-embed: <slug> -->`.
+Only Markdown and already-generated notebook/HTML viewers are
+exported. The gitignored serialized Skore `reports/` directory is
+private runtime state and is never copied into the site.
 On desktop, site pages are in the top bar (experiments in a
 scrollable dropdown) and the page contents are in a collapsible
 left rail beside a 1200px report column. Mobile uses a drawer.

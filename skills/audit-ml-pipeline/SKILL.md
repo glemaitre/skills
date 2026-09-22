@@ -75,6 +75,7 @@ and never dispatches audit back.
 |---|---|---|---|
 | `audit/<NN>_<short_name>.py` | **Durable** (in git) | This skill, once per experiment | The bare-expression cells. Source of truth. Can be opened as a notebook in JupyterLab / VS Code for the rich HTML view |
 | `scratch/audit/<stem>/audit.md` | Ephemeral (gitignored), optional | `cells run` when given a 2nd arg | Per-cell markdown digest: source + stdout + last-expression `repr`. Same content as stdout |
+| `scratch/results/<stem>/*.html` `.png` | Ephemeral (gitignored) | Audit (and evaluate for `report.*`) cells | Per-item viewers the site embeds under `## Results`. The digest already carries the text, so no `.txt` is written here |
 | Stdout from `cells run` | Captured by the bash tool | CLI (always) | Streamed digest — the agent reads this directly from the tool output |
 
 **Mnemonic:** `audit/` is *source* (in git); `scratch/audit/` and
@@ -98,8 +99,10 @@ The central rule. Surfaced as the first Stop condition below.
 - `skore.evaluate(...)` — duplicates the report under the same key
   and pollutes `summarize()`.
 - `project.put(...)` — same.
-- Writes outside `scratch/audit/<stem>/` — no `data/` writes, no
-  `reports/` writes, no edits to `src/<pkg>/`. The audit is a viewer.
+- Writes outside `scratch/audit/<stem>/` and
+  `scratch/results/<stem>/` — no `data/` writes, no `reports/`
+  writes, no edits to `src/<pkg>/`. The audit is a viewer. Snapshot
+  HTML under `scratch/results/<stem>/` is allowed.
 - Mutation of the loaded `report` that survives the cell (e.g.
   monkey-patching skore symbols).
 
@@ -182,7 +185,7 @@ conditions for the three-consumer rule.
 | Shortcut | Why it's wrong |
 |---|---|
 | `report = project.get(REPORT_ID); print(repr(report))` | Runner captures bare expressions via `result.result`, not stdout. `print(repr(...))` mixes stdout and output sections. Use `report` on its own line |
-| Drop `.frame()` from `report.checks.summarize()` / `report.metrics.summarize()` | `__repr__` of the Display objects is `<…Display at 0x…>`. `.frame()` returns a DataFrame whose repr carries the actual values |
+| `checks.frame()` instead of the bare `checks` Display | The Display `__repr__` already groups issues and tips with their codes and documentation URLs. `.frame()` flattens that into a table the agent then has to re-read, and drops the severity grouping `iterate-from-skore` mines |
 | `project.get(KEY)` raised `KeyError` → re-run `evaluate` + `put` "to refresh" | Lookup shape is wrong (get is by id, not key). Hub: read the id from the URL printed by `put()`. Local: read `summary["id"]` for the matching key row. Never re-run `evaluate` + `put` to recover |
 | Write `pixi add --feature agent ipython` directly from this skill | Install commands owned by `add-python-package`. This skill **requests**; it does not install |
 | Dump the audit `.py` into `scratch/audit/<stem>/` | `.py` is durable in git; `scratch/` is gitignored. Source in `audit/`; digest in `scratch/audit/<stem>/` |
@@ -279,7 +282,9 @@ Brief outline; full anatomy with concrete examples →
    path segment is plural, id uses singular, e.g. `cross-validations`
    → `cross-validation`, `estimators` → `estimator`; local **and
    mlflow**: read `summary["id"]` for the matching key row), then
-   `report = project.get(REPORT_ID)`; then `report`.
+   `report = project.get(REPORT_ID)`. Write `report._repr_html_()`
+   to `scratch/results/<stem>/report.html` (confirm `_repr_html_`
+   with `api get`), then `report` as the last expression.
 6. **Persisted report** — substitute the exact normalized locator
    from evaluate. For a direct audit, use the selected `REPORT_ID`
    and `policy.skore_mode`: local links `../reports/`; Hub uses the
@@ -288,38 +293,50 @@ Brief outline; full anatomy with concrete examples →
    experiment id + run id. If no authoritative locator exists,
    write `n/a — backend did not expose a locator`. Do not call
    `put`, inspect private storage, or invent a frontend URL.
-7. **Checks summary** — `report.checks.summarize().frame()`. Each row
-   carries `documentation_url` — the actionable mitigation for an
-   `issue` / `tip` lives at that link when present (custom `CSTM*`
-   checks may leave it empty).
-8. **Metrics summary** — `report.metrics.summarize().frame()`.
+7. **Checks summary** — `checks = report.checks.summarize()`, write
+   `checks._repr_html_()` to `scratch/results/<stem>/checks.html`,
+   then `checks` as the last expression. Its repr groups the walk by
+   severity; every `issue` / `tip` line ends with the documentation
+   URL holding the actionable mitigation (custom `CSTM*` checks may
+   have none).
+8. **Metrics summary** — same snapshot pattern for
+   `report.metrics.summarize()` into
+   `scratch/results/<stem>/metrics.html`, then `metrics` last.
+9. **Available report accessors** — call `help()` on
+   `report.metrics`, `report.checks`, and any other namespace that
+   exists (`inspection`, `data`, …). `help()` prints its tree and
+   returns `None`, so the runner captures it as stdout; nothing is
+   written to disk. Skip a namespace that is absent. Do not call
+   plot accessors here.
 
-That's the whole template. `.frame()` is load-bearing on cells 6
-and 7 — without it the digest shows `<…Display object at 0x…>`.
-Details: → `references/cell_anatomy.md`.
+That's the core template. Leave a bare Display as the last
+expression: editors render `_repr_html_`, the runner records the
+`repr`, and both are informative — no `.frame()` and no text
+snapshot. Extra Display cells are appended only after the user
+picks Additional report view. Details: →
+`references/cell_anatomy.md`.
 
 ### The digest is `iterate-from-skore`'s canonical source
 
 The rendered digest at `scratch/audit/<stem>/audit.md` is the
 **single source of truth** that `iterate-from-skore` mines to
 populate the JOURNAL Backlog. That skill reads the digest as text,
-walks the checks + metrics sections, and follows each check's
-`documentation_url` (or the row title and message when the URL is
-empty) to draft Backlog rows. It does NOT re-open the
+walks `Issues:` then `Tips:` in `## Checks summary`, and follows
+each line's documentation URL (or the `[CODE]` title and message
+when the URL is missing) to draft Backlog rows. It does NOT re-open the
 Project, does NOT call `report.*` accessors, and does NOT write
 `scratch/<ts>_*.py` probes for metric extraction.
 
-The contract is deliberately narrow: persisted-report locator +
-checks (with their doc URLs) + metrics summary. Do not extend the
-template with per-task
-accessors (residuals, confusion matrices, feature importances,
-calibration plots, …) unless the user asks for one explicitly —
-the actionable mitigations come from the check pages, not from
-deeper inspection here. If the user explicitly asks for a custom
-figure that is not a skore check plot, load `plot-ml-figure` if
-installed **before writing the cell**; never replace a skore
-check plot. Save PNG (or HTML) and leave the figure visible;
-never `plt.close` in the audit notebook.
+The contract for Backlog mining stays narrow: persisted-report
+locator + checks (with their doc URLs) + metrics summary.
+`iterate-from-skore` must not walk extra Display headings. Do not
+put ROC / confusion-matrix / importance cells in the core
+template. After Close-audit extras, those cells use their own
+`## <title>` headings. If the user explicitly asks for a custom
+figure that `help()` did **not** list, load
+`plot-ml-figure` if installed **before writing the cell**; never
+replace a skore Display. Save PNG (or HTML) and leave the figure
+visible; never `plt.close` in the audit notebook.
 
 ## G-AUDIT-FINDING
 
@@ -327,19 +344,23 @@ After every successful `cells run`, derive exactly one normalized
 finding from the rendered digest. This is distinct from the
 headline metric and the persisted-report locator.
 
-1. Read `## Checks summary`. Select `issue` rows first, then `tip`
-   rows, preserving digest order within each severity.
+1. Read `## Checks summary`. Take lines under `Issues:` first,
+   then `Tips:`, preserving digest order within each section.
+   Ignore Passed / Not Applicable / skipped / ignored. The code is
+   the `[SKD003]` token on each line.
 2. Format counts and every selected code with its severity:
    `<I> issue(s), <T> tip(s) — <CODE> (issue), <CODE> (tip)`.
 3. When `## Metrics summary` exposes a headline metric, append one
    short context clause copied from the digest. Do not turn that
    metric into a finding or invent a performance judgment.
-4. No issue/tip rows →
+4. No `Issues:` / `Tips:` lines →
    `0 issues, 0 tips — automated checks surfaced no actionable finding`
    plus optional copied metric context.
 5. Missing or errored digest →
    `n/a — audit digest unavailable`. Do not fabricate codes,
    counts, descriptions, or metrics.
+
+Extra Display cells do not change G-AUDIT-FINDING.
 
 Return G-AUDIT-FINDING verbatim with the digest and
 G-REPORT-LOCATOR. `manage-ml-backlog` writes it to the design
@@ -354,19 +375,41 @@ this exact order. None is recommended or preselected:
 
 | Label | Contract |
 |---|---|
-| Additional report view | Offer only task/report-compatible accessors confirmed by `python -m skore_skills api get` this turn. Omit unavailable views; never show disabled or remembered names. Ask one pick before editing. |
-| Custom query | Wait for one concrete read-only question about the loaded report. Append only the minimal accessor cells needed to answer it. |
-| Custom plot | Load `plot-ml-figure` only if `status.skills.plot-ml-figure` is true; else one-line skip and return to this gate. Append read-only plot cells and keep the figure as notebook output. |
+| Additional report view | Menu labels are **exactly** the names under the `Displays` group of this turn's `help()` trees in the digest. Confirm the picked name with `python -m skore_skills api get`. The list is task-dependent — a regression report has no `roc`. Omit anything the trees do not list; never show remembered Display names. Ask one pick before editing. |
+| Custom query | Wait for one concrete read-only question about the loaded report. Append only the minimal accessor cells needed to answer it. Prefer a name from the trees when it answers the question. |
+| Custom plot | Only when the trees have no Display for this chart. Load `plot-ml-figure` only if `status.skills.plot-ml-figure` is true; else one-line skip and return to this gate. Append read-only plot cells and keep the figure as notebook output. |
 | Close audit | Continue to the existing dispatched or direct close. |
 
 Additional report view / Custom query / Custom plot all edit the
-same durable `audit/<stem>.py`. After an edit: run `style`, then
-`cells run` to overwrite `scratch/audit/<stem>/audit.md`, derive
-G-AUDIT-FINDING again, and re-present this same gate. Do not
-convert notebooks, build the site, run `git end-turn`,
+same durable `audit/<stem>.py`, **below** `## Core audit complete`.
+After an edit: run `style`, then `cells run` to overwrite
+`scratch/audit/<stem>/audit.md`, derive G-AUDIT-FINDING again
+(from checks + metrics only), and re-present this same gate. Do
+not convert notebooks, build the site, run `git end-turn`,
 record-outcome, or return to the dispatcher while an additional
 step is active. The audit remains read-only: no `evaluate`, no
 `put`, and no workspace-data mutation.
+
+### Extra Display cells
+
+Slug = the accessor name `help()` listed under `Displays`. Do not
+invent slugs from docs memory.
+
+1. Markdown cell `## <human title>` — not `## Checks summary` or
+   `## Metrics summary`.
+2. Code cell: call the accessor; confirm `_repr_html_` with
+   `api get` on the returned Display.
+3. Write `scratch/results/<stem>/<slug>.html` from `_repr_html_()`
+   when it exists. Only when it does not, save `<slug>.png` so the
+   site can still embed a figure.
+4. Last expression: the bare Display.
+5. Failed or inapplicable accessors stay in `scratch/` probes.
+   Do not add a Results subsection for them.
+
+`manage-ml-backlog` turns each extra `<slug>` viewer (other than
+`report`, `checks`, `metrics`) into a `###` Results heading with
+`<!-- results-embed: <slug> -->`, summarizing it from the digest
+cell that produced it.
 
 ## Execution contract — one command
 
@@ -430,7 +473,7 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 
 | Callee | Why |
 |---|---|
-| `python -m skore_skills api get` | Every skore symbol (`Project`, `project.summarize`, `project.get`, `report.checks.summarize`, `report.metrics.summarize`, `.frame()`). Cache hits first |
+| `python -m skore_skills api get` | Every skore symbol (`Project`, `project.summarize`, `project.get`, `report.checks.summarize`, `report.metrics.summarize`, `_repr_html_`). Cache hits first |
 | `add-python-package` | When `ipython` is missing |
 | `manage-ml-backlog` (record-outcome mode) | End of turn on a direct free-text audit — hands over the digest so the History row and design-note Status block get written |
 | `python -m skore_skills style` | After writing / editing `audit/<stem>.py` — bundled `ruff.toml` carries `audit/**` per-file ignores; also contextualizes the header to name the audited experiment and strips workflow/process prose |
@@ -485,7 +528,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 |---|---|---|
 | `project.get(key)` raises `KeyError` / `TypeError` | Lookup by key, not id; local vs hub shape differs | → `references/failure_modes.md` § "`project.get(key)` raises" |
 | `ModuleNotFoundError: No module named 'IPython'` | Agent feature not installed | Delegate to `add-python-package`; never `pip install` here |
-| Cell renders as `<Display object at 0x…>` | `*.summarize()` called without `.frame()` | Add `.frame()` |
+| Cell renders as `<Display object at 0x…>` | skore too old to give the Display a text repr | Add `.frame()` to that cell only; leave the rest bare |
 | `AttributeError` for a `report.*` accessor | Symbol from memory; skore version drift | → `references/failure_modes.md` § "AttributeError" |
 | `RuntimeError: No report under key=...` | `put()` landed in a different Project | → `references/failure_modes.md` § "wrong Project" |
 | Report differs across runs with unchanged source | Non-deterministic step / different data slice | Not a bug here; surface to user |
@@ -515,7 +558,8 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | `evaluate-ml-pipeline` | Producer side. `skore.evaluate` + `project.put` live only in `experiments/NN_*.py` |
 | `setup-workspace` | Workspace layout; four-way stem pairing |
 | `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |
-| `python -m skore_skills api get` | skore symbol lookups. Cache hits first |
+| `python -m skore_skills api get` | skore symbol lookups, including `help` and extra Display methods. Cache hits first |
+| `plot-ml-figure` | Custom plot gate only when the `help()` trees have no Display |
 | `python -m skore_skills style` | ruff after writing/editing `audit/<stem>.py` |
 | `choose-python-library` / `skore_skills/data/python-stack.json` | Agent tools (`ipython`, `ipykernel`) live under the agent feature |
 
@@ -535,8 +579,8 @@ If the skill is not installed, name the package and stop.
 ## References (load on demand)
 
 - `references/cell_anatomy.md` — concrete cell examples (right /
-  wrong shapes), full 7-cell sequence, why `.frame()` matters,
-  bare-expression rules.
+  wrong shapes), core sequence, why the bare Display serves both
+  audiences, extra Display snapshot contract, bare-expression rules.
 - `references/runner_internals.md` — leftover runner internals
   (IPython, Agg). Prefer `--help` / the package docstring.
 - `references/failure_modes.md` — detailed recovery for every

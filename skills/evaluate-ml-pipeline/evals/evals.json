@@ -14,6 +14,7 @@
         "Mention `data={...}` (env-dict) for `SkrubLearner`, NOT positional `X, y`.",
         "Name `python -m skore_skills git end-turn --stage evaluate` at the end of the turn.",
         "If that command returns `invoke`, load `persist-ml-git`.",
+        "Write `scratch/results/01_baseline/report.html` from `report._repr_html_()` and `report.txt` from `repr(report)` in `experiments/01_baseline.py` after the bare `report` display.",
         "The response does NOT: Recommend `cross_val_score`, `cross_validate`, `classification_report`, or hand-rolled `print(mean_squared_error(...))`.",
         "The response does NOT: Default to `StratifiedKFold` (forbidden \u2014 compresses across-fold variance, even on imbalance).",
         "The response does NOT: Pre-pin metrics (e.g. `scoring=\"neg_mean_squared_error\"`) \u2014 trust skore defaults.",

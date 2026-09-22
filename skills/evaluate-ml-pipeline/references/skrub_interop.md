@@ -281,6 +281,12 @@ report  # bare line — jupytext-displays inline; no-op as a script
 # `report.checks.add(...)` calls go here, before persistence.
 # DataOp `with_scoring` was attached in build_learner.
 
+# %%
+_results = PROJECT_ROOT / "scratch" / "results" / "01_baseline"
+_results.mkdir(parents=True, exist_ok=True)
+(_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
+(_results / "report.txt").write_text(repr(report), encoding="utf-8")
+
 # %% [markdown]
 # ## Persist
 

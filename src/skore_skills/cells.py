@@ -92,6 +92,17 @@ os.environ.setdefault("TQDM_DISABLE", "1")
 os.environ.setdefault("RICH_FORCE_TERMINAL", "0")
 os.environ.setdefault("SKORE_PROGRESS_BAR", "0")
 
+# 3. Hide the editor marker so skore does not pick the notebook render path.
+#    skore builds its rich Console with
+#    ``force_jupyter=is_environment_notebook_like()``, which is true when
+#    ``VSCODE_PID`` is set and ``sys.ps1`` exists — both hold inside this
+#    runner when it is launched from a VS Code / Cursor terminal, because
+#    InteractiveShell sets ``sys.ps1``. A jupyter-mode Console writes through
+#    ``rich.jupyter.display``, which re-enters the redirected stdout proxy and
+#    recurses until the process hangs. The runner is always plain text, so the
+#    marker is dropped before skore is imported by any cell.
+os.environ.pop("VSCODE_PID", None)
+
 # ---------------------------------------------------------------------------
 # Optional library configuration
 # ---------------------------------------------------------------------------

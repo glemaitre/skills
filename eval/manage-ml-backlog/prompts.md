@@ -128,6 +128,8 @@
   · hub · id: skore:report:cross-validation:42`.
 - G-AUDIT-FINDING is
   `1 issue, 1 tip — SKD003 (issue), SKD010 (tip); ROC-AUC 0.86`.
+- The digest has an extra `## ROC curve` cell from a `roc` Display,
+  with `scratch/results/01_baseline/roc.html` beside it.
 - Smoke tests passed.
 - History row for `01_baseline` is `planned`.
 - Backlog has rows `B1` and `B2`.
@@ -140,6 +142,10 @@
   and design-note `Persisted report` Status line.
 - Copy G-AUDIT-FINDING byte-for-byte into the design-note
   `Audit findings` Status line, separately from Headline result.
+- Insert `## Results` with Report overview, then Checks, then
+  Metrics, summarizing from the digest — not from HTML.
+- After Metrics, add a `###` subsection for `roc` with
+  `<!-- results-embed: roc -->`, summarizing from that digest cell.
 - Update the rest of the design-note Status block for
   `01_baseline`.
 - Refresh the `JOURNAL.md` Status rows `Last experiment` and
@@ -155,6 +161,8 @@
 - Rewrite or shorten the supplied Hub URL. Pasting the digest
   string unchanged is required, not a violation.
 - Merge the audit finding into the headline metric or Last result.
+- Parse `scratch/results/` HTML when writing `## Results`.
+- Invent extra Display subsections without a matching digest cell.
 
 ---
 
@@ -175,11 +183,15 @@
 - Leave the History row status unchanged.
 - Copy `n/a — audit not run` into the design note's Audit findings
   line if the Status block is updated.
+- If writing `## Results`, include Report overview only when
+  `scratch/results/03_calendar/report.txt` exists. Do not invent
+  Checks or Metrics subsections.
 
 **Must NOT do:**
 - Invent or estimate a metric.
 - Mark the row `done` without a result.
 - Ask the next-lever triage question.
+- Parse report HTML to fill Results.
 
 ---
 

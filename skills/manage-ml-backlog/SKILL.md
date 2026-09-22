@@ -55,7 +55,8 @@ Run Procedure steps 1-3 and nothing else:
    block from the digest or user-supplied headline when available.
    Paste G-REPORT-LOCATOR and G-AUDIT-FINDING verbatim into their
    separate Status lines. Also refresh the `JOURNAL.md` Status rows
-   `Last experiment` and `Last result`.
+   `Last experiment` and `Last result`. Insert or replace `## Results`
+   between Status and Notebooks from digest text, not HTML.
 
 Then return to the caller. Skip step 4 (Backlog rescan) and step 5
 (the next-lever triage menu) — the caller did not ask what to try
@@ -107,7 +108,23 @@ locator.
    design note's `Audit findings` line. Audit skipped →
    `n/a — audit not run`; missing/errored digest →
    `n/a — audit digest unavailable`. Update the rest of the
-   design-note Status block the same way.
+   design-note Status block the same way. Then insert or replace
+   `## Results` in the design note, between `## Status` and
+   `## Notebooks`. Summarize from the audit digest — its cell
+   outputs carry `repr(report)`, `## Checks summary`, and
+   `## Metrics summary` as text. With no audit this turn, fall back
+   to `scratch/results/<stem>/report.txt`, which evaluate writes.
+   Write `### Report overview` from the report text, then
+   `### Checks` then `### Metrics` when those sections exist.
+   Evaluation-only (audit skipped): Report overview only — do not
+   invent Checks or Metrics subsections. After Metrics, add one
+   `###` subsection per extra Display cell the audit appended, using
+   a human title and a `<!-- results-embed: <slug> -->` comment with
+   the accessor name as `<slug>` so site build can inject the
+   viewer. Each subsection is 2–4 sentences of context from that
+   cell's output; do not copy G-AUDIT-FINDING, do not parse
+   `*.html`, and do not paste iframes (site build injects those). If
+   no subsection has a source, skip the Results section.
 4. Perform a full Backlog rescan. Resolve rows the run answered or
    killed, preserving stable indices. Then route sourcing explicitly:
    report-derived ideas → load `iterate-from-skore` only if
@@ -134,6 +151,9 @@ locator.
 - Do not invent metrics.
 - Do not derive, shorten, or merge G-AUDIT-FINDING with the
   headline metric. Copy each into its owned field.
+- Do not parse `scratch/results/<stem>/*.html` when writing
+  `## Results`. Summarize from the digest, or from `report.txt` on
+  the evaluation-only path.
 - Do not paste a `JOURNAL.md` body or recreate the index from
   memory.
 - Do not mark `done` while smoke is red.

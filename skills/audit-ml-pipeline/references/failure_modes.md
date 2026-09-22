@@ -32,10 +32,10 @@ Agent feature not installed in the env the runner is invoked from.
 
 ## Cell renders as `<Display object at 0x…>` in the digest
 
-The cell called a `*.summarize()` accessor without `.frame()`. The
-`__repr__` of skore's `Display` classes is the bare object-at-address;
-the runner can't extract a useful text representation. Edit the cell
-to chain `.frame()`:
+Current skore Displays render themselves as text, so the bare
+expression is normally enough. Seeing the object-at-address means
+this skore predates that, and the runner has nothing to capture.
+Chain `.frame()` on the affected cell only:
 
 ```python
 report.metrics.summarize().frame()

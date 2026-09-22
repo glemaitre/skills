@@ -15,6 +15,10 @@
 - Confirm the report with `project.summarize()` and load it with
   `project.get(id)`.
 - Render checks and metrics into the audit digest.
+- Write `scratch/results/<stem>/{report,checks,metrics}.html`; leave
+  the bare Display last on checks and metrics, with no text snapshot.
+- Print a `help()` tree per namespace for the Additional report view
+  menu.
 - Derive G-AUDIT-FINDING from the digest.
 - Ask Additional report view / Custom query / Custom plot / Close
   audit in that order; return the digest, finding, and normalized
@@ -102,19 +106,27 @@
 > Add another audit view before we close.
 
 **Assumed workspace state:**
-- The initial audit digest exists.
-- The report API lookup confirms one task-compatible extra view.
+- The initial audit digest exists, including a `help()` tree per
+  namespace.
+- A tree's `Displays` group lists one extra view; `api get` confirms
+  that method.
 
 **Must do:**
 - Present Additional report view / Custom query / Custom plot /
   Close audit in that exact order.
-- Confirm the selected accessor with `api get`, append it to the
-  same `audit/<stem>.py`, run style + cells run, and overwrite the
-  digest.
-- Recompute G-AUDIT-FINDING and present the same gate again.
+- Offer only accessor names from this turn's `Displays` groups — not
+  a remembered Display catalog.
+- Confirm the selected accessor with `api get`, append it below
+  `## Core audit complete` on the same `audit/<stem>.py`, write
+  `scratch/results/<stem>/<slug>.html`, leave the bare Display last,
+  run style + cells run, and overwrite the digest.
+- Recompute G-AUDIT-FINDING from checks and metrics only and
+  present the same gate again.
 
 **Must NOT do:**
 - Guess an accessor or show unavailable disabled choices.
 - Convert notebooks, build the site, run git end-turn,
   record-outcome, or return to the dispatcher before Close audit.
 - Call `evaluate` or `put`.
+- Name ROC / confusion_matrix / permutation_importance from docs
+  memory when they are absent from this turn's `help()` trees.

@@ -184,6 +184,18 @@ read the report. The pipeline declaration is out of scope (see
 - **Don't filter warnings.** No `warnings.filterwarnings(...)`
   around `skore.evaluate(...)` or the CV splitter unless the user
   explicitly asks. See `python -m skore_skills style` § Stop conditions.
+- **Save a report snapshot under `scratch/results/<stem>/`.** In
+  `experiments/NN_*.py`, after the bare `report` display and any
+  requested `metrics.add` / `checks.add`, write
+  `report._repr_html_()` to `scratch/results/<stem>/report.html`
+  and `repr(report)` to `scratch/results/<stem>/report.txt` using
+  `PROJECT_ROOT`. Confirm `_repr_html_` with
+  `python -m skore_skills api get`. This is display output only —
+  never `evaluate` or `put` from scratch. The `.html` is what site
+  build embeds under the design note's Results section. The `.txt`
+  exists because a script has no cell digest: it is what
+  `manage-ml-backlog` summarizes when the audit is skipped. Never
+  summarize by parsing the HTML.
 - **`skore.evaluate(...)` and `project.put(...)` live only in
   `experiments/NN_*.py`.** The experiment script is the sole
   producer of a report in the workspace's skore Project.

@@ -120,7 +120,8 @@ has created the shell, then stop for explicit design approval.
    G-AUDIT-FINDING. Audit skipped →
    `n/a — audit not run`. Else one-line skip; do not write History from this
    meta. It writes the `JOURNAL.md` History row and design-note
-   Status block, then returns; it does not rescan the Backlog or
+   Status block plus `## Results` from the digest text,
+   then returns; it does not rescan the Backlog or
    open the next-lever menu. Never mark `done` while smoke is red.
    Audit-skipped runs still record the locator; missing headline
    becomes `n/a`, never an invented metric. The Evaluate

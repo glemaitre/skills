@@ -7,8 +7,9 @@ the user message. Pass = every Must do ticked, zero Must NOT violated.
 
 The skill's only input is the audit digest at
 `scratch/audit/<stem>/audit.md` rendered by `audit-ml-pipeline`. Its
-`## Checks summary` rows come from `report.checks.summarize().frame()`
-and carry `code` / `severity` / `documentation_url`. Backlog rows cite
+`## Checks summary` is grouped prose from `repr(checks)`:
+`Issues:` / `Tips:` lines look like `- [SKD003] <title>. … Read
+more about this here: <url>.` Backlog rows cite
 `audit:<stem>:checks.<code>`. The skill never re-opens the Project and
 never calls `report.*` accessors.
 
@@ -24,20 +25,22 @@ never calls `report.*` accessors.
 > ```
 > ## Checks summary
 >
-> | code   | severity | description                                             | documentation_url                        |
-> |--------|----------|---------------------------------------------------------|------------------------------------------|
-> | SKD001 | passed   | No constant features detected                             | https://docs.skore.probabl.ai/c/SKD001   |
-> | SKD003 | issue    | Systematic residual bias in the top target bin            | https://docs.skore.probabl.ai/c/SKD003   |
-> | SKD007 | issue    | Predicted-interval coverage below nominal in bin 4        | https://docs.skore.probabl.ai/c/SKD007   |
-> | SKD012 | tip      | One fold's error is far from the cross-fold mean          | https://docs.skore.probabl.ai/c/SKD012   |
-> | SKD019 | tip      | A single feature dominates permutation importance         | https://docs.skore.probabl.ai/c/SKD019   |
+> Checks summary: 2 issue(s), 2 tip(s), 1 passed, 0 not applicable, 0 skipped, 0 ignored.
+> Issues:
+> - [SKD003] Systematic residual bias in the top target bin. Read more about this here: https://docs.skore.probabl.ai/c/SKD003.
+> - [SKD007] Predicted-interval coverage below nominal in bin 4. Read more about this here: https://docs.skore.probabl.ai/c/SKD007.
+> Tips:
+> - [SKD012] One fold's error is far from the cross-fold mean. Read more about this here: https://docs.skore.probabl.ai/c/SKD012.
+> - [SKD019] A single feature dominates permutation importance. Read more about this here: https://docs.skore.probabl.ai/c/SKD019.
+> Passed:
+> - [SKD001] No constant features detected
 >
 > ## Metrics summary
 >
-> | metric | value |
-> |--------|-------|
-> | RMSE   | 0.081 |
-> | R2     | 0.912 |
+>               dummyregressor_mean  dummyregressor_std
+> metric
+> rmse                     0.081                0.000
+> r2                       0.912                0.000
 > ```
 
 **Assumed workspace state:**
@@ -51,10 +54,10 @@ never calls `report.*` accessors.
   B2 (Source: `user`).
 
 **Must do:**
-- Emit one Backlog candidate per `issue` / `tip` row (SKD003, SKD007,
-  SKD012, SKD019) and none for the `passed` row.
+- Emit one Backlog candidate per `Issues:` / `Tips:` line (SKD003, SKD007,
+  SKD012, SKD019) and none for the `Passed:` line.
 - Cite each row's `Source` as `audit:02_target_transform:checks.<code>`.
-- If `documentation_url` pages cannot be fetched this turn, mark
+- If the documentation URLs cannot be fetched this turn, mark
   each `Item` **provisional** **or** say the page was not fetched.
   Do not require naming every URL as the Item source when the page
   is unreachable. `Source` as `audit:<stem>:checks.<code>` is enough.
@@ -109,9 +112,9 @@ never calls `report.*` accessors.
 
 **Assumed workspace state:**
 - `skore` installed at 0.18.0.
-- `scratch/audit/03_feature_engineering/audit.md` is on disk. Every
-  row in its `## Checks summary` has severity `passed`; there are no
-  `issue` or `tip` rows.
+- `scratch/audit/03_feature_engineering/audit.md` is on disk.
+  Every line under `Issues:` / `Tips:` in `## Checks summary` is
+  absent; only Passed / Not Applicable checks appear.
 
 **Must do:**
 - Return **zero** Backlog candidate rows.
@@ -137,23 +140,24 @@ never calls `report.*` accessors.
 > ```
 > ## Checks summary
 >
-> | code   | severity | description                                          | documentation_url                      |
-> |--------|----------|------------------------------------------------------|----------------------------------------|
-> | SKD004 | issue    | Residual spread varies sharply across groups          | https://docs.skore.probabl.ai/c/SKD004 |
-> | SKD007 | issue    | Right-tail coverage below nominal                     | https://docs.skore.probabl.ai/c/SKD007 |
-> | SKD012 | issue    | One fold's error is far from the cross-fold mean      | https://docs.skore.probabl.ai/c/SKD012 |
-> | SKD021 | tip      | Unmodelled feature-by-group interaction detected      | https://docs.skore.probabl.ai/c/SKD021 |
-> | SKD030 | tip      | Fold sizes are strongly imbalanced under the splitter | https://docs.skore.probabl.ai/c/SKD030 |
+> Checks summary: 3 issue(s), 2 tip(s), 0 passed, 0 not applicable, 0 skipped, 0 ignored.
+> Issues:
+> - [SKD004] Residual spread varies sharply across groups. Read more about this here: https://docs.skore.probabl.ai/c/SKD004.
+> - [SKD007] Right-tail coverage below nominal. Read more about this here: https://docs.skore.probabl.ai/c/SKD007.
+> - [SKD012] One fold's error is far from the cross-fold mean. Read more about this here: https://docs.skore.probabl.ai/c/SKD012.
+> Tips:
+> - [SKD021] Unmodelled feature-by-group interaction detected. Read more about this here: https://docs.skore.probabl.ai/c/SKD021.
+> - [SKD030] Fold sizes are strongly imbalanced under the splitter. Read more about this here: https://docs.skore.probabl.ai/c/SKD030.
 > ```
 
 **Assumed workspace state:**
 - `scratch/audit/04_grouped_cv/audit.md` on disk with the 5 actionable
-  rows above.
+  `Issues:` / `Tips:` lines above.
 - `JOURNAL.md` Backlog has 1 row with Source `user` that wouldn't
   match any of the 5 new candidates' Source citations.
 
 **Must do:**
-- Emit **all 5** Backlog-candidate rows (one per `issue` / `tip` row).
+- Emit **all 5** Backlog-candidate rows (one per `Issues:` / `Tips:` line).
 - Cite each row's `Source` as `audit:04_grouped_cv:checks.<code>`.
 - Summary highlights the top 2-3 *by expected payoff*, but does
   NOT collapse to a single recommendation.
@@ -179,12 +183,12 @@ never calls `report.*` accessors.
 > ```
 > ## Checks summary
 >
-> | code   | severity | description                                        | documentation_url                      |
-> |--------|----------|----------------------------------------------------|----------------------------------------|
-> | SKD003 | issue    | Systematic residual bias in the top target bin      | https://docs.skore.probabl.ai/c/SKD003 |
-> | SKD007 | issue    | Predicted-interval coverage below nominal in bin 4  | https://docs.skore.probabl.ai/c/SKD007 |
-> | SKD021 | issue    | Unmodelled feature-by-feature interaction detected  | https://docs.skore.probabl.ai/c/SKD021 |
-> | SKD044 | issue    | A target-derived column appears among the predictors| https://docs.skore.probabl.ai/c/SKD044 |
+> Checks summary: 4 issue(s), 0 tip(s), 0 passed, 0 not applicable, 0 skipped, 0 ignored.
+> Issues:
+> - [SKD003] Systematic residual bias in the top target bin. Read more about this here: https://docs.skore.probabl.ai/c/SKD003.
+> - [SKD007] Predicted-interval coverage below nominal in bin 4. Read more about this here: https://docs.skore.probabl.ai/c/SKD007.
+> - [SKD021] Unmodelled feature-by-feature interaction detected. Read more about this here: https://docs.skore.probabl.ai/c/SKD021.
+> - [SKD044] A target-derived column appears among the predictors. Read more about this here: https://docs.skore.probabl.ai/c/SKD044.
 > ```
 
 **Assumed workspace state:**
@@ -194,7 +198,7 @@ never calls `report.*` accessors.
   of the same digest, with Sources
   `audit:02_target_transform:checks.SKD003`,
   `audit:02_target_transform:checks.SKD007`,
-  `audit:02_target_transform:checks.SKD012`. Two of the 4 rows
+  `audit:02_target_transform:checks.SKD012`. Two of the 4 lines
   (SKD003, SKD007) match B3 and B4 by Source citation; the other two
   (SKD021, SKD044) are new.
 
