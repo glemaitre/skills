@@ -137,7 +137,8 @@ has created the shell, then stop for explicit design approval.
    <stem>`. Consent JSON is authoritative, not the user's wording
    alone. Missing `evaluate-ml-pipeline` → one-line skip. Do not
    invent that skill's steps.
-3. After a successful evaluate: run
+3. After a successful dispatched evaluate (locator returned):
+   this dispatcher runs
    `python -m skore_skills loop artifacts --stem <stem>`. `audit` →
    load `audit-ml-pipeline` only if
    `status.skills.audit-ml-pipeline` is true (same stem). Missing

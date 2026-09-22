@@ -52,8 +52,9 @@ Columns:
   - #      — stable index (B1, B2, ...); don't renumber on removal.
   - Item   — one-line description of the idea.
   - Source — where it came from, e.g. a finding from a prior
-             experiment's report (`skore:<stem>`), a synthesized idea
-             (`my-pick:<stem>`), or a user request (`user`).
+             experiment's report (`audit:<stem>:checks.<code>`), a
+             synthesized idea (`my-pick:<stem>`), or a user request
+             (`user`).
 
 When an item becomes a design note, remove its row here and add the
 experiment to History above.
@@ -61,5 +62,5 @@ experiment to History above.
 
 | # | Item | Source |
 |---|---|---|
-| <!-- B1 --> | <!-- "investigate target-bin>0.95 residual bias via target transform" --> | <!-- `skore:01_baseline` --> |
+| <!-- B1 --> | <!-- "investigate target-bin>0.95 residual bias via target transform" --> | <!-- `audit:01_baseline:checks.SKD003` --> |
 | <!-- B2 --> | <!-- "audit hourly-vs-15min data resolution split — likely fix for fold variance" --> | <!-- `my-pick:02_calendar_features` --> |

@@ -121,7 +121,8 @@ Short story: source → destination, whether policy changed, and
 the `skore sync` table or `No reports to synchronize.` Do not
 dump experiment files.
 
-Then `python -m skore_skills git end-turn --stage evaluate`. If
+Then `python -m skore_skills git end-turn --stage evaluate`
+(the persist bucket for this work; this is not a CV run). If
 JSON `action` is `invoke`, load `persist-ml-git` only if
 `status.skills.persist-ml-git` is true and stop; that skill
 returns to triage. If persist is missing, name the pending

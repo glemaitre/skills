@@ -27,7 +27,6 @@
 **Must NOT do:**
 - Start designing the next experiment.
 - Claim to have loaded or executed every skill.
-- Invent a deleted iterate skill as the session owner.
 - Auto-load a stage skill without asking.
 - Ask only stay / go deeper / next stage without naming entry
   skills.

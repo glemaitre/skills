@@ -151,7 +151,9 @@ locator.
 ## Stop conditions
 
 - Do not design or implement the next experiment in this turn.
-- Do not dispatch setup, model, or audit by skill id.
+- Do not dispatch setup or audit by skill id. Returning a
+  selected row or confirmed proposal to `model-ml-pipeline` is
+  required.
 - In model-entry selection mode, do not invent a Backlog row or
   remove it before the paired design note exists.
 - Do not invent metrics.

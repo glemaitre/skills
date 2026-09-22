@@ -5,7 +5,7 @@
       "id": 1,
       "title": "Ambiguous capability request",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.\n- No `.skore` file.\n- `status.data_analysis` is `missing`.\n- `status.skills` reports the usual entry skills `true`.]\n\nWhat can you help me with on this machine learning project?",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports` if installed). One pick. - Name `explore-ml-data` as the recommended next stage; do not auto-load it. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill. - Invent a deleted iterate skill as the session owner.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports` if installed). One pick. - Name `explore-ml-data` as the recommended next stage; do not auto-load it. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill. - Auto-load a stage skill without asking.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
@@ -14,7 +14,6 @@
         "Do not treat the missing `.skore` as an empty project despite the existing scaffold.",
         "The response does NOT: Start designing the next experiment.",
         "The response does NOT: Claim to have loaded or executed every skill.",
-        "The response does NOT: Invent a deleted iterate skill as the session owner.",
         "The response does NOT: Auto-load a stage skill without asking.",
         "The response does NOT: Ask only stay / go deeper / next stage without naming entry skills.",
         "The response does NOT: Put `evaluate-ml-pipeline` or `audit-ml-pipeline` on the uncertain entry board."

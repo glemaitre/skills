@@ -169,7 +169,8 @@ never calls `report.*` accessors.
   actionable rows.
 - Write "I recommend running X next" as a single-pick conclusion.
 - Author the design note for the picked candidate (out of scope —
-  parent does that after the user picks `B<N>`).
+  parent records the Backlog row; `model-ml-pipeline` authors the
+  note after the user picks `B<N>`).
 
 ---
 

@@ -7,17 +7,22 @@ description: >
   explicit report classes when needed), which cross-validator to pick
   from scikit-learn's catalogue, how to consume the structural
   metadata (`groups`, `times`, …) attached at build time via
-  `.skb.mark_as_X(split_kwargs=...)`. Stops at "what does the report
-  say". Defaults (metrics, plots, SKD checks) come from skore; only
-  override metrics or add custom checks on explicit user request.
+  `.skb.mark_as_X(split_kwargs=...)`. Writes `skore.evaluate` and
+  the persisted-report locator. When `model-ml-pipeline` dispatched
+  this turn, return after the locator — the dispatcher owns
+  `loop artifacts`, audit, record-outcome, convert, site, and git.
+  Standalone also owns that evaluate-stage close. Defaults
+  (metrics, plots, SKD checks) come from skore; only override
+  metrics or add custom checks on explicit user request.
 
   TRIGGER when: code calls `cross_val_score`, `cross_validate`,
   `classification_report`, or any handwritten metric print
   (`print(mean_squared_error(...))`); code calls
   `.skb.cross_validate(...)` (route through skore for richer output);
   user asks how to score, evaluate, or compare a single learner;
-  user asks how to pick a cross-validator; user wants to see a
-  report / metrics / diagnostic plots for a fitted learner.
+  user asks how to pick a cross-validator; user asks to run
+  evaluation / CV / metrics on a learner. Narrative reads of an
+  already-persisted report belong to `audit-ml-pipeline`.
 
   STOP when `python -m skore_skills status` shows no scaffold
   (`has_src` and `has_journal` both false), no declared learner,
@@ -625,28 +630,30 @@ API CLI is only for the signature after the name.
 ## End of turn
 
 **G-REPORT-LOCATOR.** After a successful `put`, this step is
-mandatory and runs first — before returning to the dispatcher,
-record-outcome, convert, site build, or `git end-turn`. Write
+mandatory and runs first — before returning to the dispatcher or
+running a standalone close. Write
 `scratch/results/<stem>/locator.txt`, then run
 `python -m skore_skills loop locator --stem <stem>` and paste
 JSON `locator` verbatim. Missing locator is the explicit
 string `n/a — backend did not expose a locator`, never silence.
-Hand the same value to `audit-ml-pipeline` / `manage-ml-backlog`
-record-outcome. When returning to `model-ml-pipeline`, pass it up;
-do not drop it because the dispatcher owns convert. Do not invent a
-URL here — the after-`put` rule above is the only source.
+Do not invent a URL here — the after-`put` rule above is the
+only source.
 
-Then run `python -m skore_skills loop artifacts --stem <stem>`.
+When `model-ml-pipeline` dispatched this turn, pass JSON
+`locator` up and **return immediately**. Do not run
+`loop artifacts`. Do not load `audit-ml-pipeline`. Do not run
+record-outcome, convert, site, or `git end-turn`. The dispatcher
+owns that close. Do not preview it.
+
+Otherwise this skill owns the close. Run
+`python -m skore_skills loop artifacts --stem <stem>`.
 Treat JSON `action` as authoritative:
 - `stop` / `evaluate_incomplete` — do not dispatch audit or
   record-outcome; name the missing file.
 - `audit` — load `audit-ml-pipeline` when that skill is installed.
 - `record` — skip audit; go to record-outcome.
 
-When `model-ml-pipeline` dispatched this turn, return to it — the
-dispatcher owns record-outcome / convert / site / `git end-turn`
-and the User-facing close. Do not preview that close.
-Otherwise this skill owns the close and runs the block below.
+Then run the block below.
 
 ### User-facing close
 

@@ -27,7 +27,8 @@
   Modify / Stop) before full-dataset evaluation.
 - Preserve the matching experiment stem.
 - Name `python -m skore_skills git end-turn --stage implement`
-  after the implement loop.
+  after the implement loop (after HITL, evaluate, audit, and
+  record-outcome — not before the Evaluate pick).
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**

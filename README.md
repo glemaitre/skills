@@ -4,7 +4,7 @@ A set of skills to steer your AI-assisted machine learning experiments.
 The skills help you:
 
 - build your machine learning pipeline with core data science libraries
-  (e.g. scikit-learn, skrub, skore, pandas, polar) while ensuring
+  (e.g. scikit-learn, skrub, skore, pandas, polars) while ensuring
   your agent follows correct methodologies
 - evaluate and store your results so you can easily audit and get insights from them
 - connect your agent to [Skore Hub](https://skore.probabl.ai/) to get a comprehensive view of
@@ -64,7 +64,7 @@ companion:
 skore skills install setup  # workspace, environment, git, export
 skore skills install data_analysis  # data exploration
 skore skills install model  # build, evaluate, smoke, audit
-skore skills install loop   # triage, backlog, audit, sourcing, build, evaluate, smoke
+skore skills install loop   # triage, explore, model, build, smoke, evaluate, audit, backlog, export
 skore skills install export  # notebooks and documentation site
 ```
 
@@ -111,7 +111,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 | Skill | Description |
 | --- | --- |
-| [triage-ml-task](skills/triage-ml-task/SKILL.md) | Own the canonical loop and ask one next-stage question. |
+| [triage-ml-task](skills/triage-ml-task/SKILL.md) | Session owner: list installed entry skills and ask which to run. |
 | [setup-ml-project](skills/setup-ml-project/SKILL.md) | Coordinate workspace, environment, and git setup. |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
 | [setup-python-env](skills/setup-python-env/SKILL.md) | Detect the env manager, persist managed vs user-managed, and bootstrap agent tools. |

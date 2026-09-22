@@ -25,10 +25,10 @@ description: >
 
   SKIP when: the previous experiment hasn't run yet (no audit
   digest on disk); the user has a concrete modelling idea (use
-  `iterate-from-user`); the task is the *mechanics* of running /
-  opening a report — route to `evaluate-ml-pipeline`; the user
+  `iterate-from-user`); the task is the *mechanics* of running
+  evaluation — route to `evaluate-ml-pipeline`; the user
   wants a narrative read of one specific section of the report
-  (route to `evaluate-ml-pipeline`).
+  (route to `audit-ml-pipeline`).
 
   HOW TO USE: read the existing
   `scratch/audit/<stem>/audit.md` digest as text — do NOT re-open
@@ -226,17 +226,20 @@ Summary:
 
 ## Companion skills
 
-- **`manage-ml-backlog`** — the caller; owns the design notes
-  (including `JOURNAL.md`).
+- **`manage-ml-backlog`** — the caller; writes returned candidate
+  rows into `JOURNAL.md` Backlog. It does not draft
+  `journal/NN_*.md`.
+- **`model-ml-pipeline`** — owns design-note creation and
+  approval after the user picks a `B<N>` row.
 - **`audit-ml-pipeline`** — **the producer of the digest this
   skill reads**. The two skills share the same diagnostic surface
   but have opposite directions: `audit-ml-pipeline` opens the
   Project and renders the digest (write side); `iterate-from-skore`
   consumes the digest as text and follows the check doc URLs (read
-  side).
-- **`evaluate-ml-pipeline`** — for "what does the report say"
-  before "what should we try next". The narrative read side; not
-  used by this skill.
+  side). Narrative reads of a past report also route here, not to
+  evaluate.
+- **`evaluate-ml-pipeline`** — run evaluation / CV on a learner;
+  not used by this skill.
 - **`iterate-from-user`** — the sibling sourcing strategy; sources
   from the user (article, resource, or free text) when the
   digest's findings aren't the right starting point.

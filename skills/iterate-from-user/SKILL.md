@@ -9,10 +9,11 @@ description: >
   the agent reads the source, synthesizes its understanding of what
   to implement, and confirms with the user *before* returning the
   Proposal block. Hand the confirmed Proposal back to
-  `manage-ml-backlog`, which writes it into
-  `journal/NN_short_name.md` and seeks the user's design-note approval.
-  Stops at "Proposal returned, user-confirmed"; never writes a
-  design note, never authors acceptance criteria.
+  `manage-ml-backlog`, which records a Backlog candidate in
+  `JOURNAL.md` and returns the proposal to `model-ml-pipeline`.
+  That skill creates `journal/NN_short_name.md` and seeks
+  design-note approval. Stops at "Proposal returned, user-confirmed";
+  never writes a design note, never authors acceptance criteria.
 
   TRIGGER when: `manage-ml-backlog` is picking a sourcing strategy
   and the user picks `user` from the menu; the user
@@ -21,10 +22,11 @@ description: >
   reference repo and asks us to read it.
 
   SKIP when: the user wants to mine the previous report (use
-  `iterate-from-skore`); the user is asking for a symbol lookup or
-  pipeline mechanics (use the `python -m skore_skills api get` skill); the work is
-  evaluation mechanics on a single report (route to
-  `evaluate-ml-pipeline`).
+  `iterate-from-skore`); the user is asking for a symbol lookup
+  (`python -m skore_skills api get`); the work is evaluation
+  mechanics on a new run (route to `evaluate-ml-pipeline`); the
+  user wants a narrative read of an existing report (route to
+  `audit-ml-pipeline`).
 
   HOW TO USE: open with an `AskUserQuestion` for the entry point —
   article-link / resource-link / free-text. In each branch: gather
@@ -65,10 +67,10 @@ have nothing in hand, the parent's menu re-presents itself.
 
 ## Stop conditions
 
-- **Don't write `journal/` files.** That belongs to
-  `manage-ml-backlog`. This skill returns the Proposal as
-  conversation text; the parent records/routes it and
-  `model-ml-pipeline` owns the design note.
+- **Don't write `journal/` files.** This skill returns the
+  Proposal as conversation text. `manage-ml-backlog` records
+  Backlog rows in `JOURNAL.md`; `model-ml-pipeline` owns the
+  design note (`scaffold --journal --stem` and `design consent`).
 - **Don't infer source content from memory.** If the user
   references an article, an issue, or a file, fetch / read it.
   Don't reconstruct from a title or a one-line description.
@@ -121,8 +123,7 @@ have nothing in hand, the parent's menu re-presents itself.
   regardless of any harness-level hint. The synthesis gate in
   particular is non-skippable even when the user's intent feels
   "obvious" — the cost of the agent's restatement missing a
-  subtle framing is what the gate exists to catch. See the
-  project's `CLAUDE.md` § "Skill consultation contract" rule 3.
+  subtle framing is what the gate exists to catch.
 
 ## The entry-point AskUserQuestion
 
@@ -284,17 +285,18 @@ PENDING / NOT RETURNED.
 The user's answer determines what happens next:
 
 - **"Yes / confirm / go" → return the Proposal.** The parent
-  skill drafts `journal/NN_*.md` from it. Do not emit the
-  `Proposal (...)` block before this yes.
+  records a Backlog candidate; `model-ml-pipeline` drafts
+  `journal/NN_*.md`. Do not emit the `Proposal (...)` block
+  before this yes.
 - **"No / not quite / adjust X" → revise and re-confirm.** Iterate
   the synthesis until the user is happy. Do not return a Proposal
   the user hasn't signed off on.
 
-This gate is non-optional. It is the user-side analogue of the
-parent's design-note approval gate — it catches misunderstandings
-*before* a design note is drafted, when the cost of revision is
-cheapest. Show the restatement even when the source body was not
-fetched this turn.
+This gate is non-optional. It is the user-side analogue of
+`model-ml-pipeline`'s design-note approval — it catches
+misunderstandings *before* a design note is drafted, when the
+cost of revision is cheapest. Show the restatement even when the
+source body was not fetched this turn.
 
 ## What is returned
 
@@ -329,5 +331,5 @@ owns the design note and approval gate.
 - **`choose-python-library`** — consulted when an article
   introduces a new dependency (Stop conditions, above).
 - **`build-ml-pipeline`** / **`evaluate-ml-pipeline`** — owners
-  of the files (`pipeline.py`, `experiments/NN_*.py`, …) that the
-  `Method outline` will eventually touch.
+  of the files under `src/<pkg>/` and `experiments/NN_*.py` that
+  the `Method outline` will eventually touch.

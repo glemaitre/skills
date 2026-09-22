@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "51a6c5845371dfcde878c26144a45f0c91d167b957fada73410f16c390e9ed5c",
+  "catalog_hash": "b3cfcdd2d7002623ee488b088fda7a905757903cff702d3743653eacfb5a544c",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,15 +30,15 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "7ebb1b03c988df1bd97704ec09b90122bed3a2780d909c77aa213fd262634514"
+      "hash": "774390a3ea8a399a78cbc1c821b1526f57ed2e30d08ee869ab65e03e82148986"
     },
     {
       "id": "smoke-test-ml-pipeline",
       "path": "skills/smoke-test-ml-pipeline",
       "title": "Smoke Test ML Pipeline",
       "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
-      "category": "orchestration",
-      "subcategory": "test-strategies",
+      "category": "methodology",
+      "subcategory": null,
       "hash": "5464f98cf1216c36b3c270902f9041ccb023cd275254720e9dd69b11bbdb8219"
     },
     {
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "2dfbb4d15f61d8001b49d857cff402d593392d9b78ce24051f796274e3a4037f"
+      "hash": "30da926f2d10912049d67757e125093d646069a0e8c4ca1b7bcdfd096b31db2f"
     },
     {
       "id": "iterate-from-skore",
@@ -66,7 +66,7 @@
       "summary": "Use skore to run diagnostics and checks that can be reported and addressed in the next experiment.",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "443436843b3fe8d85b222a3040fdd553b9192600c311f9816f32be2447e1fcef"
+      "hash": "a84d1907568f6ce282de519f10fdb34d4de5c9ca823921bea46e1a7521a7aeb7"
     },
     {
       "id": "iterate-from-user",
@@ -75,7 +75,7 @@
       "summary": "As a user be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo).",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "9116ef1ddededaa42630ade34679b16f6d95b357b496517328f48d5672fbd846"
+      "hash": "cfe28f2d2d72f490998cc6ce8a8e4b937b53a90c4609647cbad08f5bcacb1273"
     },
     {
       "id": "organize-ml-workspace",
@@ -93,7 +93,7 @@
       "summary": "Opinionated one-library-per-job Python stack, organized into mandatory / user-choice / optional / transitive tiers.",
       "category": "reference",
       "subcategory": null,
-      "hash": "5143c7e6882c30fac73a1ddf57e8745573b56fb42816e1f503668798456919ce"
+      "hash": "5e86bd8d17eb09d595fb74276a1c3bbd34c75fba5e9f620157a56d2076f0beb9"
     },
     {
       "id": "triage-ml-task",
@@ -102,7 +102,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "b52b7181638e0a13ecb23a323a443287c8cdbdd3b148c1258973d38229893bbe"
+      "hash": "0c0b61547c9ba506b9c6a5be89cc9403705c047036e9389f22da85f6349dd867"
     },
     {
       "id": "setup-ml-project",
@@ -138,7 +138,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "a3e351f2f87dac125aab0267a3081c013d47aea87a839685262075bb14f99e45"
+      "hash": "cf3f220f696cd6cc911e0e0d56f4cc40abc9bc2bce4a865f18aa51f2874e7772"
     },
     {
       "id": "choose-python-library",
@@ -228,7 +228,7 @@
       "summary": "Copy skore reports between local, Hub, and MLflow, and optionally switch the upload destination.",
       "category": "action",
       "subcategory": null,
-      "hash": "720aaf4bd0bad534ad380be1d81e051bf0c6a7823a1e9fa50bf8e187bc20d4cc"
+      "hash": "3497592454b399fa1fb685228a0b69efcef069053ba2b7d2e2131ca0f90eff74"
     }
   ],
   "workflows": [
@@ -311,7 +311,10 @@
         "plot-ml-figure",
         "add-python-package",
         "persist-ml-git",
-        "export-ml-project"
+        "explore-ml-data",
+        "export-ml-project",
+        "export-ml-notebook",
+        "export-ml-site"
       ]
     },
     {

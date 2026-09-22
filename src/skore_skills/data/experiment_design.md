@@ -33,7 +33,7 @@ build on, the finding from a prior experiment's report that prompted
 this, or the backlog item being promoted.
 -->
 
-- **Sourcing strategy:** <user | my-pick | skore:<stem> | backlog:B<N>>
+- **Sourcing strategy:** <user | my-pick | audit:<stem>:checks.<code> | backlog:B<N>>
 - **Source(s):**
   <!--
   One line is enough for most cases. For an article, paste the exact
@@ -85,7 +85,7 @@ run (to interpret the headline result honestly).
   -->
 - **Approved by user on:** <date or n/a>
 - **Headline result:** <fill in after run, or `n/a — abandoned: <reason>`>
-- **Persisted report:** <backend locator after `project.put`, or `n/a — not persisted`>
+- **Persisted report:** <backend locator after `project.put`, or `n/a — backend did not expose a locator`>
 - **Audit findings:** n/a — audit not run
 - **Implication for next iteration:** <fill in after run — what it suggests to try next. For abandonment: one line on what the abandonment teaches (e.g., "rules out monotonic-NN direction without paid GPU env")>
 

@@ -11,10 +11,14 @@
 - Audit digest exists with a headline ROC-AUC.
 - Smoke tests passed.
 - History row for `01_baseline` is `running`.
+- G-REPORT-LOCATOR and G-AUDIT-FINDING are available from the digest.
 
 **Must do:**
 - Name `python -m skore_skills status`.
-- Copy the headline result into the History row and ask triage.
+- Copy the headline result, locator, and G-AUDIT-FINDING into
+  History / the design-note Status block.
+- Rescan the Backlog, then ask whether to draft from the
+  refreshed Backlog or stop. Do not ask triage which lever to take.
 - Name `python -m skore_skills git end-turn --stage backlog`.
 - If that command returns `invoke`, load `persist-ml-git`.
 
@@ -34,11 +38,11 @@
 - One `done` History row and two Backlog rows `B1`, `B2`.
 
 **Must do:**
-- Surface Backlog options and ask triage which lever to take.
+- Surface Backlog options and ask whether to draft from the
+  Backlog or stop.
 
 **Must NOT do:**
 - Silently pick `B1`.
-- Invent a deleted iterate skill as the session owner.
 - Start `build-ml-pipeline`.
 
 ---
@@ -61,7 +65,6 @@
 **Must NOT do:**
 - Paste a `JOURNAL.md` body, a markdown fence of that file, or
   History/Backlog tables reconstructed from memory.
-- Invent a deleted iterate skill.
 - Draft or implement an experiment in this turn.
 
 ---
@@ -99,7 +102,7 @@
 - `model choices` returned B1 and B4 in that order.
 - B1 Item is “try robust scaling”, Source is `user`.
 - B4 Item is “inspect residual seasonality”, Source is
-  `skore:02_baseline`.
+  `audit:02_baseline:checks.SKD003`.
 
 **Must do:**
 - Present exactly B1 and B4 and ask for one pick.

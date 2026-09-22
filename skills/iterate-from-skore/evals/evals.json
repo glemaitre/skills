@@ -64,7 +64,7 @@
       "id": 4,
       "title": "Don't pick a winning finding",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `scratch/audit/04_grouped_cv/audit.md` on disk with the 5 actionable\n  `Issues:` / `Tips:` lines above.\n- `JOURNAL.md` Backlog has 1 row with Source `user` that wouldn't\n  match any of the 5 new candidates' Source citations.]\n\nThe 04_grouped_cv audit just landed. Mine it and tell me which one\nI should run next. Here's the digest:\n\n```\n## Checks summary\n\nChecks summary: 3 issue(s), 2 tip(s), 0 passed, 0 not applicable, 0 skipped, 0 ignored.\nIssues:\n- [SKD004] Residual spread varies sharply across groups. Read more about this here: https://docs.skore.probabl.ai/c/SKD004.\n- [SKD007] Right-tail coverage below nominal. Read more about this here: https://docs.skore.probabl.ai/c/SKD007.\n- [SKD012] One fold's error is far from the cross-fold mean. Read more about this here: https://docs.skore.probabl.ai/c/SKD012.\nTips:\n- [SKD021] Unmodelled feature-by-group interaction detected. Read more about this here: https://docs.skore.probabl.ai/c/SKD021.\n- [SKD030] Fold sizes are strongly imbalanced under the splitter. Read more about this here: https://docs.skore.probabl.ai/c/SKD030.\n```",
-      "expected_output": "Behavioural response satisfying: - Emit **all 5** Backlog-candidate rows (one per `Issues:` / `Tips:` line). - Cite each row's `Source` as `audit:04_grouped_cv:checks.<code>`. - Summary highlights the top 2-3 *by expected payoff*, but does NOT collapse to a single recommendation. It must NOT: - Emit only one Backlog row when the digest surfaced multiple actionable rows. - Write \"I recommend running X next\" as a single-pick conclusion. - Author the design note for the picked candidate (out of scope \u2014 parent does that after the user picks `B<N>`).",
+      "expected_output": "Behavioural response satisfying: - Emit **all 5** Backlog-candidate rows (one per `Issues:` / `Tips:` line). - Cite each row's `Source` as `audit:04_grouped_cv:checks.<code>`. - Summary highlights the top 2-3 *by expected payoff*, but does NOT collapse to a single recommendation. It must NOT: - Emit only one Backlog row when the digest surfaced multiple actionable rows. - Write \"I recommend running X next\" as a single-pick conclusion. - Author the design note for the picked candidate (out of scope \u2014 parent records the Backlog row; `model-ml-pipeline` authors the note after the user picks `B<N>`).",
       "files": [],
       "expectations": [
         "Emit **all 5** Backlog-candidate rows (one per `Issues:` / `Tips:` line).",
@@ -73,7 +73,7 @@
         "Defer the \"which one to run\" decision back to the user via the parent's `B<N>` pick mechanism.",
         "The response does NOT: Emit only one Backlog row when the digest surfaced multiple actionable rows.",
         "The response does NOT: Write \"I recommend running X next\" as a single-pick conclusion.",
-        "The response does NOT: Author the design note for the picked candidate (out of scope \u2014 parent does that after the user picks `B<N>`)."
+        "The response does NOT: Author the design note for the picked candidate (out of scope \u2014 parent records the Backlog row; `model-ml-pipeline` authors the note after the user picks `B<N>`)."
       ],
       "tools": false,
       "sandbox": [],

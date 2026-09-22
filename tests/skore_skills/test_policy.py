@@ -21,11 +21,11 @@ def test_status_merges_policy_file(tmp_path: Path) -> None:
     """Saved policy appears under ``status`` and overrides inferred stage."""
     policy = empty_policy()
     policy["env_manager"] = "pixi"
-    policy["loop"]["stage"] = "audit"
+    policy["loop"]["stage"] = "evaluate"
     save_policy(tmp_path, policy)
     payload = snapshot(tmp_path)
     assert payload["policy"]["env_manager"] == "pixi"
-    assert payload["loop_stage"] == "audit"
+    assert payload["loop_stage"] == "evaluate"
 
 
 def test_policy_set_cli(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -126,8 +126,8 @@ def test_load_legacy_flat_workspace_json(tmp_path: Path) -> None:
     assert snapshot(tmp_path)["policy"]["git"]["autocommit"] == "on"
 
 
-def test_infer_evaluate_then_audit(tmp_path: Path) -> None:
-    """Smoke without audit is evaluate; reports present becomes audit."""
+def test_infer_evaluate_until_audit_file(tmp_path: Path) -> None:
+    """Smoke without an audit file is evaluate; audit file becomes backlog."""
     (tmp_path / "src").mkdir()
     (tmp_path / "journal").mkdir()
     (tmp_path / "data_analysis").mkdir()
@@ -142,8 +142,14 @@ def test_infer_evaluate_then_audit(tmp_path: Path) -> None:
     reports = tmp_path / "reports"
     reports.mkdir()
     (reports / "01_baseline").mkdir()
-    assert snapshot(tmp_path)["loop_stage"] == "audit"
+    assert snapshot(tmp_path)["loop_stage"] == "evaluate"
     audit = tmp_path / "audit"
     audit.mkdir()
     (audit / "01_baseline.py").write_text("# audit\n", encoding="utf-8")
     assert snapshot(tmp_path)["loop_stage"] == "backlog"
+
+
+def test_policy_set_rejects_audit_loop_stage(tmp_path: Path) -> None:
+    """Audit is not a persistable loop stage."""
+    with pytest.raises(ValueError, match="loop.stage must be one of"):
+        set_policy_value(tmp_path, "loop.stage", "audit")

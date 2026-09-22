@@ -1,4 +1,4 @@
-"""Cheap pipeline HTML for Method: no fit at construct, fitted overwrite after evaluate."""
+"""Cheap pipeline HTML for Method: unfitted at construct, fitted after evaluate."""
 
 from __future__ import annotations
 

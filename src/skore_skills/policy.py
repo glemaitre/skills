@@ -22,7 +22,6 @@ LOOP_STAGES = (
     "data_analysis",
     "implement",
     "evaluate",
-    "audit",
     "backlog",
 )
 
@@ -253,8 +252,5 @@ def infer_loop_stage(
     if not (root / "tests" / "smoke" / f"test_{stem}.py").is_file():
         return "implement"
     if not (root / "audit" / f"{stem}.py").is_file():
-        reports = root / "reports"
-        if reports.is_dir() and any(reports.iterdir()):
-            return "audit"
         return "evaluate"
     return "backlog"

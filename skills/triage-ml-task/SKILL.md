@@ -30,8 +30,8 @@ route and ask. Do not execute another skill's methodology.
    | git init / first commit / ignore | `setup-git` |
    | add or install a named package | `add-python-package` |
    | exploratory data analysis / explore the data | `explore-ml-data` |
-   | evaluate / metrics / skore report / CV | `evaluate-ml-pipeline` (child gate may STOP) |
-   | audit a report or model | `audit-ml-pipeline` (child gate may STOP) |
+   | evaluate / metrics / CV / run `skore.evaluate` | `evaluate-ml-pipeline` (child gate may STOP) |
+   | audit / open / narrate an existing report | `audit-ml-pipeline` (child gate may STOP) |
    | build / model a pipeline | `model-ml-pipeline` |
    | smoke / pytest row-count / why is smoke failing | `smoke-test-ml-pipeline` (debug; does not start evaluate) |
    | backlog / history / next lever | `manage-ml-backlog` |
@@ -96,7 +96,6 @@ route and ask. Do not execute another skill's methodology.
 - Do not treat a missing `.skore` as an empty project when `src/`
   or `journal/` exist.
 - Do not invent a missing skill's steps from memory.
-- Do not invent a deleted iterate skill as the session owner.
 - Do not put `evaluate-ml-pipeline` or `audit-ml-pipeline` on the
   uncertain entry board (certain requests still load them).
 - Certain generic export: name `python -m skore_skills status`,
