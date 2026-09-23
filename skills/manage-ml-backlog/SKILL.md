@@ -132,19 +132,24 @@ locator.
    `*.html`, and do not paste iframes (site build injects those). If
    no subsection has a source, skip the Results section.
 4. Perform a full Backlog rescan. Resolve rows the run answered or
-   killed, preserving stable indices. Then route sourcing explicitly:
-   report-derived ideas → load `iterate-from-skore` only if
+   killed, preserving stable indices. Then, if
+   `status.skills.explore-ml-directions` is true, load
+   `explore-ml-directions` and let it own the source menu and the
+   Draft / Park / Stop exit. Park returns rows here; append them
+   with stable `B<N>` indices and do not reopen the menu. Do not
+   draft a design-note template in this turn.
+5. If `explore-ml-directions` is not installed, keep the direct
+   route: report-derived ideas → load `iterate-from-skore` only if
    `status.skills.iterate-from-skore` is true; user proposals →
    load `iterate-from-user` only if
    `status.skills.iterate-from-user` is true; an existing row or
    stop → `model-ml-pipeline` only if
    `status.skills.model-ml-pipeline` is true. Missing child →
    one-line skip; do not invent that skill's steps. Returned
-   candidates/proposals are written by this parent, not by
-   either sourcing child.
-5. Ask whether to draft from the refreshed Backlog or stop. When a
-   row is selected, return it to `model-ml-pipeline`, which can
-   create its design-note shell with
+   candidates/proposals are written by this parent. Ask whether to
+   draft from the refreshed Backlog or stop. When a row is
+   selected, return it to `model-ml-pipeline`, which can create
+   its design-note shell with
    `python -m skore_skills scaffold --journal --stem <NN_short_name>`.
    Do not draft that template in this backlog turn.
 

@@ -36,14 +36,16 @@
 
 **Assumed workspace state:**
 - One `done` History row and two Backlog rows `B1`, `B2`.
+- `status.skills.explore-ml-directions` is `true`.
 
 **Must do:**
-- Surface Backlog options and ask whether to draft from the
-  Backlog or stop.
+- Load `explore-ml-directions` and let it own the next-idea menu.
 
 **Must NOT do:**
 - Silently pick `B1`.
 - Start `build-ml-pipeline`.
+- Open the next-idea menu inside this skill when the router is
+  installed.
 
 ---
 

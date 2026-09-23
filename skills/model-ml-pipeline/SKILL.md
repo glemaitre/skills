@@ -75,12 +75,14 @@ note.
   `B<N>`, consume only that row into a proposal/design stem, then
   return here. Do not add a new Backlog idea in this branch.
 - **Discussion (`discuss`).** Have an open conversation about what
-  to learn, why now, and what changes. Once an idea is agreed,
-  summarize it as a Proposal using `iterate-from-user`'s three
-  shaping questions and confirmation contract, but do not force
-  its article/resource/free-text entry menu. Only after explicit
-  confirmation create/populate the design note and seek approval.
-  If no idea is agreed, return to the entry choices.
+  to learn, why now, and what changes. Do not force the free-text /
+  artifact entry menu. Once an idea is agreed, load
+  `iterate-from-user` only if `status.skills.iterate-from-user` is
+  true, with that idea pre-resolved, and wait for its confirmed
+  Proposal. Missing skill → keep the confirmation here: restate the
+  idea and wait for an explicit yes before any design note. Only
+  after that confirmation create/populate the design note and seek
+  approval. If no idea is agreed, return to the entry choices.
 
 ## Before execution
 

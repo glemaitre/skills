@@ -5,10 +5,10 @@
       "id": 1,
       "title": "Article-link branch with synthesis confirmation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` has 2 done experiments in History (iterate\n  mode).\n- The arxiv link is to a paper on \"Temporal Fusion Transformers\".]\n\nHere's the idea I want to try: https://arxiv.org/abs/2106.04545 \u2014\ncan we adapt it for our forecasting pipeline?",
-      "expected_output": "Behavioural response satisfying: - Recognise this as `article-link` branch (URL pasted directly \u2192 entry point pre-resolved per parent's free-text handling). - Mention WebFetching the URL. - Walk the three shaping questions: (1) what to learn, (2) why now, (3) what changes in `src/<pkg>/`. It must NOT: - Write `journal/NN_*.md` directly. - Emit a `Proposal (` header (or fenced Proposal block) before the user says yes \u2014 even labeled PENDING / NOT RETURNED. The synthesis paragraph is the gate; the parent does not have a Proposal until confirmation. - Add new deps to `Method outline` as fait accompli.",
+      "expected_output": "Behavioural response satisfying: - Recognise this as the `artifact` branch (URL pasted directly \u2192 entry point pre-resolved). - Mention WebFetching the URL. - Walk the three shaping questions: (1) what to learn, (2) why now, (3) what changes in `src/<pkg>/`. It must NOT: - Write `journal/NN_*.md` directly. - Emit a `Proposal (` header (or fenced Proposal block) before the user says yes \u2014 even labeled PENDING / NOT RETURNED. The synthesis paragraph is the gate; the parent does not have a Proposal until confirmation. - Add new deps to `Method outline` as fait accompli.",
       "files": [],
       "expectations": [
-        "Recognise this as `article-link` branch (URL pasted directly \u2192 entry point pre-resolved per parent's free-text handling).",
+        "Recognise this as the `artifact` branch (URL pasted directly \u2192 entry point pre-resolved).",
         "Mention WebFetching the URL.",
         "Walk the three shaping questions: (1) what to learn, (2) why now, (3) what changes in `src/<pkg>/`.",
         "Fire the **synthesis confirmation gate** as plain text before returning the Proposal block.",
@@ -70,10 +70,10 @@
       "id": 4,
       "title": "Domain-specific assertion needs confirmation",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/JOURNAL.md` shows a regression task on tabular financial\n  data.]\n\nRead this paper: https://example.com/paper-on-target-monotonicity\nThey claim feature X is monotone in the target for option pricing.\nUse that as a constraint in our model.",
-      "expected_output": "Behavioural response satisfying: - Recognise `article-link` branch. - Map the request to the three shaping questions **or** restate the user claim with the open gaps those questions would close. This case has no tools and the URL is a placeholder: an actual `WebFetch` / `WebSearch` is **n/a**. Mapping from the user's stated claim is enough. Do not require a fetched paper body. - **List the \"feature X is monotone in the target\" claim under `Open gaps`** with `[needs user confirmation]` \u2014 the paper alone can't establish this for *our* dataset. It must NOT: - Ship the monotonicity assertion as a `Method outline` fact. - Treat the paper's framing as evidence for this workspace's data. - Author the constraint silently without flagging.",
+      "expected_output": "Behavioural response satisfying: - Recognise the `artifact` branch. - Map the request to the three shaping questions **or** restate the user claim with the open gaps those questions would close. This case has no tools and the URL is a placeholder: an actual `WebFetch` / `WebSearch` is **n/a**. Mapping from the user's stated claim is enough. Do not require a fetched paper body. - **List the \"feature X is monotone in the target\" claim under `Open gaps`** with `[needs user confirmation]` \u2014 the paper alone can't establish this for *our* dataset. It must NOT: - Ship the monotonicity assertion as a `Method outline` fact. - Treat the paper's framing as evidence for this workspace's data. - Author the constraint silently without flagging.",
       "files": [],
       "expectations": [
-        "Recognise `article-link` branch.",
+        "Recognise the `artifact` branch.",
         "Map the request to the three shaping questions **or** restate the user claim with the open gaps those questions would close. This case has no tools and the URL is a placeholder: an actual `WebFetch` / `WebSearch` is **n/a**. Mapping from the user's stated claim is enough. Do not require a fetched paper body.",
         "**List the \"feature X is monotone in the target\" claim under `Open gaps`** with `[needs user confirmation]` \u2014 the paper alone can't establish this for *our* dataset.",
         "Ask the user to confirm whether the monotonicity assumption holds for the workspace's data before returning the Proposal. Withholding the Proposal until that confirmation is correct.",
@@ -104,16 +104,16 @@
     {
       "id": 6,
       "title": "Pre-resolved entry, skip inner AskUserQuestion",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Parent (`triage-ml-task`) already collected the URL via\n  its sourcing-menu free-text handler.]\n\n[parent passes: branch=resource-link, content=https://github.com/scikit-learn/scikit-learn/issues/12345]\nHand this off to iterate-from-user with the resource-link branch\npre-resolved.",
-      "expected_output": "Behavioural response satisfying: - Recognise the pre-resolved entry-point dispatch (skip the inner AskUserQuestion). - Proceed directly to the `resource-link` branch with the URL in hand. - Name the fetch sequence: `gh auth status` then `gh issue view 12345 ...`. It must NOT: - Fire the entry-point `AskUserQuestion` (article-link / resource-link / free-text) \u2014 it's been pre-resolved. - Skip the confirmation gate (still required even with pre-resolved entry).",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Parent (`explore-ml-directions`) already collected the URL.]\n\n[parent passes: branch=artifact, content=https://github.com/scikit-learn/scikit-learn/issues/12345]\nHand this off to iterate-from-user with the artifact branch\npre-resolved.",
+      "expected_output": "Behavioural response satisfying: - Recognise the pre-resolved entry-point dispatch (skip the inner AskUserQuestion). - Proceed directly to the `artifact` branch with the URL in hand. - Name the fetch sequence: `gh auth status` then `gh issue view 12345 ...`. It must NOT: - Fire the entry-point `AskUserQuestion` (free-text / artifact) \u2014 it's been pre-resolved. - Skip the confirmation gate (still required even with pre-resolved entry).",
       "files": [],
       "expectations": [
         "Recognise the pre-resolved entry-point dispatch (skip the inner AskUserQuestion).",
-        "Proceed directly to the `resource-link` branch with the URL in hand.",
+        "Proceed directly to the `artifact` branch with the URL in hand.",
         "Name the fetch sequence: `gh auth status` then `gh issue view 12345 ...`.",
         "Map to three shaping questions.",
         "Name the confirmation gate as required before returning, and show the plain-text restatement it would carry.",
-        "The response does NOT: Fire the entry-point `AskUserQuestion` (article-link / resource-link / free-text) \u2014 it's been pre-resolved.",
+        "The response does NOT: Fire the entry-point `AskUserQuestion` (free-text / artifact) \u2014 it's been pre-resolved.",
         "The response does NOT: Skip the confirmation gate (still required even with pre-resolved entry)."
       ],
       "tools": false,
@@ -124,14 +124,47 @@
       "id": 7,
       "title": "Model discussion is already pre-resolved",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The open discussion already established a concrete idea.]\n\n[model-ml-pipeline passes: discussion agreed on testing a\nmonotonic target transform]\nShape and confirm the proposal.",
-      "expected_output": "Behavioural response satisfying: - Skip the article/resource/free-text entry menu. - Apply the three shaping questions to the agreed idea. - Show the synthesis confirmation and wait before returning a Proposal. It must NOT: - Re-ask which source type the user has. - Return a Proposal before confirmation.",
+      "expected_output": "Behavioural response satisfying: - Skip the free-text / artifact entry menu. - Apply the three shaping questions to the agreed idea. - Show the synthesis confirmation and wait before returning a Proposal. It must NOT: - Re-ask which source type the user has. - Return a Proposal before confirmation.",
       "files": [],
       "expectations": [
-        "Skip the article/resource/free-text entry menu.",
+        "Skip the free-text / artifact entry menu.",
         "Apply the three shaping questions to the agreed idea.",
         "Show the synthesis confirmation and wait before returning a Proposal.",
         "The response does NOT: Re-ask which source type the user has.",
         "The response does NOT: Return a Proposal before confirmation."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 8,
+      "title": "Project question returns no Proposal",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `JOURNAL.md` History has one `done` row, headline `ROC-AUC 0.86`.\n- No audit digest is attached to this turn.]\n\nWhat was the headline result of the last experiment?",
+      "expected_output": "Behavioural response satisfying: - Answer from the History row (`ROC-AUC 0.86`). - Return to the caller with no Proposal. It must NOT: - Emit a `Proposal (` block. - Invent a metric that is not in History. - Write `journal/`.",
+      "files": [],
+      "expectations": [
+        "Answer from the History row (`ROC-AUC 0.86`).",
+        "Return to the caller with no Proposal.",
+        "The response does NOT: Emit a `Proposal (` block.",
+        "The response does NOT: Invent a metric that is not in History.",
+        "The response does NOT: Write `journal/`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 9,
+      "title": "Topic with no artifact hands off to literature",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- No URL, issue, or file was named.\n- `status.skills.iterate-from-literature` is `true`.]\n\nWhat do people do for censored regression?",
+      "expected_output": "Behavioural response satisfying: - Load `iterate-from-literature`. It must NOT: - `WebSearch` for a paper from this skill. - Emit a `Proposal (` block in this skill. - Invent papers or URLs.",
+      "files": [],
+      "expectations": [
+        "Load `iterate-from-literature`.",
+        "The response does NOT: `WebSearch` for a paper from this skill.",
+        "The response does NOT: Emit a `Proposal (` block in this skill.",
+        "The response does NOT: Invent papers or URLs."
       ],
       "tools": false,
       "sandbox": [],

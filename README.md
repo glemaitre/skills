@@ -112,6 +112,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | Skill | Description |
 | --- | --- |
 | [triage-ml-task](skills/triage-ml-task/SKILL.md) | Session owner: list installed entry skills and ask which to run. |
+| [explore-ml-directions](skills/explore-ml-directions/SKILL.md) | Ask which installed source to use for the next experiment idea. |
 | [setup-ml-project](skills/setup-ml-project/SKILL.md) | Coordinate workspace, environment, and git setup. |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
 | [setup-python-env](skills/setup-python-env/SKILL.md) | Detect the env manager, persist managed vs user-managed, and bootstrap agent tools. |
@@ -140,7 +141,8 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | --- | --- |
 | [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md) | Record experiment outcomes and next-lever backlog rows. |
 | [iterate-from-skore](skills/iterate-from-skore/SKILL.md) | Use skore to run diagnostics and checks that can be reported and addressed in the next experiment. |
-| [iterate-from-user](skills/iterate-from-user/SKILL.md) | As a user, be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo). |
+| [iterate-from-user](skills/iterate-from-user/SKILL.md) | Shape a user idea, or a named article, issue, or file, into a confirmed Proposal. |
+| [iterate-from-literature](skills/iterate-from-literature/SKILL.md) | Search scientific and technical sources and return a few experiment directions. |
 
 ### Workspace and tooling
 

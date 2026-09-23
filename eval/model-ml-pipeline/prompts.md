@@ -216,18 +216,23 @@
 
 **Assumed workspace state:**
 - The user selected Discuss the next step.
+- `status.skills.iterate-from-user` is `true`.
 
 **Must do:**
 - Preview this route as LLM discussion over recorded project
   facts, with no model fit, smoke test, or CV before confirmation.
 - Discuss what to learn, why now, and what changes.
-- Once an idea is agreed, summarize it and ask the user to
-  confirm before creating/populating a design note.
+- Once an idea is agreed, load `iterate-from-user` with that idea
+  pre-resolved.
+- Wait for its confirmed Proposal before creating/populating a
+  design note.
 
 **Must NOT do:**
 - Claim local model computation is running during the discussion.
-- Force the article/resource/free-text entry menu.
+- Force the free-text / artifact entry menu.
 - Emit a proposal or model code before confirmation.
+- Create the design note before `iterate-from-user` returns a
+  confirmed Proposal.
 
 ---
 
@@ -300,3 +305,24 @@
 - Drop the locator because there is no audit digest.
 - Invent a headline metric.
 - Open the next-lever Backlog menu.
+
+---
+
+## CASE_13 — Discuss without iterate-from-user stays inline
+
+**User prompt:**
+> I want to talk through what to model next.
+
+**Assumed workspace state:**
+- The user selected Discuss the next step.
+- `status.skills.iterate-from-user` is `false`.
+
+**Must do:**
+- Discuss what to learn, why now, and what changes.
+- Once an idea is agreed, restate it and wait for an explicit yes
+  before creating a design note.
+
+**Must NOT do:**
+- Invent the `iterate-from-user` procedure.
+- Emit a proposal or model code before confirmation.
+- Force a free-text / artifact entry menu.

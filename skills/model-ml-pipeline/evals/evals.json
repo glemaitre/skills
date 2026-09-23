@@ -154,16 +154,18 @@
     {
       "id": 9,
       "title": "Discussion becomes a confirmed proposal",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The user selected Discuss the next step.]\n\nI want to talk through what to model next.",
-      "expected_output": "Behavioural response satisfying: - Preview this route as LLM discussion over recorded project facts, with no model fit, smoke test, or CV before confirmation. - Discuss what to learn, why now, and what changes. - Once an idea is agreed, summarize it and ask the user to confirm before creating/populating a design note. It must NOT: - Claim local model computation is running during the discussion. - Force the article/resource/free-text entry menu. - Emit a proposal or model code before confirmation.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The user selected Discuss the next step.\n- `status.skills.iterate-from-user` is `true`.]\n\nI want to talk through what to model next.",
+      "expected_output": "Behavioural response satisfying: - Preview this route as LLM discussion over recorded project facts, with no model fit, smoke test, or CV before confirmation. - Discuss what to learn, why now, and what changes. - Once an idea is agreed, load `iterate-from-user` with that idea pre-resolved. It must NOT: - Claim local model computation is running during the discussion. - Force the free-text / artifact entry menu. - Emit a proposal or model code before confirmation.",
       "files": [],
       "expectations": [
         "Preview this route as LLM discussion over recorded project facts, with no model fit, smoke test, or CV before confirmation.",
         "Discuss what to learn, why now, and what changes.",
-        "Once an idea is agreed, summarize it and ask the user to confirm before creating/populating a design note.",
+        "Once an idea is agreed, load `iterate-from-user` with that idea pre-resolved.",
+        "Wait for its confirmed Proposal before creating/populating a design note.",
         "The response does NOT: Claim local model computation is running during the discussion.",
-        "The response does NOT: Force the article/resource/free-text entry menu.",
-        "The response does NOT: Emit a proposal or model code before confirmation."
+        "The response does NOT: Force the free-text / artifact entry menu.",
+        "The response does NOT: Emit a proposal or model code before confirmation.",
+        "The response does NOT: Create the design note before `iterate-from-user` returns a confirmed Proposal."
       ],
       "tools": false,
       "sandbox": [],
@@ -219,6 +221,23 @@
         "The response does NOT: Drop the locator because there is no audit digest.",
         "The response does NOT: Invent a headline metric.",
         "The response does NOT: Open the next-lever Backlog menu."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 13,
+      "title": "Discuss without iterate-from-user stays inline",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The user selected Discuss the next step.\n- `status.skills.iterate-from-user` is `false`.]\n\nI want to talk through what to model next.",
+      "expected_output": "Behavioural response satisfying: - Discuss what to learn, why now, and what changes. - Once an idea is agreed, restate it and wait for an explicit yes before creating a design note. It must NOT: - Invent the `iterate-from-user` procedure. - Emit a proposal or model code before confirmation. - Force a free-text / artifact entry menu.",
+      "files": [],
+      "expectations": [
+        "Discuss what to learn, why now, and what changes.",
+        "Once an idea is agreed, restate it and wait for an explicit yes before creating a design note.",
+        "The response does NOT: Invent the `iterate-from-user` procedure.",
+        "The response does NOT: Emit a proposal or model code before confirmation.",
+        "The response does NOT: Force a free-text / artifact entry menu."
       ],
       "tools": false,
       "sandbox": [],

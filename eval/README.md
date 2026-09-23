@@ -114,6 +114,7 @@ Defaults (override in `pixi.toml` or on the CLI):
   - medium — `openrouter/deepseek/deepseek-v4.1-flash`:
     `setup-workspace`, `setup-python-env`, `evaluate-ml-pipeline`,
     `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`,
+    `iterate-from-literature`, `explore-ml-directions`,
     `explore-ml-data`, `audit-ml-pipeline`
   - big — `openrouter/deepseek/deepseek-v4.1-flash`:
     `build-ml-pipeline`

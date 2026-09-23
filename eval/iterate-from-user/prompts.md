@@ -17,8 +17,8 @@ violated.
 - The arxiv link is to a paper on "Temporal Fusion Transformers".
 
 **Must do:**
-- Recognise this as `article-link` branch (URL pasted directly →
-  entry point pre-resolved per parent's free-text handling).
+- Recognise this as the `artifact` branch (URL pasted directly →
+  entry point pre-resolved).
 - Mention WebFetching the URL.
 - Walk the three shaping questions: (1) what to learn, (2) why now,
   (3) what changes in `src/<pkg>/`.
@@ -116,7 +116,7 @@ violated.
   data.
 
 **Must do:**
-- Recognise `article-link` branch.
+- Recognise the `artifact` branch.
 - Map the request to the three shaping questions **or** restate
   the user claim with the open gaps those questions would close.
   This case has no tools and the URL is a placeholder: an actual
@@ -164,18 +164,17 @@ violated.
 ## CASE_06 — Pre-resolved entry, skip inner AskUserQuestion
 
 **User prompt:**
-> [parent passes: branch=resource-link, content=https://github.com/scikit-learn/scikit-learn/issues/12345]
-> Hand this off to iterate-from-user with the resource-link branch
+> [parent passes: branch=artifact, content=https://github.com/scikit-learn/scikit-learn/issues/12345]
+> Hand this off to iterate-from-user with the artifact branch
 > pre-resolved.
 
 **Assumed workspace state:**
-- Parent (`triage-ml-task`) already collected the URL via
-  its sourcing-menu free-text handler.
+- Parent (`explore-ml-directions`) already collected the URL.
 
 **Must do:**
 - Recognise the pre-resolved entry-point dispatch (skip the inner
   AskUserQuestion).
-- Proceed directly to the `resource-link` branch with the URL in
+- Proceed directly to the `artifact` branch with the URL in
   hand.
 - Name the fetch sequence: `gh auth status` then
   `gh issue view 12345 ...`.
@@ -184,8 +183,8 @@ violated.
   the plain-text restatement it would carry.
 
 **Must NOT do:**
-- Fire the entry-point `AskUserQuestion` (article-link /
-  resource-link / free-text) — it's been pre-resolved.
+- Fire the entry-point `AskUserQuestion` (free-text / artifact)
+  — it's been pre-resolved.
 - Skip the confirmation gate (still required even with
   pre-resolved entry).
 
@@ -202,7 +201,7 @@ violated.
 - The open discussion already established a concrete idea.
 
 **Must do:**
-- Skip the article/resource/free-text entry menu.
+- Skip the free-text / artifact entry menu.
 - Apply the three shaping questions to the agreed idea.
 - Show the synthesis confirmation and wait before returning a
   Proposal.
@@ -210,3 +209,42 @@ violated.
 **Must NOT do:**
 - Re-ask which source type the user has.
 - Return a Proposal before confirmation.
+
+---
+
+## CASE_08 — Project question returns no Proposal
+
+**User prompt:**
+> What was the headline result of the last experiment?
+
+**Assumed workspace state:**
+- `JOURNAL.md` History has one `done` row, headline `ROC-AUC 0.86`.
+- No audit digest is attached to this turn.
+
+**Must do:**
+- Answer from the History row (`ROC-AUC 0.86`).
+- Return to the caller with no Proposal.
+
+**Must NOT do:**
+- Emit a `Proposal (` block.
+- Invent a metric that is not in History.
+- Write `journal/`.
+
+---
+
+## CASE_09 — Topic with no artifact hands off to literature
+
+**User prompt:**
+> What do people do for censored regression?
+
+**Assumed workspace state:**
+- No URL, issue, or file was named.
+- `status.skills.iterate-from-literature` is `true`.
+
+**Must do:**
+- Load `iterate-from-literature`.
+
+**Must NOT do:**
+- `WebSearch` for a paper from this skill.
+- Emit a `Proposal (` block in this skill.
+- Invent papers or URLs.

@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "b3cfcdd2d7002623ee488b088fda7a905757903cff702d3743653eacfb5a544c",
+  "catalog_hash": "29fcc93853917d42dd31e69cc98666d4fe8d5af83b971534732cd2d0b769e142",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -57,7 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "30da926f2d10912049d67757e125093d646069a0e8c4ca1b7bcdfd096b31db2f"
+      "hash": "b7e231e932433708b0ca4e15980ddaf5c9c7a8234974ddf4b05c44bf77080c47"
     },
     {
       "id": "iterate-from-skore",
@@ -66,16 +66,25 @@
       "summary": "Use skore to run diagnostics and checks that can be reported and addressed in the next experiment.",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "a84d1907568f6ce282de519f10fdb34d4de5c9ca823921bea46e1a7521a7aeb7"
+      "hash": "425bc248764a03ebe3e7cb29b9a1ae41e2ea6fb593835bd6c48a5bfbad44892c"
     },
     {
       "id": "iterate-from-user",
       "path": "skills/iterate-from-user",
       "title": "Iterate from User",
-      "summary": "As a user be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo).",
+      "summary": "Shape a user idea or answer a project question, and confirm a Proposal before any design note.",
       "category": "orchestration",
       "subcategory": "experiment-sourcing",
-      "hash": "cfe28f2d2d72f490998cc6ce8a8e4b937b53a90c4609647cbad08f5bcacb1273"
+      "hash": "98540fd61ab3a9892352934bce9990f30c860a260ae5fa83dcdc12ea4976afdf"
+    },
+    {
+      "id": "iterate-from-literature",
+      "path": "skills/iterate-from-literature",
+      "title": "Iterate from Literature",
+      "summary": "Search scientific and technical sources and return a few experiment directions for the user to pick.",
+      "category": "orchestration",
+      "subcategory": "experiment-sourcing",
+      "hash": "e63571d8c1f7680884ca3a2ae247ad02495961a8c945291b51ae5b4460d3d857"
     },
     {
       "id": "organize-ml-workspace",
@@ -96,13 +105,22 @@
       "hash": "5e86bd8d17eb09d595fb74276a1c3bbd34c75fba5e9f620157a56d2076f0beb9"
     },
     {
+      "id": "explore-ml-directions",
+      "path": "skills/explore-ml-directions",
+      "title": "Explore ML Directions",
+      "summary": "Ask which installed source to use for the next experiment idea, then Draft, Park, or Stop.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "5d551e526edb19568ed8bbd30bd74ee05850112626a94ad235411d70ee33ac15"
+    },
+    {
       "id": "triage-ml-task",
       "path": "skills/triage-ml-task",
       "title": "Triage ML Task",
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "0c0b61547c9ba506b9c6a5be89cc9403705c047036e9389f22da85f6349dd867"
+      "hash": "3dfd99d5500b3fec063dbf962f9ef7d3af82da9347b9b5e3924a3e2e3339b045"
     },
     {
       "id": "setup-ml-project",
@@ -138,7 +156,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "cf3f220f696cd6cc911e0e0d56f4cc40abc9bc2bce4a865f18aa51f2874e7772"
+      "hash": "ce1aec21d1df0eade8e4513caca2a51ccbf9179581c7c2ca6fa4581fcef4c77d"
     },
     {
       "id": "choose-python-library",
@@ -302,6 +320,8 @@
         "manage-ml-backlog",
         "iterate-from-skore",
         "iterate-from-user",
+        "iterate-from-literature",
+        "explore-ml-directions",
         "build-ml-pipeline",
         "smoke-test-ml-pipeline",
         "evaluate-ml-pipeline",
@@ -342,6 +362,8 @@
         "manage-ml-backlog",
         "iterate-from-skore",
         "iterate-from-user",
+        "iterate-from-literature",
+        "explore-ml-directions",
         "export-ml-project",
         "export-ml-notebook",
         "export-ml-site"

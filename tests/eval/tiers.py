@@ -27,6 +27,8 @@ SKILL_TIER: dict[str, str] = {
     "smoke-test-ml-pipeline": "medium",
     "iterate-from-skore": "medium",
     "iterate-from-user": "medium",
+    "iterate-from-literature": "medium",
+    "explore-ml-directions": "medium",
     "explore-ml-data": "medium",
     "research-ml-practice": "medium",
     "plot-ml-figure": "medium",
