@@ -216,23 +216,19 @@
 
 **Assumed workspace state:**
 - The user selected Discuss the next step.
-- `status.skills.iterate-from-user` is `true`.
 
 **Must do:**
 - Preview this route as LLM discussion over recorded project
   facts, with no model fit, smoke test, or CV before confirmation.
 - Discuss what to learn, why now, and what changes.
-- Once an idea is agreed, load `iterate-from-user` with that idea
-  pre-resolved.
-- Wait for its confirmed Proposal before creating/populating a
-  design note.
+- Once an idea is agreed, restate it and wait for an explicit yes
+  before creating a design note.
 
 **Must NOT do:**
 - Claim local model computation is running during the discussion.
-- Force the free-text / artifact entry menu.
+- Force a free-text / artifact entry menu.
 - Emit a proposal or model code before confirmation.
-- Create the design note before `iterate-from-user` returns a
-  confirmed Proposal.
+- Create the design note before that explicit yes.
 
 ---
 
@@ -254,7 +250,7 @@
 
 ---
 
-## CASE_11 — Implement loop records the outcome after audit
+## CASE_11 — Implement loop gates review before record-outcome
 
 **User prompt:**
 > Evaluate it.
@@ -262,12 +258,17 @@
 **Assumed workspace state:**
 - `01_baseline` design note approved; smoke green.
 - The user chose Evaluate at the post-smoke gate.
-- `evaluate-ml-pipeline` and `audit-ml-pipeline` are installed.
+- `evaluate-ml-pipeline` and `review-ml-experiment` are installed.
+- `review consent` returns `ask`.
 - `policy.notebooks` and `policy.site` are both true.
 
 **Must do:**
-- Run evaluate, then audit, then load `manage-ml-backlog` in
-  record-outcome mode with the audit digest.
+- Run evaluate, then `review consent`.
+- On `ask`, let `review-ml-experiment` preview the audit cost and
+  ask Review / Skip / Stop. Do not load `audit-ml-pipeline` from
+  this dispatcher.
+- After Review, load `manage-ml-backlog` in record-outcome mode
+  with the returned digest, locator, and G-AUDIT-FINDING.
 - Record before `notebook convert` and `site build`.
 - Write 2–6 sentences from the digest, link `journal/01_baseline.md`,
   name `<package>.html` and `html/01_baseline.html`, and include
@@ -276,14 +277,15 @@
   last.
 
 **Must NOT do:**
+- Run `cells run` from this dispatcher before Review.
 - Leave History `planned` in any journal excerpt you author.
 - Convert `audit/01_baseline.py` here — the audit skill did it.
-- Open the next-lever Backlog menu in record-outcome mode.
+- Open idea triage inside record-outcome mode.
 - Write the journal files directly instead of dispatching.
 
 ---
 
-## CASE_12 — Model close preserves the report locator
+## CASE_12 — Skip review still records the locator
 
 **User prompt:**
 > Finish the successful baseline evaluation.
@@ -291,38 +293,19 @@
 **Assumed workspace state:**
 - Smoke is green and evaluate returned
   `[Open report](https://example.invalid/report/42) · hub · id: 42`.
-- Audit is unavailable, so it was skipped.
+- The user answered Skip at the review gate.
 
 **Must do:**
-- Pass the exact locator to `manage-ml-backlog` record-outcome even
-  though audit was skipped.
+- Pass the exact locator to `manage-ml-backlog` record-outcome.
+- Pass G-AUDIT-FINDING `n/a — audit not run`.
 - Write 2–6 sentences of the result and link `journal/<stem>.md`.
 - Include the same locator in the user-facing close (first among
-  tokens) and G-AUDIT-FINDING `n/a — audit not run`.
+  tokens).
 - Record before convert, site build, and git end-turn.
 
 **Must NOT do:**
+- Run the skore-check audit after Skip.
+- Write `journal/ideas/` files.
 - Drop the locator because there is no audit digest.
 - Invent a headline metric.
-- Open the next-lever Backlog menu.
-
----
-
-## CASE_13 — Discuss without iterate-from-user stays inline
-
-**User prompt:**
-> I want to talk through what to model next.
-
-**Assumed workspace state:**
-- The user selected Discuss the next step.
-- `status.skills.iterate-from-user` is `false`.
-
-**Must do:**
-- Discuss what to learn, why now, and what changes.
-- Once an idea is agreed, restate it and wait for an explicit yes
-  before creating a design note.
-
-**Must NOT do:**
-- Invent the `iterate-from-user` procedure.
-- Emit a proposal or model code before confirmation.
-- Force a free-text / artifact entry menu.
+- Open idea triage.

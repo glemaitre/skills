@@ -17,8 +17,8 @@
 - Name `python -m skore_skills status`.
 - Copy the headline result, locator, and G-AUDIT-FINDING into
   History / the design-note Status block.
-- Rescan the Backlog, then ask whether to draft from the
-  refreshed Backlog or stop. Do not ask triage which lever to take.
+- Do not open idea triage in this record. An empty `journal/ideas/`
+  is a one-line skip.
 - Name `python -m skore_skills git end-turn --stage backlog`.
 - If that command returns `invoke`, load `persist-ml-git`.
 
@@ -29,23 +29,28 @@
 
 ---
 
-## CASE_02 — Do not implement next experiment
+## CASE_02 — Promote one idea file
 
 **User prompt:**
 > What should we try next?
 
 **Assumed workspace state:**
-- One `done` History row and two Backlog rows `B1`, `B2`.
-- `status.skills.explore-ml-directions` is `true`.
+- `journal/ideas/01_baseline-calibration.md` exists.
+- Its Source is `audit:01_baseline:checks.SKD003`.
+- That Source is not already a Backlog row.
+- The highest Backlog index is `B2`.
+- The user answers promote.
 
 **Must do:**
-- Load `explore-ml-directions` and let it own the next-idea menu.
+- Append a stable `B3` row. Item comes from the file's Question.
+  Source is copied verbatim.
+- Delete `journal/ideas/01_baseline-calibration.md`.
 
 **Must NOT do:**
-- Silently pick `B1`.
+- Silently pick an existing Backlog row.
 - Start `build-ml-pipeline`.
-- Open the next-idea menu inside this skill when the router is
-  installed.
+- Write a design note in this turn.
+- Renumber `B1` or `B2`.
 
 ---
 
@@ -218,3 +223,27 @@
 **Must NOT do:**
 - Guess a Hub, MLflow, or local artifact URL.
 - Omit the Report cell from the History row.
+
+---
+
+## CASE_09 — Empty idea folder does not invent a row
+
+**User prompt:**
+> What should we try next?
+
+**Assumed workspace state:**
+- `journal/ideas/` exists and is empty.
+- The Backlog table has no rows.
+- `status.skills.shape-user-idea` is `true`.
+- `status.skills.search-ml-literature` is `true`.
+
+**Must do:**
+- Skip in one line because there are no idea files to triage.
+- When `shape-user-idea` and `search-ml-literature` are installed,
+  offer those as the way to add an idea. Do not load them until
+  the user picks one.
+
+**Must NOT do:**
+- Fabricate a `B1` row.
+- Write a design note.
+- Invent a literature search or a shaping menu from this skill.

@@ -34,18 +34,17 @@ route and ask. Do not execute another skill's methodology.
    | audit / open / narrate an existing report | `audit-ml-pipeline` (child gate may STOP) |
    | build / model a pipeline | `model-ml-pipeline` |
    | smoke / pytest row-count / why is smoke failing | `smoke-test-ml-pipeline` (debug; does not start evaluate) |
-   | backlog / history / record the run | `manage-ml-backlog` |
-   | what next / explore ideas / next experiment | `explore-ml-directions` |
-   | I want to try X / here is an idea / what if we | `iterate-from-user` |
-   | papers / literature / what do people do for | `iterate-from-literature` |
-   | mine the report / what does skore suggest | `iterate-from-skore` |
+   | backlog / history / record the run / what next | `manage-ml-backlog` |
+   | review this stem / review the last experiment | `review-ml-experiment` |
+   | I want to try X / here is an idea / what if we / a pasted URL or issue | `shape-user-idea` |
+   | papers / literature / what do people do for (no design note in progress) | `search-ml-literature` |
    | notebook / ipynb | `export-ml-notebook` |
    | notebook viewer on the site / executed report | `export-ml-notebook` (`--html`) |
    | website / mkdocs / documentation site | `export-ml-site` |
    | export (generic) | `export-ml-project` |
    | sync / migrate reports / switch skore mode / upload reports to hub or mlflow | `sync-ml-reports` |
    | set up / bootstrap this project (generic) | `setup-ml-project` |
-   | “is this leakage” on the table | `explore-ml-data` (even if `data_analysis` is present). Do not load `research-ml-practice` or `iterate-from-literature`. |
+   | “is this leakage” on the table | `explore-ml-data` (even if `data_analysis` is present). Do not load `research-ml-practice`. |
    | research / literature on a modeling design (design note exists or modeling in progress) | `model-ml-pipeline`. Do not load `research-ml-practice`. |
 
    Certain EDA: name `python -m skore_skills status`, load
@@ -72,25 +71,22 @@ route and ask. Do not execute another skill's methodology.
    entry skills only. One pick, then load it.
 
    Offer an entry only if `status.skills.<id>` is true:
-   `setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
-   `explore-ml-directions`, `manage-ml-backlog`, `export-ml-project`,
+   `setup-ml-project`,    `explore-ml-data`, `model-ml-pipeline`,
+   `review-ml-experiment`, `manage-ml-backlog`, `export-ml-project`,
    `sync-ml-reports`. If none of those ids are true, say so in one
    line; do not invent a menu.
 
    Do not put `evaluate-ml-pipeline` or `audit-ml-pipeline` on this
    board (certain requests still load them). Do not put
-   `iterate-from-user`, `iterate-from-literature`, or
-   `iterate-from-skore` on this board (certain requests still load
-   them).
+   `shape-user-idea` or `search-ml-literature` on this board
+   (certain requests and `manage-ml-backlog` still load them).
 
    If `status.data_analysis` is `missing` and
    `status.skills.explore-ml-data` is true, name `explore-ml-data`
    as the recommended next stage (`loop_stage: data_analysis`). Do
-   not auto-load it. When `data_analysis` is `present` or `skipped`,
-   `loop_stage` is `backlog`, and
-   `status.skills.explore-ml-directions` is true, name
-   `explore-ml-directions` as the recommended next stage. Do not
-   auto-load it.
+   not auto-load it. When `data_analysis` is `present` or `skipped`
+   and `loop_stage` is `backlog`, name `manage-ml-backlog` as the
+   recommended next stage when that id is true. Do not auto-load it.
 
    Do not put internals on this board (`build-ml-pipeline`,
    `smoke-test-ml-pipeline` except as a **certain** debug load,
@@ -109,11 +105,10 @@ route and ask. Do not execute another skill's methodology.
 - Do not invent a missing skill's steps from memory.
 - Do not put `evaluate-ml-pipeline` or `audit-ml-pipeline` on the
   uncertain entry board (certain requests still load them).
-- Do not put `iterate-from-user`, `iterate-from-literature`, or
-  `iterate-from-skore` on the uncertain entry board (certain
-  requests still load them).
-- A missing explore or sourcing skill is a one-line skip. Do not
-  invent that skill's menu.
+- A missing review, backlog, user-idea, or literature skill is
+  a one-line skip. Do not invent that skill's procedure.
+- Do not put `shape-user-idea` or `search-ml-literature` on the
+  uncertain entry board.
 - Certain generic export: name `python -m skore_skills status`,
   load `export-ml-project` only — no sibling-skill menu.
 

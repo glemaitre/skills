@@ -6,7 +6,7 @@ description: >
   supports the model-entry selection mode: show real B<N> rows
   supplied by the deterministic CLI and consume one into a
   proposal. Trigger after audit, when a run finishes, when the
-  user asks what to try next, or when model-ml-pipeline routes its
+  user asks what to try next or to triage idea files, or when model-ml-pipeline routes its
   Backlog choice here. This is cadence, not a methodology owner.
 ---
 
@@ -63,9 +63,9 @@ Run Procedure steps 1-3 and nothing else:
    `Last experiment` and `Last result`. Insert or replace `## Results`
    between Status and Notebooks from digest text, not HTML.
 
-Then return to the caller. Skip step 4 (Backlog rescan) and step 5
-(the next-lever triage menu) — the caller did not ask what to try
-next.
+Then return to the caller. Do not read `journal/ideas/` and do
+not open the idea-triage menu — the caller did not ask what to
+try next.
 
 Do not dispatch `audit-ml-pipeline` in this mode; the digest is
 already in hand and dispatching would bounce back here. Do not run
@@ -131,25 +131,22 @@ locator.
    cell's output; do not copy G-AUDIT-FINDING, do not parse
    `*.html`, and do not paste iframes (site build injects those). If
    no subsection has a source, skip the Results section.
-4. Perform a full Backlog rescan. Resolve rows the run answered or
-   killed, preserving stable indices. Then, if
-   `status.skills.explore-ml-directions` is true, load
-   `explore-ml-directions` and let it own the source menu and the
-   Draft / Park / Stop exit. Park returns rows here; append them
-   with stable `B<N>` indices and do not reopen the menu. Do not
-   draft a design-note template in this turn.
-5. If `explore-ml-directions` is not installed, keep the direct
-   route: report-derived ideas → load `iterate-from-skore` only if
-   `status.skills.iterate-from-skore` is true; user proposals →
-   load `iterate-from-user` only if
-   `status.skills.iterate-from-user` is true; an existing row or
-   stop → `model-ml-pipeline` only if
-   `status.skills.model-ml-pipeline` is true. Missing child →
-   one-line skip; do not invent that skill's steps. Returned
-   candidates/proposals are written by this parent. Ask whether to
-   draft from the refreshed Backlog or stop. When a row is
-   selected, return it to `model-ml-pipeline`, which can create
-   its design-note shell with
+4. Idea triage, separate from record-outcome. Read
+   `journal/ideas/*.md`. Drop a file whose Source is already a
+   Backlog row. For each remaining file, ask promote / dismiss /
+   leave. Promote appends a stable `B<N>` row (Item from Question,
+   Source copied verbatim) and deletes the file. Dismiss deletes
+   the file. Leave keeps it. Do not create a design note here.
+   An empty folder does not fabricate `B1`. When the user wants
+   a new idea, or asks what to try next and the folder is empty,
+   load `shape-user-idea` for an idea, question, or artifact, and
+   `search-ml-literature` for a literature query, only if that id
+   is true. Missing skill → one-line skip; do not invent that
+   skill's search or shaping steps. Those skills write idea files
+   and return here; triage the new files in this same mode.
+   When the user picks an existing `B<N>` to draft, return that
+   row to `model-ml-pipeline`, which can create its design-note
+   shell with
    `python -m skore_skills scaffold --journal --stem <NN_short_name>`.
    Do not draft that template in this backlog turn.
 

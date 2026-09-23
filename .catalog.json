@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "29fcc93853917d42dd31e69cc98666d4fe8d5af83b971534732cd2d0b769e142",
+  "catalog_hash": "58131ee317dcb21a0c5a9020d28c83fed9b8d32c425706203e1ad0c4cb6465a7",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "774390a3ea8a399a78cbc1c821b1526f57ed2e30d08ee869ab65e03e82148986"
+      "hash": "4492186bb40354eb50b3e75d0d5f99041fbff692b48426c763f8c86c11bbce2a"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "d3f275f0d12a92473dc05fdfbc143c88a92537149ce2cf37377b946c175186d7"
+      "hash": "812b8c4f84a17a7e24b64279a9b77120fbdaa94a627d65a06c9f2fff3dea1b42"
     },
     {
       "id": "manage-ml-backlog",
@@ -57,34 +57,7 @@
       "summary": "Record experiment outcomes and next-lever backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "b7e231e932433708b0ca4e15980ddaf5c9c7a8234974ddf4b05c44bf77080c47"
-    },
-    {
-      "id": "iterate-from-skore",
-      "path": "skills/iterate-from-skore",
-      "title": "Iterate from Skore",
-      "summary": "Use skore to run diagnostics and checks that can be reported and addressed in the next experiment.",
-      "category": "orchestration",
-      "subcategory": "experiment-sourcing",
-      "hash": "425bc248764a03ebe3e7cb29b9a1ae41e2ea6fb593835bd6c48a5bfbad44892c"
-    },
-    {
-      "id": "iterate-from-user",
-      "path": "skills/iterate-from-user",
-      "title": "Iterate from User",
-      "summary": "Shape a user idea or answer a project question, and confirm a Proposal before any design note.",
-      "category": "orchestration",
-      "subcategory": "experiment-sourcing",
-      "hash": "98540fd61ab3a9892352934bce9990f30c860a260ae5fa83dcdc12ea4976afdf"
-    },
-    {
-      "id": "iterate-from-literature",
-      "path": "skills/iterate-from-literature",
-      "title": "Iterate from Literature",
-      "summary": "Search scientific and technical sources and return a few experiment directions for the user to pick.",
-      "category": "orchestration",
-      "subcategory": "experiment-sourcing",
-      "hash": "e63571d8c1f7680884ca3a2ae247ad02495961a8c945291b51ae5b4460d3d857"
+      "hash": "9b20f9f21897d483ab935199e2acaa06363e97cc9106105f59a5a2825fa467f6"
     },
     {
       "id": "organize-ml-workspace",
@@ -105,22 +78,40 @@
       "hash": "5e86bd8d17eb09d595fb74276a1c3bbd34c75fba5e9f620157a56d2076f0beb9"
     },
     {
-      "id": "explore-ml-directions",
-      "path": "skills/explore-ml-directions",
-      "title": "Explore ML Directions",
-      "summary": "Ask which installed source to use for the next experiment idea, then Draft, Park, or Stop.",
-      "category": "meta",
-      "subcategory": null,
-      "hash": "5d551e526edb19568ed8bbd30bd74ee05850112626a94ad235411d70ee33ac15"
-    },
-    {
       "id": "triage-ml-task",
       "path": "skills/triage-ml-task",
       "title": "Triage ML Task",
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "3dfd99d5500b3fec063dbf962f9ef7d3af82da9347b9b5e3924a3e2e3339b045"
+      "hash": "73629ab0d9e009d2f1e8b50f25aef00c61998bb4a995b9af04590678e3af536e"
+    },
+    {
+      "id": "review-ml-experiment",
+      "path": "skills/review-ml-experiment",
+      "title": "Review ML Experiment",
+      "summary": "Gate the skore-check audit, then write one idea file per candidate.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "93b4f240b3758ca0e73efeb25c6a0fc429b4e55f2bd05a159ef0571174ae4d21"
+    },
+    {
+      "id": "shape-user-idea",
+      "path": "skills/shape-user-idea",
+      "title": "Shape User Idea",
+      "summary": "Shape a user idea or a named artifact into one idea file after they confirm.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "75cf7972e5496390fb7744b5919c4da13967722dfb8e85ecac4e4f8f1f135ac1"
+    },
+    {
+      "id": "search-ml-literature",
+      "path": "skills/search-ml-literature",
+      "title": "Search ML Literature",
+      "summary": "Search scientific and technical sources and write one idea file for the direction the user confirms.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "8f9540001ff1672b5296093832a892c95c7a5057a54eb021743258c750907b26"
     },
     {
       "id": "setup-ml-project",
@@ -156,7 +147,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "ce1aec21d1df0eade8e4513caca2a51ccbf9179581c7c2ca6fa4581fcef4c77d"
+      "hash": "683977a347f11c8376bc50a60c945b73ed9ba1663ff22c4b63679107c9956415"
     },
     {
       "id": "choose-python-library",
@@ -297,8 +288,6 @@
       "includes": [
         "model-ml-pipeline",
         "manage-ml-backlog",
-        "iterate-from-skore",
-        "iterate-from-user",
         "build-ml-pipeline",
         "smoke-test-ml-pipeline",
         "evaluate-ml-pipeline",
@@ -318,10 +307,9 @@
         "triage-ml-task",
         "model-ml-pipeline",
         "manage-ml-backlog",
-        "iterate-from-skore",
-        "iterate-from-user",
-        "iterate-from-literature",
-        "explore-ml-directions",
+        "review-ml-experiment",
+        "shape-user-idea",
+        "search-ml-literature",
         "build-ml-pipeline",
         "smoke-test-ml-pipeline",
         "evaluate-ml-pipeline",
@@ -360,10 +348,9 @@
         "sync-ml-reports",
         "triage-ml-task",
         "manage-ml-backlog",
-        "iterate-from-skore",
-        "iterate-from-user",
-        "iterate-from-literature",
-        "explore-ml-directions",
+        "review-ml-experiment",
+        "shape-user-idea",
+        "search-ml-literature",
         "export-ml-project",
         "export-ml-notebook",
         "export-ml-site"

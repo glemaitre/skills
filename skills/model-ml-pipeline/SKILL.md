@@ -75,14 +75,10 @@ note.
   `B<N>`, consume only that row into a proposal/design stem, then
   return here. Do not add a new Backlog idea in this branch.
 - **Discussion (`discuss`).** Have an open conversation about what
-  to learn, why now, and what changes. Do not force the free-text /
-  artifact entry menu. Once an idea is agreed, load
-  `iterate-from-user` only if `status.skills.iterate-from-user` is
-  true, with that idea pre-resolved, and wait for its confirmed
-  Proposal. Missing skill → keep the confirmation here: restate the
-  idea and wait for an explicit yes before any design note. Only
-  after that confirmation create/populate the design note and seek
-  approval. If no idea is agreed, return to the entry choices.
+  to learn, why now, and what changes. Restate the agreed idea and
+  wait for an explicit yes before any design note. Only after that
+  confirmation create/populate the design note and seek approval.
+  If no idea is agreed, return to the entry choices.
 
 ## Before execution
 
@@ -97,9 +93,9 @@ duplicate a child's detailed preview.
 - For an approved implementation, say which child comes next and
   the broad sequence: local pipeline preparation → small
   real-data smoke fit/predict → optional full-dataset evaluation
-  → read-only audit. Then let `build-ml-pipeline`,
+  → gated review. Then let `build-ml-pipeline`,
   `smoke-test-ml-pipeline`, `evaluate-ml-pipeline`, and
-  `audit-ml-pipeline` each own the single detailed Before
+  `review-ml-experiment` each own the single detailed Before
   execution preview at its actual compute boundary.
 
 Do not invent minute estimates at dispatcher level. Name a known
@@ -139,33 +135,37 @@ has created the shell, then stop for explicit design approval.
    <stem>`. Consent JSON is authoritative, not the user's wording
    alone. Missing `evaluate-ml-pipeline` → one-line skip. Do not
    invent that skill's steps.
-3. After a successful dispatched evaluate (locator returned):
-   this dispatcher runs
-   `python -m skore_skills loop artifacts --stem <stem>`. `audit` →
-   load `audit-ml-pipeline` only if
-   `status.skills.audit-ml-pipeline` is true (same stem). Missing
-   skill → one-line skip. `evaluate_incomplete` / `stop` → do
-   not invent an audit. The audit owns its deterministic
-   follow-up gate and returns only after Close audit, with the
-   digest, G-AUDIT-FINDING from `audit finding`, locator, and
-   optional headline.
-4. After audit — or after evaluate when artifacts JSON is `record`
-   or audit was skipped — load
-   `manage-ml-backlog` only if `status.skills.manage-ml-backlog`
-   is true, in **record-outcome mode**, handing it the
-   JSON locator from `loop locator --stem <stem>`, optional headline, and
-   G-AUDIT-FINDING from `audit finding` (or
-   `n/a — audit not run`). Else one-line skip; do not write History from this
-   meta. It writes the `JOURNAL.md` History row and design-note
-   Status block plus `## Results` from the digest text,
-   then returns; it does not rescan the Backlog or
-   open the next-lever menu. Never mark `done` while `smoke run`
-   is `stop`.
-   Audit-skipped runs still record the locator; missing headline
-   becomes `n/a`, never an invented metric. The Evaluate
-   branch's visible close is that dispatch sequence. Do not claim
-   History remains `planned` because a child was not executed
-   in-process.
+3. After a successful dispatched evaluate (locator returned): run
+   `python -m skore_skills review consent --stem <stem>`. Treat
+   JSON `action` as authoritative.
+   - `stop` — no `report.html`. Do not review. Name the missing
+     file. Do not record-outcome.
+   - `ask` — the review skill owns the cost preview and
+     Review (Recommended) / Skip / Stop question. Load
+     `review-ml-experiment` only if
+     `status.skills.review-ml-experiment` is true so it can ask.
+     Missing skill → one-line skip and record-outcome with
+     `n/a — audit not run`.
+   - **Review** or `proceed` — load `review-ml-experiment` (same
+     gate). It returns the digest, G-AUDIT-FINDING, locator, and
+     idea paths. Do not load `audit-ml-pipeline` from this
+     dispatcher.
+   - **Skip** — no idea files. Record-outcome with
+     `n/a — audit not run`.
+   - **Stop** — do not record-outcome and do not audit. Return
+     to triage when `status.skills.triage-ml-task` is true.
+4. After **Review** or `proceed`, or after **Skip** / a missing
+   review skill: load `manage-ml-backlog` only if
+   `status.skills.manage-ml-backlog` is true, in **record-outcome
+   mode**, handing it the locator, optional headline, and
+   G-AUDIT-FINDING (`n/a — audit not run` when skipped). Else
+   one-line skip; do not write History from this meta. It writes
+   the `JOURNAL.md` History row and design-note Status block plus
+   `## Results`, then returns. It does not triage idea files in
+   this mode. Never mark `done` while `smoke run` is `stop`.
+   Missing headline becomes `n/a`, never an invented metric. Do
+   not claim History remains `planned` because a child was not
+   executed in-process.
 
 Do not duplicate child-skill methodology. Before new library
 symbols are written, children use
@@ -216,11 +216,12 @@ script; say so when it is slow. Missing jupytext / nbclient /
 nbconvert → one-line skip naming `add-python-package`; do not
 fail the turn.
 
-After **Evaluate** (and audit if it ran), implement-loop step 4
-(record-outcome) runs first, so the journal files are on disk
-before anything is staged. This dispatcher owns the User-facing
-close. Children return locator / digest / finding and do not
-preview this close.
+After **Review** or **Skip** (or a missing review skill),
+implement-loop step 4 (record-outcome) runs first, so the journal
+files are on disk before anything is staged. **Stop** skips
+record-outcome. This dispatcher owns the User-facing close.
+Children return locator / digest / finding and do not preview
+this close.
 
 ### User-facing close
 

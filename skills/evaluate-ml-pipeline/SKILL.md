@@ -225,10 +225,9 @@ read the report. The pipeline declaration is out of scope (see
   § "Scratch is read-only") and `audit/<stem>.py` files (owned by
   `audit-ml-pipeline`, executed via its bundled in-process IPython
   runner; output digest at `scratch/audit/<stem>/audit.md`).
-  Neither calls `evaluate(...)` or `put(...)`. A third consumer,
-  `iterate-from-skore`, does not open the Project at all — it
-  reads the audit's digest as text and converts the surfaced
-  checks into Backlog candidates. The trap the two Project-side
+  Neither calls `evaluate(...)` or `put(...)`. `review-ml-experiment`
+  does not open the Project at all — it reads the audit digest as
+  text and writes one idea file per candidate. The trap the two Project-side
   consumers share: `project.get(key)` raising `KeyError` reads as
   "the report is missing" but actually means "the lookup shape is
   wrong — `get` is by id, not
@@ -276,8 +275,8 @@ read the report. The pipeline declaration is out of scope (see
   `add-python-package` § "Where does the package belong?",
   `choose-python-library` (polars vs pandas; policy in
   `skore_skills/data/python-stack.json`),
-  `manage-ml-backlog` (sourcing menu), `iterate-from-user`
-  § "The entry-point AskUserQuestion". When in doubt: the user's
+  `manage-ml-backlog` (idea triage), `review-ml-experiment`
+  (audit cost gate). When in doubt: the user's
   approval is the gate, not the harness's instruction text.
 
 ## Pre-flight — emit this checklist as visible text before any code

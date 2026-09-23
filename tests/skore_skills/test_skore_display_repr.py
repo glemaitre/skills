@@ -78,7 +78,7 @@ def test_display_renders_html_for_notebooks(
 def test_checks_repr_carries_codes_and_doc_urls(
     displays: dict[str, object],
 ) -> None:
-    """``iterate-from-skore`` mines codes and mitigation links from the digest."""
+    """Checks repr carries codes and documentation URLs."""
     text = repr(displays["checks"])
     assert "issue(s)" in text
     assert "SKD" in text

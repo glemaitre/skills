@@ -22,7 +22,7 @@ description: >
   - An experiment was re-run (same `put()` key overwritten) and the
     matching audit file needs re-execution.
   - The user wants a human-readable narrative of a past experiment
-    without firing the full `iterate-from-skore` flow.
+    without writing `journal/ideas/` files.
 
   STOP when `python -m skore_skills status` shows no scaffold
   (`has_src` and `has_journal` both false), no approved design,
@@ -112,9 +112,9 @@ stdout to the digest. A forbidden call surfaces in the digest (as a
 section). The contract is *visible*, not invisible.
 
 Sibling read-only consumers (different output shapes, same
-discipline): `scratch/<ts>_*.py` probes, `iterate-from-skore`'s
-Backlog enrichment walk. See `evaluate-ml-pipeline` § Stop
-conditions for the three-consumer rule.
+discipline): `scratch/<ts>_*.py` probes. `review-ml-experiment`
+reads the digest as text and does not open the Project. See
+`evaluate-ml-pipeline` § Stop conditions for the consumer rule.
 
 ## Stop conditions — read before anything else
 
@@ -185,7 +185,7 @@ conditions for the three-consumer rule.
 | Shortcut | Why it's wrong |
 |---|---|
 | `report = project.get(REPORT_ID); print(repr(report))` | Runner captures bare expressions via `result.result`, not stdout. `print(repr(...))` mixes stdout and output sections. Use `report` on its own line |
-| `checks.frame()` instead of the bare `checks` Display | The Display `__repr__` already groups issues and tips with their codes and documentation URLs. `.frame()` flattens that into a table the agent then has to re-read, and drops the severity grouping `iterate-from-skore` mines |
+| `checks.frame()` instead of the bare `checks` Display | The Display `__repr__` already groups issues and tips with their codes and documentation URLs. `.frame()` flattens that into a table the agent then has to re-read, and drops the severity grouping the review mines |
 | `project.get(KEY)` raised `KeyError` → re-run `evaluate` + `put` "to refresh" | Lookup shape is wrong (get is by id, not key). Hub: read the id from the URL printed by `put()`. Local: read `summary["id"]` for the matching key row. Never re-run `evaluate` + `put` to recover |
 | Write `pixi add --feature agent ipython` directly from this skill | Install commands owned by `add-python-package`. This skill **requests**; it does not install |
 | Dump the audit `.py` into `scratch/audit/<stem>/` | `.py` is durable in git; `scratch/` is gitignored. Source in `audit/`; digest in `scratch/audit/<stem>/` |
@@ -342,20 +342,19 @@ snapshot. Extra Display cells are appended only after the user
 picks Additional report view. Details: →
 `references/cell_anatomy.md`.
 
-### The digest is `iterate-from-skore`'s canonical source
+### The digest is the review's canonical source
 
 The rendered digest at `scratch/audit/<stem>/audit.md` is the
-**single source of truth** that `iterate-from-skore` mines to
-populate the JOURNAL Backlog. That skill reads the digest as text,
-walks `Issues:` then `Tips:` in `## Checks summary`, and follows
-each line's documentation URL (or the `[CODE]` title and message
-when the URL is missing) to draft Backlog rows. It does NOT re-open the
-Project, does NOT call `report.*` accessors, and does NOT write
+**single source of truth** that `review-ml-experiment` reads to
+write `journal/ideas/<stem>-<slug>.md`. That skill reads the digest
+as text, walks `Issues:` then `Tips:` in `## Checks summary`, and
+does not re-open the Project, call `report.*`, or write
 `scratch/<ts>_*.py` probes for metric extraction.
+`manage-ml-backlog` later triages those files into Backlog rows.
 
-The contract for Backlog mining stays narrow: persisted-report
-locator + checks (with their doc URLs) + metrics summary.
-`iterate-from-skore` must not walk extra Display headings. Do not
+The contract stays narrow: persisted-report locator + checks +
+metrics summary. The review must not walk extra Display headings.
+Do not
 put ROC / confusion-matrix / importance cells in the core
 template. After Close-audit extras, those cells use their own
 `## <title>` headings. If the user explicitly asks for a custom
@@ -428,6 +427,19 @@ cell that produced it.
 
 ## Execution contract — one command
 
+Before the first `cells run` for a stem, run
+`python -m skore_skills review consent --stem <stem>`.
+- `stop` — name the missing `report.html` and stop.
+- `ask` — emit the cost preview (local read of the persisted
+  report; every skore check; can be slow; name
+  `audit/<stem>.py` and `scratch/audit/<stem>/audit.md`; do not
+  invent minutes) and **AskUserQuestion** Review (Recommended) /
+  Skip / Stop. Do not `cells run` until **Review**. If this turn
+  already answered **Review** (including from
+  `review-ml-experiment`), do not ask again.
+- `proceed` — digest exists. Do not `cells run` unless the user
+  explicitly asked to re-audit; that re-audit asks the gate again.
+
 ```bash
 python -m skore_skills cells run audit/<stem>.py scratch/audit/<stem>/audit.md
 python -m skore_skills audit finding --stem <stem>
@@ -479,7 +491,8 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 
 | Caller | When |
 |---|---|
-| `model-ml-pipeline` | After successful evaluate, before record-outcome |
+| `review-ml-experiment` | After Review, before idea files and record-outcome |
+| `model-ml-pipeline` | Does not load this skill; it loads `review-ml-experiment` |
 | `evaluate-ml-pipeline` | Standalone evaluate may run audit before its close |
 | User free-text | "audit experiment 02", "show me what 03", "re-audit 04" — resolves directly |
 
@@ -578,7 +591,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 
 - Open or write the skore Project's reports (`evaluate-ml-pipeline`).
 - Install `ipython` (`add-python-package` owns).
-- Enrich the Backlog from the audit digest (`iterate-from-skore`).
+- Write `journal/ideas/` files (`review-ml-experiment` owns that).
 - Write or edit `journal/NN_*.md` or `JOURNAL.md` directly. At end
   of turn, dispatch `manage-ml-backlog` record-outcome mode
   instead — that skill owns every journal write.
@@ -592,7 +605,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | Skill | Relationship |
 |---|---|
 | `manage-ml-backlog` | Downstream record-outcome consumer; never dispatches audit from record-outcome mode |
-| `iterate-from-skore` | Downstream consumer of this skill's digest. `audit-ml-pipeline` opens the Project and renders the digest; `iterate-from-skore` parses the digest as text and drafts Backlog rows from each surfaced check. Never opens the Project itself |
+| `review-ml-experiment` | Loop caller. Parses the digest as text and writes one idea file per candidate. Never opens the Project |
 | `evaluate-ml-pipeline` | Producer side. `skore.evaluate` + `project.put` live only in `experiments/NN_*.py` |
 | `setup-workspace` | Workspace layout; four-way stem pairing |
 | `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |

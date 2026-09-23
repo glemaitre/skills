@@ -113,8 +113,8 @@ Defaults (override in `pixi.toml` or on the CLI):
   - small — `openrouter/qwen/qwen3.7-flash`: no default assignment
   - medium — `openrouter/deepseek/deepseek-v4.1-flash`:
     `setup-workspace`, `setup-python-env`, `evaluate-ml-pipeline`,
-    `smoke-test-ml-pipeline`, `iterate-from-skore`, `iterate-from-user`,
-    `iterate-from-literature`, `explore-ml-directions`,
+    `smoke-test-ml-pipeline`, `review-ml-experiment`,
+    `shape-user-idea`, `search-ml-literature`,
     `explore-ml-data`, `audit-ml-pipeline`
   - big — `openrouter/deepseek/deepseek-v4.1-flash`:
     `build-ml-pipeline`

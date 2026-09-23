@@ -13,6 +13,7 @@ from skore_skills.check import render_workspace_check
 from skore_skills.design_consent import render_design_consent
 from skore_skills.evaluate_consent import render_evaluate_consent
 from skore_skills.model_choices import render_model_choices
+from skore_skills.review_consent import render_review_consent
 from skore_skills.status import render_status
 
 
@@ -198,6 +199,21 @@ def evaluate_consent_cmd(stem: str) -> None:
     """Print whether first-eval HITL is required as JSON."""
     try:
         click.echo(render_evaluate_consent(Path.cwd(), stem), nl=False)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+
+
+@cli.group("review")
+def review_group() -> None:
+    """Inspect deterministic review-workflow gates."""
+
+
+@review_group.command("consent")
+@click.option("--stem", required=True, help="Experiment stem, e.g. 01_baseline.")
+def review_consent_cmd(stem: str) -> None:
+    """Print whether the skore-check audit may run as JSON."""
+    try:
+        click.echo(render_review_consent(Path.cwd(), stem), nl=False)
     except ValueError as exc:
         raise click.UsageError(str(exc)) from exc
 

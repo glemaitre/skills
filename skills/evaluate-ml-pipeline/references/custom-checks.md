@@ -54,7 +54,7 @@ raises `CheckNotApplicable` when required data is missing.
 | `title` | Short label shown in the checks summary |
 | `report_types` | `"estimator"`, `"cross-validation"`, or both |
 | `severity` | `"tip"` (caution) or `"issue"` (fix) |
-| `docs_url` | Optional. Prefer a full `http…` URL so `iterate-from-skore` can fetch it. Omit or set `None` when none exists |
+| `docs_url` | Optional. Prefer a full `http…` URL so the review can cite it. Omit or set `None` when none exists |
 
 `"estimator"` checks do **not** run on `CrossValidationReport`.
 To share logic, set `report_types = ["estimator", "cross-validation"]`

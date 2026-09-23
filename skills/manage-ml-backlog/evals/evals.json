@@ -5,12 +5,12 @@
       "id": 1,
       "title": "Record outcome into History",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Audit digest exists with a headline ROC-AUC.\n- Smoke tests passed.\n- History row for `01_baseline` is `running`.\n- G-REPORT-LOCATOR and G-AUDIT-FINDING are available from the digest.]\n\nThe 01_baseline run finished. Record it.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Copy the headline result, locator, and G-AUDIT-FINDING into History / the design-note Status block. - Rescan the Backlog, then ask whether to draft from the refreshed Backlog or stop. Do not ask triage which lever to take. It must NOT: - Invent a metric that is not in the digest or user text. - Draft `02_*.py` in this turn. - Run `git commit` in this skill or `git push`.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Copy the headline result, locator, and G-AUDIT-FINDING into History / the design-note Status block. - Do not open idea triage in this record. An empty `journal/ideas/` is a one-line skip. It must NOT: - Invent a metric that is not in the digest or user text. - Draft `02_*.py` in this turn. - Run `git commit` in this skill or `git push`.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
         "Copy the headline result, locator, and G-AUDIT-FINDING into History / the design-note Status block.",
-        "Rescan the Backlog, then ask whether to draft from the refreshed Backlog or stop. Do not ask triage which lever to take.",
+        "Do not open idea triage in this record. An empty `journal/ideas/` is a one-line skip.",
         "Name `python -m skore_skills git end-turn --stage backlog`.",
         "If that command returns `invoke`, load `persist-ml-git`.",
         "The response does NOT: Invent a metric that is not in the digest or user text.",
@@ -23,15 +23,17 @@
     },
     {
       "id": 2,
-      "title": "Do not implement next experiment",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- One `done` History row and two Backlog rows `B1`, `B2`.\n- `status.skills.explore-ml-directions` is `true`.]\n\nWhat should we try next?",
-      "expected_output": "Behavioural response satisfying: - Load `explore-ml-directions` and let it own the next-idea menu. It must NOT: - Silently pick `B1`. - Start `build-ml-pipeline`. - Open the next-idea menu inside this skill when the router is installed.",
+      "title": "Promote one idea file",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/ideas/01_baseline-calibration.md` exists.\n- Its Source is `audit:01_baseline:checks.SKD003`.\n- That Source is not already a Backlog row.\n- The highest Backlog index is `B2`.\n- The user answers promote.]\n\nWhat should we try next?",
+      "expected_output": "Behavioural response satisfying: - Append a stable `B3` row. Item comes from the file's Question. Source is copied verbatim. - Delete `journal/ideas/01_baseline-calibration.md`. It must NOT: - Silently pick an existing Backlog row. - Start `build-ml-pipeline`. - Write a design note in this turn.",
       "files": [],
       "expectations": [
-        "Load `explore-ml-directions` and let it own the next-idea menu.",
-        "The response does NOT: Silently pick `B1`.",
+        "Append a stable `B3` row. Item comes from the file's Question. Source is copied verbatim.",
+        "Delete `journal/ideas/01_baseline-calibration.md`.",
+        "The response does NOT: Silently pick an existing Backlog row.",
         "The response does NOT: Start `build-ml-pipeline`.",
-        "The response does NOT: Open the next-idea menu inside this skill when the router is installed."
+        "The response does NOT: Write a design note in this turn.",
+        "The response does NOT: Renumber `B1` or `B2`."
       ],
       "tools": false,
       "sandbox": [],
@@ -151,6 +153,23 @@
         "Continue recording the valid headline result.",
         "The response does NOT: Guess a Hub, MLflow, or local artifact URL.",
         "The response does NOT: Omit the Report cell from the History row."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 9,
+      "title": "Empty idea folder does not invent a row",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/ideas/` exists and is empty.\n- The Backlog table has no rows.\n- `status.skills.shape-user-idea` is `true`.\n- `status.skills.search-ml-literature` is `true`.]\n\nWhat should we try next?",
+      "expected_output": "Behavioural response satisfying: - Skip in one line because there are no idea files to triage. - When `shape-user-idea` and `search-ml-literature` are installed, offer those as the way to add an idea. Do not load them until the user picks one. It must NOT: - Fabricate a `B1` row. - Write a design note. - Invent a literature search or a shaping menu from this skill.",
+      "files": [],
+      "expectations": [
+        "Skip in one line because there are no idea files to triage.",
+        "When `shape-user-idea` and `search-ml-literature` are installed, offer those as the way to add an idea. Do not load them until the user picks one.",
+        "The response does NOT: Fabricate a `B1` row.",
+        "The response does NOT: Write a design note.",
+        "The response does NOT: Invent a literature search or a shaping menu from this skill."
       ],
       "tools": false,
       "sandbox": [],

@@ -4,12 +4,12 @@
     {
       "id": 1,
       "title": "Ambiguous capability request",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.\n- No `.skore` file.\n- `status.data_analysis` is `missing`.\n- `status.skills` reports the usual entry skills `true`, including\n  `explore-ml-directions`.]\n\nWhat can you help me with on this machine learning project?",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `explore-ml-directions`, `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports` if installed). One pick. - Name `explore-ml-data` as the recommended next stage; do not auto-load it. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill. - Auto-load a stage skill without asking.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.\n- No `.skore` file.\n- `status.data_analysis` is `missing`.\n- `status.skills` reports the usual entry skills `true`, including\n  `review-ml-experiment`.]\n\nWhat can you help me with on this machine learning project?",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `review-ml-experiment`, `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports` if installed). One pick. - Name `explore-ml-data` as the recommended next stage; do not auto-load it. It must NOT: - Start designing the next experiment. - Claim to have loaded or executed every skill. - Auto-load a stage skill without asking.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `explore-ml-directions`, `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports` if installed). One pick.",
+        "AskUserQuestion listing installed entry skills (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`, `review-ml-experiment`, `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports` if installed). One pick.",
         "Name `explore-ml-data` as the recommended next stage; do not auto-load it.",
         "Do not treat the missing `.skore` as an empty project despite the existing scaffold.",
         "The response does NOT: Start designing the next experiment.",
@@ -17,8 +17,8 @@
         "The response does NOT: Auto-load a stage skill without asking.",
         "The response does NOT: Ask only stay / go deeper / next stage without naming entry skills.",
         "The response does NOT: Put `evaluate-ml-pipeline` or `audit-ml-pipeline` on the uncertain entry board.",
-        "The response does NOT: Put `iterate-from-user`, `iterate-from-literature`, or `iterate-from-skore` on the uncertain entry board.",
-        "The response does NOT: Auto-load `explore-ml-directions` while `data_analysis` is `missing`."
+        "The response does NOT: Put `shape-user-idea` or `search-ml-literature` on the uncertain entry board.",
+        "The response does NOT: Auto-load `review-ml-experiment` while `data_analysis` is `missing`."
       ],
       "tools": false,
       "sandbox": [],
@@ -269,14 +269,14 @@
     },
     {
       "id": 17,
-      "title": "Certain next-experiment request loads the router",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.data_analysis` is `present`.\n- `loop_stage` is `backlog`.\n- `status.skills.explore-ml-directions` is `true`.]\n\nWhat should we try next?",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `explore-ml-directions` without listing the catalog menu. It must NOT: - Auto-load `iterate-from-user`, `iterate-from-literature`, or `iterate-from-skore`. - Design the next experiment in triage. - Ask which entry skill to run.",
+      "title": "Certain next-experiment request loads the backlog",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.data_analysis` is `present`.\n- `loop_stage` is `backlog`.\n- `status.skills.manage-ml-backlog` is `true`.\n- `journal/ideas/` has one idea file.]\n\nWhat should we try next?",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `manage-ml-backlog` without listing the catalog menu. It must NOT: - Load `review-ml-experiment` or `audit-ml-pipeline`. - Design the next experiment in triage. - Ask which entry skill to run.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "Load `explore-ml-directions` without listing the catalog menu.",
-        "The response does NOT: Auto-load `iterate-from-user`, `iterate-from-literature`, or `iterate-from-skore`.",
+        "Load `manage-ml-backlog` without listing the catalog menu.",
+        "The response does NOT: Load `review-ml-experiment` or `audit-ml-pipeline`.",
         "The response does NOT: Design the next experiment in triage.",
         "The response does NOT: Ask which entry skill to run."
       ],
@@ -286,16 +286,16 @@
     },
     {
       "id": 18,
-      "title": "Backlog stage recommends the router",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.data_analysis` is `present`.\n- `loop_stage` is `backlog`.\n- `status.skills.explore-ml-directions` is `true`.\n- The usual entry skills are `true`.]\n\nWhat can you help me with on this machine learning project?",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills, including `explore-ml-directions`. One pick. - Name `explore-ml-directions` as the recommended next stage. Do not auto-load it. It must NOT: - Auto-load `explore-ml-directions`. - Put `iterate-from-literature` on the uncertain entry board. - Start designing the next experiment.",
+      "title": "Backlog stage recommends the backlog skill",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.data_analysis` is `present`.\n- `loop_stage` is `backlog`.\n- `status.skills.manage-ml-backlog` is `true`.\n- The usual entry skills are `true`.]\n\nWhat can you help me with on this machine learning project?",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - AskUserQuestion listing installed entry skills, including `manage-ml-backlog` and `review-ml-experiment`. One pick. - Name `manage-ml-backlog` as the recommended next stage. Do not auto-load it. It must NOT: - Auto-load `manage-ml-backlog`. - Put `audit-ml-pipeline` on the uncertain entry board. - Start designing the next experiment.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "AskUserQuestion listing installed entry skills, including `explore-ml-directions`. One pick.",
-        "Name `explore-ml-directions` as the recommended next stage. Do not auto-load it.",
-        "The response does NOT: Auto-load `explore-ml-directions`.",
-        "The response does NOT: Put `iterate-from-literature` on the uncertain entry board.",
+        "AskUserQuestion listing installed entry skills, including `manage-ml-backlog` and `review-ml-experiment`. One pick.",
+        "Name `manage-ml-backlog` as the recommended next stage. Do not auto-load it.",
+        "The response does NOT: Auto-load `manage-ml-backlog`.",
+        "The response does NOT: Put `audit-ml-pipeline` on the uncertain entry board.",
         "The response does NOT: Start designing the next experiment."
       ],
       "tools": false,
@@ -304,14 +304,14 @@
     },
     {
       "id": 19,
-      "title": "Missing router is a one-line skip",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `loop_stage` is `backlog`.\n- `status.skills.explore-ml-directions` is `false`.]\n\nWhat should we try next?",
-      "expected_output": "Behavioural response satisfying: - Skip in one line because `explore-ml-directions` is not installed. It must NOT: - Invent the explore menu (user idea, literature, audit, backlog). - Load `iterate-from-literature` from memory.",
+      "title": "Missing backlog skill is a one-line skip",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `loop_stage` is `backlog`.\n- `status.skills.manage-ml-backlog` is `false`.]\n\nWhat should we try next?",
+      "expected_output": "Behavioural response satisfying: - Skip in one line because `manage-ml-backlog` is not installed. It must NOT: - Invent idea-file triage (promote / dismiss / leave). - Load `review-ml-experiment` from memory.",
       "files": [],
       "expectations": [
-        "Skip in one line because `explore-ml-directions` is not installed.",
-        "The response does NOT: Invent the explore menu (user idea, literature, audit, backlog).",
-        "The response does NOT: Load `iterate-from-literature` from memory."
+        "Skip in one line because `manage-ml-backlog` is not installed.",
+        "The response does NOT: Invent idea-file triage (promote / dismiss / leave).",
+        "The response does NOT: Load `review-ml-experiment` from memory."
       ],
       "tools": false,
       "sandbox": [],
@@ -319,14 +319,14 @@
     },
     {
       "id": 20,
-      "title": "Certain idea loads iterate-from-user",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.skills.iterate-from-user` is `true`.]\n\nI want to try a monotonic constraint on the target.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `iterate-from-user` without listing the catalog menu. It must NOT: - Load `iterate-from-literature`. - Ask which entry skill to run. - Write a design note in triage.",
+      "title": "Certain review request loads review",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.skills.review-ml-experiment` is `true`.]\n\nReview experiment 02.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `review-ml-experiment` without listing the catalog menu. It must NOT: - Load `audit-ml-pipeline` from triage. - Ask which entry skill to run. - Write a design note in triage.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "Load `iterate-from-user` without listing the catalog menu.",
-        "The response does NOT: Load `iterate-from-literature`.",
+        "Load `review-ml-experiment` without listing the catalog menu.",
+        "The response does NOT: Load `audit-ml-pipeline` from triage.",
         "The response does NOT: Ask which entry skill to run.",
         "The response does NOT: Write a design note in triage."
       ],
@@ -336,15 +336,32 @@
     },
     {
       "id": 21,
-      "title": "Certain literature query loads literature search",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- No design note is in progress.\n- `status.skills.iterate-from-literature` is `true`.]\n\nWhat do people do for censored regression?",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `iterate-from-literature` without listing the catalog menu. It must NOT: - Load `research-ml-practice`. - Load `explore-ml-data` as the certain skill. - Invent papers in triage.",
+      "title": "Certain idea loads shape-user-idea",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.skills.shape-user-idea` is `true`.]\n\nI want to try a monotonic constraint on the target.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `shape-user-idea` without listing the catalog menu. It must NOT: - Load `search-ml-literature`. - Ask which entry skill to run. - Write a design note in triage.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills status`.",
-        "Load `iterate-from-literature` without listing the catalog menu.",
+        "Load `shape-user-idea` without listing the catalog menu.",
+        "The response does NOT: Load `search-ml-literature`.",
+        "The response does NOT: Ask which entry skill to run.",
+        "The response does NOT: Write a design note in triage."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 22,
+      "title": "Certain literature query loads literature search",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- No design note is in progress.\n- `status.skills.search-ml-literature` is `true`.]\n\nWhat do people do for censored regression?",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills status`. - Load `search-ml-literature` without listing the catalog menu. It must NOT: - Load `research-ml-practice`. - Load `model-ml-pipeline` as the certain skill. - Invent papers in triage.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills status`.",
+        "Load `search-ml-literature` without listing the catalog menu.",
         "The response does NOT: Load `research-ml-practice`.",
-        "The response does NOT: Load `explore-ml-data` as the certain skill.",
+        "The response does NOT: Load `model-ml-pipeline` as the certain skill.",
         "The response does NOT: Invent papers in triage."
       ],
       "tools": false,
