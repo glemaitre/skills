@@ -535,11 +535,11 @@ Dispatched audit never writes this block.
 1. **Narrative first** — 2–6 sentences from Checks + Metrics in
    the digest (issues/tips that matter, headline metric). Do not
    invent a metric. Do not paste the digest wholesale.
-2. **Open these** — markdown links plus the resolved absolute
-   path for local files: `[journal/<stem>.md](journal/<stem>.md)`.
-   If `policy.site` is true and `site build` ran or is about to:
-   `[<package>.html](<workspace>/<package>.html)` and
-   `html/<stem>.html`.
+2. **Open these** — resolved absolute paths. When `site build`
+   ran or is about to, link the site and not the design note:
+   `[report.html](<workspace>/report.html)` and
+   `html/<stem>.html`. Otherwise
+   `[journal/<stem>.md](journal/<stem>.md)`.
 3. **Normalized tokens second** — JSON `locator` verbatim first
    among tokens (local: also the absolute `reports/` path), then
    G-AUDIT-FINDING verbatim. Index strings, not the narrative.
@@ -559,8 +559,9 @@ The `notebook convert` for `audit/<stem>.py` already ran above.
 If `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` so the audit viewer reaches
 the experiment page. Skip in one line otherwise. Name a build
-error; do not fail the audit turn. Name `<package>.html` (and
+error; do not fail the audit turn. Name `report.html` (and
 `html/<stem>.html`) in the User-facing close when the build ran.
+Do not also send the user to the markdown.
 
 Run `python -m skore_skills git end-turn --stage evaluate` — the
 audit continues the evaluate stage; there is no `audit` stage on

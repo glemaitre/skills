@@ -2,7 +2,7 @@
 name: export-ml-site
 description: >
   Package JOURNAL, exploratory data analysis markdown, and design notes into an offline
-  MkDocs site opened via <package>.html at the workspace root. Embeds existing notebook HTML
+  MkDocs site opened via report.html at the workspace root. Embeds existing notebook HTML
   companions in their associated reports. Never executes Python. Trigger
   when the user asks for a website, mkdocs, or documentation site.
 ---
@@ -42,11 +42,12 @@ left rail beside a 1200px report column. Mobile uses a drawer.
    only). Later turns only `site build`.
 5. `python -m skore_skills site build`. Do not run
    `notebook convert`. Name a build error; the markdown sources
-   remain the record. Tell the user to open `<package>.html` at
-   the workspace root (`status.package`; double-click; no server).
-   Stage owners that just ran `site build` must name that
-   launcher (and the stage page: `html/data_analysis.html` or
-   `html/<stem>.html`) in the same User-facing close.
+   remain the record. Tell the user to open `report.html` at
+   the workspace root (double-click; no server). Do not send
+   them to the markdown instead. Stage owners that just ran
+   `site build` must name that launcher (and the stage page:
+   `html/data_analysis.html` or `html/<stem>.html`) in the same
+   User-facing close.
 
 ## Stop conditions
 

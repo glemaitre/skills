@@ -252,11 +252,11 @@ locator/finding alone.
 1. **Narrative first** — 2–6 sentences of the result, grounded in
    the audit digest when present (Checks + Metrics), else the
    user's headline / `report.txt`. Do not invent a metric.
-2. **Open these** — markdown links plus the resolved absolute
-   path for local files: `[journal/<stem>.md](journal/<stem>.md)`.
-   If `policy.site` is true and `site build` ran or is about to:
-   `[<package>.html](<workspace>/<package>.html)` and
-   `html/<stem>.html`.
+2. **Open these** — resolved absolute paths. When `site build`
+   ran or is about to, link the site and not the design note:
+   `[report.html](<workspace>/report.html)` and
+   `html/<stem>.html`. Otherwise
+   `[journal/<stem>.md](journal/<stem>.md)`.
 3. **Normalized tokens second** — G-REPORT-LOCATOR evaluate
    passed up (or `n/a — backend did not expose a locator`) first
    among tokens, then G-AUDIT-FINDING (`n/a — audit not run`
@@ -272,8 +272,9 @@ Then, if `policy.site` is true, `export-ml-site` is installed, run
 diagram (and Results) replace the construct-time snapshot. Skip in
 one line otherwise.
 Name a build error; do not fail the model turn. Name
-`<package>.html` (and `html/<stem>.html`) in the User-facing
-close when the build ran.
+`report.html` (and `html/<stem>.html`) in the User-facing
+close when the build ran. Do not also send the user to the
+markdown.
 
 Then run
 `python -m skore_skills git end-turn --stage implement`. If JSON

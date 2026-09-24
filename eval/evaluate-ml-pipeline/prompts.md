@@ -338,10 +338,10 @@ violated.
 - `export-ml-notebook` and `export-ml-site` are installed.
 
 **Must do:**
-- Write 2–6 sentences of the evaluation result and link
-  `journal/01_baseline.md`.
-- Name `<package>.html` and `html/01_baseline.html` in the
-  user-facing close after site build.
+- Write 2–6 sentences of the evaluation result.
+- Name `report.html` and `html/01_baseline.html` in the
+  user-facing close after site build. Do not send the user to
+  the design-note markdown instead.
 - Include the G-REPORT-LOCATOR value (or
   `n/a — backend did not expose a locator`) in the user-facing
   close before convert (first among tokens, after the narrative).
@@ -502,10 +502,10 @@ violated.
 - Notebooks and site are enabled.
 
 **Must do:**
-- After `put`, write a 2–6 sentence narrative, link
-  `journal/<stem>.md`, then surface G-REPORT-LOCATOR first among
-  tokens. Name `<package>.html` and `html/<stem>.html` when site
-  build ran.
+- After `put`, write a 2–6 sentence narrative, then surface
+  G-REPORT-LOCATOR first among tokens. Name `report.html` and
+  `html/<stem>.html` when site build ran. Do not send the user
+  to the design-note markdown instead.
 - Run audit when available, then record-outcome with locator and
   optional digest/headline.
 - Order the remaining close as notebook convert, site build, then

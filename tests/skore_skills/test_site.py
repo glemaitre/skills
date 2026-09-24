@@ -62,7 +62,7 @@ def test_site_init_writes_gitignore(
     text = (tmp_path / ".gitignore").read_text(encoding="utf-8")
     assert "_build/" in text
     assert "html/" in text
-    assert "claim_predictor.html" in text
+    assert "report.html" in text
     assert not (tmp_path / "mkdocs.yml").exists()
 
 
@@ -140,11 +140,11 @@ def test_site_build_runs_mkdocs(
     assert "](data_analysis.md)" in journal
     index = tmp_path / "html" / "index.html"
     assert index.is_file()
-    launcher = tmp_path / "claim_predictor.html"
+    launcher = tmp_path / "report.html"
     assert launcher.is_file()
     assert "url=html/index.html" in launcher.read_text(encoding="utf-8")
     assert str(launcher) in result.output
-    assert "claim_predictor.html" in (tmp_path / ".gitignore").read_text(
+    assert "report.html" in (tmp_path / ".gitignore").read_text(
         encoding="utf-8"
     )
 

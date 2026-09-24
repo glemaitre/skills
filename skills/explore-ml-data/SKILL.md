@@ -363,12 +363,13 @@ alone.
    stage, grounded in Modelling implications / the JSON facts
    (shape, target, leakage or duplicates that shape modelling).
    Do not invent columns. Do not paste `data_analysis.md`.
-2. **Open these** — markdown links plus the resolved absolute
-   path for local files (TUI clickability):
+2. **Open these** — resolved absolute paths (TUI clickability).
+   When `site build` ran or is about to, link the site and not
+   the markdown:
+   `[report.html](<workspace>/report.html)` and
+   `html/data_analysis.html`. Otherwise
    `[data_analysis/data_analysis.md](data_analysis/data_analysis.md)`.
-   If `policy.site` is true and `site build` ran or is about to:
-   `[<package>.html](<workspace>/<package>.html)` and
-   `html/data_analysis.html`. No Skore locator on this stage.
+   No Skore locator on this stage.
 3. **Normalized tokens second** — none for EDA (no
    G-REPORT-LOCATOR / G-AUDIT-FINDING).
 
@@ -386,9 +387,9 @@ do not fail the turn, do not `pixi add`.
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` after durable files are on
 disk. Skip in one line otherwise. Name a build error; do not fail
-the data-analysis turn. Name `<package>.html` and
+the data-analysis turn. Name `report.html` and
 `html/data_analysis.html` in the User-facing close when the
-build ran.
+build ran. Do not also send the user to the markdown.
 
 `python -m skore_skills git end-turn --stage data_analysis`. If
 JSON `action` is `invoke`, load `persist-ml-git` only if

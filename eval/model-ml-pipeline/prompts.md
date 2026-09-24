@@ -270,9 +270,10 @@
 - After Review, load `manage-ml-backlog` in record-outcome mode
   with the returned digest, locator, and G-AUDIT-FINDING.
 - Record before `notebook convert` and `site build`.
-- Write 2–6 sentences from the digest, link `journal/01_baseline.md`,
-  name `<package>.html` and `html/01_baseline.html`, and include
-  locator plus G-AUDIT-FINDING in the user-facing close.
+- Write 2–6 sentences from the digest, name `report.html` and
+  `html/01_baseline.html` instead of the design-note markdown,
+  and include locator plus G-AUDIT-FINDING in the user-facing
+  close.
 - Name `python -m skore_skills git end-turn --stage implement`
   last.
 
@@ -353,7 +354,10 @@
   `pipeline.html` snapshot and before the Evaluate question,
   inside that build.
 - Keep the post-loop `site build` for the fitted diagram.
+- Name `report.html` when each site build runs.
 
 **Must NOT do:**
 - Defer the first `site build` until after `skore.evaluate`.
 - Skip the pre-Evaluate site build because EDA was skipped.
+- Point the user at the design-note markdown instead of
+  `report.html` after a site build.

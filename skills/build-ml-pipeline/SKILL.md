@@ -156,13 +156,12 @@ stem/headline/learner alone.
 1. **Narrative first** — 2–6 sentences: what was declared, that
    smoke is green, the learner. Ground in Method. Do not invent
    a CV metric. No Skore locator yet (`put` has not run).
-2. **Open these** — markdown links plus the resolved absolute
-   path for local files:
+2. **Open these** — resolved absolute paths. When `site build`
+   ran this turn, link the site and not the design note:
+   `[report.html](<workspace>/report.html)` and
+   `html/<stem>.html` (Method diagram). Otherwise
    `[journal/<stem>.md](journal/<stem>.md)` and
-   `[experiments/<stem>.py](experiments/<stem>.py)`. When
-   `policy.site` is true and `export-ml-site` is installed, also
-   `[<package>.html](<workspace>/<package>.html)` and
-   `html/<stem>.html` (Method diagram).
+   `[experiments/<stem>.py](experiments/<stem>.py)`.
 3. **Normalized tokens second** — none (no G-REPORT-LOCATOR /
    G-AUDIT-FINDING).
 

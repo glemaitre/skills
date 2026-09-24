@@ -152,14 +152,18 @@ def collect_pages(root: Path) -> list[Page]:
     return pages
 
 
+LAUNCHER_NAME = "report.html"
+
+
 def site_title(root: Path) -> str:
-    """Return the project name used as site title and launcher stem."""
+    """Return the project name used as the site title."""
     return package_name(root) or root.name
 
 
 def launcher_name(root: Path) -> str:
     """Return the workspace-root HTML launcher filename."""
-    return f"{site_title(root)}.html"
+    del root
+    return LAUNCHER_NAME
 
 
 def render_launcher(title: str) -> str:

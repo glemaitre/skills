@@ -665,11 +665,11 @@ dump of `report.txt` / the design note, and not locator alone.
    `scratch/results/<stem>/report.txt`. Do not invent a metric.
    If audit ran this turn, ground the story in the digest
    (Checks + Metrics), not a paste of `audit.md`.
-2. **Open these** — markdown links plus the resolved absolute
-   path for local files: `[journal/<stem>.md](journal/<stem>.md)`.
-   If `policy.site` is true and `site build` ran or is about to:
-   `[<package>.html](<workspace>/<package>.html)` and
-   `html/<stem>.html`.
+2. **Open these** — resolved absolute paths. When `site build`
+   ran or is about to, link the site and not the design note:
+   `[report.html](<workspace>/report.html)` and
+   `html/<stem>.html`. Otherwise
+   `[journal/<stem>.md](journal/<stem>.md)`.
 3. **Normalized tokens second** — JSON `locator` verbatim first
    among tokens (local: also the absolute `reports/` path), then
    G-AUDIT-FINDING verbatim (`n/a — audit not run` when skipped).
@@ -702,8 +702,9 @@ the matching design note's single `## Notebooks` section.
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build`. Skip in one line otherwise.
 Name a build error; do not fail the evaluate turn. Name
-`<package>.html` (and `html/<stem>.html`) in the User-facing
-close when the build ran.
+`report.html` (and `html/<stem>.html`) in the User-facing
+close when the build ran. Do not also send the user to the
+markdown.
 
 Run `python -m skore_skills git end-turn --stage evaluate`. If JSON
 `action` is `invoke`, load `persist-ml-git` only if

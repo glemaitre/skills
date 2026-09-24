@@ -520,8 +520,9 @@ violated. 19 cases; Must-NOT is all-or-nothing.
 - After the unfitted `scratch/results/01_baseline/pipeline.html`
   snapshot, name `python -m skore_skills site build` before
   `smoke run` and before the Evaluate question.
-- In the checkpoint, link `<package>.html` and
-  `html/01_baseline.html` (Method diagram).
+- In the checkpoint, link `report.html` and
+  `html/01_baseline.html` (Method diagram). Do not link the
+  design-note markdown instead.
 
 **Must NOT do:**
 - Defer `site build` until after `skore.evaluate`.
