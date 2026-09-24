@@ -149,6 +149,41 @@ def test_site_build_runs_mkdocs(
     )
 
 
+def test_site_build_omits_data_understanding_without_eda(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A missing analysis report drops Data understanding from the home page."""
+    _scaffold(tmp_path)
+    journal = (
+        "# JOURNAL\n\n"
+        "## Status\n\n"
+        "| Variable | Value |\n"
+        "|---|---|\n"
+        "| Goal | predict |\n\n"
+        "## Data understanding\n\n"
+        "| Variable | Value |\n"
+        "|---|---|\n"
+        "| Status | skipped — 2026-09-24 |\n"
+        "| Report | [data_analysis/data_analysis.md]"
+        "(../data_analysis/data_analysis.md) |\n\n"
+        "## History\n\n"
+        "| Stem | Intent |\n"
+        "|---|---|\n"
+    )
+    source = tmp_path / "journal" / "JOURNAL.md"
+    source.write_text(journal, encoding="utf-8")
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    staged = (tmp_path / "_build" / "docs" / "index.md").read_text(encoding="utf-8")
+    assert "## Data understanding" not in staged
+    assert "data_analysis.md" not in staged
+    assert "## History" in staged
+    assert "## Status" in staged
+    assert source.read_text(encoding="utf-8") == journal
+
+
 def test_site_build_groups_experiments_and_writes_top_nav(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
