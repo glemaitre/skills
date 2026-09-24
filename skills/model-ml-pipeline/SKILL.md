@@ -25,8 +25,8 @@ Do not load `smoke-test-ml-pipeline` as a sibling of evaluate.
    current design, run
    `python -m skore_skills design consent --stem <stem>`. Treat
    JSON `action` as authoritative. `proceed` → resume that stem
-   directly; do not ask how to start again. `ask` → show the note
-   and **stop** for approval; do not write code. `stop` → missing
+   directly; do not ask how to start again. `ask` → Design approval
+   below; do not write code. `stop` → missing
    note: name `scaffold --journal --stem` (or abandoned: explain
    and do not implement). Do not infer approval from "build it".
 3. Otherwise run `python -m skore_skills model choices`. Treat its
@@ -47,9 +47,10 @@ empty. Discussion is always present.
 ## Choice contracts
 
 Every choice first produces a user-confirmed proposal and an
-approved design note. No branch writes model code before approval.
-Use the next available numeric stem; never overwrite an existing
-note.
+approved design note. The proposal yes agrees the idea. The note
+is approved only by Design approval below. No branch writes model
+code before that gate is `proceed`. Use the next available numeric
+stem; never overwrite an existing note.
 
 - **Dummy predictor (`dummy`).** Determine classification vs
   regression from recorded project facts; ask if unknown. Propose
@@ -62,12 +63,12 @@ note.
   traditional-ML baseline: skrub automatic preprocessing plus a
   task-appropriate standard estimator, with no domain feature
   engineering. It establishes a real comparison point. Confirm the
-  proposal and design before build.
+  proposal, write the note, then Design approval, before build.
 - **EDA proposal (`eda_proposal`).** Read
   `data_analysis/data_analysis.md` and the project goal. Cite the
   EDA findings that motivate one pipeline proposal. Do not invent
   findings or present multiple silent alternatives. Confirm the
-  proposal and design before build.
+  proposal, write the note, then Design approval, before build.
 - **Backlog (`backlog`).** Load `manage-ml-backlog` only if
   `status.skills.manage-ml-backlog` is true. Else one-line skip;
   do not invent a Backlog. Pass the
@@ -77,8 +78,8 @@ note.
 - **Discussion (`discuss`).** Have an open conversation about what
   to learn, why now, and what changes. Restate the agreed idea and
   wait for an explicit yes before any design note. Only after that
-  confirmation create/populate the design note and seek approval.
-  If no idea is agreed, return to the entry choices.
+  confirmation create/populate the design note, then Design
+  approval. If no idea is agreed, return to the entry choices.
 
 ## Before execution
 
@@ -108,7 +109,22 @@ If the design-note shell is missing, this turn only names
 `python -m skore_skills scaffold --journal --stem <NN_short>`
 and stops. Do not fill Question / Motivation / Method / Risks
 from memory. Populate those sections only after that command
-has created the shell, then stop for explicit design approval.
+has created the shell, then Design approval.
+
+## Design approval
+
+One gate approves a populated note. Run
+`python -m skore_skills design consent --stem <stem>`.
+`proceed` → already approved; do not ask again. `ask` → show the
+note and **AskUserQuestion** (single choice), in order:
+**Approve** / **Modify** / **Stop**. Do not also ask in chat
+whether the note looks right.
+- **Approve** → set `**State:**` to `approved` and
+  `**Approved by user on:**` to today's date (`YYYY-MM-DD`).
+  Re-run `design consent`; code starts only on `proceed`.
+- **Modify** → leave `State` `planned`, edit the note, and ask
+  this gate again.
+- **Stop** → do not implement.
 
 ## Approved-design implement loop
 
@@ -181,10 +197,11 @@ symbols are written, children use
   `python -m skore_skills scaffold --journal --stem
   <NN_short>` and stops. Do not recreate or fill the template
   from memory. Populate Question / Motivation / Method / Risks
-  only after that command has created the shell, then stop for
-  user approval.
+  only after that command has created the shell, then Design
+  approval.
 - Require `design consent` `proceed` before code. Do not treat
-  "the user asked to build" as approval.
+  "the user asked to build", or a chat yes on the drafted note,
+  as approval.
 - Preserve identical stems across design, experiment, smoke, audit.
 - Do not replace skrub DataOps with bare sklearn Pipeline.
 - Do not persist a result as done while `smoke run` is `stop`.

@@ -230,6 +230,23 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 13,
+      "title": "Planned design note uses one approval gate",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_target_transform.md` exists with State `planned`.\n- Question, Motivation, Method, and Risks are filled.\n- `design consent` returns `ask` with choices approve, modify, stop.]\n\nThe design note is written. Approve it and implement.",
+      "expected_output": "Behavioural response satisfying: - Ask one AskUserQuestion, in order: Approve / Modify / Stop. - On Approve, set State to `approved` and Approved by user on to a `YYYY-MM-DD` date, then require `design consent` `proceed` before code. It must NOT: - Also ask in chat whether the note looks right. - Treat \"Approve it and implement\" as approval before the gate. - Write model code while State is still `planned`.",
+      "files": [],
+      "expectations": [
+        "Ask one AskUserQuestion, in order: Approve / Modify / Stop.",
+        "On Approve, set State to `approved` and Approved by user on to a `YYYY-MM-DD` date, then require `design consent` `proceed` before code.",
+        "The response does NOT: Also ask in chat whether the note looks right.",
+        "The response does NOT: Treat \"Approve it and implement\" as approval before the gate.",
+        "The response does NOT: Write model code while State is still `planned`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

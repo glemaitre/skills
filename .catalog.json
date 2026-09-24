@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "58131ee317dcb21a0c5a9020d28c83fed9b8d32c425706203e1ad0c4cb6465a7",
+  "catalog_hash": "dce154a0454fe2d7ffbfc72fcb01730bf01f0f5c2c0d2ef9e3473b25f6cfaf56",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -147,7 +147,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "683977a347f11c8376bc50a60c945b73ed9ba1663ff22c4b63679107c9956415"
+      "hash": "85079bf4c1c67c38907cfe4ee97b4518d8e99c7001f3e512cca586fd9f3392dc"
     },
     {
       "id": "choose-python-library",

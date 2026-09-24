@@ -309,3 +309,26 @@
 - Drop the locator because there is no audit digest.
 - Invent a headline metric.
 - Open idea triage.
+
+---
+
+## CASE_13 — Planned design note uses one approval gate
+
+**User prompt:**
+> The design note is written. Approve it and implement.
+
+**Assumed workspace state:**
+- `journal/02_target_transform.md` exists with State `planned`.
+- Question, Motivation, Method, and Risks are filled.
+- `design consent` returns `ask` with choices approve, modify, stop.
+
+**Must do:**
+- Ask one AskUserQuestion, in order: Approve / Modify / Stop.
+- On Approve, set State to `approved` and Approved by user on to
+  a `YYYY-MM-DD` date, then require `design consent` `proceed`
+  before code.
+
+**Must NOT do:**
+- Also ask in chat whether the note looks right.
+- Treat "Approve it and implement" as approval before the gate.
+- Write model code while State is still `planned`.
