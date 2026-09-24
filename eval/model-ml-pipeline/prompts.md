@@ -332,3 +332,28 @@
 - Also ask in chat whether the note looks right.
 - Treat "Approve it and implement" as approval before the gate.
 - Write model code while State is still `planned`.
+
+---
+
+## CASE_14 — Skipped EDA still site-builds before Evaluate
+
+**User prompt:**
+> The baseline design is approved. Implement and test the model.
+
+**Assumed workspace state:**
+- Matching approved design note and experiment shell exist.
+- `status.data_analysis` is `skipped`. No
+  `data_analysis/data_analysis.md`.
+- `policy.site` is true. `export-ml-site` is installed.
+- `build-ml-pipeline` is installed.
+
+**Must do:**
+- Dispatch `build-ml-pipeline`.
+- Require `python -m skore_skills site build` after the unfitted
+  `pipeline.html` snapshot and before the Evaluate question,
+  inside that build.
+- Keep the post-loop `site build` for the fitted diagram.
+
+**Must NOT do:**
+- Defer the first `site build` until after `skore.evaluate`.
+- Skip the pre-Evaluate site build because EDA was skipped.

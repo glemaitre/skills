@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "dce154a0454fe2d7ffbfc72fcb01730bf01f0f5c2c0d2ef9e3473b25f6cfaf56",
+  "catalog_hash": "7936c4ba121a25e499b2d4767270d04ffe1d7d9be0465469aa6432ab58071c79",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "e4a7d3164c91fd29df57c784377b87666813990d1c7b5c2d6ab1f356c41fd94a"
+      "hash": "c3a9b8848d8310c90ad8882a3acc5d830c0fb4436c0adcc812cc6d31b016a0ec"
     },
     {
       "id": "build-ml-pipeline",
@@ -21,7 +21,7 @@
       "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "7c5ea117ff90e37506ba17c7a7df9f6bba062bd7e9a1648b3de426d79e954202"
+      "hash": "71a78578329a4f36b74429f417dd1fbfe4f016fbc0df1f0774f0ede21e7f99f3"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -147,7 +147,7 @@
       "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "85079bf4c1c67c38907cfe4ee97b4518d8e99c7001f3e512cca586fd9f3392dc"
+      "hash": "831dca71ad17c39893f96e1801c210894d6126174896a8857663fd35332ad0b3"
     },
     {
       "id": "choose-python-library",

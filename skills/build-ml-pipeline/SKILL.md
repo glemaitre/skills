@@ -110,12 +110,14 @@ it does not fit or test a model.
    `skore.evaluate` / `project.put` here. Optional:
    `DataOp.skb.draw_graph()` to `pipeline.svg` only if
    `python -m skore_skills env graphviz` is healthy; otherwise
-   skip Graphviz in one line. If `policy.site` is true and
+   skip Graphviz in one line. Missing or skipped EDA does not
+   defer the site. If `policy.site` is true and
    `export-ml-site` is installed, run
-   `python -m skore_skills site build` so Method shows the
-   diagram before Evaluate. Skip in one line otherwise. Do not
-   `notebook convert` if the experiment file already contains
-   `skore.evaluate`.
+   `python -m skore_skills site build` after this unfitted
+   snapshot, before `smoke run` and before the Evaluate
+   question, so Method shows the diagram. Skip in one line
+   otherwise. Do not `notebook convert` if the experiment file
+   already contains `skore.evaluate`.
 4. When `experiments/NN_*.py` exists with the matching stem, load
    `smoke-test-ml-pipeline` only if
    `status.skills.smoke-test-ml-pipeline` is true. Missing skill →
@@ -157,10 +159,10 @@ stem/headline/learner alone.
 2. **Open these** — markdown links plus the resolved absolute
    path for local files:
    `[journal/<stem>.md](journal/<stem>.md)` and
-   `[experiments/<stem>.py](experiments/<stem>.py)`. If
-   `policy.site` is true and `site build` ran this turn:
+   `[experiments/<stem>.py](experiments/<stem>.py)`. When
+   `policy.site` is true and `export-ml-site` is installed, also
    `[<package>.html](<workspace>/<package>.html)` and
-   `html/<stem>.html`.
+   `html/<stem>.html` (Method diagram).
 3. **Normalized tokens second** — none (no G-REPORT-LOCATOR /
    G-AUDIT-FINDING).
 
@@ -515,7 +517,7 @@ Look up symbols with `api get`. Code: `references/common_patterns.md`.
 | `research-ml-practice` | Load if installed on FE / transform / leakage. Abstract the **problem class**, not the table name. Summarize `scratch/research/<slug>.md`. AskUserQuestion `allow_multiple` on **`declare`** rows that do not violate stops. `measure` → revisit EDA; do not edit `data_analysis.py`. Declaring id handling does **not** wire Pattern B — no `cv=` / `split_kwargs` / `GroupKFold` until grouping is an approved Method choice. `evaluate` → name `evaluate-ml-pipeline`. `confirm` → ask the user. Missing skill → one-line skip |
 | `python -m skore_skills style` | After writing/editing `pipeline.py` / `features.py` / `data.py` |
 | `python -m skore_skills env graphviz` | Optional DataOp SVG via `draw_graph`; not required for Method HTML |
-| `python -m skore_skills site build` | After the unfitted `pipeline.html` snapshot when `policy.site` |
+| `python -m skore_skills site build` | After the unfitted `pipeline.html` snapshot, before smoke and Evaluate, when `policy.site`. Skipped EDA does not defer it |
 
 ## References (load on demand)
 

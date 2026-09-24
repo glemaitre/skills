@@ -83,7 +83,8 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   anywhere.
 - **G-DATA-ANALYSIS run | skip.** AskUserQuestion. "Go fast" does
   not skip. Skip → JOURNAL Status row `skipped — <date>` and stop.
-  Do not run `site build` on skip.
+  Do not run `site build` on skip. The unfitted snapshot build in
+  `build-ml-pipeline` still runs before Evaluate.
 - **IPython on the run path.** Missing → `add-python-package` for
   `ipython` (`env route` agent). Decline → skip path. Do not
   `pixi add` / fabricate output.

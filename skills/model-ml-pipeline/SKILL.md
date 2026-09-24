@@ -139,8 +139,11 @@ whether the note looks right.
    `python -m skore_skills evaluate consent --stem <stem>`
    (Evaluate / Modify / Stop on `ask`). Build also writes the
    unfitted `scratch/results/<stem>/pipeline.html` and, when
-   `policy.site` is true, runs `site build` so Method shows the
-   diagram **before** Evaluate. Do not convert
+   `policy.site` is true and `export-ml-site` is installed, runs
+   `site build` after that snapshot and before Evaluate so Method
+   shows the diagram. Missing or skipped EDA does not defer it.
+   The post-loop rebuild is the fitted diagram; it does not
+   replace this one. Do not convert
    `experiments/<stem>.py` at that point if it already contains
    `skore.evaluate`.
 2. Only if the user chose **Evaluate** and `smoke run` is `proceed`: load
