@@ -24,7 +24,7 @@ reporting is owned by `skore` reports.
   tracking server**, that is still a skore-owned operation — use
   `skore.Project(mode="mlflow", tracking_uri=...)` (the
   `skore[mlflow]` backend) and keep calling `project.put(...)`. The
-  mode is picked at `organize-ml-workspace` § "G-SKORE-MODE"; you
+  mode is picked at `evaluate-ml-pipeline` § "G-SKORE-MODE"; you
   still never call the raw `mlflow.log_*` API yourself. Install with an
   explicit `mlflow>=3` pin (`skore[mlflow]` alone can resolve mlflow
   2.x, which the backend doesn't support).

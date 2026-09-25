@@ -1,0 +1,101 @@
+# export-ml-notebook eval
+
+---
+
+## CASE_01 — Convert EDA percent file
+
+**User prompt:**
+> Give me an executed notebook of the EDA.
+
+**Assumed workspace state:**
+- `data_analysis/data_analysis.py` exists.
+- `policy.notebooks` is true.
+- `jupytext` and `nbclient` are installed.
+
+**Must do:**
+- Name `python -m skore_skills notebook convert data_analysis/data_analysis.py`.
+
+**Must NOT do:**
+- Rewrite `data_analysis/data_analysis.py` from a `.ipynb`.
+- Run `git commit`.
+- Run `cells run` as a substitute for convert.
+- Pass `--html` unless the user asked for HTML or a site viewer.
+
+---
+
+## CASE_02 — Null gate asks then installs
+
+**User prompt:**
+> Make an ipynb from data_analysis/data_analysis.py.
+
+**Assumed workspace state:**
+- `policy.notebooks` is null.
+- `add-python-package` is installed.
+
+**Must do:**
+- AskUserQuestion executed notebooks (default off).
+- If the user says yes: persist `notebooks true`, load
+  `add-python-package` for `jupytext` and `nbclient`, then convert.
+
+**Must NOT do:**
+- Convert while the gate is still null or false.
+- Run `pixi add` / `uv add` from this skill.
+
+---
+
+## CASE_03 — Convert without HTML does not rebuild site
+
+**User prompt:**
+> Convert data_analysis/data_analysis.py to a notebook.
+
+**Assumed workspace state:**
+- `policy.notebooks` is true.
+- `policy.site` is true.
+- `export-ml-site` is installed.
+
+**Must do:**
+- Convert the percent file without `--html`.
+
+**Must NOT do:**
+- Name `python -m skore_skills site build`.
+- Run `git end-turn`.
+
+---
+
+## CASE_04 — Notebook page on the site on explicit request
+
+**User prompt:**
+> Put the executed EDA notebook on the site.
+
+**Assumed workspace state:**
+- `data_analysis/data_analysis.py` exists.
+- `policy.notebooks` is true.
+- `jupytext` and `nbclient` are installed.
+- `add-python-package` is installed.
+- `policy.site` is true.
+- `export-ml-site` is installed.
+
+**Must do:**
+- Load `add-python-package` for `nbconvert`.
+- Name `python -m skore_skills notebook convert data_analysis/data_analysis.py --html`.
+- Name `python -m skore_skills site build`.
+
+**Must NOT do:**
+- Run `cells run` as a substitute for convert.
+- Run `git end-turn`.
+
+---
+
+## CASE_05 — Gate off
+
+**User prompt:**
+> Convert data_analysis/data_analysis.py to a notebook.
+
+**Assumed workspace state:**
+- `policy.notebooks` is false.
+
+**Must do:**
+- Say the executed-notebooks gate is off and offer to turn it on.
+
+**Must NOT do:**
+- Run `notebook convert` while the flag is false.

@@ -1,0 +1,1518 @@
+"""Tests for ``skore_skills env detect`` / ``env add``."""
+
+from __future__ import annotations
+
+import io
+import json
+from pathlib import Path
+from typing import Any
+
+import pytest
+from click.testing import CliRunner
+from packaging.requirements import Requirement
+
+from skore_skills.cli import cli
+from skore_skills.env import _venv_bin, install_argv, load_stack_policy
+
+FIXTURES = Path(__file__).resolve().parent / "fixtures" / "envs"
+
+
+@pytest.mark.parametrize(
+    ("name", "manager"),
+    [
+        ("pixi", "pixi"),
+        ("uv", "uv"),
+        ("poetry", "poetry"),
+        ("hatch", "hatch"),
+        ("conda", "conda"),
+        ("pip-venv", "pip-venv"),
+        ("none", "none"),
+    ],
+)
+def test_env_detect_each_manager(
+    name: str, manager: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Each fixture maps to the documented manager (or none)."""
+    monkeypatch.chdir(FIXTURES / name)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] == manager
+    assert payload["ambiguous"] is False
+    assert payload["mismatch"] is False
+
+
+def test_env_detect_ambiguous(monkeypatch: pytest.MonkeyPatch) -> None:
+    """pixi.toml + conda env is ambiguous: JSON flag and non-zero exit."""
+    monkeypatch.chdir(FIXTURES / "ambiguous")
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code != 0
+    payload = json.loads(result.output)
+    assert payload["ambiguous"] is True
+    assert payload["env_manager"] is None
+    assert payload["managers"] == ["pixi", "conda"]
+
+
+def test_status_reports_ambiguous_manager(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Status exposes the same ambiguity facts as env detect."""
+    monkeypatch.chdir(FIXTURES / "ambiguous")
+    result = CliRunner().invoke(cli, ["status"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] is None
+    assert payload["ambiguous"] is True
+    assert payload["mismatch"] is False
+    assert payload["managers"] == ["pixi", "conda"]
+
+
+def test_reexec_in_dev_refuses_ambiguous_manager(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Library commands do not fall back to ambient Python when ambiguous."""
+    from skore_skills import env as env_mod
+
+    called = False
+
+    def fake_run(*args: Any, **kwargs: Any) -> Any:
+        nonlocal called
+        called = True
+        raise AssertionError("subprocess must not run")
+
+    monkeypatch.delenv(env_mod.IN_DEV_ENV, raising=False)
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    code = env_mod.reexec_in_dev(FIXTURES / "ambiguous", argv=["api", "version", "x"])
+    assert code == 1
+    assert called is False
+
+
+def test_env_add_pixi_never_pip(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``env add`` on a pixi fixture prints ``pixi add``, never ``pip install``."""
+    monkeypatch.chdir(FIXTURES / "pixi")
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "pixi add skrub pydot graphviz"
+    assert "pip install" not in result.output
+
+
+@pytest.mark.parametrize(
+    ("fixture", "expected"),
+    [
+        ("uv", "uv add pandas"),
+        ("poetry", "poetry add pandas"),
+        (
+            "conda",
+            "conda install -n fixture-conda -c conda-forge pandas"
+            " && conda install -n workspace-dev -c conda-forge pandas",
+        ),
+        ("pip-venv", "pip install pandas"),
+    ],
+)
+def test_env_add_command_per_manager(
+    fixture: str, expected: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Print-only add matches the env-manager command table."""
+    monkeypatch.chdir(FIXTURES / fixture)
+    result = CliRunner().invoke(cli, ["env", "add", "pandas"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == expected
+
+
+def test_env_add_hatch_writes_pyproject(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hatch add inserts the package into pyproject.toml."""
+    (tmp_path / "hatch.toml").write_text("# hatch\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "pandas"])
+    assert result.exit_code == 0, result.output
+    assert "updated pyproject.toml" in result.output
+    assert "pip install" not in result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"pandas"' in text
+    agent = CliRunner().invoke(cli, ["env", "add", "--feature", "agent", "optuna"])
+    assert agent.exit_code == 0, agent.output
+    agent_text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.hatch.envs.agent]" in agent_text
+    assert "[tool.hatch.envs.dev]" in agent_text
+    assert "extra-dependencies" in agent_text
+    assert '"optuna"' in agent_text
+
+
+def test_env_add_named_package_not_substituted(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """User-named packages are added; no HistGradientBoosting swap."""
+    monkeypatch.chdir(FIXTURES / "pixi")
+    result = CliRunner().invoke(cli, ["env", "add", "xgboost"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "pixi add xgboost"
+    assert "HistGradientBoosting" not in result.output
+    policy = load_stack_policy()
+    assert "forbidden_substitutes" not in policy
+    assert "ruff" in policy["mandatory"]
+
+
+def test_env_stack_prints_policy() -> None:
+    """``env stack`` prints the packaged policy, including competing jobs."""
+    result = CliRunner().invoke(cli, ["env", "stack"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["competing"]["tabular"] == ["pandas", "polars"]
+    assert "pytest" in payload["stage"]
+    assert payload == load_stack_policy()
+
+
+def test_env_add_ambiguous_refuses(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Do not install into an ambiguous workspace."""
+    monkeypatch.chdir(FIXTURES / "ambiguous")
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code != 0
+    assert "multiple env managers" in result.output
+
+
+def test_env_add_none_refuses(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Nothing detected: do not invent pip."""
+    monkeypatch.chdir(FIXTURES / "none")
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code != 0
+    assert "no env manager" in result.output
+    assert "pip install" not in result.output
+
+
+def test_env_add_requires_package() -> None:
+    """``env add`` without packages is usage error."""
+    result = CliRunner().invoke(cli, ["env", "add"])
+    assert result.exit_code != 0
+
+
+def test_env_add_execute_runs_subprocess(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``--execute`` runs the printed command."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "add", "--execute", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert seen == [["pixi", "add", "skrub", "pydot", "graphviz"]]
+    assert result.output.strip() == "pixi add skrub pydot graphviz"
+
+
+def test_install_argv_unknown_manager() -> None:
+    """Unknown manager names are a programming error."""
+    with pytest.raises(ValueError, match="unknown manager"):
+        install_argv("pants", ["x"])
+
+
+def test_add_packages_empty_list(tmp_path: Path) -> None:
+    """Library callers still get a usage error for an empty package list."""
+    from skore_skills.env import add_packages
+
+    text, code = add_packages(tmp_path, [])
+    assert code == 2
+    assert "at least one package" in text
+
+
+def test_env_add_feature_flag(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``--feature`` / ``--group`` map onto pixi and uv/poetry flags."""
+    monkeypatch.chdir(FIXTURES / "pixi")
+    pixi = CliRunner().invoke(cli, ["env", "add", "--feature", "agent", "ruff"])
+    assert pixi.exit_code == 0, pixi.output
+    assert pixi.output.strip() == "pixi add --feature agent ruff"
+    monkeypatch.chdir(FIXTURES / "uv")
+    uv = CliRunner().invoke(cli, ["env", "add", "--group", "agent", "ruff"])
+    assert uv.exit_code == 0, uv.output
+    assert uv.output.strip() == "uv add --group agent ruff"
+
+
+def test_env_add_refuses_when_unmanaged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """User-managed workspaces never emit an install command."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code != 0
+    assert "user-managed" in result.output
+    assert "pixi add" not in result.output
+
+
+def test_env_detect_recommended_uses_policy(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Recorded ``env_manager`` leads the recommended list when none is visible."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    policy = empty_policy()
+    policy["env_manager"] = "uv"
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("skore_skills.env.shutil.which", lambda *_a, **_k: None)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] == "none"
+    assert payload["recommended"][0] == "uv"
+    assert payload["mismatch"] is False
+    assert payload["managed"] is None
+
+
+def _write_fake_skore(tmp_path: Path, *parts: str) -> Path:
+    path = tmp_path.joinpath(*parts)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("", encoding="utf-8")
+    path.chmod(0o755)
+    return path
+
+
+def _patch_which(monkeypatch: pytest.MonkeyPatch, binary: Path | None) -> None:
+    def which(name: str, path: str | None = None) -> str | None:
+        if binary is not None and name in {"skore", "skore-cli"}:
+            return str(binary)
+        return None
+
+    monkeypatch.setattr("skore_skills.env.shutil.which", which)
+
+
+def test_env_detect_provenance_uv_when_empty(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Empty root ranks ``uv`` from the ``skore`` install prefix."""
+    binary = _write_fake_skore(tmp_path, "uv", "tools", "skore-cli", "bin", "skore")
+    root = tmp_path / "project"
+    root.mkdir()
+    monkeypatch.chdir(root)
+    _patch_which(monkeypatch, binary)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] == "none"
+    assert payload["recommended"][0] == "uv"
+    assert payload["provenance"]["manager"] == "uv"
+    assert payload["mismatch"] is False
+
+
+def test_env_detect_default_when_no_skore(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Empty root with no ``skore`` on PATH keeps the packaged default."""
+    monkeypatch.chdir(tmp_path)
+    _patch_which(monkeypatch, None)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] == "none"
+    assert payload["recommended"][0] == "pixi"
+    assert payload["provenance"] == {"manager": None, "path": None}
+
+
+def test_env_detect_policy_beats_provenance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Recorded policy ranks above a pixi-looking ``skore`` prefix."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    binary = _write_fake_skore(tmp_path, ".pixi", "bin", "skore")
+    root = tmp_path / "project"
+    root.mkdir()
+    policy = empty_policy()
+    policy["env_manager"] = "uv"
+    save_policy(root, policy)
+    monkeypatch.chdir(root)
+    _patch_which(monkeypatch, binary)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["recommended"][0] == "uv"
+    assert payload["provenance"]["manager"] == "pixi"
+    assert payload["mismatch"] is False
+
+
+def test_env_detect_manifest_beats_provenance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A unique manifest wins over ``skore`` provenance."""
+    binary = _write_fake_skore(tmp_path, "uv", "tools", "skore-cli", "bin", "skore")
+    root = tmp_path / "project"
+    root.mkdir()
+    (root / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    monkeypatch.chdir(root)
+    _patch_which(monkeypatch, binary)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] == "pixi"
+    assert payload["recommended"] == ["pixi"]
+    assert payload["provenance"]["manager"] == "uv"
+    assert payload["mismatch"] is False
+
+
+def test_env_detect_policy_manifest_mismatch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Policy vs a different unique manifest is mismatch, not ambiguous."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env_manager"] = "uv"
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    _patch_which(monkeypatch, None)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] == "pixi"
+    assert payload["ambiguous"] is False
+    assert payload["mismatch"] is True
+    assert payload["recommended"][0] == "uv"
+
+
+def test_env_detect_ignores_pipx_provenance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A pipx ``skore`` install is too weak to rank a project manager."""
+    binary = _write_fake_skore(
+        tmp_path, ".local", "pipx", "venvs", "skore-cli", "bin", "skore"
+    )
+    root = tmp_path / "project"
+    root.mkdir()
+    monkeypatch.chdir(root)
+    _patch_which(monkeypatch, binary)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["recommended"][0] == "pixi"
+    assert payload["provenance"]["manager"] is None
+    assert payload["provenance"]["path"] == str(binary.resolve())
+
+
+def test_env_detect_pixi_from_pyproject(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``[tool.pixi]`` in pyproject.toml is pixi evidence."""
+    (tmp_path / "pyproject.toml").write_text(
+        '[tool.pixi.workspace]\nchannels = ["conda-forge"]\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "detect"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["env_manager"] == "pixi"
+    assert "pyproject.toml:[tool.pixi]" in payload["evidence"]["pixi"]
+
+
+def test_env_init_pixi_writes_agent_tables(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Pixi init merges ``[tool.pixi]`` and agent packages into pyproject."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "pixi"])
+    assert result.exit_code == 0, result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.pixi" in text
+    assert "ipykernel" in text
+    assert "ipython" in text
+    assert "skore-skills" not in text
+    assert 'dev = { features = ["default", "agent"]' in text
+    assert 'agent = { features = ["agent"]' in text
+    assert 'default = { features = ["default"]' in text
+    assert "[tool.ruff]" in text
+    assert not (tmp_path / "pixi.toml").exists()
+    assert not (tmp_path / "src").exists()
+    second = CliRunner().invoke(cli, ["env", "init", "--manager", "pixi"])
+    assert second.exit_code != 0
+    assert "already present" in second.output
+
+
+def test_env_init_uv_writes_dependency_groups(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """uv init writes PEP 735 agent groups."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "uv"])
+    assert result.exit_code == 0, result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.uv]" in text
+    assert "ipykernel" in text
+    assert "skore-skills" not in text
+
+
+def test_env_init_hatch_writes_dev_extra_dependencies(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hatch init keeps agent tools-only and extends default via ``dev``."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "hatch"])
+    assert result.exit_code == 0, result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.hatch.envs.agent]" in text
+    assert "[tool.hatch.envs.dev]" in text
+    assert "extra-dependencies" in text
+    assert "skore-skills" not in text
+
+
+@pytest.mark.parametrize("manager", ["poetry", "pip-venv"])
+def test_env_init_agent_tools_do_not_list_skore_skills(
+    manager: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Generated agent dependencies never own ``skore-skills``."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", manager])
+    assert result.exit_code == 0, result.output
+    pyproject = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    requirements = tmp_path / "requirements.txt"
+    generated = pyproject
+    if requirements.is_file():
+        generated += requirements.read_text(encoding="utf-8")
+    assert "skore-skills" not in generated
+
+
+def test_env_init_refuses_manager_mismatch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``--manager`` must match an already-detected manager."""
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "uv"])
+    assert result.exit_code != 0
+    assert "does not match" in result.output
+
+
+def test_env_init_refuses_pixi_toml(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Refuse to add ``[tool.pixi]`` when ``pixi.toml`` already exists."""
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "pixi"])
+    assert result.exit_code != 0
+    assert "pixi.toml already exists" in result.output
+
+
+def test_env_init_refuses_ambiguous_manifests(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Init never chooses or mutates one manager in an ambiguous root."""
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    conda = tmp_path / "environment.yml"
+    conda.write_text("name: existing\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "conda"])
+    assert result.exit_code != 0
+    assert "multiple env managers" in result.output
+    assert conda.read_text(encoding="utf-8") == "name: existing\n"
+    assert not (tmp_path / "environment-agent.yml").exists()
+
+
+def test_env_init_refuses_when_unmanaged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Init is skipped when the user opted out of env management."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "pixi"])
+    assert result.exit_code != 0
+    assert "user-managed" in result.output
+
+
+def test_env_init_conda_writes_yaml(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Conda init writes sidecar YAML, not pyproject manager tables."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "conda"])
+    assert result.exit_code == 0, result.output
+    assert (tmp_path / "environment.yml").is_file()
+    agent = (tmp_path / "environment-agent.yml").read_text(encoding="utf-8")
+    assert "ipykernel" in agent
+    assert "ipython" in agent
+    assert "skore-skills" not in agent
+    dev = (tmp_path / "environment-dev.yml").read_text(encoding="utf-8")
+    assert "name: workspace-dev" in dev
+    assert "skore-skills" not in dev
+    second = CliRunner().invoke(cli, ["env", "init", "--manager", "conda"])
+    assert second.exit_code != 0
+
+
+def test_env_init_requires_manager() -> None:
+    """``env init`` without ``--manager`` is a usage error."""
+    result = CliRunner().invoke(cli, ["env", "init"])
+    assert result.exit_code != 0
+
+
+def test_env_init_unknown_manager_library(tmp_path: Path) -> None:
+    """Library callers still reject unknown manager names."""
+    from skore_skills.env import init_environment
+
+    text, code = init_environment(tmp_path, "pants")
+    assert code == 2
+    assert "unknown manager" in text
+
+
+def test_env_agent_removed() -> None:
+    """LSP agent install is no longer a CLI command."""
+    result = CliRunner().invoke(cli, ["env", "agent"])
+    assert result.exit_code != 0
+    result_check = CliRunner().invoke(cli, ["env", "check"])
+    assert result_check.exit_code != 0
+
+
+@pytest.mark.parametrize(
+    ("fixture", "expected"),
+    [
+        ("pixi", "pixi install -e dev"),
+        ("uv", "uv sync --group agent"),
+        ("poetry", "poetry install --with agent"),
+        ("hatch", "hatch env create dev"),
+        (
+            "conda",
+            "conda env create -f environment.yml"
+            " && conda env create -f environment-agent.yml"
+            " && conda env create -f environment-dev.yml",
+        ),
+        (
+            "pip-venv",
+            f"python -m venv .venv && {_venv_bin('pip')} install -r requirements.txt",
+        ),
+    ],
+)
+def test_env_sync_print(
+    fixture: str, expected: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Print-only sync matches the post-init command table."""
+    monkeypatch.chdir(FIXTURES / fixture)
+    result = CliRunner().invoke(cli, ["env", "sync"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == expected
+
+
+def test_env_sync_refuses_unmanaged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Sync refuses when env.managed is false."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "sync"])
+    assert result.exit_code != 0
+    assert "user-managed" in result.output
+
+
+def test_env_sync_execute_runs_subprocess(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``env sync --execute`` runs the printed argv."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "sync", "--execute"])
+    assert result.exit_code == 0, result.output
+    assert seen == [["pixi", "install", "-e", "dev"]]
+
+
+@pytest.mark.parametrize(
+    ("package", "scope", "feature"),
+    [
+        ("ruff", "agent", "agent"),
+        ("skore", "default", None),
+        ("skore-skills", "default", None),
+        ("skrub", "default", None),
+        ("pytest", "default", None),
+        ("optuna", "ask", None),
+        ("jupyterlab", "ask", None),
+        ("jupytext", "agent", "agent"),
+        ("nbclient", "agent", "agent"),
+        ("nbconvert", "agent", "agent"),
+        ("mkdocs-material", "agent", "agent"),
+        ("pandas", "default", None),
+        ("xgboost", "default", None),
+        ("black", "default", None),
+    ],
+)
+def test_env_route_scopes(package: str, scope: str, feature: str | None) -> None:
+    """Stack policy maps packages onto default, agent, or ask."""
+    result = CliRunner().invoke(cli, ["env", "route", package])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["scope"] == scope
+    assert payload["feature"] == feature
+
+
+def test_env_route_named_booster_is_default() -> None:
+    """Unknown named libraries route to default, not refuse."""
+    result = CliRunner().invoke(cli, ["env", "route", "xgboost"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["scope"] == "default"
+    assert payload["feature"] is None
+    assert "HistGradientBoosting" not in result.output
+
+
+def _pixi_editable_spec(root: Path, package: str) -> str:
+    return f"{package} @ {root.resolve().as_uri()}"
+
+
+def _assert_pixi_editable_spec(spec: str, *, root: Path, package: str) -> None:
+    requirement = Requirement(spec)
+    assert requirement.name == package
+    assert requirement.url == root.resolve().as_uri()
+    assert requirement.url.startswith("file:")
+
+
+def test_env_add_editable_pixi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Editable pixi add uses a PEP 508 ``file:`` URL, not ``--path .``."""
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "demo-pkg"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable"])
+    assert result.exit_code == 0, result.output
+    prefix = "pixi add --pypi --editable "
+    assert result.output.startswith(prefix)
+    spec = result.output.removeprefix(prefix).strip()
+    _assert_pixi_editable_spec(spec, root=tmp_path, package="demo-pkg")
+    assert "--path" not in result.output
+
+
+def test_env_add_editable_pixi_execute(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``--execute`` runs the pixi editable argv with a ``file:`` spec."""
+    from skore_skills import env as env_mod
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "demo-pkg"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable", "--execute"])
+    assert result.exit_code == 0, result.output
+    spec = _pixi_editable_spec(tmp_path, "demo-pkg")
+    assert seen == [["pixi", "add", "--pypi", "--editable", spec]]
+    _assert_pixi_editable_spec(spec, root=tmp_path, package="demo-pkg")
+
+
+@pytest.mark.parametrize(
+    ("files", "expected"),
+    [
+        ({"uv.lock": ""}, "uv add --editable ."),
+        ({"poetry.lock": ""}, "poetry add --editable ."),
+        (
+            {"requirements.txt": "click\n", ".venv": None},
+            "pip install -e .",
+        ),
+    ],
+)
+def test_env_add_editable_other_managers_print(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    files: dict[str, str | None],
+    expected: str,
+) -> None:
+    """uv, poetry, and pip-venv already emit an editable argv."""
+    for name, body in files.items():
+        path = tmp_path / name
+        if body is None:
+            path.mkdir()
+        else:
+            path.write_text(body, encoding="utf-8")
+    (tmp_path / "src" / "demo_pkg").mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "demo-pkg"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == expected
+
+
+def test_env_add_editable_conda_refuses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Conda has no editable add; do not emit pip -e."""
+    (tmp_path / "environment.yml").write_text(
+        "name: workspace\ndependencies: []\n", encoding="utf-8"
+    )
+    (tmp_path / "src" / "pkg").mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "pkg"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable"])
+    assert result.exit_code != 0
+    assert "not supported" in result.output
+    assert not result.output.startswith("pip install")
+
+
+def test_env_add_editable_requires_src(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Editable add waits for ``src/``."""
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--editable"])
+    assert result.exit_code != 0
+    assert "has_src" in result.output
+
+
+def test_env_add_conda_feature_agent(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Agent-scope conda add targets the agent environment name."""
+    (tmp_path / "environment.yml").write_text(
+        "name: workspace\ndependencies: []\n", encoding="utf-8"
+    )
+    (tmp_path / "environment-agent.yml").write_text(
+        "name: workspace-agent\ndependencies: []\n", encoding="utf-8"
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "--feature", "agent", "ruff"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == (
+        "conda install -n workspace-agent -c conda-forge ruff"
+        " && conda install -n workspace-dev -c conda-forge ruff"
+    )
+
+
+def test_env_add_conda_execute_mirrors_default_into_dev(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Conda emulates composition by updating default and dev."""
+    from skore_skills import env as env_mod
+
+    (tmp_path / "environment.yml").write_text(
+        "name: workspace\ndependencies: []\n", encoding="utf-8"
+    )
+    (tmp_path / "environment-dev.yml").write_text(
+        "name: workspace-dev\ndependencies: []\n", encoding="utf-8"
+    )
+    monkeypatch.chdir(tmp_path)
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "add", "--execute", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert seen == [
+        [
+            "conda",
+            "install",
+            "-n",
+            "workspace",
+            "-c",
+            "conda-forge",
+            "skrub",
+            "pydot",
+            "graphviz",
+        ],
+        [
+            "conda",
+            "install",
+            "-n",
+            "workspace-dev",
+            "-c",
+            "conda-forge",
+            "skrub",
+            "pydot",
+            "graphviz",
+        ],
+    ]
+
+
+def test_env_verify_print_pixi(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify checks bootstrap packages in composed ``dev``."""
+    monkeypatch.chdir(FIXTURES / "pixi")
+    result = CliRunner().invoke(cli, ["env", "verify"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["ok"] is None
+    assert payload["argv"][:5] == ["pixi", "run", "-e", "dev", "python"]
+    assert "IPython" in payload["argv"][-1]
+    assert "skore" in payload["argv"][-1]
+    assert "skore_skills" in payload["argv"][-1]
+
+
+def test_agent_packages_exclude_transitive_skore_skills() -> None:
+    """Agent tools and bootstrap import verification are distinct lists."""
+    from skore_skills.env import AGENT_PACKAGES, BOOTSTRAP_PACKAGES
+
+    assert AGENT_PACKAGES == ("ruff", "ipython", "ipykernel")
+    assert BOOTSTRAP_PACKAGES == (
+        "skore",
+        "skore-skills",
+        "ruff",
+        "ipython",
+        "ipykernel",
+    )
+
+
+def test_env_verify_execute_mocked(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``env verify --execute`` runs the printed argv."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "verify", "--execute"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["ok"] is True
+    assert seen == [payload["argv"]]
+
+
+def test_env_init_mentions_sync(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Init still prints next: and points at ``env sync``."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "init", "--manager", "pixi"])
+    assert result.exit_code == 0, result.output
+    assert "next: pixi install -e dev" in result.output
+    assert "run: python -m skore_skills env sync" in result.output
+
+
+@pytest.mark.parametrize(
+    ("fixture", "mode", "expected"),
+    [
+        ("pixi", "local", "pixi add skore"),
+        ("pixi", "hub", "pixi add skore"),
+        ("pixi", "mlflow", "pixi add skore mlflow>=3"),
+        ("uv", "local", "uv add skore"),
+        ("uv", "hub", "uv add skore[hub]"),
+        ("uv", "mlflow", "uv add skore[mlflow] mlflow>=3"),
+        ("poetry", "hub", "poetry add skore[hub]"),
+        ("pip-venv", "hub", "pip install skore[hub]"),
+        (
+            "conda",
+            "hub",
+            "conda install -n fixture-conda -c conda-forge skore"
+            " && conda install -n workspace-dev -c conda-forge skore",
+        ),
+        (
+            "conda",
+            "mlflow",
+            "conda install -n fixture-conda -c conda-forge skore mlflow>=3"
+            " && conda install -n workspace-dev -c conda-forge skore mlflow>=3",
+        ),
+    ],
+)
+def test_env_add_skore_manager_mode_matrix(
+    fixture: str,
+    mode: str,
+    expected: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Skore uses conda packages for pixi/conda and PyPI elsewhere."""
+    monkeypatch.chdir(FIXTURES / fixture)
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", mode])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == expected
+
+
+def test_env_add_skore_hatch_writes_pypi_requirement(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hatch upgrades bootstrap Skore to the mode-specific requirement."""
+    (tmp_path / "hatch.toml").write_text("# hatch\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    bootstrap = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "local"])
+    assert bootstrap.exit_code == 0, bootstrap.output
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "hub"])
+    assert result.exit_code == 0, result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"skore[hub]"' in text
+    assert '"skore"' not in text
+
+    second = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "hub"])
+    assert second.exit_code == 0, second.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert text.count('"skore[hub]"') == 1
+
+
+def test_env_add_skore_execute_runs_subprocess(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Managed ``--execute`` runs the resolved manager command."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(
+        cli, ["env", "add-skore", "--mode", "mlflow", "--execute"]
+    )
+    assert result.exit_code == 0, result.output
+    assert seen == [["pixi", "add", "skore", "mlflow>=3"]]
+
+
+def test_env_add_skore_refuses_unmanaged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Skore install preserves the managed-environment gate."""
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(
+        cli, ["env", "add-skore", "--mode", "local", "--execute"]
+    )
+    assert result.exit_code != 0
+    assert "user-managed" in result.output
+
+
+@pytest.mark.parametrize("fixture", ["none", "ambiguous"])
+def test_env_add_skore_refuses_unresolved_manager(
+    fixture: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Skore source is never selected without one manifest manager."""
+    monkeypatch.chdir(FIXTURES / fixture)
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "local"])
+    assert result.exit_code != 0
+
+
+def test_env_add_skore_rejects_invalid_mode() -> None:
+    """The CLI rejects an unknown Skore mode."""
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "remote"])
+    assert result.exit_code != 0
+
+
+def test_add_skore_rejects_invalid_mode_library(tmp_path: Path) -> None:
+    """Library callers receive a usage error for an unknown mode."""
+    from skore_skills.env import add_skore
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    text, code = add_skore(tmp_path, "remote")
+    assert code == 2
+    assert "unknown skore mode" in text
+
+
+@pytest.mark.parametrize(
+    ("manager", "expected"),
+    [
+        ("pixi", ["pixi", "run", "-e", "dev", "python"]),
+        ("uv", ["uv", "run", "--group", "agent", "python"]),
+        ("poetry", ["poetry", "run", "python"]),
+        ("hatch", ["hatch", "run", "dev:python"]),
+        ("conda", ["conda", "run", "-n", "workspace-dev", "python"]),
+        ("pip-venv", [_venv_bin("python")]),
+    ],
+)
+def test_dev_run_argv_per_manager(
+    manager: str, expected: list[str], tmp_path: Path
+) -> None:
+    """Composed-dev launcher matches the manager table."""
+    from skore_skills.env import dev_run_argv
+
+    if manager == "conda":
+        (tmp_path / "environment-dev.yml").write_text(
+            "name: workspace-dev\ndependencies: []\n", encoding="utf-8"
+        )
+    assert dev_run_argv(manager, root=tmp_path) == expected
+
+
+def test_dev_run_argv_unknown_manager(tmp_path: Path) -> None:
+    """Unknown managers are a programming error."""
+    from skore_skills.env import dev_run_argv
+
+    with pytest.raises(ValueError, match="unknown manager"):
+        dev_run_argv("pants", root=tmp_path)
+
+
+def test_api_get_reexecs_into_dev(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Library-touching commands re-enter the composed pixi ``dev`` env."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    seen: list[list[str]] = []
+    captured: dict[str, Any] = {}
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+        captured.update(kwargs)
+
+        class Result:
+            returncode = 0
+            stdout = "# card\n"
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["api", "get", "skrub.TableReport"])
+    assert result.exit_code == 0, result.output
+    assert seen == [
+        [
+            "pixi",
+            "run",
+            "-e",
+            "dev",
+            "python",
+            "-m",
+            "skore_skills",
+            "api",
+            "get",
+            "skrub.TableReport",
+        ]
+    ]
+    assert captured["env"][IN_DEV_ENV] == "1"
+    assert result.output == "# card\n"
+
+
+def test_style_reexecs_into_dev(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``style`` re-enters composed ``dev`` with the original flags."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["style", "--init"])
+    assert result.exit_code == 0, result.output
+    assert seen[0][:8] == [
+        "pixi",
+        "run",
+        "-e",
+        "dev",
+        "python",
+        "-m",
+        "skore_skills",
+        "style",
+    ]
+    assert "--init" in seen[0]
+
+
+def test_cells_run_reexecs_into_dev(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``cells run`` re-enters composed ``dev``."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV
+
+    src = tmp_path / "nb.py"
+    src.write_text("# %%\n1\n", encoding="utf-8")
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+            stdout = "# digest\n"
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["cells", "run", str(src)])
+    assert result.exit_code == 0, result.output
+    assert seen[0][:8] == [
+        "pixi",
+        "run",
+        "-e",
+        "dev",
+        "python",
+        "-m",
+        "skore_skills",
+        "cells",
+    ]
+    assert result.output == "# digest\n"
+
+
+def test_api_get_skips_reexec_when_already_in_dev(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``SKORE_SKILLS_IN_DEV`` prevents a second dispatch."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV, reexec_in_dev
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.setenv(IN_DEV_ENV, "1")
+    seen: list[list[str]] = []
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(argv)
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    assert reexec_in_dev(FIXTURES / "pixi", argv=["api", "get", "x"]) is None
+    assert seen == []
+
+
+def test_api_get_skips_reexec_when_unmanaged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """User-managed workspaces keep the running interpreter."""
+    from skore_skills.env import IN_DEV_ENV, reexec_in_dev
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    assert reexec_in_dev(tmp_path, argv=["api", "get", "x"]) is None
+
+
+def test_reexec_skips_when_no_manager(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """No env manager means the current interpreter stays in-process."""
+    from skore_skills.env import IN_DEV_ENV, reexec_in_dev
+
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+    assert reexec_in_dev(tmp_path, argv=["api", "get", "x"]) is None
+
+
+def test_reexec_hints_when_skore_skills_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A missing wheel in ``dev`` points at ``env sync``."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import IN_DEV_ENV, MISSING_SKORE_SKILLS_HINT, reexec_in_dev
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.delenv(IN_DEV_ENV, raising=False)
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        class Result:
+            returncode = 1
+            stdout = ""
+            stderr = "ModuleNotFoundError: No module named 'skore_skills'\n"
+
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    monkeypatch.setattr(env_mod.sys, "stdout", stdout)
+    monkeypatch.setattr(env_mod.sys, "stderr", stderr)
+    code = reexec_in_dev(FIXTURES / "pixi", argv=["api", "get", "x"])
+    assert code == 1
+    assert MISSING_SKORE_SKILLS_HINT in stderr.getvalue()
+    assert "env add-skore --mode local --execute" in stderr.getvalue()
+    assert "env sync" not in stderr.getvalue()
+
+
+def test_env_add_skrub_uv_adds_pydot_not_graphviz(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pip-based managers get pydot; Graphviz is not a PyPI package here."""
+    monkeypatch.chdir(FIXTURES / "uv")
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "uv add skrub pydot"
+    assert "graphviz" not in result.output
+
+
+def test_env_add_skrub_pip_adds_pydot_not_graphviz(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """pip-venv follows the same pydot-only expansion as uv."""
+    monkeypatch.chdir(FIXTURES / "pip-venv")
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "pip install skrub pydot"
+    assert "graphviz" not in result.output
+
+
+def test_env_add_skrub_hatch_writes_pydot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hatch records pydot next to skrub; not graphviz."""
+    (tmp_path / "hatch.toml").write_text("# hatch\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code == 0, result.output
+    text = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"skrub"' in text
+    assert '"pydot"' in text
+    assert "graphviz" not in text
+
+
+def _graphviz_run(
+    seen: list[list[str]], *, which: str | None = "/usr/bin/dot", dot_c: int = 0
+) -> Any:
+    """Return a subprocess.run stand-in for ``env graphviz`` probes."""
+    from skore_skills.env import DOT_C_SNIPPET, WHICH_DOT_SNIPPET
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(list(argv))
+        snippet = argv[-1] if argv else ""
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        if snippet == WHICH_DOT_SNIPPET:
+            Result.stdout = (which or "") + "\n"
+            Result.returncode = 0
+        elif snippet == DOT_C_SNIPPET:
+            Result.returncode = dot_c
+            Result.stderr = "plugin cache locked\n" if dot_c else ""
+        return Result()
+
+    return fake_run
+
+
+def test_env_graphviz_pixi_missing_dot_prints_conda_command(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pixi without ``dot`` reports action conda and the add command."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(env_mod.subprocess, "run", _graphviz_run(seen, which=None))
+    result = CliRunner().invoke(cli, ["env", "graphviz"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["action"] == "conda"
+    assert payload["dot"] is None
+    assert payload["command"] == ["pixi", "add", "graphviz"]
+    assert "graphviz.org/download" in payload["instructions"]
+    assert not any(argv[-1:] == [env_mod.DOT_C_SNIPPET] for argv in seen)
+
+
+def test_env_graphviz_pixi_execute_adds_then_dot_c(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Managed pixi ``--execute`` installs Graphviz then rebuilds the cache."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+    which_hits = {"n": 0}
+
+    def fake_run(argv: list[str], **kwargs: Any) -> Any:
+        seen.append(list(argv))
+        snippet = argv[-1] if argv else ""
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        if snippet == env_mod.WHICH_DOT_SNIPPET:
+            which_hits["n"] += 1
+            Result.stdout = ("" if which_hits["n"] == 1 else "/pixi/env/bin/dot") + "\n"
+        return Result()
+
+    monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["dot"] == "/pixi/env/bin/dot"
+    assert ["pixi", "add", "graphviz"] in seen
+    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+
+
+def test_env_graphviz_dot_present_execute_only_dot_c(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """When ``dot`` is already on the env PATH, ``--execute`` only runs ``dot -c``."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(
+        env_mod.subprocess, "run", _graphviz_run(seen, which="/usr/bin/dot")
+    )
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["dot"] == "/usr/bin/dot"
+    assert payload["command"] is None
+    assert ["pixi", "add", "graphviz"] not in seen
+    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+
+
+def test_env_graphviz_uv_missing_dot_refuses_os_execute(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pip-based managers never ``env add graphviz``; ``--execute`` cannot brew."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "uv")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(env_mod.subprocess, "run", _graphviz_run(seen, which=None))
+    printed = CliRunner().invoke(cli, ["env", "graphviz"])
+    assert printed.exit_code == 0, printed.output
+    payload = json.loads(printed.output)
+    assert payload["action"] == "system"
+    assert payload["command"] is None
+    executed = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert executed.exit_code != 0
+    assert not any("brew" in " ".join(argv) for argv in seen)
+    assert not any(argv[:2] == ["uv", "add"] for argv in seen)
+
+
+def test_env_graphviz_uv_dot_present_runs_dot_c(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """System Graphviz already on PATH: ``--execute`` still rebuilds the cache."""
+    from skore_skills import env as env_mod
+
+    monkeypatch.chdir(FIXTURES / "uv")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(
+        env_mod.subprocess, "run", _graphviz_run(seen, which="/usr/bin/dot")
+    )
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code == 0, result.output
+    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+
+
+def test_env_graphviz_dot_c_permission_message(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A failed ``dot -c`` names admin rerun; the CLI never sudoes."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import DOT_C_ADMIN
+
+    monkeypatch.chdir(FIXTURES / "pixi")
+    seen: list[list[str]] = []
+    monkeypatch.setattr(
+        env_mod.subprocess,
+        "run",
+        _graphviz_run(seen, which="/usr/bin/dot", dot_c=1),
+    )
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code != 0
+    assert DOT_C_ADMIN in result.output
+    assert not any(argv and argv[0] == "sudo" for argv in seen)
+
+
+def test_env_graphviz_unmanaged_prints_json(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Unmanaged workspaces still get print-only Graphviz JSON."""
+    from skore_skills import env as env_mod
+    from skore_skills.policy import empty_policy, save_policy
+
+    (tmp_path / "pixi.toml").write_text("[workspace]\n", encoding="utf-8")
+    policy = empty_policy()
+    policy["env"]["managed"] = False
+    save_policy(tmp_path, policy)
+    monkeypatch.chdir(tmp_path)
+    seen: list[list[str]] = []
+    monkeypatch.setattr(env_mod.subprocess, "run", _graphviz_run(seen, which=None))
+    printed = CliRunner().invoke(cli, ["env", "graphviz"])
+    assert printed.exit_code == 0, printed.output
+    payload = json.loads(printed.output)
+    assert payload["action"] == "conda"
+    assert payload["command"] == ["pixi", "add", "graphviz"]
+    executed = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert executed.exit_code != 0
+    assert "user-managed" in executed.output
+    assert ["pixi", "add", "graphviz"] not in seen

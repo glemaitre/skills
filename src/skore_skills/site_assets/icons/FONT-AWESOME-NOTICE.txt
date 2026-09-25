@@ -1,0 +1,8 @@
+Font Awesome Free 6.7.2
+Copyright 2024 Fonticons, Inc.
+
+The SVG icons in this directory are licensed under CC BY 4.0:
+https://creativecommons.org/licenses/by/4.0/
+
+Font Awesome Free license:
+https://fontawesome.com/license/free

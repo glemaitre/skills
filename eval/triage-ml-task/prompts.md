@@ -1,0 +1,461 @@
+# triage-ml-task eval
+
+---
+
+## CASE_01 — Ambiguous capability request
+
+**User prompt:**
+> What can you help me with on this machine learning project?
+
+**Assumed workspace state:**
+- Existing scaffold with no specific task requested.
+- No `.skore` file.
+- `status.data_analysis` is `missing`.
+- `status.skills` reports the usual entry skills `true`, including
+  `review-ml-experiment`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- AskUserQuestion listing installed entry skills
+  (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
+  `review-ml-experiment`, `manage-ml-backlog`, `export-ml-project`,
+  `sync-ml-reports` if installed). One pick.
+- Name `explore-ml-data` as the recommended next stage; do not
+  auto-load it.
+- Do not treat the missing `.skore` as an empty project despite
+  the existing scaffold.
+
+**Must NOT do:**
+- Start designing the next experiment.
+- Claim to have loaded or executed every skill.
+- Auto-load a stage skill without asking.
+- Ask only stay / go deeper / next stage without naming entry
+  skills.
+- Put `evaluate-ml-pipeline` or `audit-ml-pipeline` on the
+  uncertain entry board.
+- Put `shape-user-idea` or `search-ml-literature` on the
+  uncertain entry board.
+- Auto-load `review-ml-experiment` while `data_analysis` is
+  `missing`.
+
+---
+
+## CASE_02 — Certain git request
+
+**User prompt:**
+> Initialize git here.
+
+**Assumed workspace state:**
+- Scaffolded workspace, no `.git`.
+- `status.skills.setup-git` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `setup-git` without listing the catalog menu.
+
+**Must NOT do:**
+- Ask which entry skill to run.
+- Invent `git init` procedure in triage instead of loading
+  `setup-git`.
+
+---
+
+## CASE_03 — Git skill not installed
+
+**User prompt:**
+> Initialize git here.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.setup-git` is `false`.
+
+**Must do:**
+- Skip in one line because `setup-git` is not installed.
+
+**Must NOT do:**
+- Run `git init` or invent the `setup-git` procedure from memory.
+- Treat the missing skill as an error that aborts the session.
+
+---
+
+## CASE_04 — Generic bootstrap
+
+**User prompt:**
+> Bootstrap this project for me.
+
+**Assumed workspace state:**
+- Empty folder.
+- `status.skills.setup-ml-project` is `true`.
+- `status.skills.setup-python-env` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `setup-ml-project` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `setup-python-env` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_05 — Certain env manager request
+
+**User prompt:**
+> Get pixi going for this folder.
+
+**Assumed workspace state:**
+- Empty folder.
+- `status.skills.setup-python-env` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `setup-python-env` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `setup-ml-project` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_06 — Certain EDA request
+
+**User prompt:**
+> Explore the data in data/.
+
+**Assumed workspace state:**
+- Scaffolded workspace with `data/` present.
+- `status.skills.explore-ml-data` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `explore-ml-data` without listing the catalog menu.
+
+**Must NOT do:**
+- Ask which entry skill to run.
+- Start exploratory data analysis methodology in triage instead of loading the skill.
+
+---
+
+## CASE_07 — Model request while EDA is missing
+
+**User prompt:**
+> Build the first baseline model.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.data_analysis` is `missing`.
+- `status.skills.explore-ml-data` is `true`.
+- `status.skills.model-ml-pipeline` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- AskUserQuestion: run exploratory data analysis first (default) vs proceed to modeling
+  with user-supplied facts.
+- Do not invent dataset facts.
+
+**Must NOT do:**
+- Auto-load `model-ml-pipeline`.
+- Auto-load `explore-ml-data` without asking.
+
+---
+
+## CASE_08 — Model request after EDA is present
+
+**User prompt:**
+> Build the first baseline model.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.data_analysis` is `present`.
+- `status.skills.model-ml-pipeline` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `model-ml-pipeline` without an exploratory data analysis AskUserQuestion.
+
+**Must NOT do:**
+- Ask which entry skill to run.
+- Load `explore-ml-data` first.
+
+---
+
+## CASE_09 — Certain notebook request
+
+**User prompt:**
+> Give me an executed ipynb of the EDA.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.export-ml-notebook` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `export-ml-notebook` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `export-ml-project` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_10 — Certain website request
+
+**User prompt:**
+> Build the MkDocs documentation site.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.export-ml-site` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `export-ml-site` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `export-ml-project` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_11 — Generic export
+
+**User prompt:**
+> Export the project.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.export-ml-project` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `export-ml-project` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `export-ml-notebook` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_12 — Certain HTML notebook request
+
+**User prompt:**
+> Give me an HTML notebook of the EDA.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.export-ml-notebook` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `export-ml-notebook` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `export-ml-project` as the certain skill.
+- Load `export-ml-site` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_13 — Certain leakage question routes to explore
+
+**User prompt:**
+> Research whether 0.97 correlation with the target is leakage.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- The question is about the table (`data_analysis` may be
+  `present` or `missing`).
+- `status.skills.explore-ml-data` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `explore-ml-data` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `research-ml-practice` as the certain skill.
+- Put `research-ml-practice` on the uncertain entry board.
+- Ask which entry skill to run.
+
+---
+
+## CASE_14 — Certain research during modeling routes to model
+
+**User prompt:**
+> Research whether target encoding is the right transform for
+> this high-cardinality column.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- An approved design note exists; modeling is in progress.
+- `status.skills.model-ml-pipeline` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `model-ml-pipeline` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `research-ml-practice` as the certain skill.
+- Load `explore-ml-data` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_15 — Certain audit loads audit, not the meta skill
+
+**User prompt:**
+> Audit experiment 02.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.audit-ml-pipeline` is `true`.
+- `status.skills.model-ml-pipeline` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `audit-ml-pipeline` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `model-ml-pipeline` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_16 — Certain report sync loads sync-ml-reports
+
+**User prompt:**
+> Push our skore reports to Hub.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.sync-ml-reports` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `sync-ml-reports` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `evaluate-ml-pipeline` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_17 — Certain next-experiment request loads the backlog
+
+**User prompt:**
+> What should we try next?
+
+**Assumed workspace state:**
+- `status.data_analysis` is `present`.
+- `loop_stage` is `backlog`.
+- `status.skills.manage-ml-backlog` is `true`.
+- `journal/ideas/` has one idea file.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `manage-ml-backlog` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `review-ml-experiment` or `audit-ml-pipeline`.
+- Design the next experiment in triage.
+- Ask which entry skill to run.
+
+---
+
+## CASE_18 — Backlog stage recommends the backlog skill
+
+**User prompt:**
+> What can you help me with on this machine learning project?
+
+**Assumed workspace state:**
+- `status.data_analysis` is `present`.
+- `loop_stage` is `backlog`.
+- `status.skills.manage-ml-backlog` is `true`.
+- The usual entry skills are `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- AskUserQuestion listing installed entry skills, including
+  `manage-ml-backlog` and `review-ml-experiment`. One pick.
+- Name `manage-ml-backlog` as the recommended next stage. Do
+  not auto-load it.
+
+**Must NOT do:**
+- Auto-load `manage-ml-backlog`.
+- Put `audit-ml-pipeline` on the uncertain entry board.
+- Start designing the next experiment.
+
+---
+
+## CASE_19 — Missing backlog skill is a one-line skip
+
+**User prompt:**
+> What should we try next?
+
+**Assumed workspace state:**
+- `loop_stage` is `backlog`.
+- `status.skills.manage-ml-backlog` is `false`.
+
+**Must do:**
+- Skip in one line because `manage-ml-backlog` is not installed.
+
+**Must NOT do:**
+- Invent idea-file triage (promote / dismiss / leave).
+- Load `review-ml-experiment` from memory.
+
+---
+
+## CASE_20 — Certain review request loads review
+
+**User prompt:**
+> Review experiment 02.
+
+**Assumed workspace state:**
+- `status.skills.review-ml-experiment` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `review-ml-experiment` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `audit-ml-pipeline` from triage.
+- Ask which entry skill to run.
+- Write a design note in triage.
+
+---
+
+## CASE_21 — Certain idea loads shape-user-idea
+
+**User prompt:**
+> I want to try a monotonic constraint on the target.
+
+**Assumed workspace state:**
+- `status.skills.shape-user-idea` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `shape-user-idea` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `search-ml-literature`.
+- Ask which entry skill to run.
+- Write a design note in triage.
+
+---
+
+## CASE_22 — Certain literature query loads literature search
+
+**User prompt:**
+> What do people do for censored regression?
+
+**Assumed workspace state:**
+- No design note is in progress.
+- `status.skills.search-ml-literature` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `search-ml-literature` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `research-ml-practice`.
+- Load `model-ml-pipeline` as the certain skill.
+- Invent papers in triage.

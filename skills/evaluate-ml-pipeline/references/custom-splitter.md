@@ -44,7 +44,7 @@ Optional but encouraged: subclass
 protocol. Implement `_iter_test_indices(self, X, y, groups)` and
 `get_n_splits(...)`; the base class fills in `split`.
 
-Look up the exact base class signature in `python-api`.
+Look up the exact base class signature in `python -m skore_skills api get`.
 
 ## Wiring with `split_kwargs`
 
@@ -52,6 +52,10 @@ The splitter receives `split_kwargs` keys as kwargs to `split`. So if
 the pipeline carries `split_kwargs={"groups": ...}`, the custom
 splitter's `split(self, X, y, groups)` is called with that `groups`
 value at fold time.
+
+If `split` needs extra kwargs, that is Pattern B: declare `cv=` +
+`split_kwargs` on the DataOp and omit `splitter=` on `evaluate`.
+See `metadata-routing.md`.
 
 Add only the kwargs you need. Extra kwargs not declared in your
 splitter's `split` signature will surface as a `TypeError` —

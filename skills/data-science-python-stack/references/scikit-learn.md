@@ -19,12 +19,11 @@ and inspection tools — all behind a small, consistent API (`fit` /
 - You need model-agnostic inspection (permutation importance, partial
   dependence, calibration).
 
-**No need to reach for xgboost or lightgbm.**
+**When the user has not named a booster**, prefer
 `HistGradientBoostingClassifier` / `HistGradientBoostingRegressor`
-cover the same ground (binned histograms, categorical support,
-missing-value handling) inside the sklearn API. Pick those first; only
-surface a specialized boosting library if the user asks or hits a
-specific gap.
+(binned histograms, categorical support, missing-value handling)
+inside the sklearn API. If the user named `xgboost`, `lightgbm`, or
+`catboost`, keep that library — do not redirect to HistGradientBoosting.
 
 **Pick something else when:**
 - The task is **NLP** — transformer architectures (e.g. Hugging Face

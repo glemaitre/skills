@@ -1,0 +1,141 @@
+# frame-ml-problem eval
+
+---
+
+## CASE_01 — First key reads one reference
+
+**User prompt:**
+> Which comparison metric should we lock before building?
+
+**Assumed workspace state:**
+- `journal/JOURNAL.md` exists. Modeling decisions Status is still
+  the empty placeholder.
+- `scratch/data_analysis/extras.json` has `"task": "classification"`.
+- `python -m skore_skills frame show` returns `ask` /
+  `missing_keys`, `missing` `["prediction_goal"]`, `candidates`
+  `["probabilities", "point_labels", "uncovered"]`, and `reference`
+  `references/prediction-goal.md`.
+
+**Must do:**
+- Name `python -m skore_skills frame show`.
+- Read `references/prediction-goal.md` and no other file under
+  `references/`.
+- Ask only `probabilities`, `point_labels`, and `uncovered`.
+
+**Must NOT do:**
+- Write Python, a pipeline, or a splitter constructor.
+- Ask about horizon, the baseline, or the fold count in this turn.
+- Open `references/horizon-gap.md` or `references/baseline.md`.
+
+---
+
+## CASE_02 — Horizon is asked only after a time deployment
+
+**User prompt:**
+> New rows arrive later than the fit. Lock that.
+
+**Assumed workspace state:**
+- Prediction goal is `point_predictions` and Deployment is `time`.
+  Status is `draft`.
+- `frame show` returns `missing` `["horizon"]`, `reference`
+  `references/horizon-gap.md`, and no `candidates`.
+
+**Must do:**
+- Read `references/horizon-gap.md`.
+- Explain horizon as the lead time of the target and gap as
+  deployment delay, and ask for the horizon as a number and a unit.
+
+**Must NOT do:**
+- Ask for a generalize-to column.
+- Write `TimeSeriesSplit` or `gap=` into the journal.
+- Invent a fold count.
+
+---
+
+## CASE_05 — Clustering uses the fallback, not the closed menu
+
+**User prompt:**
+> We are clustering customers. What should we lock?
+
+**Assumed workspace state:**
+- `scratch/data_analysis/extras.json` has `"task": "clustering"`.
+- `frame show` returns `ask` / `uncovered`, `reference`
+  `references/fallback.md`, and `context.task` `clustering`.
+  There is no `candidates` list.
+
+**Must do:**
+- Read `references/fallback.md` and no other file under
+  `references/`.
+- Say the closed menu does not cover clustering.
+- Ask what a better result means and what the baseline is.
+- Write Prediction goal `uncovered` plus those two prose cells.
+
+**Must NOT do:**
+- Ask for `probabilities` or `point_labels`.
+- Write a splitter class or Python.
+
+---
+
+## CASE_06 — A missing command uses the same fallback
+
+**User prompt:**
+> Lock the comparison metric and the baseline.
+
+**Assumed workspace state:**
+- `python -m skore_skills frame show` exits with `No such command
+  'frame'`. There is no JSON.
+
+**Must do:**
+- Read `references/fallback.md`.
+- Record the comparison and the baseline in words, with Prediction
+  goal `uncovered`.
+
+**Must NOT do:**
+- Invent `probabilities`, `iid`, or `KFold`.
+- Open `references/prediction-goal.md` or
+  `references/metric-role.md`.
+- Write Python.
+
+---
+
+## CASE_03 — Confirm lock quotes the context
+
+**User prompt:**
+> The table is filled. Lock it.
+
+**Assumed workspace state:**
+- Every required cell is valid and Status is `draft`.
+- `frame show` returns `ask` / `confirm_lock` with choices
+  `lock`, `modify`, `stop`, and `context.metric` `MAE`.
+
+**Must do:**
+- Quote the JSON context, including MAE, in the question.
+- Offer only lock, modify, and stop.
+- On lock, set Status to `locked`.
+
+**Must NOT do:**
+- Write Python or a class constructor.
+- Treat the user's sentence as the lock before the choice.
+- Load `build-ml-pipeline`.
+
+---
+
+## CASE_04 — Revise edits, then the lock is asked again
+
+**User prompt:**
+> The constraint changed: we now need intervals, not point predictions.
+
+**Assumed workspace state:**
+- Status is `locked`.
+- `python -m skore_skills frame show --revise` returns `ask` /
+  `revise` with choices `modify`, `keep`, `stop`.
+
+**Must do:**
+- Name `frame show --revise`.
+- On modify, set Status to `draft` and Revised on to today's date,
+  then stop for the next `frame show`.
+
+**Must NOT do:**
+- Leave Status `locked` after modify.
+- Treat the locked table as frozen.
+- Write a model or a splitter.

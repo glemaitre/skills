@@ -16,10 +16,16 @@ violated.
   `RMSE 0.083 ± 0.004 (5-fold CV)`.
 - `experiments/02_load_forecast.py` exists.
 - `src/<pkg>/data.py` exposes `build_supervised_frame(data_dir)`.
-- `tests/smoke/test_02_load_forecast.py` empty scaffold from
-  `test-ml-pipeline`.
+- `tests/smoke/test_02_load_forecast.py` is an empty scaffold.
 
 **Must do:**
+- Before writing/running the test, give a 1–3 sentence preview:
+  local fit/predict on a small real-data slice, the exact
+  row-count assertion, `tests/smoke/test_02_load_forecast.py`,
+  and the `smoke run` command.
+- Distinguish this diagnostic slice from full CV and say timing
+  depends on the loader, feature graph, and learner; do not invent
+  a minute estimate.
 - Wire the **hard assertion**:
   `assert len(predictions) == n_predict_grid_rows`.
 - Build the predict env-dict with **no pre-history buffer** — only
@@ -30,8 +36,10 @@ violated.
   pointing to the design note).
 - Mention NOT importing `skore` in the test file (test must run
   in any skrub-capable env).
+- Run `python -m skore_skills smoke run --stem 02_load_forecast`.
 
 **Must NOT do:**
+- Say the smoke test performs full-dataset cross-validation.
 - Synthesize a fake DataFrame fixture.
 - Import `skore` / `skore.Project` in the test.
 - Wrap the predictor or add NaN-handling to make the test pass.
@@ -54,8 +62,8 @@ violated.
 - Refuse to write the smoke test.
 - Cite the Stop condition: "No smoke test without an approved
   design note + script."
-- Route to `iterate-ml-experiment` to author + approve the design
-  note first.
+- State that status is missing an approved design and tell the user
+  to run the model/loop pack or ask triage.
 
 **Must NOT do:**
 - Write `tests/smoke/test_03_target_transform.py` even as a stub.
@@ -147,7 +155,7 @@ violated.
 
 ---
 
-## CASE_06 — Smoke fails → route to build-ml-pipeline, not loosen
+## CASE_06 — Smoke fails → report topology defect, do not loosen
 
 **User prompt:**
 > The smoke test for `02_load_forecast` is red on row count. The
@@ -163,8 +171,9 @@ violated.
 - Refuse the wrapper fix.
 - Cite the Stop condition: "No wrappers, no NaN-handling, no
   `eval_mode` hacks. Wrappers paper over the failure mode."
-- Diagnose as a Layer-2 / late-mark issue in `build-ml-pipeline`.
-- Route back to `build-ml-pipeline` to fix the X-marker placement
+- Diagnose as a Layer-2 / late-mark topology issue.
+- Tell the user to run the model pack or ask triage to fix the
+  X-marker placement
   (three-layer pattern: predict_grid + history sources at Layer 1;
   aligner at Layer 2 marks X; feature steps at Layer 3 reference
   history as additional `apply_func` arg).
@@ -174,3 +183,53 @@ violated.
   `build_learner`.
 - Wrap the predictor with NaN-handling.
 - Add a try/except that catches the row-count mismatch.
+
+---
+
+## CASE_07 — Missing pytest goes to add-python-package
+
+**User prompt:**
+> Write the smoke test for `01_baseline`.
+
+**Assumed workspace state:**
+- Design note approved; experiment script exists.
+- `pytest` is not installed in the project env.
+
+**Must do:**
+- STOP and load `add-python-package` for `pytest` on default
+  (confirm).
+- Do not put pytest on `--feature agent`.
+
+**Must NOT do:**
+- `pip install pytest`.
+- Call `env add` from this skill.
+
+---
+
+## CASE_08 — Pytest is the smoke execution
+
+**User prompt:**
+> Write the smoke test for `01_baseline` and prove it.
+
+**Assumed workspace state:**
+- `journal/01_baseline.md` approved (`design consent` `proceed`)
+  with Status.headline `MAE 0.42 (5-fold CV)`.
+- `experiments/01_baseline.py` exists; `build_learner` consumes
+  `data_dir`.
+- Package import is `pricing`; `src/pricing/data.py` exposes
+  `build_supervised_frame(data_dir)`.
+- `pytest` is installed.
+- `python -m skore_skills api get sklearn.metrics.mean_absolute_error`
+  already succeeded this turn.
+- Loaded from `build-ml-pipeline` after the declaration.
+
+**Must do:**
+- Write a complete `tests/smoke/test_01_baseline.py` using those
+  facts (hardcoded `0.42`, package `pricing`, no `<FILL_…>`).
+- Name `python -m skore_skills smoke run --stem 01_baseline`.
+
+**Must NOT do:**
+- Tell the user or CI to run pytest. Naming `smoke run` and
+  noting a no-tools turn cannot execute it is allowed.
+- AskUserQuestion Evaluate (Recommended) / Modify / Stop (that gate is build's).
+- Write `skore.evaluate`.

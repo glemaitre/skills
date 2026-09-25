@@ -14,29 +14,30 @@ Lookup shape is wrong: `get` is by id, not by key.
   singular — drop the trailing `s`, e.g. `cross-validations` →
   `cross-validation`, `estimators` → `estimator`). If the audit
   file's `REPORT_ID` is wrong, update it from the correct URL.
-- **Local mode**: `summarize()` returns a DataFrame with a flat
-  `RangeIndex` and an `"id"` column — read
-  `summary.loc[summary["key"] == "<NN>_<short_name>", "id"].iloc[0]`
-  and set it as `REPORT_ID`.
+- **Local mode**: `summarize()` is a Display. Bind
+  `frame = summary.frame()`, then
+  `frame.loc[frame["key"] == "<NN>_<short_name>", "id"].iloc[0]`
+  and set it as `REPORT_ID`. The core template leaves `summary`
+  as the last expression so the digest shows the Display;
+  `.frame()` is for lookup, not for replacing that last line.
 
-Never substitute by re-running `evaluate` + `put`. See `python-api`
+Never substitute by re-running `evaluate` + `put`. See `python -m skore_skills api get`
 § "Lookup failure ≠ artifact missing".
 
-## `run_cells.py` exits with `ModuleNotFoundError: No module named 'IPython'`
+## `cells run` exits with `ModuleNotFoundError: No module named 'IPython'`
 
 Agent feature not installed in the env the runner is invoked from.
-**Delegate to `python-env-manager` § "Agent feature" via
-`G-AGENT-FEATURE`.** Do not type install commands from this skill.
-The per-manager install scripts under
-`.agents/skills/python-env-manager/scripts/install_agent_feature_<manager>.sh`
-do the full install + verification in one call.
+**Delegate to `add-python-package` § "Agent feature" via
+`agent tools (ruff / ipython / ipykernel)`.** Do not type install commands from this skill.
+`python -m skore_skills env init` prints the full plan;
+`env init --execute` installs and verifies it.
 
 ## Cell renders as `<Display object at 0x…>` in the digest
 
-The cell called a `*.summarize()` accessor without `.frame()`. The
-`__repr__` of skore's `Display` classes is the bare object-at-address;
-the runner can't extract a useful text representation. Edit the cell
-to chain `.frame()`:
+Current skore Displays render themselves as text, so the bare
+expression is normally enough. Seeing the object-at-address means
+this skore predates that, and the runner has nothing to capture.
+Chain `.frame()` on the affected cell only:
 
 ```python
 report.metrics.summarize().frame()
@@ -46,7 +47,7 @@ report.checks.summarize().frame()
 ## Digest contains `**error:** AttributeError: 'X' object has no attribute 'Y'` for a `report.*` accessor
 
 Symbol drift between skore versions OR symbol-from-memory in the
-audit file. Consult `python-api` against the installed skore version,
+audit file. Consult `python -m skore_skills api get` against the installed skore version,
 update the cell, re-run the runner.
 
 ## Digest contains `**error:**` for the `project.get(REPORT_ID)` cell
@@ -86,7 +87,7 @@ Two possibilities:
 
 1. **Different hub workspace.** The audit is opening a different hub
    workspace than the experiment wrote to. Verify the
-   `<hub-workspace>` part of the name matches `Workspace decisions`.
+   `<hub-workspace>` part of the name matches `experiments/<stem>.py`.
 2. **No read access.** The user's credentials don't have read access
    to the workspace they wrote to (rare). Surface the access issue
    to the user; do not silently fall back to local mode.

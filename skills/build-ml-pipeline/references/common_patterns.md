@@ -2,7 +2,7 @@
 
 Recurring shapes of a complex pipeline expressed within the skrub
 DataOps graph. SKILL.md has the one-line summaries; this file has
-the worked patterns. Look up exact symbols in `python-api` — the
+the worked patterns. Look up exact symbols in `python -m skore_skills api get` — the
 patterns tell you *which* shape applies, not the precise signature.
 
 ## 1. Heterogeneous columns (skrub answer to `ColumnTransformer`)
@@ -106,7 +106,7 @@ The tuning skill discovers the knobs by walking the graph.
 Author one **only when** (a) no built-in fits and (b) the
 operation is stateful. Subclass `TransformerMixin` + `BaseEstimator`
 (Mixin first — sklearn convention so the mixin's `fit_transform`
-wins MRO; see SKILL.md Rule 5). Implement `fit(self, X, y=None)` to
+wins MRO; see SKILL.md Rule 3). Implement `fit(self, X, y=None)` to
 learn state and `transform(self, X)` to apply it; add
 `get_feature_names_out` if downstream consumers need feature names.
 
@@ -145,5 +145,5 @@ Attach via `.skb.apply(QuantileRankEncoder(), cols=s.numeric())`.
 
 Drop a `scratch/<ts>_<short>.py` probe to explore the skrub
 surface (`dir(skrub)`, `dir(some_node.skb)`), or WebFetch the skrub
-narrative docs for the installed version via `python-api` Shape 3.
+narrative docs for the installed version via `python -m skore_skills api get` Shape 3.
 Cache new findings to `scratch/api/skrub/<version>/<topic>.md`.

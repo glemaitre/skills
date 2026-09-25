@@ -1,459 +1,424 @@
 ---
 name: explore-ml-data
 description: >
-  Owns data understanding BEFORE any model is designed. Places and
-  executes `data/eda.py` (a jupytext `# %%` script) via the shared
-  in-process runner, reads the streamed digest, then writes a
-  persisted `data/eda.md` report (plus linked `data/eda_<table>.html`
-  skrub `TableReport` pages) and the `## Data understanding (EDA)`
-  section of `journal/JOURNAL.md`. The point is to surface the
-  dataset facts — shape, dtypes, missingness, cardinality, target
-  balance / skew, datetime / group structure, feature associations —
-  that JUSTIFY the later learner / splitter / metric decisions, so the
-  user understands *why* the modelling choices are made. Uses
-  `skrub.TableReport` for dataframe overviews and the shared runner
-  `audit-ml-pipeline/scripts/run_cells.py`. Stops at "EDA executed,
-  `data/eda.md` + HTML written, JOURNAL EDA section updated." Never
-  designs the model, never edits `src/<pkg>/`, never modifies the
-  user's raw data files.
+  Owns data understanding BEFORE any model is designed. Places
+  `data_analysis/data_analysis.py` (TableReport plus duplicates,
+  target, bivariate, leakage), runs `python -m skore_skills cells
+  run`, dumps agent facts under `scratch/data_analysis/`, then
+  writes `data_analysis/data_analysis.md` and JOURNAL § Data
+  understanding. Never designs the model, never edits `src/<pkg>/`,
+  never modifies raw data files.
 
   TRIGGER — any of:
-  - `iterate-ml-experiment` § 0 bootstrap, BEFORE the baseline design
-    note — the G-EDA gate fires here (run / skip).
   - The user asks to "explore the data", "do an EDA", "profile the
     dataset", "what does the data look like", "understand the data".
-  - A new or changed data source needs (re-)understanding before the
-    next experiment.
+  - Triage sent the user here before modeling
+    (`status.data_analysis` missing).
+  - A new or changed data source needs (re-)understanding.
+  - The user asks to add analysis to an already-recorded EDA
+    (refresh: edit the `.py`, re-run, overwrite the `.md`).
+  - A methodology concern on the table (“is this leakage”,
+    “research this”) while EDA is already recorded.
 
-  SKIP when: the workspace isn't scaffolded / bootstrapped yet —
-  `iterate-ml-experiment` § 0 owns bootstrap ordering and will
-  dispatch here at the G-EDA step; don't run standalone ahead of
-  scaffolding (route to `iterate-ml-experiment` / `organize-ml-
-  workspace`); there is no data to explore yet; the user wants to
-  inspect a finished run's skore report rather than the raw dataset
-  (`audit-ml-pipeline`); the user is past data understanding and wants
-  pipeline / evaluation mechanics (`build-ml-pipeline` /
-  `evaluate-ml-pipeline`); a pure symbol lookup (`python-api`); EDA is
-  already recorded (`data/eda.md` + the JOURNAL EDA section exist) and
-  the user is not asking to refresh it.
+  STOP when `python -m skore_skills status` shows no scaffold or no
+  data: explain and send the user to setup or triage. Also stop when
+  the request is not raw-data exploration, or when exploratory data
+  analysis is already recorded and no refresh and no methodology
+  concern was requested.
 
-  HOW TO USE: run the Detection step (does `data/eda.md` + the JOURNAL
-  EDA section already exist?), emit the Pre-flight checklist as
-  visible text, read the Stop conditions, then place `data/eda.py`
-  from `templates/eda.py`, execute it via the shared runner, read the
-  digest, and author `data/eda.md` + the JOURNAL EDA section. Always
-  resolve skrub / pandas / polars symbols via `python-api`, never from
-  memory.
+  HOW TO USE: G-TABULAR then add pandas/polars + skrub + matplotlib
+  + seaborn via `add-python-package`. Infer or ask the target.
+  Load `plot-ml-figure` if installed, copy
+  `templates/data_analysis.py` if it fits then edit (only the
+  live path), `cells run`, copy `templates/facts.py` to scratch,
+  author `data_analysis.md`, then ask keep-exploring vs close.
+  Resolve symbols via `api get`.
 ---
 
 # Explore ML Data
 
-Understand the dataset before designing a model. One project-level
-EDA per workspace: an executable `data/eda.py`, a persisted
-`data/eda.md` narrative, rich `data/eda_<table>.html` reports, and a
-short JOURNAL section that links them. The findings feed the baseline
-design note's learner / splitter / metric choices.
+One project-level exploratory data analysis: a notebook the user
+can open, HTML reports, a short `data_analysis.md` that embeds
+them, and a JOURNAL index row.
 
-## Next-step pointers — where you go after this skill
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Notebook markdown, `data_analysis.md`, JOURNAL text, and `#`
+comments describe **this** dataset — not the skills framework, the
+CLI, or the command that produced an output. `<!-- results-embed:
+… -->` is a site marker. Authoring hints stay in this skill.
+`style` is ruff only.
+
+## Artifacts
+
+| Path | Audience |
+|---|---|
+| raw data (anywhere) | User-owned, **read-only** |
+| `data_analysis/data_analysis.py` | Human notebook — TableReport + ML-gap cells |
+| `data_analysis/data_analysis_<slug>.html` | Human — TableReport page, one per family |
+| `data_analysis/*.png` | Human — figures for implications, never glance |
+| `data_analysis/<slug>.html` | Human — Plotly (or other) HTML, iframe in implications |
+| `data_analysis/data_analysis.md` | Human + later modelling — TableReport iframes, implications |
+| `scratch/data_analysis/<slug>.json` | Agent — `TableReport.json()` per family; gitignored |
+| `scratch/data_analysis/extras.json` | Agent — `tables[]`, target, leakage, png and html paths |
+| JOURNAL § Data understanding | Index: status, 2–4 line summary, link |
+
+TableReport owns dtypes, missingness, univariate distributions,
+cardinality, and top pairwise associations. Extra cells cover
+duplicates, target distribution, feature-vs-target, and leakage
+candidates. Do not duplicate TableReport in extra cells.
+
+Details: `references/cell_anatomy.md`. Extra recipes:
+`references/extra_analyses.md`.
+
+## Next-step pointers
 
 | You came here for… | → next |
 |---|---|
-| Bootstrap, before the first baseline | → back to `iterate-ml-experiment` § 0; the EDA findings inform the auto-drafted `01_baseline.md` |
-| User free-text ("explore the data") | → surface the findings; no further dispatch unless the user asks to model |
-| Re-understand a changed data source | → re-run, overwrite `data/eda.*`, refresh the JOURNAL EDA section |
+| First EDA (triage or free-text) | → write md; then keep-exploring vs close |
+| Keep exploring | → pre-defined option, query, automatic exploration, or describe a plot; no end-turn yet |
+| Close this stage | → convert / site / git end-turn / `triage-ml-task` if installed |
+| Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § Automatic exploration (named concern skips the canned survey) |
+| Changed data source or "also plot X" | → overwrite `data_analysis/data_analysis.*`, refresh JOURNAL |
 
-Always re-emit the Pre-flight checklist with evidence before
-declaring the turn done.
+## Stop conditions
 
-## Where this sits in the loop
+- **Read-only raw data.** Never clean, rewrite, or re-save the
+  user's files. Never tell the user to drop a column or file
+  (“drop it”). Leakage stays Open questions / a `measure`
+  board. Cleaning belongs in `build-ml-pipeline`.
+- **Deliverables under `data_analysis/`.** Raw load may point
+  anywhere.
+- **Every ask carries its context.** Before any AskUserQuestion in
+  this skill, state in 2–4 lines what the answer authorizes, the
+  facts it rests on — echoed inline, e.g. the file names, the
+  candidate columns, the proposed family slugs — and what each
+  option does. A file link is an addition, never the context.
+- **G-DATA-ANALYSIS run | skip.** AskUserQuestion. "Go fast" does
+  not skip. Skip → JOURNAL Status row `skipped — <date>` and stop.
+  Do not run `site build` on skip. The unfitted snapshot build in
+  `build-ml-pipeline` still runs before Evaluate.
+- **IPython on the run path.** Missing → `add-python-package` for
+  `ipython` (`env route` agent). Decline → skip path. Do not
+  `pixi add` / fabricate output.
+- **G-TABULAR before `data_analysis/data_analysis.py`.**
+  `status.policy.tabular`; else `choose-python-library` (recommend
+  pandas) then `add-python-package` for that lib **and** `skrub`,
+  `matplotlib`, and `seaborn`. No silent default. If G-TABULAR,
+  target, or families are unanswered, **stop after the asks** —
+  no default-path notebook, even as a “Deliverable A assuming
+  pandas.” Do not install sklearn / skore / pytest unless the
+  user picked an extra that needs them.
+- **Target.** Infer from JOURNAL Status / the user prompt when the
+  column is obvious. Otherwise AskUserQuestion (column names plus
+  "no target yet") and **stop** — write no notebook yet. Do not
+  list feature-vs-target / leakage as always-on next steps.
+  After a named column, append that one target snippet. After
+  “no target yet” or Decline → `<TARGET>=None`, `<TASK>=none`;
+  TableReport + duplicates only. Do not persist a policy key.
+- **No train/test split.** Splitter choice is a later gate.
+  Leakage cells are qualitative flags on the raw family that
+  holds the target. Further families use `templates/family.py`
+  only (TableReport + duplicates) — no leakage / target /
+  bivariate cells on a family that does not hold the target.
+  Do not persist a joined modeling table.
+- **Families before the notebook.** More than one data file →
+  AskUserQuestion grouping (none recommended): Use a proposed
+  grouping / Profile every file separately / I will describe
+  the   grouping. Propose clusters from extension, name pattern,
+  or a header/schema peek; generic slugs (`family_a`). Inventing
+  families means writing them before the answer, not proposing
+  those slugs in the ask. One file → skip this ask.
+- **`api get` this turn** for symbols used (cache hits count).
+  `TableReport.json()` keys drift — `.get(...)`.
+- **One `data_analysis/data_analysis.py`.** Repeat the
+  TableReport cell per confirmed family (or per file if the
+  user picked that). Re-run overwrites in place. Default
+  notebook = those templates only (plus the matching target
+  snippet). Do not add extra histograms, `sns.heatmap` /
+  association matrices, unique-ratio (`nunique()/n`),
+  column-dicts, or `report.json()` cells. Leakage is the
+  template table, not a comment. Default figures: seaborn
+  `displot` for the target only inside
+  `templates/target_regression.py` /
+  `target_classification.py` (describe + one target figure).
+  Copy that snippet into the live notebook; do not invent a
+  second target histogram next to `TableReport`. One
+  faceted `relplot` → `bivariate_grid.png`, last expression
+  `g`. Do not `import matplotlib.pyplot` on the default path.
+- **Do not design the model.** Implications in
+  `data_analysis.md` only.
+- Do not gitignore `data_analysis/`. Ignore specific raw patterns
+  via `setup-git` if the user asks (default: don't).
 
-EDA is a **bootstrap-time gate (G-EDA)** owned by this skill and
-fired by `iterate-ml-experiment` § 0 **before** the baseline design
-note. Ordering matters: the dataset facts (class balance, datetime /
-group columns, missingness, cardinality) are exactly what justifies
-the splitter (`G-CV-SPLITTER`), the metric default, and the learner
-default. Running EDA after the model is designed defeats the purpose.
-
-```
-scaffold → JOURNAL → goal from data/README.md
-   │
-   └─► G-EDA (run | skip)  ◄── this skill
-         │ run
-         └─► data/eda.py → execute → data/eda.md + HTML + JOURNAL §EDA
-   │
-   └─► auto-draft 01_baseline.md  (cites the EDA findings)
-```
-
-## Where things live — visual map
-
-Two locations are kept separate: the **raw data source** (read-only,
-may live anywhere) and the **EDA deliverables** (always under
-`<project>/data/`).
-
-| Path | Durability | Who writes it | What it holds |
-|---|---|---|---|
-| raw data source (`data/`, `raw/`, an absolute path, external) | user-owned, **READ-ONLY** | the user | The dataset. EDA reads it; never modifies it. May be anywhere — not assumed to be `data/` |
-| `data/eda.py` | **Durable** (committed) | This skill, once per workspace | The jupytext `# %%` EDA cells. Source of truth. Openable as a notebook for the rich view |
-| `data/eda.md` | **Durable** (committed) | This skill (authored from the digest) | The prose narrative: findings + **modelling implications** that the baseline note cites |
-| `data/eda_<table>.html` | **Durable** (committed) | `data/eda.py` via `TableReport.write_html(...)` | The rich, interactive skrub report per table — for the human |
-| `scratch/eda/eda.md` | Ephemeral (gitignored), optional | `run_cells.py` when given a 2nd arg | Per-cell digest the agent reads. Same content as stdout |
-| `journal/JOURNAL.md` § Data understanding (EDA) | **Durable** (committed) | This skill | 2–4 line summary + link to `data/eda.md` |
-
-**Mnemonic:** the raw data is *read-only and lives wherever the user
-keeps it*; `data/eda.py` is *source*; `data/eda.md` + the HTML are the
-*durable deliverables, always under `data/`*; `scratch/eda/` and
-stdout are the *ephemeral run digest*.
-
-## Read-only-against-raw-data contract
-
-The central rule. Surfaced as the first Stop condition below.
-
-**Allowed — this skill writes ONLY (deliverables always under
-`<project>/data/`, created if absent):**
-
-- `data/eda.py` — the EDA script (created / overwritten in place).
-- `data/eda.md` — the authored narrative.
-- `data/eda_<table>.html` — the skrub `TableReport` pages.
-- `scratch/eda/` — the ephemeral digest.
-- `journal/JOURNAL.md` § Data understanding (EDA).
-
-**Forbidden:**
-
-- Modifying, deleting, renaming, re-encoding, or "cleaning" the
-  user's raw data files — **wherever they live** (`data/`, another
-  folder, an absolute/external path). EDA **reads** them; it never
-  rewrites them. Data cleaning is the pipeline's job
-  (`build-ml-pipeline`), declared at fit time, not a one-off mutation.
-- Writing anywhere outside the five paths above — no `src/<pkg>/`
-  edits, no `reports/` writes, no new experiment files.
-- Designing the model: no `skore.evaluate(...)`, no `project.put(...)`,
-  no learner selection here. EDA *informs* those; it does not make
-  them.
-
-## Stop conditions — read before anything else
-
-- **Read-only against the user's raw data.** See § Read-only-
-  against-raw-data contract. `data/eda.py` reads the raw files
-  (wherever they live) and writes only the `data/eda.*` deliverables.
-- **Deliverables always under `<project>/data/`; the raw source is
-  separate.** Write `data/eda.py` / `data/eda.md` /
-  `data/eda_<table>.html` under `<project>/data/` (create the folder
-  if absent). The raw data the script *reads* may live anywhere
-  (`data/`, another in-repo folder, an absolute or external path) —
-  decouple the two: a `RAW = <LOAD_RAW_DATA>` source vs an `EDA_DIR`
-  output. Never assume the raw data is in `data/`.
-- **EDA precedes model design (G-EDA).** In bootstrap, the gate fires
-  **before** `journal/01_baseline.md` is drafted. It is binary:
-  **run** (place + execute `data/eda.py`, write the deliverables) or
-  **skip** (record `Status: skipped — <date>` in the JOURNAL section
-  and proceed). Do not silently bypass — fire the `AskUserQuestion`.
-  Free-text "go fast" / "quick baseline" does NOT resolve it.
-- **Agent feature required to execute.** The cell runner needs
-  `ipython`. If it is missing and the user chose **run**, STOP and
-  delegate to `python-env-manager` § "Agent feature"
-  (`G-AGENT-FEATURE`). Do NOT type `pixi add ... ipython` yourself;
-  do NOT fabricate EDA output with hand-written `print()`s. If the
-  user declines the agent feature, **fall back to the skip path**
-  (record `Status: skipped`) — never loop between run and install.
-- **Symbol from memory is forbidden.** Any `skrub` / `pandas` /
-  `polars` symbol (`TableReport`, `TableReport.json`, `write_html`,
-  `column_associations`, the tabular reader, …) must come from
-  `python-api` *this turn*. Cache hits under
-  `scratch/api/<lib>/<version>/` count; inline memory does not.
-  **`TableReport.json()`'s key names are not formally documented and
-  drift across skrub versions — confirm them via `python-api` and
-  parse defensively (`.get(...)`).**
-- **Library-agnostic — read facts off skrub, not pandas/polars.** The
-  workspace may use pandas OR polars (G-TABULAR), whose summary
-  methods differ (`select_dtypes` doesn't even exist in polars). The
-  structured facts come from `skrub` (`TableReport(...).json()`,
-  `column_associations`), which accept both. The ONLY library-
-  specific line is `RAW = <LOAD_RAW_DATA>`. Do not write
-  `df.isna()`/`df.nunique()`/`df.select_dtypes(...)` etc.
-- **`skrub.TableReport` for dataframe overviews.** Every table gets a
-  `TableReport(RAW, title=..., verbose=0)` written to
-  `data/eda_<table>.html` (the user-facing artifact) AND read via
-  `.json()` for the digest. `verbose=0` keeps progress prints out of
-  the digest.
-- **Never end a cell on a bare `TableReport`.** Outside a notebook,
-  `repr(TableReport(df))` is the useless `<TableReport: use .open()
-  to display>`. Use `report.write_html(...)` (a statement) for the
-  HTML, and end cells on **text-friendly** expressions (`RAW.shape`,
-  a `dict`/`list` built from `report.json()`,
-  `skrub.column_associations(RAW)`) so the digest carries real
-  values. Mirrors audit's `.frame()` rule.
-- **Never gitignore the whole `data/`; ask about the inputs.** The
-  deliverables live in `data/` and must stay committable, so the
-  whole `data/` folder must never be in `.gitignore`. If the raw
-  inputs should be kept out of git (large / local-only), fire an
-  `AskUserQuestion` offering to ignore **specific input patterns**
-  (e.g. `data/raw/`, `data/*.parquet`) — default: don't. Then verify
-  the deliverables are tracked (`git check-ignore data/eda.md` must
-  return nothing). Never auto-edit `.gitignore` — that is
-  `organize-ml-workspace`'s to write; surface the patch and ask.
-- **One project-level EDA.** A single `data/eda.py` covers the whole
-  dataset; multi-table data gets one `TableReport` cell per table
-  inside that one file (run the target/structure cells on the
-  target-bearing table). No `eda_v2.py`, no per-experiment EDA files,
-  not part of the four-way stem pairing. Re-understanding overwrites
-  `data/eda.py` in place.
-- **Don't design the model here.** No splitter pick, no metric pick,
-  no learner pick. Record *implications* in `data/eda.md`; the picks
-  happen in their owning gates (`G-CV-SPLITTER`, the baseline note).
-- **Harness "no clarifying questions" hints do NOT waive G-EDA or
-  G-AGENT-FEATURE.** Both fire regardless.
-- **Post-hoc audit — required before ending the turn.** Walk every
-  pre-flight row; surface unfilled Evidence cells explicitly.
-
-## Forbidden shortcuts
-
-| Shortcut | Why it's wrong |
-|---|---|
-| Design the baseline first, EDA "later if there's time" | Inverts G-EDA. The point is to justify the modelling choices *before* making them. EDA runs first in bootstrap |
-| End a cell on a bare `TableReport(df)` to "show the report" | Outside a notebook that repr is `<TableReport: use .open() to display>` — zero signal in the digest. Use `write_html(...)` + a text summary built from `report.json()` |
-| `print(...)` instead of a bare summary expression | The runner captures bare last-expressions via `result.result`; `print(...)` lands in stdout and is harder to scan. Use bare expressions |
-| Use pandas/polars methods (`df.isna()`, `df.nunique()`, `df.select_dtypes(...)`) for the summaries | Breaks on the other library (polars has no `select_dtypes`). Read the facts off `skrub` (`TableReport(...).json()`, `column_associations`) — agnostic to pandas/polars |
-| Clean / impute / drop columns in `data/eda.py` and re-save the raw file | EDA is read-only against raw data. Cleaning belongs in the pipeline (`build-ml-pipeline`), applied at fit time for train/test consistency |
-| Assume the raw data is in `data/` | The raw source may live anywhere; only the deliverables are pinned to `data/`. Set `RAW = <LOAD_RAW_DATA>` to wherever the data actually is |
-| Gitignore the whole `data/` folder | The committed deliverables (`data/eda.*`) live there. Ignore only specific input patterns, and ask the user first |
-| Run EDA without the agent feature by hand-writing the expected output | Fabricated EDA is worse than none. Missing runner → G-AGENT-FEATURE (install) or the skip path |
-| `pixi add ipython` directly from this skill | Install is owned by `python-env-manager`. This skill *requests* via G-AGENT-FEATURE |
-| Drop the authored `data/eda.md` and leave only the HTML | The `.md` carries the modelling implications the baseline note cites and the JOURNAL section links. Both are required |
-| Invent column meanings not visible in the data | Report what the data shows. Domain semantics the user didn't state go in an explicit "open questions" list, not as asserted fact |
-| Forget the JOURNAL § Data understanding update | The section is the index entry; without it later sessions can't find the EDA. It is part of "done" |
-
-## Pre-flight — emit before any write or execution
+## Pre-flight
 
 ```
-Pre-flight (explore-ml-data):
-- [ ] Trigger: bootstrap-G-EDA | user-request | data-changed
-      Evidence: caller + rule that matched
-- [ ] Detection: EDA already present? data/eda.md + JOURNAL §EDA
-      Evidence: ls / Glob on data/eda.md + Read JOURNAL §EDA
-                | "n/a — first EDA"
-- [ ] G-EDA resolved: run | skip
-      Evidence: AskUserQuestion id=<id>, answer=<run|skip>
-                | user free-text quote turn N
-      If skip: JOURNAL §EDA records "Status: skipped — <date>"; STOP here.
-- [ ] Tabular library known (G-TABULAR): pandas | polars
-      Evidence: JOURNAL.md Status (Workspace decisions) | AskUserQuestion
-                via data-science-python-stack
-- [ ] Raw data located (may be outside data/): <paths / loader>
-      Evidence: ls / Glob on the data location + the RAW load call placed
-                in data/eda.py | user-quoted path turn N
-- [ ] data/ not gitignored as a whole; deliverables will be tracked
-      Evidence: `git check-ignore data/eda.md` returns nothing
-                | AskUserQuestion id=<id> on ignoring specific inputs
-                | "n/a — no .gitignore yet"
-- [ ] Agent feature available (run path only):
-        `pixi run -e agent ipython -c "print(0)"` exit 0
-      Evidence: tool output | JOURNAL.md Status `agent feature: installed`
-                Missing → STOP, delegate to python-env-manager G-AGENT-FEATURE
-                (decline → fall back to skip path)
-- [ ] python-api consulted for symbols used:
-        skrub.TableReport, TableReport.write_html, TableReport.json,
-        skrub.column_associations, the tabular reader (load cell only)
-      Evidence: Read/Write scratch/api/<lib>/<version>/<topic>.md (this turn)
-                | "n/a — cache hit + Read this turn"
-- [ ] Template copy + substitution decided:
-        <pkg> → package name from src/<pkg>/
-        <LOAD_RAW_DATA> → the real loader, pointing wherever the data lives
-        <TARGET_COLUMN> → the target (from goal / data/README.md), or n/a
-        <table> → short slug per table for eda_<table>.html
-      Evidence: Read templates/eda.py this turn before Write data/eda.py
-- [ ] Execution command shape confirmed:
-        pixi run -e agent python \
-          .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-          data/eda.py [scratch/eda/eda.md]
-      Evidence: command emitted before running
-- [ ] Deliverables written: data/eda.md (prose + implications),
-        data/eda_<table>.html (≥1), JOURNAL §Data understanding
-      Evidence: Write of each | "n/a — skip path"
-- [ ] Pre-flight re-emitted with evidence before final message.
-      Evidence: this checklist appears in the end-of-turn summary.
+- [ ] Detect: status.data_analysis present|skipped|missing
+- [ ] G-DATA-ANALYSIS: run | skip (skip → JOURNAL only, STOP)
+- [ ] G-TABULAR + add frame lib + skrub + matplotlib + seaborn
+- [ ] Target: inferred | AskUserQuestion | none
+- [ ] Families: one file | AskUserQuestion grouping
+- [ ] IPython available or add-python-package
+- [ ] Load plot-ml-figure if installed; place
+      data_analysis/data_analysis.py from the template (edit to
+      the live path); cells run
+- [ ] scratch/data_analysis/facts.py → <slug>.json per family
+      + extras.json
+- [ ] Author data_analysis.md + JOURNAL
+- [ ] Preview `site build` if `policy.site` (skip on G-DATA-ANALYSIS skip)
+- [ ] AskUserQuestion keep exploring vs close (skip if user
+      already closed the turn)
 ```
 
-## EDA file contract — overview
+Tick, then run the matching step. Re-emit the checklist with
+evidence. End of turn only after Close.
 
-`data/eda.py` is **jupytext percent format** (`# %%`), executed by
-the shared runner. Template: `templates/eda.py`. Full cell-by-cell
-anatomy with right / wrong shapes: → `references/cell_anatomy.md`.
+## Before execution
 
-### Substitutions
+After G-DATA-ANALYSIS, G-TABULAR, target, families, and IPython
+are resolved, emit 1–3 natural sentences immediately before the
+first notebook write / `cells run`. Say that this is **local
+computation**: it profiles the confirmed full table family or
+families, runs duplicate / target / bivariate / leakage analyses
+that apply, and writes `data_analysis/` HTML / figures plus
+`scratch/data_analysis/` JSON facts. Name the data scope and the
+report paths; do not dump Pre-flight as the explanation.
 
-| Placeholder | Replaced with |
-|---|---|
-| `<pkg>` | The importable package name (from `src/<pkg>/`); used for `from <pkg> import PROJECT_ROOT` (only to locate `EDA_DIR = PROJECT_ROOT / "data"`) |
-| `<LOAD_RAW_DATA>` | The real load of the raw file(s), pointing wherever the data lives (in `data/`, another folder, an absolute path, or external). Uses the workspace tabular lib (pandas/polars); skrub accepts both. The one library-specific line |
-| `<TARGET_COLUMN>` | The target column name (from the goal / `data/README.md`), or remove the target cell if unsupervised / unknown |
-| `<table>` | A short slug per table for the HTML filename (`eda_<table>.html`) — for a single table use the dataset name |
+Describe cost from facts, not guesses. TableReport and requested
+plots scale with table size and number of families; unless a
+measured duration is already available, say timing depends on
+those inputs and do not invent minutes. Emit this preview once,
+not before every cell command; refresh it only when a newly
+selected extra materially changes the work.
 
-### Cell sequence (what each cell does)
+Automatic exploration / a methodology discussion is **LLM
+research**, not model fitting or testing: say that it will reason
+over the recorded EDA, may write a scratch research note, and
+will stop at a measurement-choice board before local analysis.
+If a mandatory gate is pending, preview the possible work but do
+not write or execute the notebook.
 
-Brief outline; concrete examples → `references/cell_anatomy.md`.
+## Procedure (run path)
 
-1. **Module docstring (markdown)** — what this file is, the
-   read-only-against-raw-data rule, raw-vs-deliverables split, how it
-   is executed.
-2. **Imports + paths (code)** — `import json`, `import skrub`,
-   `from <pkg> import PROJECT_ROOT`, `EDA_DIR = PROJECT_ROOT / "data"`
-   (+ `EDA_DIR.mkdir(parents=True, exist_ok=True)`). No pandas/polars
-   import here.
-3. **Load raw data (code, bare expression)** — `RAW = <LOAD_RAW_DATA>`
-   pointing wherever the data lives; end on `RAW.shape`.
-4. **Per-table overview (code)** — `report = skrub.TableReport(RAW,
-   title=..., verbose=0)`; `report.write_html(EDA_DIR /
-   "eda_<table>.html")`; then `summary = json.loads(report.json())`
-   and end on a `dict`/`list` of per-column dtype / null / cardinality
-   facts. One such cell per table.
-5. **Target analysis (code, bare expression)** — pick the target's
-   entry out of `summary["columns"]`; it carries value counts
-   (classification) or a distribution summary (regression). Drives the
-   metric default and whether the splitter should stratify.
-6. **Structure signals (code, bare expression)** — datetime columns
-   (from skrub's inferred dtypes, catches string dates) and high
-   unique-ratio id/group columns. Drives the `G-CV-SPLITTER` choice
-   (`TimeSeriesSplit` / `GroupKFold`).
-7. **Associations (code, bare expression)** —
-   `skrub.column_associations(RAW)` to flag strong predictors and
-   possible leakage.
-8. **End (markdown)** — reminder that the agent now authors
-   `data/eda.md` + the JOURNAL section from this digest.
+1. Resolve `<TARGET>` / `<TASK>` (`classification` | `regression`
+   | `none`) first. Resolve families (stop condition above).
+   Copy `templates/data_analysis.py` if it fits, then **edit**
+   — do not paste unused branches. The first family is the one
+   that contains `<TARGET>` when a target exists; substitute
+   `<pkg>`, `<LOAD_RAW_DATA>` (in-memory concat of that family's
+   shards; optional `_source_file`), `<slug>` (Python
+   identifier). Each further family → `templates/family.py` (`<OTHER_SLUG>`,
+   `<LOAD_OTHER>`). Append
+   `templates/target_regression.py` **or**
+   `templates/target_classification.py` (set `TARGET` / `TASK`
+   in the first-family load cell). No target → neither snippet,
+   no `TARGET` / `TASK` lines. Datetime columns on a family →
+   `templates/datetime.py` for that family (drop the relplot
+   cell if there is no numeric target). Two families that share
+   column names → `templates/drift.py` with `<OTHER_FRAME>`.
+   Disjoint schemas → no drift on the default pass. Do not
+   append join-coverage cells here. Generated notebook must
+   not contain `if TARGET`, `if TASK`, `OTHER = None`, empty
+   datetime loops, or “skip this cell”. Load `plot-ml-figure`
+   if installed **before** writing figure cells (including this
+   first write). Markdown is about **this** analysis.
+   `python -m skore_skills style` after the write.
+2. `python -m skore_skills cells run
+   data_analysis/data_analysis.py` — writes HTML and PNGs. A
+   useless TableReport `repr` in the digest is expected.
+3. Copy `templates/facts.py` → `scratch/data_analysis/facts.py`
+   with the same families and target; run it; read
+   `scratch/data_analysis/<slug>.json` (each family) and
+   `extras.json`.
+4. Write `data_analysis/data_analysis.md` from
+   `templates/data_analysis.md`: glance (one iframe per family
+   and nothing else), modelling implications (include
+   feature-engineering *candidates*), open questions. Reports
+   and figures are embedded, not linked; `![](<name>.png)` or an
+   HTML iframe (`<iframe src="<slug>.html" …>`) sits beside the
+   implication it supports, never in the glance. Glance stays
+   TableReport-only. Every `extras["pngs"]` and `extras["htmls"]`
+   path is embedded, each with a sentence citing numbers from
+   those JSON files (or a notebook summary table). Do not save a
+   figure that earns no such sentence.
+   Ground claims in both JSON files and the HTML. Do not invent
+   columns.
+5. JOURNAL § Data understanding table: Status `done — <date>`,
+   short summary (shape, target balance/skew, one or two findings
+   that shape modelling), Report
+   `[data_analysis/data_analysis.md](../data_analysis/data_analysis.md)`.
+   Skip path: Status row only. Do not convert or `git end-turn` on
+   skip.
+6. **Keep exploring vs close** — unless the user already closed
+   the turn (“EDA is done”, “close the turn”): if `policy.site`
+   is true and `export-ml-site` is installed, run
+   `python -m skore_skills site build` first (skip in one line
+   otherwise; name a build error; do not fail the gate). Link
+   `data_analysis/data_analysis.md` plus `report.html` and
+   `html/data_analysis.html` when the build ran. Do not
+   `notebook convert` or `git end-turn` on this preview. Then
+   **AskUserQuestion** one pick. Neither option is recommended
+   or preselected. After the first md, always ask (including
+   when triage sent you here). Close → End of turn
+   (User-facing close). Do not rewrite `data_analysis.md` on
+   Close. Duplicate / target / leakage stay in Modelling
+   implications, not only Open questions.
 
-`write_html(...)` is load-bearing on the overview cells (the human
-artifact). `verbose=0` and the bare `report.json()`-derived
-expressions are load-bearing for a clean, library-agnostic digest.
-For multi-table data, run cells 5–7 on the target-bearing table; for
-very large data, load a row sample (see `references/cell_anatomy.md`).
+If the original prompt already named extras (e.g. PCA), include
+those cells in step 1 and do not re-ask that extra.
 
-## Execution contract — one command
+Import failures → `add-python-package`, do not work around.
 
-```bash
-pixi run -e agent python \
-  .agents/skills/audit-ml-pipeline/scripts/run_cells.py \
-  data/eda.py
-```
+Refresh (already `done`, user asks for more plots): edit the
+`.py`, re-run steps 2–5, then step 6. Do not re-ask
+G-DATA-ANALYSIS.
 
-The runner (shared with `audit-ml-pipeline`) streams the digest to
-stdout — the agent reads it directly from the bash tool output. Pass
-a second arg `scratch/eda/eda.md` to also write the digest to a file.
-For non-pixi workspaces, swap the activation prefix per
-`python-env-manager` § "Agent feature".
+Methodology concern while `status.data_analysis` is present
+(leakage / “research this”): skip G-DATA-ANALYSIS; do not
+overwrite the notebook; go to **Keep exploring** § research
+with that named concern (skip the canned extra-analysis
+survey).
 
-**This skill ships no runner of its own** — there is no
-`explore-ml-data/scripts/`. Always invoke the shared
-`audit-ml-pipeline/scripts/run_cells.py` at the path above; don't
-look for or fork a local copy.
+Always load `plot-ml-figure` if installed before writing or
+rewriting figure cells. The template is not a license to skip
+the plotting worker. Missing skill → one-line skip and still
+follow that tree (seaborn statistical, pandas simple chart,
+matplotlib last). Never `plt.close` in notebook cells: save PNG
+then leave the figure/grid as the cell output.
 
-**Prerequisites for the run path:** the workspace package must be
-importable (`from <pkg> import PROJECT_ROOT` — editable install done
-during scaffold) and `skrub` installed (Tier 1). If either import
-fails, the digest shows the `ImportError`; route to
-`python-env-manager` for the missing piece rather than working around
-it.
+## Keep exploring
 
-### Re-execution semantics
+No convert, no `git end-turn`. Do not run a **second** `site
+build` on this four-pick extras menu until the md is rewritten.
 
-- A changed / added data source → overwrite `data/eda.py`, re-run,
-  re-author `data/eda.md` + HTML, refresh the JOURNAL section.
-- `scratch/eda/` is overwritten on every run. The durable record is
-  `data/eda.py` + `data/eda.md` + git history.
+1. **AskUserQuestion** one pick, none recommended. Do not say
+   “extra-analyses” or “standard extra analysis” **anywhere
+   this turn** (chat, checklists, or the board). The file
+   `references/extra_analyses.md` may be named as a path only.
 
-## Authoring `data/eda.md`
+   | Label | Subtitle |
+   |---|---|
+   | Choose additional pre-defined option | Name only items that apply: interactions / pairplot, PCA, hypothesis tests, subgroup, time-series, text or geo, join keys / coverage (2+ families) |
+   | Provide a query to extend the exploration | Describe an analysis to add to the notebook (table, test, or plot) |
+   | Automatic exploration related to the data and problem | Do in-depth research related to the problem and data that we are exploring |
+   | Describe a plot | You name a chart and I add cells for it |
 
-After the run, read the digest and write `data/eda.md` from
-`templates/eda.md`. It is prose, grounded in the digest — no invented
-facts. Required sections:
+2. **Pre-defined option** — the recipe file
+   `references/extra_analyses.md` (path only; do not say
+   “extra-analyses” in chat). Its own `allow_multiple` board,
+   all unchecked. Load
+   `plot-ml-figure` if installed before figure cells.
+3. **Query** — wait for the user’s analysis request. Append
+   cells (load `plot-ml-figure` if a figure). Not the canned
+   research survey. Then step 6.
+4. **Automatic exploration** — load `research-ml-practice`
+   if installed with stage `data_analysis` and the canned
+   survey concern below. Missing skill → one-line skip and
+   return to step 1. Do not ask intake. Pass JOURNAL,
+   `data_analysis.md` (implications + open questions), and
+   `scratch/data_analysis/extras.json` as **context**. The
+   worker abstracts the **problem class** (no dataset proper
+   name) before searching. Canned question:
 
-- **Dataset at a glance** — tables, rows × columns, target.
-- **Per-column findings** — dtypes, missingness, cardinality
-  highlights, anything surprising.
-- **Target** — balance / skew; class counts or distribution summary.
-- **Structure** — datetime ordering, groups / ids (or "none found").
-- **Associations** — strong feature↔target / feature↔feature links;
-  flag possible leakage explicitly.
-- **Modelling implications** — the payoff section. Translate findings
-  into *candidate* picks the baseline note will weigh: e.g.
-  "imbalanced target → `StratifiedKFold` + look at ROC-AUC / PR-AUC,
-  not accuracy"; "`user_id` repeats across rows → consider
-  `GroupKFold`"; "timestamp present → `TimeSeriesSplit` if forecasting".
-  These are *implications*, not decisions — the gates own the picks.
-- **Open questions** — domain ambiguities for the user to confirm.
+   > Given the kind of problem in JOURNAL (domain, task,
+   > constraints) and the kinds of structure already seen in
+   > EDA (not the dataset’s proper name), what extra
+   > measurements on a raw table like this are still worth
+   > doing?
 
-Link each `data/eda_<table>.html` from the relevant section.
+   Read `scratch/research/survey-<slug>.md`. Summarize in
+   chat; do not dump the note. If tools did not run, two
+   sentences on the **named concern** (for leakage:
+   provenance / scoring-time availability) plus the
+   `measure` board — do not claim a scratch file was read.
+   Do not say to drop a raw column. **AskUserQuestion**
+   `allow_multiple` (unchecked) on **only** sourced
+   **`measure`** extras that are not already in the notebook.
+   Map onto extra_analyses when a recipe exists; else a
+   custom cell. `declare` / `evaluate` / `confirm` stay off
+   this board → Open questions as advice, not findings. Do
+   not copy Open questions onto the board unless the survey
+   note listed them with a source.
 
-## JOURNAL § Data understanding (EDA)
+   A user-named methodology concern (leakage / “research
+   this”) skips the canned survey: pass that concern for
+   **depth**, then the same **`measure`** board. Summarize
+   as above if tools did not run; do not say to drop a raw
+   column.
+5. **Describe a plot** — load `plot-ml-figure` if installed;
+   append cells.
+6. Picks that change the `.py`: `style`, `cells run`, refresh
+   facts, rewrite `data_analysis.md` from JSON/PNGs/HTML
+   (implications from **results**). Then preview `site build` if
+   `policy.site` and re-ask keep vs close (run path step 6). Do
+   not invent domain checklists.
 
-`iterate-ml-experiment`'s `JOURNAL.md` carries a top-level
-`## Data understanding (EDA)` section (placed right after `##
-Status`). This skill owns its content:
+## Dispatch
 
-```
-## Data understanding (EDA)
+Called from `triage-ml-task` (explore-the-data intent, or
+explore-first on a modeling request while `data_analysis` is
+missing) and user free-text.
 
-- **Status:** done — <YYYY-MM-DD>   <!-- or: skipped — <YYYY-MM-DD> -->
-- **Summary:** <2–4 lines: dataset shape, target balance/skew, the
-  one or two findings that most shape the modelling choices>
-- **Report:** [data/eda.md](../data/eda.md)
-```
+Calls: `add-python-package`, `api get`, `choose-python-library` /
+stack for G-TABULAR, `research-ml-practice` if installed when the
+user wants extra-analysis research or a named methodology
+concern, `plot-ml-figure` if installed before **any** figure
+cells (default notebook, extras, free-text, research-`measure`),
+`style` after `data_analysis.py`.
 
-Keep it to a few lines — it is an index entry, not the report. The
-detail lives in `data/eda.md`. On the **skip** path, only the
-`Status: skipped` line is required.
+Need a package? Load `add-python-package` if installed; else name
+it and stop. Do not `env add` here.
 
-## Dispatching in and out
+## End of turn
 
-### Called from
+Run this block **only after Close** (or when the user already
+closed the turn). Keep exploring never reaches here. Do not
+rewrite `data_analysis.md` in this block.
 
-| Caller | When |
-|---|---|
-| `iterate-ml-experiment` § 0 bootstrap | Automatic; G-EDA fires **before** the baseline design note |
-| User free-text | "explore the data", "do an EDA", "profile the dataset" — resolves directly |
+### User-facing close
 
-### Calls into
+The user-facing message is a short story plus links. It is not
+Pre-flight, not a dump of markdown, and not JOURNAL table cells
+alone.
 
-| Callee | Why |
-|---|---|
-| `python-env-manager` § Agent feature | When `ipython` is missing on the run path — G-AGENT-FEATURE |
-| `python-api` | Every skrub / pandas / polars symbol. Cache hits first |
-| `data-science-python-stack` | G-TABULAR (pandas / polars) if not yet recorded; skrub `TableReport` reference |
-| `python-code-style` | After writing `data/eda.py` — ruff format / check + contextualize the comments to this dataset (strip any leftover workflow/process prose) |
+1. **Narrative first** — 2–6 sentences of findings for this
+   stage, grounded in Modelling implications / the JSON facts
+   (shape, target, leakage or duplicates that shape modelling).
+   Do not invent columns. Do not paste `data_analysis.md`.
+2. **Open these** — resolved absolute paths (TUI clickability).
+   When `site build` ran or is about to, link the site and not
+   the markdown:
+   `[report.html](<workspace>/report.html)` and
+   `html/data_analysis.html`. Otherwise
+   `[data_analysis/data_analysis.md](data_analysis/data_analysis.md)`.
+   No Skore locator on this stage.
+3. **Normalized tokens second** — none for EDA (no
+   G-REPORT-LOCATOR / G-AUDIT-FINDING).
 
-## What this skill does NOT do
+This skill owns the close. Keep exploring stays a 1–2 sentence
+summary (optional md / site link); it never reaches convert /
+`git end-turn`.
 
-- Design, select, or evaluate a model (`build-ml-pipeline` /
-  `evaluate-ml-pipeline` / `iterate-ml-experiment`).
-- Pick the CV splitter or metric — it only surfaces the *evidence*
-  for those picks.
-- Edit `src/<pkg>/` or the experiment / audit files.
-- Clean, transform, or re-save the user's raw data.
-- Install `ipython` / `pyright` (`python-env-manager` owns).
-- Open or write the skore Project.
-- Render commits or PRs.
+If `policy.notebooks` is true, `export-ml-notebook` is installed,
+run `python -m skore_skills notebook convert
+data_analysis/data_analysis.py`, with `--html` when `policy.site`
+is also true. Skip in one line otherwise. Missing jupytext /
+nbclient / nbconvert → one-line skip naming `add-python-package`;
+do not fail the turn, do not `pixi add`.
 
-## Companion skills
+Then, if `policy.site` is true, `export-ml-site` is installed, run
+`python -m skore_skills site build` after durable files are on
+disk. Skip in one line otherwise. Name a build error; do not fail
+the data-analysis turn. Name `report.html` and
+`html/data_analysis.html` in the User-facing close when the
+build ran. Do not also send the user to the markdown.
 
-| Skill | Relationship |
-|---|---|
-| `iterate-ml-experiment` | Caller. § 0 fires G-EDA before the baseline note; the EDA findings seed the note's Method / Risks |
-| `audit-ml-pipeline` | Owns the shared cell runner `scripts/run_cells.py` this skill executes; same bare-expression discipline |
-| `organize-ml-workspace` | Workspace layout; `data/` is user-owned — this skill is the one exception that writes `data/eda.*` into it |
-| `python-env-manager` | Agent feature install (G-AGENT-FEATURE). This skill requests; that skill installs |
-| `python-api` | skrub / pandas / polars symbol lookups. Cache hits first |
-| `data-science-python-stack` | G-TABULAR; skrub `TableReport` is catalogued there |
-| `python-code-style` | ruff after writing `data/eda.py` |
-
-## Templates and assets
-
-- `templates/eda.py` — the `data/eda.py` skeleton. Copy + substitute;
-  don't rewrite from memory.
-- `templates/eda.md` — the `data/eda.md` report skeleton.
-
-The cell runner is **not** owned here — it is
-`audit-ml-pipeline/scripts/run_cells.py` (shared). Don't fork it.
-
-## References (load on demand)
-
-- `references/cell_anatomy.md` — concrete cell examples (right /
-  wrong shapes), the `TableReport` repr trap, the full cell
-  sequence, and how each finding maps to a downstream gate.
+`python -m skore_skills git end-turn --stage data_analysis`. If
+JSON `action` is `invoke`, load `persist-ml-git` only if
+`status.skills.persist-ml-git` is true and stop; that skill
+returns to triage. If persist is missing, name the pending
+`staged` paths and stop. Otherwise load `triage-ml-task` only if
+`status.skills.triage-ml-task` is true; else stop. No `git
+commit`.

@@ -1,223 +1,90 @@
-# Explore ML Data — Cell anatomy
+# Explore ML Data — Human notebook vs agent facts
 
-Concrete cell shapes for `data/eda.py`, the `TableReport` repr trap,
-the library-agnostic (skrub) approach, and how each finding maps to a
-downstream modelling gate. SKILL.md carries the compact cell
-sequence; load this when you are actually writing or debugging the
-cells.
+`data_analysis/data_analysis.py` is for a person in Jupyter.
+Agent-only blobs go under `scratch/data_analysis/`. SKILL.md is
+the procedure; this file is the split.
 
-## Two locations, kept separate
+## Human — `data_analysis/data_analysis.py`
 
-| Concern | Variable | Where | Mutable? |
-|---|---|---|---|
-| Raw data source | `RAW = <LOAD_RAW_DATA>` | anywhere — `data/`, `raw/`, an absolute path, or external | **read-only** |
-| EDA deliverables | `EDA_DIR` | always `PROJECT_ROOT / "data"` (created if missing) | written by this skill only |
+Markdown cells describe **this dataset's analysis**, not the repo
+and not the CLI. Authoring hints (which template to append, when
+to omit drift, glance vs implications) stay in this file and
+SKILL.md — never as HTML comments in `data_analysis.md` or as
+`#` procedure in the notebook.
 
-The raw data is **never** assumed to live in `data/`. Only the
-deliverables (`eda_<table>.html`, and `eda.md` authored by the agent)
-land in `EDA_DIR`. This is the fix for "data lives in another folder".
+Last expressions are rich objects or small summary frames: the
+frame (`RAW`), `skrub.TableReport(...)`, duplicate/target/leakage
+tables, bivariate column lists, **and live figures**. `write_html`
+saves `data_analysis/data_analysis_<slug>.html` for
+`data_analysis.md` to embed. Saved figures are PNG siblings under
+`data_analysis/`, or Plotly HTML siblings (`<plot_slug>.html`, never
+`data_analysis_<slug>.html`). Do not put `json()`, dict dumps of TableReport,
+or analyses TableReport already covers (dtypes, missingness,
+cardinality, univariate histograms, pairwise associations,
+`sns.heatmap` of a correlation matrix). Do not add unique-ratio
+(`nunique()/n`) or column-dict cells.
 
-## Library-agnostic by design — read facts off skrub
+Start from `templates/data_analysis.py` if it fits, then **edit**.
+The first family holds `<TARGET>` when a target exists. Each
+further family: `templates/family.py`. Append
+`templates/target_regression.py` or
+`templates/target_classification.py` after the target is known;
+append `templates/datetime.py` / `templates/drift.py` only when
+those data exist (datetime per family; include the datetime
+relplot only when TARGET is numeric; copy the datetime block per
+family with `FRAME_<OTHER_SLUG>`; drift only when two
+families share column names — omit on disjoint schemas). Join coverage is Keep exploring
+only (`templates/join_coverage.py`: diagnostic coverage, do not
+write a joined frame or TableReport on the join). Do not leave `if TARGET` /
+`if TASK` / `OTHER = None` / empty datetime loops / “skip this
+cell” in the notebook. Load `plot-ml-figure` before figure cells. Save each
+PNG, then leave the figure/grid as the cell output — never
+`plt.close`. Prefer seaborn figure-level (`displot`, `relplot`,
+`catplot`, `pairplot`); default target vs features is one
+faceted `relplot` saved as `bivariate_grid.png`, last
+expression `g`. Do not `import matplotlib.pyplot` on the
+normal path. One figure-level call per cell as the last
+expression; facet with `col=` / `col_wrap` instead of looping.
+A bare name inside a `for` loop is not displayed.
 
-The workspace's tabular library (G-TABULAR) may be pandas **or**
-polars, whose summary methods differ (`isna`/`null_count`,
-`nunique`/`n_unique`, `select_dtypes` doesn't exist in polars, …).
-Writing pandas-specific code here breaks on polars workspaces.
+`python -m skore_skills cells run` captures `repr()`, so a last-line
+`TableReport` looks empty in the digest. That is expected. Do not
+put TableReport dicts back in the notebook to feed the agent.
 
-`skrub` is the equaliser: `TableReport` and `column_associations`
-accept both libraries and return the same thing. So the structured
-facts (dtypes, missingness, cardinality, datetime inference, target
-summary) come from `report.json()`, **not** from dataframe methods.
-The only library-specific line in the whole file is
-`RAW = <LOAD_RAW_DATA>`.
+## Agent — `scratch/data_analysis/facts.py`
 
-> **Dependency:** `TableReport.json()`'s exact keys are not formally
-> documented and can shift across skrub versions. Confirm the shape
-> via `python-api` *this turn* (probe `report.json()` on a tiny frame
-> in `scratch/`), pin a skrub floor, and parse defensively with
-> `.get(...)`. If a key you expect is absent, adapt the field name —
-> don't crash the cell. (The template uses `name`, `dtype`,
-> `null_proportion`, `nunique`, `n_rows`, `columns` — verify these.)
+Copy `templates/facts.py` to `scratch/data_analysis/facts.py`
+(gitignored). Reuse the same families, `<TARGET>`, `<TASK>`.
+Build `TableReport(..., plot_distributions=False)` per family and
+write `scratch/data_analysis/<slug>.json` from `report.json()` so
+that snapshot has statistics, not SVG. Also write
+`scratch/data_analysis/extras.json` (`tables[]`, target, top
+feature–target correlations, leakage flags, png and html paths). Confirm
+keys with `api get`; parse JSON files with `.get(...)`. If
+`data_analysis/data_analysis_<slug>.html` is missing, `write_html`
+from a **plotting** TableReport — do not dump that report to JSON.
 
-## The `TableReport` repr trap (the load-bearing rule)
+Author `data_analysis/data_analysis.md` from those JSON files plus
+the HTML. The glance section is one iframe per family and nothing
+else — no bullets restating the report. Every path in
+`extras["pngs"]` and `extras["htmls"]` is embedded in Modelling
+implications (`![](<name>.png)` or `<iframe src="<plot_slug>.html">`)
+beside a sentence that cites numbers from those JSON files (or a
+summary table from the notebook). If a figure earns no such
+sentence, do not save it — no orphan files under `data_analysis/`.
+Glance stays TableReport-only.
 
-`skrub.TableReport` is built to render rich HTML in a notebook. The
-shared runner is **not** a notebook — it captures each cell's last
-bare expression via `repr(result.result)`. A bare `TableReport`
-reprs to nothing useful:
+Extra cells after the user picks extras: `references/extra_analyses.md`.
 
-```python
-# WRONG — digest shows: <TableReport: use .open() to display>
-skrub.TableReport(RAW)
-```
+## Substitutions
 
-```python
-# RIGHT — write the rich HTML (statement), read facts from json()
-report = skrub.TableReport(RAW, title="customers", verbose=0)
-report.write_html(EDA_DIR / "eda_customers.html")
-summary = json.loads(report.json())
-{"n_rows": summary.get("n_rows"), "n_columns": len(summary.get("columns", []))}
-```
-
-`verbose=0` is load-bearing too: the default `verbose=1` prints
-per-column progress into the cell's `stdout:` section.
-
-## Bare expressions, not `print()`
-
-```python
-# WRONG — lands in stdout, mixed with other noise, harder to scan
-print(summary["n_rows"])
-```
-
-```python
-# RIGHT — captured in the cell's **output:** section
-{"n_rows": summary.get("n_rows")}
-```
-
-Statement-only cells (assignments, `write_html(...)`,
-`EDA_DIR.mkdir(...)`) are fine — they just produce no `output:`
-section. Put the value you want to read on the **last** line.
-
-## Cell-by-cell, with downstream mapping
-
-### Cell 2 — imports + paths
-
-```python
-import json
-
-import skrub
-
-from <pkg> import PROJECT_ROOT
-
-EDA_DIR = PROJECT_ROOT / "data"
-EDA_DIR.mkdir(parents=True, exist_ok=True)
-```
-
-`from <pkg> import PROJECT_ROOT` works because the workspace package
-is installed editable by the time bootstrap reaches EDA. No
-pandas/polars import here — only the load cell needs the tabular lib.
-
-### Cell 3 — load raw data (anywhere)
-
-```python
-RAW = pd.read_parquet(PROJECT_ROOT / "data" / "train.parquet")  # or elsewhere
-RAW.shape
-```
-
-Adapt the load to where the data actually lives — in-repo folder,
-absolute path, or external store. For multiple tables, load each into
-its own variable and repeat the overview cell (Cell 4) per table, one
-HTML file each.
-
-### Cell 4 — overview → downstream: learner / encoders
-
-```python
-report = skrub.TableReport(RAW, title="train", verbose=0)
-report.write_html(EDA_DIR / "eda_train.html")
-
-summary = json.loads(report.json())
-n_rows = summary.get("n_rows")
-overview = [
-    {
-        "column": c.get("name"),
-        "dtype": c.get("dtype"),
-        "null_pct": c.get("null_proportion"),
-        "n_unique": c.get("nunique"),
-    }
-    for c in summary.get("columns", [])
-]
-{"n_rows": n_rows, "n_columns": len(overview), "columns": overview}
-```
-
-- **High `null_pct`** → note columns that may need imputation /
-  dropping in the pipeline (not here).
-- **High `n_unique` on string columns** → high-cardinality
-  categoricals; skrub's default encoders handle these. Free-text
-  columns may want a text encoder — flag it.
-
-### Cell 5 — target → downstream: metric + stratification
-
-```python
-TARGET = "<TARGET_COLUMN>"
-next((c for c in summary.get("columns", []) if c.get("name") == TARGET), None)
-```
-
-The target's column entry carries value counts (low-cardinality →
-classification) or a distribution summary (numeric → regression), so
-one expression covers both task types — no `value_counts` blow-up on a
-continuous target.
-
-- **Imbalance** → implication: `StratifiedKFold` + ROC-AUC / PR-AUC
-  over accuracy.
-- **Heavy skew** → implication: candidate target transform; flag in
-  the baseline note's Risks.
-
-### Cell 6 — structure → downstream: `G-CV-SPLITTER`
-
-```python
-datetime_cols = [
-    c.get("name") for c in summary.get("columns", [])
-    if "date" in str(c.get("dtype", "")).lower()
-]
-unique_ratio = sorted(
-    ({"column": c.get("name"),
-      "unique_ratio": (c.get("nunique") or 0) / n_rows if n_rows else None}
-     for c in summary.get("columns", [])),
-    key=lambda r: (r["unique_ratio"] is not None, r["unique_ratio"]),
-    reverse=True,
-)
-{"datetime_cols": datetime_cols, "top_unique_ratio": unique_ratio[:10]}
-```
-
-- **Datetime column present + forecasting task** → implication:
-  `TimeSeriesSplit`. (skrub infers datetimes even from string columns,
-  so this catches dates a raw `select_dtypes` would miss.)
-- **A column whose values repeat across rows but identify an entity**
-  (`user_id`, `patient_id`) → implication: `GroupKFold` on it.
-  `unique_ratio` near 1 means a near-unique key (often a row id to
-  drop, not a group).
-
-### Cell 7 — associations → downstream: leakage check
-
-```python
-skrub.column_associations(RAW).head(20)
-```
-
-- A feature with an **implausibly perfect** association to the target
-  is a leakage flag — name it in `data/eda.md` § Associations and
-  raise it as an open question, do not silently keep it.
-
-## Multiple tables
-
-Run Cell 4 once per table (`eda_<table>.html` each). Run Cells 5–7 on
-the **target-bearing** table (the one you will model on); for the
-other tables, the Cell 4 overview is usually enough, plus a note on
-the join key. Don't try to associate columns across unjoined tables.
-
-## Large data
-
-`TableReport` computes stats over the whole frame and
-`column_associations` is roughly O(columns²). On very large datasets,
-load a row sample for the report (e.g. the first N rows or a random
-sample via the tabular lib) and say so in `data/eda.md` — the goal is
-a fast, representative read, not exhaustive stats.
-
-## What NOT to do in these cells
-
-- No imputation / dropping / re-saving of raw files (read-only).
-- No `skore.evaluate` / `project.put` (that is the experiment's job).
-- No splitter / metric / learner *decision* — only the *evidence*.
-- No pandas/polars-specific summary methods — read skrub's json.
-- No `warnings.filterwarnings(...)` — stderr in the digest is signal
-  (see `python-code-style` § Stop conditions).
-
-## From digest to deliverables
-
-After the run:
-
-1. Read the digest (stdout, or `scratch/eda/eda.md`).
-2. Author `data/eda.md` from `templates/eda.md` — every claim
-   grounded in the digest; the **Modelling implications** section is
-   the payoff the baseline note cites.
-3. Write the `journal/JOURNAL.md` § "Data understanding (EDA)" 2–4
-   line summary + link to `data/eda.md`.
+| Placeholder | Where |
+|---|---|
+| `<pkg>` | `from <pkg> import PROJECT_ROOT` |
+| `<LOAD_RAW_DATA>` | first family; pandas/polars load; in-memory concat of shards; convert to pandas for seaborn cells |
+| `<slug>` | Python identifier; `data_analysis_<slug>.html` and `<slug>.json` |
+| `<OTHER_SLUG>` / `<LOAD_OTHER>` | `templates/family.py` for each further family |
+| `<TARGET>` | `"column"` in the notebook load cell when a target exists; facts.py may use `None` |
+| `<TASK>` | `classification` \| `regression` \| `none` (facts.py; omit in the notebook when none) |
+| `<OTHER_FRAME>` | `templates/drift.py` when two families share column names |
+| `<JOIN_KEY>` | `templates/join_coverage.py` (Keep exploring only) |

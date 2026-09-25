@@ -1,92 +1,96 @@
-# Metadata routing: `mark_as_X` → splitter
+# Metadata routing: Pattern A vs Pattern B
 
-`.skb.mark_as_X(split_kwargs={...})` (set during pipeline declaration)
-attaches per-row metadata that travels with X through fold splits.
-The keys in `split_kwargs` map directly to the keyword arguments of
-the splitter's `split(X, y, **split_kwargs)` call.
+`skore.evaluate` accepts `estimator`, `X`/`y` **or** `data`, and
+`splitter`. It does **not** take `groups=` or other `split()`
+kwargs. Those kwargs, when needed, live on the DataOp X marker.
 
-`mark_as_X` **also** accepts a `cv=` argument (a scikit-learn
-cross-validator). When set, `skore.evaluate(...)` called **without**
-an explicit `splitter=` reuses that DataOp `cv` — including its
-`split_kwargs` such as `groups` — and returns a
-`CrossValidationReport` instead of the default 80/20 holdout. **This
-stack does not use that path**: per `build-ml-pipeline` § S3, no
-splitter is imported into pipeline code; the splitter is chosen at
-evaluate time (the `G-CV-SPLITTER` gate) and passed via `splitter=`,
-which **overrides** any DataOp `cv`. The `cv=` capability is
-documented here only so the override semantics are explicit. The X
-marker in this stack carries `split_kwargs` (metadata) but not `cv=`
-(the splitter object).
+`G-CV-SPLITTER` still chooses the sklearn splitter (mapping table
+in `evaluate-ml-pipeline` rule 3). These patterns only say **where
+that object is passed**. Confirm signatures with
+`python -m skore_skills api get`.
 
-skrub reference for the build-time API:
+This document routes cross-validation metadata only. Custom metric
+kwargs such as `sample_weight` follow
+`references/custom-metrics.md`; never put them in `split_kwargs`.
+
+skrub `mark_as_X`:
 https://skrub-data.org/stable/reference/generated/skrub.DataOp.skb.mark_as_X.html
 
-## Build-time contract
+## Does `split(X, y)` need extra kwargs?
 
-In `build-ml-pipeline`, the user attaches metadata at the X marker:
+| Splitter | Extra `split()` kwargs | Pattern |
+|---|---|---|
+| `KFold` | none | **A** |
+| `RepeatedKFold` | none | **A** |
+| `ShuffleSplit` | none | **A** |
+| `TimeSeriesSplit` | none (rows must already be time-ordered) | **A** |
+| `GroupKFold` | `groups` | **B** |
+| `GroupShuffleSplit` | `groups` | **B** |
+| `StratifiedKFold` *(avoid)* | none | **A** if forced |
+| `StratifiedGroupKFold` *(avoid)* | `groups` | **B** if forced |
+| `LeaveOneGroupOut` *(avoid)* | `groups` | **B** if forced |
+| Custom splitter | whatever its `split` declares | **A** if none; **B** otherwise |
+
+## Pattern A — pass `splitter=` to `evaluate`
+
+Use when the chosen splitter's `split(X, y)` needs nothing else
+(`KFold`, `TimeSeriesSplit`, `RepeatedKFold`, …).
 
 ```python
-X = data.drop([...]).skb.mark_as_X(
-    split_kwargs={"groups": data["customer_id"]},
+report = skore.evaluate(
+    build_learner(),
+    data={"data_dir": str(DATA_DIR)},
+    splitter=KFold(n_splits=5),
 )
-y = data["target"].skb.mark_as_y()
 ```
 
-The DataOp `data["customer_id"]` is split alongside X at fold time —
-fold `i` gets the slice of `groups` that matches the slice of X.
+The X marker has **empty** `split_kwargs` and **no** `cv=`. An
+omitted `splitter=` here is an 80/20 holdout, not the gated CV.
 
-Multiple keys are fine if the splitter consumes more than one
-metadata column (rare). Most splitters take at most one.
+## Pattern B — `cv=` + `split_kwargs` on the DataOp; omit `splitter=`
 
-## Eval-time contract
+Use when `split(X, y, **kwargs)` needs keys `evaluate` cannot take
+(typically `groups`). skrub requires `cv=` whenever `split_kwargs`
+is set; `cv=<int>` is not a splitter (skore cannot call `.split` on
+it).
 
-When you build a splitter at evaluation time, its `split()` signature
-must accept the keys you put in `split_kwargs`:
+**Build** (`pipeline.py`) — placeholder `cv` is the mapping-table
+splitter, not a second `G-CV-SPLITTER` gate:
 
-Some splitters are listed for completeness but are discouraged on
-methodological grounds — see `cross-validation.md` § "Avoid" before
-picking (stratified variants and `LeaveOne*Out` family).
+```python
+from sklearn.model_selection import GroupKFold
 
-| Splitter                              | Required `split_kwargs` keys |
-|---------------------------------------|------------------------------|
-| `KFold`                               | none                         |
-| `GroupKFold`                          | `groups`                     |
-| `TimeSeriesSplit`                     | none (data must be ordered)  |
-| `RepeatedKFold`                       | none                         |
-| `ShuffleSplit`                        | none                         |
-| `GroupShuffleSplit`                   | `groups`                     |
-| `StratifiedKFold` *(avoid)*           | none                         |
-| `StratifiedGroupKFold` *(avoid)*      | `groups`                     |
-| `LeaveOneGroupOut` *(avoid)*          | `groups`                     |
-| `LeavePGroupsOut` *(avoid)*           | `groups`                     |
-| Custom splitter                       | whatever you declared        |
+X = data.drop(columns=[..., "customer_id"]).skb.mark_as_X(
+    cv=GroupKFold(),
+    split_kwargs={"groups": data["customer_id"]},
+)
+```
 
-Pass the splitter via `splitter=...` to `skore.evaluate` (or as the
-`splitter=` argument of `CrossValidationReport`). The framework
-forwards the `split_kwargs` metadata automatically — you don't pass
-`groups=` yourself at evaluation time. Passing `splitter=` explicitly
-also overrides any `cv=` declared on the DataOp at the X marker.
+**Evaluate** — do **not** pass `splitter=`. skore reuses the DataOp
+`cv` **and** `split_kwargs`. An explicit `splitter=` **overrides
+`cv` and drops `split_kwargs`**, so `GroupKFold` then raises
+`groups` is None.
 
-## Mismatch errors
+```python
+report = skore.evaluate(
+    build_learner(),
+    data={"data_dir": str(DATA_DIR)},
+)
+```
 
-If the splitter expects `groups` but the X marker doesn't carry one,
-sklearn raises `ValueError: The 'groups' parameter should not be
-None.` at fold time. Resolution:
+## Traps
 
-1. Return to `build-ml-pipeline` and add
-   `split_kwargs={"groups": data[col]}` at the X marker.
-2. If no group column exists in the data, switch to a splitter that
-   doesn't require groups (the user may have over-specified the
-   structure).
+- `mark_as_X(split_kwargs=...)` without `cv=` — skrub raises at
+  construction.
+- `mark_as_X(cv=5, split_kwargs={"groups": ...})` — not Pattern B.
+- `evaluate(..., splitter=GroupKFold())` when groups are only on
+  the DataOp — `groups` is None.
 
-## When `split_kwargs` is missing entirely
+## Empty `split_kwargs`
 
-The X marker can be created without `split_kwargs` (the default is
-no metadata). At evaluation time:
-
-- If you can confirm with the user that the data has no group
-  structure and no temporal ordering, default to `KFold` /
-  `StratifiedKFold`.
-- If you cannot confirm, return to `build-ml-pipeline` and ask the
-  user before picking a splitter. Do not silently default — it
-  produces optimistic scores when group structure exists.
+If the X marker has no metadata and you can confirm there is no
+group or time structure, Pattern A with `KFold`. Possible
+**groups** with empty `split_kwargs` → return to
+`build-ml-pipeline`. **Time** with empty `split_kwargs` is
+expected; fire the time-ordered AskUserQuestion (Pattern A if
+the user picks `TimeSeriesSplit`). Do not invent a `times=` key.

@@ -1,17 +1,23 @@
 # Audit ML Pipeline — Cell anatomy
 
 Full anatomy of an audit-file cell: concrete right/wrong examples,
-the 7-cell template sequence, and why `.frame()` matters.
-Cross-referenced from SKILL.md § "Audit file contract — overview".
+the core template sequence, and why a bare Display is the right
+last expression. Cross-referenced from SKILL.md § "Audit file
+contract — overview".
 
-The template is deliberately narrow: checks summary + metrics
-summary. The rendered digest at `scratch/audit/<stem>/audit.md`
-is what `iterate-from-skore` reads to populate the JOURNAL
-Backlog — each row in the checks summary carries a
-`documentation_url` that drives an actionable mitigation. Do not
-extend the template with per-task accessors (residuals, confusion
-matrices, feature importances, calibration, …) unless the user
-asks for one — the goal is a small, predictable digest.
+The template core is task-agnostic: persisted-report locator +
+checks summary + metrics summary + a `help()` tree per namespace.
+The rendered digest at `scratch/audit/<stem>/audit.md`
+is what `review-ml-experiment` reads — only `## Checks summary`
+and `## Metrics summary`. Do not name extra Display headings
+like those two. Per-task accessors are appended after the user
+picks Additional report view from names in the trees.
+
+Markdown cells in `templates/audit.py` name the experiment and
+interpret **this** report. Hub vs local id mapping, `put()` URL
+plural→singular, `summarize(ignore=…)`, version floors, and
+`help()`-as-menu recipes stay in this file and SKILL.md — never in
+the audit notebook comments.
 
 ## Concrete cell examples — right vs wrong
 
@@ -30,6 +36,9 @@ summary
 ```python
 # %% Right — multiple statements, bare expression at the end
 report = project.get(REPORT_ID)
+_results = PROJECT_ROOT / "scratch" / "results" / "01_baseline"
+_results.mkdir(parents=True, exist_ok=True)
+(_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
 report
 ```
 
@@ -65,17 +74,18 @@ project.put("01_baseline", report)           # ← duplicates the row; pollutes 
   `print`).
 - Rich `_repr_html_` is preferred over `__repr__` when both exist
   in JupyterLab / VS Code. **The runner does NOT request
-  `_repr_html_`** — it captures `repr(result.result)` only. Use
-  `.frame()` on Display objects to get a text-readable repr.
+  `_repr_html_`** — it captures `repr(result.result)` only. skore
+  Displays define both, so one bare Display line serves the editor
+  and the digest at once.
 - Assignment-only / statement-only cells produce **no output and
   no error** — they execute silently. This is the right shape for
   setup cells (imports, `REPORT_ID = …`, etc.).
 
-## The 7-cell template sequence
+## The core template sequence
 
-The template ships with this cell sequence. All seven cells are
-task-agnostic. Leave them as-is unless a specific experiment's
-user asks for a deeper accessor.
+The template ships with this cell sequence. Core cells are
+task-agnostic. Leave them as-is; append Display cells only after
+the user picks a name from the `help()` trees.
 
 1. **Module-level docstring (markdown cell).** What this file is,
    the read-only rule, where the digest lands. Verbatim from the
@@ -105,74 +115,144 @@ user asks for a deeper accessor.
    Set `REPORT_ID` to the id of this experiment's report, then load
    it. The id comes from different sources per skore mode:
 
-   - **Hub mode**: `project.put()` prints a URL of the form
-     `https://skore.probabl.ai/<workspace>/<project>/<type-plural>/<N>`.
-     The id is `skore:report:<type-singular>:<N>` — the URL path
-     segment is the plural; the id uses the singular (drop the trailing
-     `s`). Examples: `cross-validations/42` →
+   - **Hub mode**: `project.put()` prints the exact frontend URL.
+     Preserve it as the report locator. The id is
+     `skore:report:<type-singular>:<N>` — the URL path segment is
+     plural; the id uses the singular. Examples:
+     `cross-validations/42` →
      `skore:report:cross-validation:42`; `estimators/7` →
      `skore:report:estimator:7`. Copy `<N>` and `<type-singular>` from
      the put() stdout; hardcode as `REPORT_ID`; no `summarize()` needed.
-   - **Local mode**: read `summary["id"]` from the `summarize()` cell
-     above, filtering to the row where `key == "<NN>_<short_name>"`.
-   - **MLflow mode**: same as local — read `summary["id"]` from the
-     `summarize()` cell above, filtering to the row where
-     `key == "<NN>_<short_name>"`. (No URL is printed at `put()`;
-     the report lives as a run under the MLflow experiment.)
+   - **Local mode**: `summarize()` last-expression is a Display.
+     Bind `frame = summary.frame()`, then
+     `frame.loc[frame["key"] == "<NN>_<short_name>", "id"].iloc[0]`.
+     Do not treat the Display as a dict (`summary["id"]`). Keep
+     `summary` as the cell's last expression.
+   - **MLflow mode**: same as local — read `"id"` from
+     `summary.frame()`, filtering to the newest row where
+     `key == "<NN>_<short_name>"`. Preserve an emitted MLflow run URL
+     when available; otherwise use the tracking URI + experiment id
+     + run id locator contract.
 
    ```python
    REPORT_ID = "skore:report:<type-singular>:<N>"  # hub: from put() URL
 
    report = project.get(REPORT_ID)
+   _results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
+   _results.mkdir(parents=True, exist_ok=True)
+   (_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
+   (_results / "locator.txt").write_text("<REPORT_LOCATOR>", encoding="utf-8")
    report
    ```
-   The runner captures `repr(report)` — the report's plain text
-   repr identifies the estimator (and, for `CrossValidationReport`,
-   the splitter as well). The two report classes share the
+   Confirm `_repr_html_` with `api get`. The HTML is for the site
+   Results viewer; the digest's `repr(report)` is what the agent
+   summarizes. The two report classes share the
    `checks` / `metrics` accessor API used by the next two cells,
    so the audit body is identical for both.
 
-6. **Checks summary (code cell, bare expression).**
-   ```python
-   report.checks.summarize().frame()
-   ```
-   Pandas DataFrame of the passed/issue/tip walk with codes like
-   `SKD003`. Each row carries a `documentation_url` — the
-   actionable mitigation lives at that link, and
-   `iterate-from-skore` follows it to draft Backlog rows.
-   Verified on `CrossValidationReport` and `EstimatorReport` in
-   skore ≥ 0.18.
+6. **Persisted report (markdown cell).**
 
-7. **Metrics summary (code cell, bare expression).**
+   Substitute `<REPORT_LOCATOR>` with evaluate's normalized
+   Markdown value. A direct audit derives it from the selected id
+   and backend contract: local workspace link, exact Hub put URL,
+   or MLflow run/tracking locator. Missing authoritative data is
+   `n/a — backend did not expose a locator`; never guess.
+
+7. **Checks summary (code cell, bare Display last).**
    ```python
-   report.metrics.summarize().frame()
+   checks = report.checks.summarize()
+   _results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
+   _results.mkdir(parents=True, exist_ok=True)
+   (_results / "checks.html").write_text(checks._repr_html_(), encoding="utf-8")
+   checks
    ```
-   Pandas DataFrame with task-appropriate defaults:
+   The repr opens with the severity counts, then lists issues,
+   tips, passed, and not-applicable checks with codes like
+   `SKD003`. Actionable lines carry the documentation URL the
+   review cites in an idea file.
+   Verified on `CrossValidationReport` and `EstimatorReport`.
+
+8. **Metrics summary (code cell, bare Display last).**
+   ```python
+   metrics = report.metrics.summarize()
+   _results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
+   _results.mkdir(parents=True, exist_ok=True)
+   (_results / "metrics.html").write_text(metrics._repr_html_(), encoding="utf-8")
+   metrics
+   ```
+   Repr is the metric table with task-appropriate defaults:
    - **regression**: RMSE / MAE / R² + fit/predict timings.
    - **binary classification**: accuracy / precision / recall / F1
      / ROC-AUC / log-loss + timings.
    - **multiclass**: macro/micro averages.
 
-That's the whole template. Deeper accessors
-(`prediction_error()`, `confusion_matrix()`, `roc()`,
-`permutation_importance()`, …) are intentionally out of scope —
-add them per-experiment only when the user asks.
+9. **Available report accessors (code cell, printed trees).**
+   `help()` prints its tree and returns `None`, so the runner
+   captures it as stdout — there is nothing to leave as a last
+   expression and nothing to write to disk.
+   ```python
+   for _name in ("metrics", "checks", "inspection", "data"):
+       _namespace = getattr(report, _name, None)
+       if callable(getattr(_namespace, "help", None)):
+           _namespace.help()
+   ```
+   Each tree ends in a `Displays` group; Additional report view
+   labels are exactly those names. The group is task-dependent — a
+   regression report offers `prediction_error` and no `roc`. Do not
+   remember Display class names from docs. `available()` is a
+   different thing: it lists metric or check *names* and only
+   exists on `metrics` and `checks`.
 
-## Why `.frame()` is load-bearing on cells 6–7
+That's the core template. Deeper accessors are appended after
+`## Core audit complete` only when the user picks Additional
+report view (or a Custom query that is still a report accessor).
+Confirm the method with `api get`, then snapshot:
 
-`MetricsSummaryDisplay` and `ChecksSummaryDisplay` define
-`_repr_html_` for rich HTML in JupyterLab / VS Code, but their
-`__repr__` is the default `<…Display object at 0x…>` — no useful
-text.
+```python
+# %% [markdown]
+# ## <human title>
+#
+# Heading must not be Checks summary or Metrics summary.
 
-The runner captures `repr(result.result)`, so `.frame()` is what
-turns the Display into a pandas DataFrame whose `repr` carries the
-actual values. The runner's pandas display options widen that repr;
-the agent reads the values from there.
+# %%
+disp = report.<namespace>.<slug>()  # <slug> from this turn's Displays group
+_results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
+_results.mkdir(parents=True, exist_ok=True)
+(_results / "<slug>.html").write_text(disp._repr_html_(), encoding="utf-8")
+disp
+```
 
-When a human opens the audit `.py` as a notebook in their editor,
-the rich HTML view still works — `.frame()` doesn't suppress it; it
-just adds a text-readable path for the agent.
+Plot Displays carry `_repr_html_` too. Only when one does not,
+save `<slug>.png` instead. Failed probes stay under `scratch/` and
+do not become Results subsections. Re-run `style` + `cells run`
+after each append.
+
+## Digest-to-finding contract
+
+After every digest run, execute
+`python -m skore_skills audit finding --stem <stem>` and paste
+JSON `finding` verbatim. Do not re-derive the string by hand.
+Extra Display cells do not change G-AUDIT-FINDING.
+
+## Why the bare Display is the right last expression
+
+Every skore Display — `ChecksSummaryDisplay`,
+`MetricsSummaryDisplay`, and the plot ones like
+`PredictionErrorDisplay` — defines **both** `_repr_html_` and a
+`__repr__` that renders the underlying values as text. Pinned by
+`tests/skore_skills/test_skore_display_repr.py`.
+
+That makes one line serve both audiences. A human opening the
+audit `.py` as a notebook gets the rich HTML; the runner captures
+`repr(result.result)` and the digest gets the text. `.frame()` is
+not needed for either, and on checks it is a downgrade: the frame
+drops the severity grouping and buries the messages in a column.
+
+The only thing neither path produces is a *standalone* per-item
+HTML file, because the converted notebook is one document. That is
+the sole reason cells write `scratch/results/<stem>/<slug>.html` —
+the site embeds those under `## Results`. Agents never read them;
+they summarize from the digest.
 
 ## Statement-only cells are fine
 

@@ -1,0 +1,6 @@
+{% extends 'index.html.j2' %}
+
+{# The report viewer is opened offline, so omit CDN-only helpers. #}
+{% block html_head_js_requirejs %}{% endblock html_head_js_requirejs %}
+{% block html_head_js_mathjax %}{% endblock html_head_js_mathjax %}
+{% block html_head_js_mermaidjs %}{% endblock html_head_js_mermaidjs %}

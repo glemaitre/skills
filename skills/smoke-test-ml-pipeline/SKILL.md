@@ -14,32 +14,29 @@ description: >
   steps will pass trivially. The smoke test is the executable
   proof of the X-marker placement rule from `build-ml-pipeline`.
 
-  TRIGGER when: `test-ml-pipeline` has dispatched here to write
-  the smoke test for an approved experiment; `pytest tests/smoke/`
+  TRIGGER when: an approved experiment needs its smoke test;
+  `pytest tests/smoke/`
   is failing on row count; the user asks "why is the smoke test
   failing?"; a pipeline edit in `build-ml-pipeline` needs an
   executable proof; an experiment script changes the pipeline
   shape and the matching smoke test needs revisiting.
 
-  SKIP when: the design note does not exist or is not yet
-  approved (route to `iterate-ml-experiment`); the user is asking
-  about a regression test or schema invariant (route to
-  `regression-test-ml-pipeline` /
-  `distribution-test-ml-pipeline` once those exist); the question
-  is the *interpretation* of CV metrics, not predict-time
-  correctness (route to `evaluate-ml-pipeline`).
+  STOP when `python -m skore_skills status` shows no scaffold
+  (`has_src` and `has_journal` both false), no approved design,
+  or no matching experiment script: explain the missing fact and
+  send the user to setup/triage or stay in `build-ml-pipeline`.
+  Do not require `git`. Parent skill is `build-ml-pipeline`
+  (loaded after the declaration). Direct "why is smoke failing?"
+  still this skill. This action does not cover regression tests
+  or CV interpretation. Do not write `skore.evaluate`.
 
-  HOW TO USE: read the matching experiment's `journal/NN_*.md` and
-  `experiments/NN_*.py` first to understand the pipeline's source
-  binding (what env-dict keys does `build_learner` expect?). Then
-  construct two env-dicts from the **real `data/` source** — a
-  train env and a predict env — such that the predict env carries
-  *only the rows we want predictions for* and *no pre-history
-  buffer*. The hard assertion is that the prediction count
-  matches the predict-env row count exactly. The soft assertion
-  is that the smoke set's MAE is within `3 × CV_mean` (or the
-  task-appropriate analogue). **Do not write the design note
-  or run CV — that's other skills' job.**
+  HOW TO USE: run `status` first. Read the matching experiment's
+  `journal/NN_*.md` and `experiments/NN_*.py` for env-dict keys.
+  Write or update `tests/smoke/test_NN_*.py`, then run
+  `python -m skore_skills smoke run --stem <stem>`. Red JSON is the
+  signal to modify the pipeline
+  in `build-ml-pipeline`; do not loosen the assertion. Do not
+  write the design note or run CV.
 ---
 
 # Smoke Test ML Pipeline
@@ -52,20 +49,42 @@ user-visible content is the complete test file in a fenced block
 (`assert len(predictions) == n_predict_grid_rows`, predict env
 with no pre-history buffer, real `data/` source, soft assertion
 with the CV-mean hardcoded as a literal, no `skore` import).
-Do not stop at a plan or leave the file only in a thinking
-channel.
+Then **run** `python -m skore_skills smoke run --stem
+<NN>_<short_name>`. Treat JSON `action` as authoritative. Do not
+stop at a plan or leave
+the file only in a thinking channel. Never tell the user or CI
+to run pytest later. Name that exact
+`smoke run` command. A
+no-tools harness still gets a **complete** test file (use
+assumed journal / experiment / package facts; no `<FILL_…>`)
+and that invocation. Saying this turn cannot execute pytest is
+fine; instructing the user to run it is not. Do not
+AskUserQuestion for evaluate here — that gate belongs to
+`build-ml-pipeline` after `smoke run` is `proceed`. After
+green, the parent owns the User-facing close (narrative +
+links); this skill does not narrate the pipeline.
 
 ## Stop conditions — read before anything else
 
+- **Workspace not scaffolded.** Run `python -m skore_skills status`
+  first. If `has_src` and `has_journal` are both false, STOP and
+  send the user to setup/triage. Do not require `git`.
 - **No smoke test without an approved design note + script.** The pairing
-  rule from `test-ml-pipeline` is hard:
-  `tests/smoke/test_NN_<short_name>.py` exists only when
-  `journal/NN_<short_name>.md` is at least `approved` *and*
+  rule is hard: run
+  `python -m skore_skills design consent --stem <stem>`.
+  `tests/smoke/test_NN_<short_name>.py` exists only when that JSON
+  is `proceed` *and*
   `experiments/NN_<short_name>.py` exists with the matching stem.
+  `ask` / `stop` → do not write the smoke test.
+- **Missing pytest.** If `pytest` is not importable in the project
+  env, STOP. Load `add-python-package` for `pytest` on **default**
+  (confirm; `env route` maps pytest off `--feature agent`). Do not
+  `pip install pytest` or put it on the agent feature (use the composed
+  `dev` env, default + agent).
 - **Symbol from memory is forbidden.** Any skrub /
-  scikit-learn name you write in the smoke test must come from a
-  `Skill(python-api)` / `Skill(python-api)` call **in this
-  turn**. The smoke test is a small file but it imports the
+  scikit-learn name you write in the smoke test must come from
+  `python -m skore_skills api get <dotted>` or a matching cache
+  read **in this turn**. The smoke test is a small file but it imports the
   predicting-package API surface; the same memory-forbidden rule
   applies.
 - **Don't shrink the assertion.** The hard assertion is exact
@@ -110,23 +129,43 @@ channel.
   `warnings.filterwarnings(...)` in the test body, no
   `filterwarnings = [...]` in `pytest.ini` /
   `pyproject.toml` — unless the user explicitly asks. See
-  `python-code-style` § Stop conditions.
+  `python -m skore_skills style` § Stop conditions.
+
+## Before execution
+
+After design / script pairing and pytest availability are
+confirmed, emit 1–3 natural sentences before the test-file write.
+Say that this is a **local real-data smoke computation**: it will
+fit the declared learner on a small real-data slice, predict a
+disjoint slice with no pre-history buffer, and check exact output
+row count plus the optional soft metric. Name
+`tests/smoke/test_<stem>.py` and the exact `smoke run` command.
+
+Explain that this slice is intentionally much smaller than
+full-dataset cross-validation, but its runtime still depends on
+the loader, feature graph, and learner. Do not promise minutes
+unless a measured duration is already available, and never
+replace real data with synthetic rows to make the estimate
+shorter. Emit this preview once, not once per pytest action.
+If a mandatory gate is pending, preview the possible test but do
+not write or run it. This skill performs no LLM research and no
+full evaluation.
 
 ## Pre-flight — emit this checklist as visible text before any test code
 
 ```
 Pre-flight (smoke-test-ml-pipeline):
 - [ ] Tier 1 mandatory libs importable: pytest + sklearn + skrub
-      (per `data-science-python-stack` § "Tier 1"). **Not skore** —
+      (stage libraries per `python -m skore_skills env stack`). **Not skore** —
       see the Stop conditions; the smoke test is intentionally
       portable to any skrub-capable environment
-- [ ] Skill(python-api) consulted for skrub / sklearn symbols used in
+- [ ] API confirmed for skrub / sklearn symbols used in
       the test: <symbols, or "none">
-      Evidence: Read scratch/api/<lib>/<version>/<topic>.md (this turn)
+      Evidence: python -m skore_skills api get <dotted>
+                | Read scratch/api/<lib>/<version>/<topic>.md (this turn)
                 | Write scratch/api/<lib>/<version>/<topic>.md (this turn)
                 | "n/a — test only uses symbols already present in
                   src/<pkg>/ (build_learner / load_training_table / etc.)"
-      "Read python-api SKILL.md" alone is NOT evidence.
 - [ ] `journal/NN_<short_name>.md` read this turn (frozen sections:
       Question, Method) so the test asserts what the experiment claims
 - [ ] `experiments/NN_<short_name>.py` skimmed this turn for the env-dict
@@ -145,6 +184,9 @@ Pre-flight (smoke-test-ml-pipeline):
       analogue). Value is a literal pulled from the matching
       `journal/NN_<short_name>.md` § Status.headline; the test does
       not import `skore` / read the project store at runtime.
+- [ ] Pytest run this turn on `tests/smoke/test_NN_<short_name>.py`.
+      Red → return to `build-ml-pipeline`. Green (sub-step) →
+      return to build for the design HITL.
 ```
 
 ## What the smoke test asserts
@@ -282,10 +324,8 @@ match whichever the experiment uses:
 For the second shape (predict-grid + raw-history sources), the
 three layers — sources → predict-grid + alignment + `mark_as_X`
 → features after (with history as an upstream reference) — are
-described in `build-ml-pipeline` § "Common patterns" rule 2,
-with a full worked example (drawn from this workspace's
-01_baseline pipeline) in
-`python-api/references/pre_mark_alignment.md`. Read that
+described in `build-ml-pipeline` Rule 2, with worked code in
+`build-ml-pipeline/references/layer_examples.md`. Read that
 reference before constructing the predict env for an early-mark
 pipeline.
 
@@ -394,18 +434,16 @@ metric problem.
   predict time, so a lag column is silently NaN. Inspect
   `learner.skb.full_report()` and look for nodes whose value at
   predict time doesn't match what fit time saw.
-- **Failure blocks `done` status.** `iterate-ml-experiment` § 4
-  refuses to flip an experiment to `done` until the matching
-  smoke test passes. The CV report can land in the skore Project
-  before the smoke test passes (CV is independent of predict-time
-  binding), but the experiment row in `JOURNAL.md` stays `approved`
-  until smoke passes.
+- **Failure blocks `done` status.** `manage-ml-backlog`
+  record-outcome refuses to flip an experiment to `done` until
+  the matching smoke test passes.   `evaluate-ml-pipeline` also
+  STOPs while `smoke run` is `stop` (or the smoke file is missing on a
+  history-dependent pipeline).
 
 ## What this skill does NOT do
 
-- Run pytest. Test execution is the user's call (or CI's).
 - Write the design note or the experiment script. Those are
-  `iterate-ml-experiment` and `organize-ml-workspace` /
+  `model-ml-pipeline` and `setup-workspace` /
   `build-ml-pipeline`.
 - Touch the skore Project. The smoke test does not call
   `project.put` — it's a pre-flight check, not a metric
@@ -413,37 +451,52 @@ metric problem.
 - Define what "good metrics" mean. The hard assertion is
   structural; the soft assertion is a sanity bound, not a
   performance target. Performance judgment is the user's, per
-  `iterate-ml-experiment`'s rule that the user judges results.
+  `triage-ml-task`'s rule that the user judges results.
+- Ask Evaluate (Recommended) / Modify / Stop. After `smoke run`, return to
+  `build-ml-pipeline` (parent) or report pass/fail on a
+  direct debug request.
+
+## Run pytest
+
+This is the executable proof. After the test file is written or
+updated, run `python -m skore_skills smoke run --stem
+<NN>_<short_name>`. It streams pytest on
+`tests/smoke/test_NN_<short_name>.py` then prints JSON. Do not
+claim green without `action: proceed`. `stop` / `red` → route to
+`build-ml-pipeline` to modify the pipeline;
+do not start evaluate. `proceed` → return to build for the
+design HITL when this skill was loaded as a sub-step.
 
 ## Companion skills
 
-- **`test-ml-pipeline`** — the router that dispatched here.
-  Owns layout and pairing.
-- **`build-ml-pipeline`** — owns the X-marker placement rule
-  the smoke test asserts. Smoke-test failure typically routes
-  back here for a pipeline-shape fix.
-- **`iterate-ml-experiment`** — owns the iteration loop. Requires
+- **`build-ml-pipeline`** — parent. Owns the X-marker placement
+  rule the smoke test asserts, and the post-green HITL. Smoke
+  failure typically routes back there for a pipeline-shape fix.
+  Pytest is the loop: `smoke run` red → modify pipeline → `smoke run` again.
+- **`manage-ml-backlog`** — record-outcome writes `done`. Requires
   the smoke test to pass before an experiment can flip to `done`.
-- **`evaluate-ml-pipeline`** — owns CV. The smoke test fills the
-  predict-time-binding gap CV doesn't cover. The soft assertion's
-  CV-mean baseline is *hardcoded* in the smoke test from the
-  matching design note's Status.headline (which `evaluate-ml-pipeline`
-  ultimately fills in after the run); the test does not import
-  skore at runtime.
-- **`python-api`** / **`python-api`** — symbol references for
+- **`evaluate-ml-pipeline`** — owns CV. Do not load it from here.
+- **`python -m skore_skills api get`** — symbol references for
   the predicting-package APIs the smoke test uses. Consult
   before naming any imported function in the test body.
-  `python-api` is **not** a smoke-test dependency — see the
+  `python -m skore_skills api get` is **not** a smoke-test dependency — see the
   "no skore import" Stop condition above. **Cache hits first**:
   check `scratch/api/<lib>/<version>/` before WebSearching;
-  cache new findings back there (per `python-api` Shape 0/3).
-- **`data-science-python-stack`** — declares pytest as a Tier 1
-  mandatory dependency for any workspace using this skill.
-- **`python-code-style`** — **must be invoked** after writing or
-  editing `tests/smoke/test_NN_*.py`. Running `pixi run ruff
+  cache new findings back there (per `python -m skore_skills api get` Shape 0/3).
+- **`python -m skore_skills env stack`** — declares pytest as a
+  stage library for any workspace using this skill.
+- **`python -m skore_skills style`** — **must be invoked** after writing or
+  editing `tests/smoke/test_NN_*.py`. Running a manager-specific ruff
   check` directly without invoking this skill silently drops the
   NumPyDoc docstring convention the stack expects: ruff's
   `D`-rules pass on a one-line summary, but only the skill body
   teaches the parameter-shape-in-type-slot and the section
   layout (`Parameters` / `Returns` / `Notes`) the test fixture +
   test function should use.
+
+## Need a package?
+
+When an import is missing, load `add-python-package` if
+`status.skills.add-python-package` is true. That skill owns
+`env add` and the unmanaged ask. Do not run `env add` here.
+If the skill is not installed, name the package and stop.

@@ -1,0 +1,78 @@
+{
+  "skill_name": "setup-git",
+  "evals": [
+    {
+      "id": 1,
+      "title": "First repository, autocommit on",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `.env` and raw data are present and must remain untracked.\n- `policy.git.autocommit` is `null` (never asked).\n- The user answers the autocommit question with `on`.]\n\nInitialize git here and make the first commit.",
+      "expected_output": "Behavioural response satisfying: - Emit the Pre-flight then run the commands (do not stop after listing boxes). - Name `git init`. - Name `python -m skore_skills git ignore-merge`. It must NOT: - Stage `.env` or raw data. - Ask a second time before the first commit after `on`. - Push or create a remote.",
+      "files": [],
+      "expectations": [
+        "Emit the Pre-flight then run the commands (do not stop after listing boxes).",
+        "Name `git init`.",
+        "Name `python -m skore_skills git ignore-merge`.",
+        "Ask once whether later stages may autocommit (`on` vs `off`) and persist with `python -m skore_skills policy set git.autocommit`.",
+        "After `on`, use `git add` and `git commit -m` without a second confirm.",
+        "The response does NOT: Stage `.env` or raw data.",
+        "The response does NOT: Ask a second time before the first commit after `on`.",
+        "The response does NOT: Push or create a remote.",
+        "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "Autocommit already persisted",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- A git repository exists and already has a HEAD commit.\n- `policy.git.autocommit` is already `on`.]\n\nGit is already initialized. Check ignore rules.",
+      "expected_output": "Behavioural response satisfying: - Run or name `python -m skore_skills git ignore-merge`. - Skip the autocommit policy question because it is already `on`. It must NOT: - Re-ask whether later stages may autocommit. - Invent another `git commit` on this turn. - Run `git push`.",
+      "files": [],
+      "expectations": [
+        "Run or name `python -m skore_skills git ignore-merge`.",
+        "Skip the autocommit policy question because it is already `on`.",
+        "The response does NOT: Re-ask whether later stages may autocommit.",
+        "The response does NOT: Invent another `git commit` on this turn.",
+        "The response does NOT: Run `git push`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "Autocommit off, no first commit",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `policy.git.autocommit` is `null`.\n- The user answers the autocommit question with `off`.]\n\nInitialize git here.",
+      "expected_output": "Behavioural response satisfying: - Name `git init`. - Name `python -m skore_skills git ignore-merge`. - Persist `python -m skore_skills policy set git.autocommit off`. It must NOT: - Run `git commit`. - Run `git push`. - Use `python -m skore_skills git end-turn` to create a commit.",
+      "files": [],
+      "expectations": [
+        "Name `git init`.",
+        "Name `python -m skore_skills git ignore-merge`.",
+        "Persist `python -m skore_skills policy set git.autocommit off`.",
+        "The response does NOT: Run `git commit`.",
+        "The response does NOT: Run `git push`.",
+        "The response does NOT: Use `python -m skore_skills git end-turn` to create a commit."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "Resolve hidden paths",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `python -m skore_skills git ignore-merge` returns\n  `action: resolve-dotfiles` with `.cursor/` listed.\n- `policy.git.autocommit` is already `on`.\n- No HEAD yet.]\n\nSet up git and keep the `.cursor` folder tracked.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills git ignore-merge`. - Ask which hidden paths to keep, then re-run `python -m skore_skills git ignore-merge --decide --keep .cursor`. - After autocommit `on` and no HEAD, `git add` and `git commit`. It must NOT: - `--keep` `.env` or `.skore`. - Use `python -m skore_skills git end-turn` to create the first commit.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills git ignore-merge`.",
+        "Ask which hidden paths to keep, then re-run `python -m skore_skills git ignore-merge --decide --keep .cursor`.",
+        "After autocommit `on` and no HEAD, `git add` and `git commit`.",
+        "The response does NOT: `--keep` `.env` or `.skore`.",
+        "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

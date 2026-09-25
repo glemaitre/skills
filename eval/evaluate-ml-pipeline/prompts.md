@@ -8,48 +8,74 @@ violated.
 ## CASE_01 — Standard skore.evaluate entry, IID tabular
 
 **User prompt:**
-> Wire `evaluate.py` for the baseline. Tabular regression, no
-> groups, no temporal ordering.
+> Wire `experiments/01_baseline.py` for the baseline. Tabular
+> regression, no groups, no temporal ordering.
 
 **Assumed workspace state:**
 - `journal/01_baseline.md` approved.
 - `src/<pkg>/pipeline.py` exists with `build_learner` returning a
   `SkrubLearner`. The X-marker has empty `split_kwargs`.
 - `experiments/01_baseline.py` is the scaffold placeholder.
+- `policy.skore_mode` is `local`.
 - Cache exists at `scratch/api/sklearn/1.8.0/cv_splitters.md`
   covering `KFold` / `GroupKFold` / `TimeSeriesSplit`, and at
   `scratch/api/skore/0.18.0/evaluate.md`.
 
 **Must do:**
+- After all evaluation gates and before writing/running
+  `skore.evaluate`, give a 1–3 sentence preview: local
+  full-dataset CV with the selected splitter, report persistence,
+  and the `experiments/01_baseline.py` /
+  `scratch/results/01_baseline/` outputs.
+- Name the fold count when known; otherwise explain that timing
+  depends on rows, folds/repeats, and learner cost. Do not invent
+  a minute estimate.
 - Pick **`skore.evaluate(learner, data={...}, splitter=...)`** as
   the entry point (not `cross_val_score`, not `cross_validate`).
-- Map empty `split_kwargs` + IID → **`KFold`** per the mapping table.
-- Mention python-api consultation for `skore.evaluate` and
-  `KFold` signatures.
+- Map empty `split_kwargs` + IID → **`KFold`** per the mapping table
+  (Pattern A: pass `splitter=KFold(...)`).
+- Name `python -m skore_skills api get` for `skore.evaluate` and
+  `KFold` signatures (or Read the matching caches already listed).
 - Mention `data={...}` (env-dict) for `SkrubLearner`, NOT
   positional `X, y`.
+- Name `python -m skore_skills git end-turn --stage evaluate` at
+  the end of the turn.
+- If that command returns `invoke`, load `persist-ml-git`.
+- Write `scratch/results/01_baseline/report.html` from
+  `report._repr_html_()`, `report.txt` from `repr(report)`, and
+  `locator.txt` with the normalized G-REPORT-LOCATOR in
+  `experiments/01_baseline.py` after the bare `report` display.
+- Overwrite `scratch/results/01_baseline/pipeline.html` from a
+  fitted `estimator_` (`reports_[0].estimator_` on a CV report),
+  not `SkrubLearner.report`.
+- Name `python -m skore_skills loop locator --stem 01_baseline` and
+  `python -m skore_skills loop artifacts --stem 01_baseline`.
 
 **Must NOT do:**
+- Present splitter reasoning alone as model fitting.
 - Recommend `cross_val_score`, `cross_validate`,
   `classification_report`, or hand-rolled `print(mean_squared_error(...))`.
 - Default to `StratifiedKFold` (forbidden — compresses across-fold
   variance, even on imbalance).
 - Pre-pin metrics (e.g. `scoring="neg_mean_squared_error"`) — trust
   skore defaults.
+- Run `git commit` in this skill or `git push`.
 
 ---
 
 ## CASE_02 — Time-ordered data, mandatory AskUserQuestion
 
 **User prompt:**
-> Wire `evaluate.py` for the 24h-ahead load forecast experiment.
-> Pick the splitter.
+> Wire `experiments/02_load_forecast.py` for the 24h-ahead load
+> forecast experiment. Pick the splitter.
 
 **Assumed workspace state:**
 - `journal/02_load_forecast.md` approved.
-- `pipeline.py` X-marker has `split_kwargs={"times": ...}` (temporal
-  ordering attached at build time).
+- `pipeline.py` X-marker has empty `split_kwargs` (no `cv=`).
+  Rows are already time-ordered. `TimeSeriesSplit` needs no
+  extra `split()` kwargs (Pattern A).
 - Forecast horizon is 24h.
+- Matching smoke pytest is green.
 - Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering
   `KFold` / `GroupKFold` / `TimeSeriesSplit` — the splitter lookup
   is already satisfied.
@@ -76,8 +102,8 @@ violated.
 **Must NOT do:**
 - Skip the four-option ask and lock a splitter with no user pick.
   Naming a **recommended** option (e.g. `TimeSeriesSplit(gap=horizon)`)
-  next to the menu, or drafting `evaluate.py` labeled pending
-  confirmation, is not a silent pick.
+  next to the menu, or drafting `experiments/02_load_forecast.py`
+  labeled pending confirmation, is not a silent pick.
 - Default to `KFold` because empty `gap` "feels safer".
 - Treat harness "no clarifying questions" hint as waiving the
   mandatory ask.
@@ -87,20 +113,24 @@ violated.
 ## CASE_03 — `split_kwargs={"groups": ...}` → GroupKFold
 
 **User prompt:**
-> Wire `evaluate.py` for a tabular regression where rows are grouped
-> by customer.
+> Wire `experiments/NN_*.py` for a tabular regression where rows
+> are grouped by customer.
 
 **Assumed workspace state:**
 - `pipeline.py` X-marker has
-  `split_kwargs={"groups": data["customer_id"]}`.
+  `cv=GroupKFold()` and
+  `split_kwargs={"groups": data["customer_id"]}` (Pattern B).
 - No temporal structure.
 
 **Must do:**
 - Paste **`GroupKFold`** from the mapping table (`groups` →
   `GroupKFold`). That identifier is the mapping; do not withhold it.
-- python-api for the *signature* may be named as the next live
-  turn. Do not fail if signature lookup is BLOCKED as long as
-  `GroupKFold` is named.
+- Call `skore.evaluate(learner, data={...})` **without**
+  `splitter=` so skore reuses the DataOp `cv` and `groups`
+  (`references/metadata-routing.md` Pattern B).
+- `python -m skore_skills api get` for the *signature* may be named
+  as the next live turn. Do not fail if signature lookup is BLOCKED
+  as long as `GroupKFold` is named.
 - Show the `data={...}` env-dict form for a `SkrubLearner`.
 - Do NOT use `StratifiedGroupKFold` (forbidden by Stop conditions).
 
@@ -108,14 +138,16 @@ violated.
 - Use `StratifiedGroupKFold`.
 - Use `LeaveOneGroupOut` (forbidden — per-fold variance too high).
 - Pick `KFold` ignoring the group structure.
+- Pass `splitter=GroupKFold()` (or any `splitter=`) to `evaluate`
+  — that drops `split_kwargs` and `groups` becomes None.
 
 ---
 
 ## CASE_04 — Empty `split_kwargs` BUT possible group structure
 
 **User prompt:**
-> Wire `evaluate.py`. The data has a `region` column. Not sure if
-> we should treat it as a group.
+> Wire `experiments/NN_*.py`. The data has a `region` column. Not
+> sure if we should treat it as a group.
 
 **Assumed workspace state:**
 - `pipeline.py` X-marker has empty `split_kwargs`.
@@ -126,9 +158,8 @@ violated.
 - Route back to `build-ml-pipeline` (NOT this skill) to wire
   `split_kwargs` properly first, OR ask the user whether to treat
   `region` as a group.
-- Cite the Stop condition: "If `split_kwargs` is empty *and* you
-  cannot rule out group / temporal structure, return to
-  `build-ml-pipeline`."
+- Cite the Stop condition: empty `split_kwargs` plus possible
+  **groups** → return to `build-ml-pipeline`.
 
 **Must NOT do:**
 - Default to `KFold` and proceed.
@@ -159,7 +190,7 @@ violated.
   instead.
 
 **Must NOT do:**
-- Write `cross_val_score(...)` in `evaluate.py`.
+- Write `cross_val_score(...)` in `experiments/NN_*.py`.
 - Use `print(mean_squared_error(...))` instead of the report
   object.
 - Allow the substitution as a "just for now" workaround.
@@ -184,13 +215,14 @@ violated.
 - Mention that `skore.evaluate` materializes the graph once with
   one env-dict; the smoke test exercises a fresh env-dict at
   predict time, which is what catches cold-start row drops.
-- Route to `smoke-test-ml-pipeline` (or its router
-  `test-ml-pipeline`) before flipping the status.
+- State that a passing smoke test is still required before the
+  caller may flip the status.
 
 **Must NOT do:**
 - Edit `journal/02_load_forecast.md` Status to `done`.
 - Edit `journal/JOURNAL.md` History row to `done`.
 - Treat clean CV as sufficient for a history-dependent pipeline.
+- Write `skore.evaluate` while pytest smoke is red.
 
 ---
 
@@ -219,3 +251,410 @@ violated.
 **Must NOT do:**
 - Approve the scratch probe with `evaluate` + `put`.
 - Treat scratch as a producer of reports.
+
+---
+
+## CASE_08 — G-SKORE-MODE unset at first evaluate
+
+**User prompt:**
+> Wire `experiments/01_baseline.py` for the baseline.
+
+**Assumed workspace state:**
+- `journal/01_baseline.md` approved.
+- `src/<pkg>/pipeline.py` has `build_learner`.
+- `policy.skore_mode` is unset. `import skore` may fail.
+- `add-python-package` is installed.
+
+**Must do:**
+- Ask G-SKORE-MODE (local recommended / hub / mlflow) before
+  writing `skore.evaluate`.
+- Persist `policy set skore_mode` after the user answers.
+- If the answer is **local**, create `reports/` (`mkdir`, exist_ok)
+  with no README. If **hub** or **mlflow**, do not create
+  `reports/`.
+- Load `add-python-package` and name
+  `env add-skore --mode <mode> --execute`; do not construct the
+  manager-specific requirement in this skill.
+
+**Must NOT do:**
+- Silent-default `mode="local"` without asking.
+- Drop back to `cross_val_score` because skore is missing.
+- Re-ask G-TABULAR.
+- Send `skore[hub]` / `skore[mlflow]` directly to pixi or conda.
+- Write `reports/README.md`.
+
+---
+
+## CASE_09 — Recorded skore mode is not re-asked
+
+**User prompt:**
+> Wire `experiments/01_baseline.py` for the baseline.
+
+**Assumed workspace state:**
+- Same as CASE_01.
+- `policy.skore_mode` is `local`.
+- `skore` imports.
+
+**Must do:**
+- Use local mode; do not re-ask G-SKORE-MODE.
+- Pick `skore.evaluate` as the entry point.
+
+**Must NOT do:**
+- Re-open local vs hub vs mlflow.
+
+---
+
+## CASE_10 — Smoke not green stops before skore.evaluate
+
+**User prompt:**
+> Wire evaluate for the 24h-ahead load forecast. Run CV now.
+
+**Assumed workspace state:**
+- `journal/02_load_forecast.md` approved.
+- `experiments/02_load_forecast.py` exists.
+- Pipeline has lag features (history-dependent).
+- `tests/smoke/test_02_load_forecast.py` is missing, or pytest is red.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- STOP. Route to `build-ml-pipeline` (pytest smoke).
+
+**Must NOT do:**
+- Author `skore.evaluate` / `project.put` call sites this turn
+  (naming them in a STOP sentence is allowed).
+- Say CV can still be produced while smoke is failing.
+
+---
+
+## CASE_11 — Direct evaluate owns convert and site build
+
+**User prompt:**
+> Evaluate the baseline.
+
+**Assumed workspace state:**
+- Same as CASE_01; smoke is green.
+- `model-ml-pipeline` did NOT dispatch this turn.
+- `policy.notebooks` and `policy.site` are both true.
+- `export-ml-notebook` and `export-ml-site` are installed.
+
+**Must do:**
+- Write 2–6 sentences of the evaluation result.
+- Name `report.html` and `html/01_baseline.html` in the
+  user-facing close after site build. Do not send the user to
+  the design-note markdown instead.
+- Include the G-REPORT-LOCATOR value (or
+  `n/a — backend did not expose a locator`) in the user-facing
+  close before convert (first among tokens, after the narrative).
+- Load `manage-ml-backlog` in record-outcome mode before the
+  convert, since no audit ran this turn, and hand it the locator.
+- Name `python -m skore_skills notebook convert
+  experiments/01_baseline.py --html` after the evaluation.
+- Name `python -m skore_skills site build` after the convert.
+- Name `python -m skore_skills git end-turn --stage evaluate`.
+- If that command returns `invoke`, load `persist-ml-git`.
+
+**Must NOT do:**
+- Convert, site-build, or `git end-turn` without the locator (or
+  the explicit n/a string).
+- End the turn without convert or site build while both gates are
+  true.
+- Run `site build` before the journal is recorded.
+- Write `journal/JOURNAL.md` or the design note directly.
+- Run `git commit` in this skill.
+
+---
+
+## CASE_12 — Dispatched evaluate returns instead of closing
+
+**User prompt:**
+> Evaluate the baseline.
+
+**Assumed workspace state:**
+- Same as CASE_01; smoke is green.
+- `model-ml-pipeline` dispatched this turn and owns the close.
+- `policy.notebooks` and `policy.site` are both true.
+
+**Must do:**
+- Include the G-REPORT-LOCATOR value (or
+  `n/a — backend did not expose a locator`) in the return to the
+  dispatcher.
+- Return to `model-ml-pipeline` after the evaluation.
+- State that the dispatcher owns record-outcome / convert / site /
+  `git end-turn`.
+
+**Must NOT do:**
+- Drop the locator because the dispatcher owns convert.
+- Write the User-facing close (narrative + Open these) here;
+  the dispatcher owns it.
+- Run `notebook convert`, `site build`, or `git end-turn` here.
+- Load `manage-ml-backlog` here.
+- Load `triage-ml-task` directly.
+
+---
+
+## CASE_13 — Local put records workspace locator
+
+**User prompt:**
+> Evaluate and save 01_baseline locally.
+
+**Assumed workspace state:**
+- Smoke is green and `policy.skore_mode` is `local`.
+- `project.put("01_baseline", report)` succeeds.
+- The newest matching summary row has id `local-report-id`.
+
+**Must do:**
+- Read `project.summarize().frame()` after the successful put and
+  select the newest matching-key row.
+- Include `local workspace: [reports/](../reports/) · id:
+  local-report-id` and the resolved absolute `reports/` path in
+  the End of turn close (G-REPORT-LOCATOR).
+- Pass that locator to audit / record-outcome.
+
+**Must NOT do:**
+- Treat the return from `put` as the report id.
+- Link an internal serialized report file.
+- Announce a locator when `put` has not succeeded, or invent
+  an id. Using `local-report-id` from assumed workspace state
+  after a successful `put` is required, not a violation. Saying
+  the live shell did not re-run `put` this turn is not a
+  violation.
+- Convert, site-build, or `git end-turn` without the locator.
+
+---
+
+## CASE_14 — Hub put preserves its exact report URL
+
+**User prompt:**
+> Evaluate and upload 02_encoder to Skore Hub.
+
+**Assumed workspace state:**
+- Smoke is green and `policy.skore_mode` is `hub`.
+- Successful `put` stdout contains
+  `Consult your report at https://hub.example/direct-report`.
+- The matching report id is
+  `skore:report:cross-validation:42`.
+
+**Must do:**
+- Preserve the exact stdout URL.
+- Include `[Open report](https://hub.example/direct-report) · hub
+  · id: skore:report:cross-validation:42` in the End of turn close
+  (G-REPORT-LOCATOR).
+- Pass that exact Markdown locator downstream.
+
+**Must NOT do:**
+- Construct a Hub report URL from workspace/project/type.
+- Drop the report id.
+- Convert, site-build, or `git end-turn` without the locator.
+
+---
+
+## CASE_15 — MLflow non-HTTP locator is not a browser URL
+
+**User prompt:**
+> Evaluate 03_features into our file-backed MLflow project.
+
+**Assumed workspace state:**
+- Smoke is green and `policy.skore_mode` is `mlflow`.
+- `tracking_uri` is `file:./mlruns`; put emits no run URL.
+- Summary identifies experiment `7` and run `abc123`.
+
+**Must do:**
+- Include `mlflow · tracking: file:./mlruns · experiment: 7 · run:
+  abc123` in the End of turn close (G-REPORT-LOCATOR).
+- Pass that locator downstream.
+
+**Must NOT do:**
+- Invent an HTTP URL for the file store.
+- Treat `file:./mlruns` as a clickable run page.
+- Convert, site-build, or `git end-turn` without the locator.
+
+---
+
+## CASE_16 — Do not pass `splitter=` when groups are on the DataOp
+
+**User prompt:**
+> Groups are already on `mark_as_X`. Call `skore.evaluate` with
+> `splitter=GroupKFold()` so the gate is visible.
+
+**Assumed workspace state:**
+- X marker has `cv=GroupKFold()` and
+  `split_kwargs={"groups": data["customer_id"]}`.
+- Smoke is green.
+
+**Must do:**
+- Cite Pattern B (`references/metadata-routing.md`): omit
+  `splitter=` so skore reuses DataOp `cv` + `groups`.
+- Write `skore.evaluate(learner, data={...})` with no `splitter=`.
+
+**Must NOT do:**
+- Pass `splitter=GroupKFold()` (or any `splitter=`) — that drops
+  `split_kwargs` and `groups` becomes None.
+
+---
+
+## CASE_17 — Standalone evaluate close is ordered
+
+**User prompt:**
+> Evaluate the approved, smoke-green experiment and finish the turn.
+
+**Assumed workspace state:**
+- This is a standalone evaluate invocation.
+- Notebooks and site are enabled.
+
+**Must do:**
+- After `put`, write a 2–6 sentence narrative, then surface
+  G-REPORT-LOCATOR first among tokens. Name `report.html` and
+  `html/<stem>.html` when site build ran. Do not send the user
+  to the design-note markdown instead.
+- Run audit when available, then record-outcome with locator and
+  optional digest/headline.
+- Order the remaining close as notebook convert, site build, then
+  `git end-turn --stage evaluate`.
+- If git returns `invoke`, stop after loading `persist-ml-git`
+  because it returns to triage.
+
+**Must NOT do:**
+- Record before the locator exists.
+- Build the site before record-outcome.
+- Load triage a second time after `persist-ml-git`.
+
+---
+
+## CASE_18 — Direct first evaluation still requires post-smoke consent
+
+**User prompt:**
+> Run evaluation for 05_new_model.
+
+**Assumed workspace state:**
+- The design is approved and smoke is green.
+- This experiment has never been evaluated.
+- The user has not yet chosen Evaluate at the post-smoke gate.
+
+**Must do:**
+- Preview the possible full-dataset CV and its cost drivers, but
+  state that no local evaluation starts until the gate is answered.
+- Present Evaluate (Recommended) / Modify / Stop before the first
+  evaluation.
+- Explain that an explicit re-evaluation request for an existing
+  persisted report can proceed directly.
+
+**Must NOT do:**
+- Treat the first-run request as re-evaluation.
+- Write or execute `skore.evaluate` before the gate answer.
+
+---
+
+## CASE_19 — Register report custom metric before persistence
+
+**User prompt:**
+> Evaluate 06_classifier with an F2 score using beta=2, show it,
+> and save the report.
+
+**Assumed workspace state:**
+- The post-smoke answer was Evaluate in this turn.
+- This is a sklearn-style classifier, not a SkrubLearner.
+- `python -m skore_skills api get` confirmed the installed
+  `skore.evaluate`, `make_scorer`, and metric-registry signatures.
+
+**Must do:**
+- Load `references/custom-metrics.md` and use the report-registry
+  route.
+- Define a named scorer with `make_scorer(..., beta=2)`.
+- Order the implementation as `skore.evaluate(...)`, then
+  `report.metrics.add(...)`, then
+  `report.metrics.summarize(...)`, then `project.put(...)`.
+
+**Must NOT do:**
+- Pass `scoring=` to `skore.evaluate`.
+- Call `project.put` before registering and computing the F2
+  metric.
+- Use a lambda for the persisted metric.
+
+---
+
+## CASE_20 — Route weighted Skrub scoring through the DataOp
+
+**User prompt:**
+> Evaluate 07_grouped with weighted MAE. Customer groups must stay
+> disjoint and `sample_weight` is a column in the input table.
+
+**Assumed workspace state:**
+- The post-smoke answer was Evaluate in this turn.
+- The learner is a SkrubLearner whose X marker already has
+  `cv=GroupKFold()` and
+  `split_kwargs={"groups": data["customer_id"]}`.
+- `python -m skore_skills api get` confirmed the installed
+  `with_scoring`, `make_scorer`, and `skore.evaluate` signatures.
+
+**Must do:**
+- Route back through build to derive `sample_weight` from the
+  marked/aligned X DataOp and attach
+  `.skb.with_scoring(..., kwargs={"sample_weight": ...})` after
+  prediction and before `.skb.make_learner()`.
+- Keep Pattern B: call `skore.evaluate(learner, data={...})`
+  without `splitter=`.
+- Inspect the custom scorer with `report.metrics.score()`, then
+  call `project.put(...)`.
+
+**Must NOT do:**
+- Pass `scoring=` to `skore.evaluate`.
+- Put `sample_weight` in `mark_as_X(..., split_kwargs=...)`.
+- Derive scoring weights from the unsplit raw frame.
+- Claim the DataOp scorer appears in `metrics.summarize()`.
+
+---
+
+## CASE_21 — Register a custom check before persistence
+
+**User prompt:**
+> Evaluate 08_wide_table and add a custom check that flags when
+> the test set has more than 50 features, then save the report.
+
+**Assumed workspace state:**
+- The post-smoke answer was Evaluate in this turn.
+- This is a sklearn-style estimator, not a SkrubLearner.
+- `python -m skore_skills api get` confirmed the installed
+  `skore.evaluate`, `skore.Check`, `CheckNotApplicable`, and
+  `checks.add` signatures.
+
+**Must do:**
+- Load `references/custom-checks.md`.
+- Define a named module-level `Check` subclass (not a lambda).
+- Order the implementation as `skore.evaluate(...)`, then
+  `report.checks.add(...)`, then
+  `report.checks.summarize(...)`, then `project.put(...)`.
+
+**Must NOT do:**
+- Call `project.put` before registering the custom check.
+- Replace or disable built-in SKD checks.
+- Use a lambda or nested class for the persisted check.
+- Register the check from `audit/` instead of
+  `experiments/NN_*.py`.
+
+---
+
+## CASE_22 — Do not invent a custom check
+
+**User prompt:**
+> Wire `experiments/01_baseline.py` for the baseline. Tabular
+> regression, no groups, no temporal ordering.
+
+**Assumed workspace state:**
+- `journal/01_baseline.md` approved.
+- `src/<pkg>/pipeline.py` exists with `build_learner` returning a
+  `SkrubLearner`. The X-marker has empty `split_kwargs`.
+- Matching smoke pytest is green.
+- The post-smoke answer was Evaluate in this turn.
+- The user did not ask for a custom metric or custom check.
+
+**Must do:**
+- Pick `skore.evaluate(learner, data={...}, splitter=...)` with
+  Pattern A `KFold`.
+- Trust skore metric and SKD-check defaults.
+
+**Must NOT do:**
+- Define a `Check` subclass or call `report.checks.add`.
+- Pass `scoring=` to `skore.evaluate`.
+- Call `report.metrics.add` without an explicit metric request.
+
+---

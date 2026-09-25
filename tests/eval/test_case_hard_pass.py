@@ -72,6 +72,26 @@ def test_missing_files_fail_even_if_metrics_pass() -> None:
     assert judge_err is False
 
 
+def test_missing_cli_fail_even_if_metrics_pass() -> None:
+    hard, weak, judge_err = case_hard_pass(
+        outcomes=[_do(passed=True), _must(passed=True)],
+        missing_cli=["api get sklearn.model_selection.KFold"],
+    )
+    assert hard is False
+    assert weak is False
+    assert judge_err is False
+
+
+def test_missing_tools_fail_even_if_metrics_pass() -> None:
+    hard, weak, judge_err = case_hard_pass(
+        outcomes=[_do(passed=True), _must(passed=True)],
+        missing_tools=["AskUserQuestion"],
+    )
+    assert hard is False
+    assert weak is False
+    assert judge_err is False
+
+
 def test_both_pass_is_clean() -> None:
     hard, weak, judge_err = case_hard_pass(
         outcomes=[_do(passed=True), _must(passed=True)]

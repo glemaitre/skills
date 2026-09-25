@@ -26,63 +26,192 @@ description: >
   - The user asks to build / declare / set up a pipeline /
     classifier / regressor for X.
 
-  SKIP when: `.fit(...)` calls / training loops / `Trainer.fit` /
-  epoch loops; train/test split or cross-validation splitting;
-  hyperparameter search; persistence (`joblib.dump`, checkpointing);
-  evaluation / metrics / scoring; inference over a pre-trained
-  model; pure EDA; library-choice questions with no concrete
-  declaration in play.
+  STOP when `python -m skore_skills status` shows no scaffold
+  (`has_src` and `has_journal` both false), no approved design,
+  or no data contract: explain the missing fact and send the user
+  to setup/triage. Do not require `git`.   After the declaration
+  exists, load `smoke-test-ml-pipeline` only if
+  `status.skills.smoke-test-ml-pipeline` is true and iterate on
+  pytest; else one-line skip and do not invent the pytest file.
+  Do not start CV here. This action does not cover fitting, CV,
+  metrics, persistence, inference, or pure exploratory data
+  analysis. Do not invent a missing action skill's steps.
 
   HOW TO USE: consult before the first declarative line and on
   every structural edit (added/swapped step, changed input columns,
   changed estimator family). Don't re-consult for cosmetic edits.
   **First, read the Stop conditions and emit the Pre-flight
-  checklist as visible text before any code.** Always invoke
-  `python-api` to confirm skrub / sklearn symbol names and
-  signatures before typing — don't guess from memory.
+  checklist as visible text before any code.** Always run
+  `python -m skore_skills api get <dotted>` to confirm skrub /
+  sklearn symbol names and signatures before typing.
 ---
 
 # Build ML Pipeline (Declaration)
 
-Declarative shape of a Python ML pipeline from data source to
-predictor.
+Declare a skrub DataOps graph from source to predictor. Then smoke
+(pytest) and the design HITL. Do not fit, split, tune, persist, or
+evaluate here.
 
-## Terms used in this skill
+## Human-facing prose
 
-Read these once; they're referenced throughout.
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Experiment markdown, design-note Method text, and `#` comments
+describe **this** pipeline — not the skills framework, the CLI, or
+the command that produced an output. `<!-- results-embed: … -->` is
+a site marker. Authoring hints stay in this skill. `style` is ruff
+only.
 
-- **X marker** — the `.skb.mark_as_X()` call that anchors the
-  predict-time slice. Everything upstream runs identically at
-  fit and predict; everything downstream is per-prediction work.
-- **Predict grid** — the rows you want predictions for at predict
-  time. For IID flat tables: the loaded frame itself. For
-  time-series / panels: a `(group, time)` set.
-- **Cold-start row** — a predict-grid row that has no in-slice
-  history available (typical for lags at the start of the slice).
-- **Predict-time replay** — re-binding the graph to a fresh source
-  identifier at predict (e.g. `learner.predict({"data_dir": …})`).
-- **Cross-row step** — a feature whose output for a row reads
-  values from other rows (lag, rolling window, group aggregation,
-  side-table join by time/group, drop_nulls on a shifted column).
-- **Layers 1 / 2 / 3** — source / predict-grid + X-marker / features
-  after the marker. Defined in Rule 2.
+**Terms.** **X marker** = `.skb.mark_as_X()` (predict-time slice).
+**Predict grid** = rows to score (IID: the loaded frame; panels:
+`(group, time)`). **Cross-row step** = output for a row reads
+other rows (lag, rolling, group-agg, side join, `drop_nulls` on a
+shifted col). **Layers 1 / 2 / 3** = sources / grid + marker /
+features after the marker.
 
-## Next-step pointers — where you go after this skill
+## Before execution
 
-| You came here for… | → next |
-|---|---|
-| Declared pipeline → CV strategy | → `evaluate-ml-pipeline` (the `G-CV-SPLITTER` gate, rule 3) |
-| Declared pipeline → smoke test | → `test-ml-pipeline` → `smoke-test-ml-pipeline` |
-| Symbol lookup mid-declaration | → `python-api` (Shape 1 / 1b / 3) |
-| Missing skrub/sklearn import | → `python-env-manager` § install |
-| Modified `pipeline.py` / `features.py` / `data.py` | → `python-code-style` (ruff + NumPyDoc) |
+After `design consent` is `proceed`, emit 1–3 natural sentences
+immediately before the first declaration write. Say that this is
+**local preparation**, not training or full evaluation: the turn
+will write the skrub DataOps `build_learner`, update the
+experiment Method cells, render an **unfitted** pipeline snapshot,
+and then hand off to a real-data smoke test. Name the stem and the
+main `src/<pkg>/`, `experiments/<stem>.py`, and
+`scratch/results/<stem>/pipeline.html` outputs.
 
-Always re-emit the Pre-flight checklist with evidence before
-declaring the turn done.
+Describe cost from facts, not guesses. Declaration and unfitted
+rendering should be distinguished from the later fit/predict
+smoke and full-dataset cross-validation. Do not promise minutes
+unless a measured duration is already available. Emit this
+preview once; refresh it only when a structural edit materially
+changes the work. If approval is pending, preview the possible
+work but do not write model code.
+
+Research or open design discussion is **LLM work**: say that it
+will reason over the design / sources and stop for confirmation;
+it does not fit or test a model.
+
+## Gate context
+
+Every question that gates work carries its own context. Before
+asking, state in 2–4 lines what the answer authorizes, the facts
+it rests on — echoed inline — and what each option does. A file
+link is an addition, never the context.
+
+`evaluate consent` `ask` returns a `context` with `question`,
+`experiment`, `smoke`, and `persisted_report`: quote the design
+question and what evaluation would now run on the full dataset
+before the Evaluate / Modify / Stop menu. For the grouping and
+research questions below, the facts are this turn's evidence —
+the column names, the distilled finding — so name them in the
+question instead of pointing at a file.
+
+## Procedure
+
+1. `python -m skore_skills status`. Missing scaffold → setup/triage
+   (S0). Then `python -m skore_skills design consent --stem
+   <stem>`. Treat JSON `action` as authoritative. `ask` / `stop`
+   → do not declare the pipeline ("build it" is not approval).
+   `proceed` continues. Missing data contract → S0.
+2. Emit Before execution, then Pre-flight; tick only with
+   evidence from this turn.
+3. Declare `build_learner` under `src/<pkg>/` (Rule 1–3). Confirm
+   new symbols with `python -m skore_skills api get`. After edits,
+   `python -m skore_skills style`. Probes go to `scratch/` via the
+   composed-dev Python from `env verify` (no inline `python -c`,
+   no warning filters unless the user asks).
+   Then snapshot the **unfitted** learner — no fit, no
+   `SkrubLearner.report`, no `full_report`, no `.skb.eval`. Confirm
+   `sklearn.utils.estimator_html_repr` (or the learner's
+   `_repr_html_`) with `api get`. Write
+   `scratch/results/<stem>/pipeline.html` from that HTML. Ensure
+   `journal/<stem>.md` Method contains
+   `<!-- results-embed: pipeline -->` (add the line if the note
+   predates the marker). Add or update `experiments/<stem>.py`
+   Method cells: markdown + a code cell that builds the unfitted
+   `build_learner()`, writes the same HTML path, and leaves
+   `learner` as the last expression. Do **not** add
+   `skore.evaluate` / `project.put` here. Optional:
+   `DataOp.skb.draw_graph()` to `pipeline.svg` only if
+   `python -m skore_skills env graphviz` is healthy; otherwise
+   skip Graphviz in one line. Missing or skipped EDA does not
+   defer the site. If `policy.site` is true and
+   `export-ml-site` is installed, run
+   `python -m skore_skills site build` after this unfitted
+   snapshot, before `smoke run` and before the Evaluate
+   question, so Method shows the diagram. Skip in one line
+   otherwise. Do not `notebook convert` if the experiment file
+   already contains `skore.evaluate`.
+4. When `experiments/NN_*.py` exists with the matching stem, load
+   `smoke-test-ml-pipeline` only if
+   `status.skills.smoke-test-ml-pipeline` is true. Missing skill →
+   one-line skip; do not invent the pytest file. After the smoke
+   file exists, run
+   `python -m skore_skills smoke run --stem <stem>`. Treat JSON
+   `action` as authoritative. `stop` / `red` / `smoke_missing` →
+   fix topology here; do not loosen the assertion; do not
+   evaluate. Do not claim pytest is green without this command.
+5. `smoke run` `proceed`: User-facing close (checkpoint), then
+   run `python -m skore_skills evaluate consent --stem <stem>`.
+   Treat JSON `action` as authoritative.
+   - `ask` — render that JSON `context` inline (§ Gate context),
+     then **AskUserQuestion** (single choice), in order:
+     **Evaluate (Recommended)** / **Modify** / **Stop**, then
+     **stop**. Do not write `skore.evaluate(...)`. `smoke run`
+     `proceed` is not Evaluate. If the user answers **Evaluate**, load
+     `evaluate-ml-pipeline` only if
+     `status.skills.evaluate-ml-pipeline` is true (or return to
+     `model-ml-pipeline` if that is the caller). Missing skill →
+     one-line skip. **Modify** — edit, then `smoke run` again.
+     **Stop** — end this skill. No `skore.evaluate`.
+   - `proceed` — skip the post-smoke menu; load evaluate / return
+     to model for re-eval.
+   - `stop` — smoke file missing; do not evaluate.
+
+Do not load evaluate before Evaluate on `ask` (or `proceed`).
+Re-emit Pre-flight with evidence before the final message.
+
+### User-facing close
+
+Checkpoint after `smoke run` `proceed`, before the Evaluate
+menu. The user-facing message is a short story plus links. It
+is not Pre-flight, not a dump of the design note, and not
+stem/headline/learner alone.
+
+1. **Narrative first** — 2–6 sentences: what was declared, that
+   smoke is green, the learner. Ground in Method. Do not invent
+   a CV metric. No Skore locator yet (`put` has not run).
+2. **Open these** — resolved absolute paths. When `site build`
+   ran this turn, link the site and not the design note:
+   `[report.html](<workspace>/report.html)` and
+   `html/<stem>.html` (Method diagram). Otherwise
+   `[journal/<stem>.md](journal/<stem>.md)` and
+   `[experiments/<stem>.py](experiments/<stem>.py)`.
+3. **Normalized tokens second** — none (no G-REPORT-LOCATOR /
+   G-AUDIT-FINDING).
+
+This skill owns the checkpoint. `smoke-test-ml-pipeline` does
+not narrate after green.
+
+## Entry contracts
+
+Implement the approved design; do not silently upgrade a choice.
+
+- **Dummy** — `DummyClassifier` / `DummyRegressor` in the normal
+  DataOps graph. Operational only. `api get` the exact Dummy.
+- **Standard baseline** — skrub `tabular_pipeline` (or installed
+  equivalent from `api get`) plus a traditional estimator. No EDA
+  features, column recipes, or search.
+- **EDA-backed** — only Method-cited findings. Missing choice →
+  stop and ask. Temporal grouping is Pattern B metadata (`cv=` +
+  `split_kwargs`), not a license for three-layer / lag / `AlignXy`
+  unless Method names those steps.
+- **Backlog / discussion** — Method is the boundary.
 
 ## Canonical pipeline shape — IID flat-table
 
-The 90% case. Copy + adapt; replace `TARGET_COL` and the regressor.
+Copy + adapt. History-dependent / loader-baked Don't:
+`references/layer_examples.md` (read it before proposing Layer 2).
 
 ```python
 import skrub
@@ -98,75 +227,68 @@ def build_learner(data_dir_preview=None):
         if data_dir_preview is not None
         else skrub.var("data_dir")
     )
-
-    # Layer 1 + 2: load + mark X / y on the source frame.
-    # No cross-row feature steps → marker sits here.
     data = data_dir.skb.apply_func(load_raw)
     X = data.drop(columns=[TARGET_COL]).skb.mark_as_X()
     y = data[TARGET_COL].skb.mark_as_y()
-
-    # Layer 3: estimator at the tail. Feature engineering (if any)
-    # chains between mark_as_X and the final .skb.apply.
     predictions = X.skb.apply(
         HistGradientBoostingRegressor(random_state=0), y=y
     )
     return predictions.skb.make_learner()
 ```
 
-For history-dependent / panel / cold-start cases (≠ IID):
-→ `references/layer_examples.md` § history-dependent.
+## Stop conditions
 
-For loader-baked-shift counter-example (what NOT to do):
-→ `references/layer_examples.md` § counter-example.
+Scan top to bottom; any match means STOP.
 
-## Stop conditions — read before anything else
+### S0. Workspace not scaffolded
 
-Each Stop condition: **rule → symptom → recovery**. Scan top to
-bottom; any match means STOP.
+- **Rule:** `status` first. `has_src` and `has_journal` both false
+  → STOP. Do not require `git`.
+- **Recovery:** setup/triage. Missing design: run
+  `python -m skore_skills design consent --stem <stem>`; `ask` /
+  `stop` stop here (`scaffold --journal --stem` if the stem is
+  known and journal is the only gap). Missing data contract:
+  explain and stop.
 
 ### S1. Missing dependency
 
-- **Rule:** `import skrub` raising means `python-env-manager` is
-  next, not a substitute library.
-- **Symptom:** `ModuleNotFoundError: No module named 'skrub'`.
-- **Recovery:** invoke `python-env-manager` for the install
-  command. Do NOT substitute with `sklearn.Pipeline` /
-  `make_pipeline` / `FunctionTransformer` — that silently rewrites
-  this skill out of the project.
+- **Rule:** `import skrub` / `sklearn` failure, or a DataOp HTML
+  stub ("install Pydot and Graphviz"), is `add-python-package` —
+  not a pipeline rewrite. Confirm then add `skrub` and
+  `scikit-learn`. Graphviz rides with `skrub`; that skill owns
+  `env graphviz` / `dot -c`.
+- **Recovery:** load `add-python-package` if installed; else name
+  the package and stop. Do not `env add` here. Do not
+  `pip install graphviz`. Do not substitute `sklearn.Pipeline`.
 
 ### S2. Symbol from memory is forbidden
 
-- **Rule:** every skrub / scikit-learn / skore name must come from
-  a `python-api` lookup *this turn*.
-- **Symptom:** you type `tabular_learner` (renamed in 0.7+),
-  `mark_as_y(col)` (signature dropped the positional in 0.9+), or
-  any name "you remember".
-- **Recovery:** invoke `python-api`. Recognition is not a lookup;
-  names drift between releases.
+- **Rule:** every new skrub / sklearn / skore name from
+  `python -m skore_skills api get <dotted>` or a matching cache
+  read *this turn*.
+- **Recovery:** run `api get`. Names drift (`tabular_learner`,
+  positional `mark_as_y(col)`).
 
 ### S3. Splitter selection is out of scope
 
-- **Rule:** no `KFold` / `StratifiedKFold` / `train_test_split` /
-  any splitter import in pipeline code.
-- **Symptom:** you're about to type `from sklearn.model_selection
-  import KFold` in `pipeline.py`.
-- **Recovery:** that's `evaluate-ml-pipeline`'s territory. This
-  skill only wires `split_kwargs` AT the X marker (see Rule 2).
+- **Rule:** no `train_test_split` and no `skore.evaluate` in
+  pipeline code. Do not pick `KFold` vs `TimeSeriesSplit`.
+  **Exception:** non-empty `split_kwargs` → Pattern B:
+  `cv=<mapping-table splitter>()` on `mark_as_X` (skrub requires
+  `cv=`). Integer `cv` is not a splitter. See
+  `evaluate-ml-pipeline/references/metadata-routing.md`.
+- **Recovery:** kwargs-free CV is evaluate Pattern A
+  (`splitter=`). Grouped metadata stays on the X marker.
 
 ### S4. `skrub.X(...)` / `skrub.y(...)` are not acceptable graph roots
 
-- **Rule:** root on `skrub.var("<source>", value=preview)` instead.
-- **Symptom:** code starts with `skrub.X(df)` / `skrub.y(s)`.
-- **Recovery:** rewrite to `skrub.var("data_dir", value=...)` →
-  `.skb.apply_func(load_fn)` → `.skb.mark_as_X()`. The shortcuts
-  (1) bake the marker at the source — defeating Layer 1; (2)
-  force a pre-loaded binding, breaking predict-time replay;
-  (3) silently re-enable the late-`mark_as_X` bug for cross-row
-  features.
+- **Rule:** root on `skrub.var("<source>", value=preview)`.
+- **Recovery:** `skrub.var` → `.skb.apply_func(load_fn)` (if the
+  source is a path) → `.skb.mark_as_X()`. Existing `skrub.X`
+  graphs: surface the alternative and ask; do not auto-rewrite.
+  Catalogue: `references/source-binding.md`.
 
-**S4 copy this into the assistant message, then stop.** Do not
-leave the refuse in a thinking channel. Do not add encoder /
-predictor steps on the `skrub.X` skeleton.
+**S4 copy this into the assistant message, then stop.**
 
 ```
 Refuse: skrub.X / skrub.y are not graph roots (S4).
@@ -178,43 +300,22 @@ Alternative (refactor — ask before rewriting):
   y = data[TARGET_COL].skb.mark_as_y()
 ```
 
-### S5. Late `mark_as_X` is forbidden when any feature step is cross-row
+### S5. Late `mark_as_X` is forbidden when any feature is cross-row
 
-- **Rule:** for any cross-row step (lag, rolling, group-agg,
-  target shift, side-join, `drop_nulls` on shifted col), the
-  X marker goes UPSTREAM of that step. The step references the
-  cross-row source as an additional `apply_func` argument
-  (Layer 1 source → Layer 3 feature, via the marker bypass).
-- **Symptom:** the smoke test fails on `len(predictions) !=
-  n_predict_grid_rows`; OR a `feature_steps=[]` toggle appears
-  in `build_learner` "to make predict work for cold-start"; OR
-  a temp-dir gymnastic at predict time to fake history; OR a
-  wrapper estimator whose only job is to filter NaN rows the
-  pipeline itself produced. (Don't be misled by syntax —
-  `pl.col("x").shift(k)` IS cross-row.)
-- **Recovery:** fix the graph topology via Rule 2's three-layer
-  model. Don't loosen the smoke-test assertion. Don't wrap the
-  predictor. Don't `feature_steps=[]`.
-- **Proof:** smoke test (`smoke-test-ml-pipeline`) — pipeline
-  with marker in the right place passes by construction.
+- **Rule:** marker UPSTREAM of every cross-row step. History is
+  an extra `apply_func` argument, not fused into the loader.
+- **Symptom:** smoke `len(predictions) != n_predict_grid_rows`;
+  `feature_steps=[]`; temp-dir history gymnastics; a wrapper
+  whose job is to filter NaNs the pipeline produced.
+- **Recovery:** three-layer pattern in Rule 2 /
+  `references/layer_examples.md`. Do not loosen smoke.
 
 ### Loader-baked target shift — refuse immediately
 
-When the user asks the loader to compute `y = col.shift(-H)` (or
-equivalent) then `mark_as_X` on the result:
-
-1. Refuse the loader-baked target shift.
-2. Cite **late-`mark_as_X` is forbidden** (S5 — cross-row
-   dependency) and **Layer 1 doesn't know the question** (S6 —
-   the forecasting horizon is not a loader concern).
-3. Propose the three-layer pattern: Layer 1 `history_source` +
-   `predict_grid`; Layer 2 aligns into `{X, y}` and marks;
-   Layer 3 features take X + history as references.
-
-Do not end on a generic three-layer sketch that terminates in an
-estimator and omits `history_source` / `predict_grid`. The 24-hour
-(or `H`) horizon belongs to **Layer 2**, not Layer 1 and not as a
-Layer-3 estimator trick.
+When the loader should compute `y = col.shift(-H)` then
+`mark_as_X` on the result: refuse (S5 + S6). Horizon lives in
+Layer 2. Do not invent `_ShiftTargetHorizon` / `*Target*`
+estimators that `dropna`.
 
 ```
 STOP — no wrapper estimator. Do not invent `_ShiftTargetHorizon`,
@@ -229,319 +330,156 @@ Layer 3: features take X + history as references.
 
 ### S6. Layer 1 doesn't know the question
 
-- **Rule:** Layer 1 (sources + loaders) describes *what data
-  exists*. Anything that requires knowing *which rows we want
-  predictions for* — any horizon / lag / window / shift — belongs
-  to Layer 2 or downstream, never Layer 1.
-- **Symptom:** the loader's body contains a `target.shift(-HORIZON)`,
-  a `drop_nulls("y")`, or any task-specific filter.
-- **Recovery:** push the task-specific operation past Layer 1.
-  The horizon / shift belongs to **Layer 2** (align
-  `history_source` + `predict_grid` into `{X, y}` and mark). Do
-  **not** implement the shift as a stateful `*Target*` estimator
-  that filters NaN rows. Layer 3 is features that take X +
-  history as references. The smoke test passes trivially when
-  the bug is fused into Layer 1 — CV looks fine, and the
-  structural debt only surfaces when the *next* experiment
-  composes against the raw source.
-- **Constructive test:** *would an external consumer — a SQL
-  view, a feature store, a second model — derive this same
-  output without knowing your task?* No → push it past the
-  marker.
-
-### S7. All Python execution goes to `scratch/`
-
-- **Rule:** every Python command (version check, signature
-  lookup, data inspection, loader sanity-check, anything) lands
-  in `scratch/<YYYY-MM-DD>_<HHMMSS>_<short>.py` and runs via
-  `pixi run python scratch/<ts>_<short>.py`.
-- **Symptom:** you catch yourself typing `pixi run python -c`
-  or `python -c`.
-- **Recovery:** write the file first, then execute. **Inline is
-  forbidden regardless of length** (see `python-api` § Stop
-  conditions). No 2-line carve-out.
-
-### S8. Don't filter warnings
-
-- **Rule:** no `warnings.filterwarnings(...)` in `pipeline.py` or
-  scratch probes unless the user explicitly asks. See
-  `python-code-style` § Stop conditions.
+- **Rule:** loaders describe *what data exists*. Horizon / lag /
+  window / task filter belongs to Layer 2+. Constructive test:
+  would an external consumer derive this without knowing our
+  task? No → push it past Layer 1.
+- **Symptom:** `target.shift(-HORIZON)` or `drop_nulls("y")` in
+  the loader. CV looks fine; the next experiment cannot compose
+  against the raw source.
 
 ## Forbidden shortcuts
 
 | Shortcut | Why it's wrong |
 |---|---|
-| `tabular_learner` from memory | Renamed to `tabular_pipeline` in skrub 0.7+. Memory typed → ImportError on modern installs |
-| `mark_as_y(target_column)` positional arg | Dropped in 0.9+. Use `.skb.select("...")` BEFORE the mark |
-| `skrub.X(df)` / `skrub.y(s)` as roots | Forbidden (S4). Use `skrub.var("<source>", value=...)` |
-| `value="data/train.parquet"` literal in `pipeline.py` | Resolves against CWD; breaks runs from non-root dirs. Expose `data_dir_preview` as kwarg; caller passes `PROJECT_ROOT / "data"` |
-| `feature_steps=[]` toggle "to make predict work" | S5 symptom. Fix the graph, not the predict-time bypass |
-| `skore.evaluate(learner, X, y, ...)` | SkrubLearner takes an env-dict. Use `data={"data_dir": ..., ...}` |
-| `bare sklearn.Pipeline` as top-level | Rewrite as skrub DataOps graph (Rule 1) |
-| Inline `pixi run python -c "..."` | S7. Write to `scratch/<ts>_*.py` instead |
+| `tabular_learner` from memory | Renamed to `tabular_pipeline` in skrub 0.7+ |
+| `mark_as_y(target_column)` positional | Dropped in 0.9+. Select the column first |
+| `skrub.X(df)` / `skrub.y(s)` as roots | S4 |
+| `value="data/train.parquet"` in `pipeline.py` | CWD-relative. Use `data_dir_preview` |
+| `feature_steps=[]` at predict | S5. Fix the graph |
+| `skore.evaluate(learner, X, y, ...)` | SkrubLearner takes `data={...}` |
+| Bare `sklearn.Pipeline` as top-level | Rule 1 |
+| Inline composed-dev `python -c` | Write `scratch/<ts>_*.py` |
+| `learner.report(...)` / `full_report` / `.skb.eval` for Method | Those **fit**. Use `estimator_html_repr` / `_repr_html_` |
 
 ## Pre-flight — emit before any code
 
-Each ticked box requires an actual tool call this turn. Empty
-Evidence = unchecked.
+Each ticked box requires a tool call this turn.
 
 ```
 Pre-flight (build-ml-pipeline):
-- [ ] Tier 1 mandatory libs importable: sklearn, skrub, skore
-      Evidence: scratch/<ts>_check_tier1.py + `pixi run python …` output.
+- [ ] Tier 1 libs importable: sklearn, skrub, skore
+      Evidence: scratch/<ts>_check_tier1.py + composed-dev output.
                 **Inline `python -c` is NOT evidence.**
-- [ ] Tabular library identified: pandas | polars
-      Evidence: JOURNAL.md Status (Workspace decisions) | user quote
+- [ ] Tabular library: pandas | polars
+      Evidence: `status.policy.tabular` | user quote
                 | "n/a — pandas already in loader signature"
-- [ ] python-api consulted for skrub symbols this turn
-      Evidence: Read scratch/api/skrub/<v>/<topic>.md (this turn)
-                | "n/a — no new skrub symbol this turn"
-- [ ] python-api consulted for sklearn symbols this turn
-      Evidence: Read scratch/api/sklearn/<v>/<topic>.md (this turn)
-                | "n/a — no new sklearn symbol this turn"
+- [ ] API confirmed for skrub symbols this turn
+      Evidence: api get | Read scratch/api/skrub/... (this turn)
+                | "n/a — no new skrub symbol"
+- [ ] API confirmed for sklearn symbols this turn
+      Evidence: api get | Read scratch/api/sklearn/... (this turn)
+                | "n/a — no new sklearn symbol"
 - [ ] Source-binding pattern chosen
-      Evidence: list each planned `skrub.var("<name>")` and state
-                whether it's a source identifier (e.g. `data_dir`)
-                or a predict-grid descriptor. IID: one `skrub.var`
-                rooted on the loaded frame is enough.
+      Evidence: each `skrub.var("<name>")` (source id vs predict-grid)
 - [ ] X-marker placement decided
-      Evidence: name the DataOp node where `.skb.mark_as_X()` lands.
-                IID: on the loaded source frame. Panel / cold-start:
-                on the predict-grid node, BEFORE any history-dep step.
-- [ ] (Cross-row pipelines only) Each cross-row step references the
-      upstream history DataOp as an extra `apply_func` arg
-      Evidence: name each step + its history-DataOp argument
-                | "n/a — no cross-row steps"
-- [ ] Layer 1 audit — every `apply_func` upstream of `mark_as_X`
-      passes the constructive test (S6)
-      Evidence: per-step "external consumer would derive this: yes/no"
+      Evidence: node for `.skb.mark_as_X()`. IID: loaded frame.
+                Panel / cold-start: predict-grid, before history-dep.
+- [ ] (Cross-row only) each cross-row step names its history DataOp
+      Evidence: step + arg | "n/a — no cross-row steps"
+- [ ] Layer 1 audit (S6 constructive test)
+      Evidence: per upstream `apply_func`: external consumer yes/no
 - [ ] Preview value handling
-      Evidence: `build_learner` exposes `data_dir_preview=None` kwarg;
-                no relative-path literal baked into `pipeline.py`
-- [ ] split_kwargs at the X marker decided: groups | time | none
-      Evidence: name the column(s) wired OR "n/a — i.i.d., no group
-                or time structure"
-- [ ] Smoke test wired (`tests/smoke/test_NN_<short_name>.py`)
-      Evidence: per `smoke-test-ml-pipeline`; trivial assertions if no
-                history-dep
+      Evidence: `data_dir_preview=None` kwarg; no path literal
+- [ ] split_kwargs at the X marker: groups | none
+      Evidence: column(s) wired OR "n/a — i.i.d., no group structure"
 - [ ] Pre-flight re-emitted with evidence before final message.
-      Evidence: this checklist appears in the end-of-turn summary.
 ```
-
-## Scope
-
-- **In scope:** how the pipeline *object* is composed — source
-  wiring, preprocessing/feature steps, estimator at the tail.
-- **Out of scope:** fitting, splitting, tuning, persisting,
-  evaluating — those have their own skills.
 
 ## Core rules
 
 ### Rule 1 — Skrub DataOps is the pipeline entry point
 
-Declare the pipeline as a skrub DataOps graph rooted at one or
-more `skrub.var(...)` calls — **not** as a bare
-`sklearn.Pipeline`. The `skrub.X(...)` / `skrub.y(...)` shortcuts
-are not acceptable roots (see S4). Look up the underlying
-signatures via `python-api`.
+Root at `skrub.var(...)`, not a bare `sklearn.Pipeline`.
+`skrub.X` / `skrub.y` are not roots (S4). Look up signatures
+with `api get`.
 
 **If the user asks for `sklearn.Pipeline` / `build_pipeline()`:**
-do not `from sklearn.pipeline import Pipeline`. Redirect to
-`skrub.var(...)` and a `build_learner` that returns
-`predictions.skb.make_learner()`. Do not illustrate the refusal
-with a `Pipeline([...])` constructor in a docstring.
+do not `from sklearn.pipeline import Pipeline`, even as an inner
+estimator. Redirect to `skrub.var(...)` and `build_learner`
+returning `predictions.skb.make_learner()`. Attach `StandardScaler`
+then `Ridge` with separate `.skb.apply` calls, or
+`skrub.tabular_pipeline` plus a regressor. Do not illustrate the
+refusal with a `Pipeline([...])` constructor in a docstring,
+heading, or “what I did not write” fence.
 
-Reference: https://skrub-data.org/stable/data_ops.html
-
-→ next: Rule 2 (where the marker goes).
+https://skrub-data.org/stable/data_ops.html
 
 ### Rule 2 — Mark X early; featurize after
 
-The marker is the **shared-vs-predict-specific boundary**.
+*Does any feature look at rows other than the current one?*
 
-**One question to place the marker:** *does any feature step look
-at rows other than the one currently being processed?*
+| Answer | Placement |
+|---|---|
+| **No** (per-row math, fit-time encoders) | Marker on the loaded source frame |
+| **Yes** (lag / rolling / join / target-shift) | Marker UPSTREAM of every cross-row step |
 
-| Answer | Placement | Pattern |
-|---|---|---|
-| **No** (per-row math, stateful encoders that learn at fit and apply per-row) | Marker on the loaded source frame | Canonical IID example above |
-| **Yes** (lag / rolling / cross-row join / target-shift) | Marker UPSTREAM of every cross-row step | Three-layer model below |
+Three layers when **Yes** (code: `references/layer_examples.md`):
 
-**The three logical layers:**
+- **Layer 1 — Sources.** One `skrub.var` per identifier. Loaders
+  are pure functions of that identifier. No load+featurize in one
+  `apply_func`.
+- **Layer 2 — Predict grid + marker.** IID: the loaded frame.
+  Panels: `(group, time)` grid. `mark_as_X` / `mark_as_y` here.
+  Target derivation that needs history is a small `BaseEstimator`
+  (`fit_transform → {X, y}` / `transform → {X, y=None}`).
+- **Layer 3 — Features after the marker.** History-dependent
+  steps take X **and** the Layer-1 history DataOp.
 
-- **Layer 1 — Sources.** One `skrub.var(...)` per input identifier:
-  raw history file(s) / URL(s) / table name(s), side tables, and —
-  for time-series / cold-start panels — the *predict-time-grid
-  description* (`start`/`end` range, list of `(group_id, time)`).
-  The loader for each source is its first `.skb.apply_func`.
-  Loaders are pure functions of a single source identifier.
-  **Do not load + featurize in one `apply_func`** — that fuses
-  Layers 2 + 3 with the loader and breaks predict-time replay.
+`value=` is preview only. Expose `data_dir_preview=None` on
+`build_learner`; never bake a relative path into `pipeline.py`.
 
-- **Layer 2 — Predict-time grid + X marker.** A DataOp whose
-  rows are exactly the predict grid.
-  - IID flat tables: this IS the loaded source frame.
-  - Time-series / panel: the `(group, time)` grid derived from
-    Layer 1's predict-time bounds.
-
-  **`mark_as_X` and `mark_as_y` go here.** Target derivation that
-  requires history (and `drop_nulls` on `y`) belongs to a small
-  stateful `BaseEstimator` with `fit_transform → {X, y}` /
-  `transform → {X, y=None}`, attached at this layer.
-
-- **Layer 3 — Feature engineering.** `apply_func` chained on the
-  X-branch **after** `mark_as_X`. History-dependent steps take the
-  X DataOp as their first argument **and** the relevant Layer-1
-  source DataOp(s) as additional arguments — history is
-  *referenced*, not bound to X. The same history node materializes
-  the full available history at fit and at predict, so a backward
-  lag computed for a row in the predict grid sees real values from
-  the train history — **no cold-start NaN**.
-
-**Worked examples** (full code, IID + history-dependent +
-counter-example): → `references/layer_examples.md`. Also see
-`python-api/references/pre_mark_alignment.md` for the
-production-style three-layer walkthrough drawn from this
-workspace's 01_baseline.
-
-**Preview value is a caller-supplied parameter, not a literal in
-`pipeline.py`.** `value=` controls what `learner.skb.preview()`
-sees during interactive iteration — nothing else. A literal like
-`value="data/train.parquet"` resolves against CWD and silently
-breaks runs not started from the project root. Expose the preview
-as an optional kwarg on `build_learner` and leave it `None` for
-production fit / cross-validate.
-
-**Downstream evaluation contract.** A `SkrubLearner` does NOT
-implement sklearn's `fit(X, y)` signature — it takes an
-environment dict. Pair with
-`skore.evaluate(learner, data={"data_dir": ..., ...}, splitter=...)`,
-never with `skore.evaluate(learner, X, y, ...)` (raises). See
-`evaluate-ml-pipeline`; confirm signatures via `python-api`.
-
-**Cross-validation metadata at the X marker.** If the data has
-group structure (subjects, sessions, customer IDs, repeated
-measures) or temporal ordering, attach the relevant column at
-`.skb.mark_as_X(split_kwargs={...})`:
+**CV metadata at the X marker.** Groups (subjects, sessions,
+customer IDs): Pattern B — `cv=` **and** `split_kwargs`. skrub
+requires `cv=` whenever `split_kwargs` is set; `cv=<int>` is not
+a splitter. `G-CV-SPLITTER` still owns KFold vs time; this is
+only the mapping-table placeholder for `groups`.
 
 ```python
-X = data.drop(columns=[...]).skb.mark_as_X(
+from sklearn.model_selection import GroupKFold
+
+X = data.drop(columns=[..., "customer_id"]).skb.mark_as_X(
+    cv=GroupKFold(),
     split_kwargs={"groups": data["customer_id"]},
 )
 ```
 
-Keys map to the cross-validator's `split(X, y, **split_kwargs)`
-(e.g. `groups`). **Ask the user** when you can't tell from data
-alone whether such structure exists — name suspect columns
-(anything ending in `_id`, columns called `subject` / `session` /
-`region`, any `date` / `timestamp` for temporal ordering) and
-ask whether to wire them. Don't silently leave `split_kwargs`
-empty when group structure is plausible — that produces optimistic
-CV downstream. Choosing the splitter itself is
-`evaluate-ml-pipeline`'s job; this skill only wires the metadata.
+Evaluate omits `splitter=` so skore reuses this `cv` + `groups`
+(`evaluate-ml-pipeline/references/metadata-routing.md`).
 
-`mark_as_X` also accepts a `cv=<splitter>` argument, and
-`skore.evaluate(...)` without an explicit `splitter=` will reuse it
-(with these `split_kwargs`). **Do not use `cv=` here** — it would
-pull a splitter import into pipeline code (forbidden by S3). Wire
-only `split_kwargs`; `evaluate-ml-pipeline` selects the splitter and
-passes `splitter=`, which overrides any DataOp `cv` anyway.
+**Time is not a `split_kwargs` key.** Sort upstream; leave
+`split_kwargs` empty. Pattern A (`TimeSeriesSplit`) is evaluate.
+Only a custom splitter whose `split()` takes `times=` is Pattern B.
+Refuse integer `cv` and unsupported time metadata in prose. Do not
+paste forbidden `mark_as_X(...)` / `cv=5` / `times=` into headings
+or “what I did not write” fences.
 
-**Stop after wiring `split_kwargs`.** Do not write
-`splitter=GroupKFold(...)` or `skore.evaluate(..., splitter=...)`
-in this skill. Do not name `GroupKFold` / `KFold` /
-`TimeSeriesSplit` as the likely default — that is picking the
-splitter. Say only: `evaluate-ml-pipeline` consumes `split_kwargs`
-and owns the splitter.
-
-Even when `customer_id` is already wired, still paste this ask
-verbatim (the named-heuristic tokens are load-bearing):
+Ask when grouping is plausible (load-bearing tokens), naming the
+columns that triggered the question and what grouping would change
+(§ Gate context):
 
 ```
 AskUserQuestion: grouping intended? anything ending in `_id`,
 columns called `subject` / `session` / `region`?
 ```
 
-**When editing an existing pipeline that uses `skrub.X` /
-`skrub.y` or binds materialized data:** do not auto-rewrite.
-Surface the source-bound alternative and ask whether to refactor.
-Full catalogue: → `references/source-binding.md`.
+Do not write `skore.evaluate(...)` here.
 
-→ next: Rule 3 (attach mechanism).
+### Rule 3 — Attach: stateless function, stateful estimator
 
-### Rule 3 — Attach data modifications via `.skb`
+- `.skb.apply_func(fn)` — callable, output depends only on the
+  current row and constants.
+- `.skb.apply(estimator)` — sklearn-compatible; learns on
+  training, reapplies on test.
+- `skrub.deferred` — rare; only when combining **multiple
+  DataOps** and no skrub joiner fits. Default: `apply_func`.
+  Details: `references/source-binding.md`.
 
-Two attach points:
-
-- `.skb.apply_func(fn)` — wraps a callable that transforms data.
-- `.skb.apply(estimator)` — wraps any sklearn-compatible estimator
-  (transformer in the middle, or the final predictor).
-
-When to use `skrub.deferred` instead of `apply_func`: rare —
-only when the callable must combine **multiple DataOps** at once
-(e.g. a custom join over two tables). Even then, check whether a
-skrub joiner (`Joiner` / `AggJoiner` / `MultiAggJoiner`) covers it
-first. Default: `.skb.apply_func`. Details:
-→ `references/source-binding.md`.
-
-→ next: Rule 4 (function vs estimator).
-
-### Rule 4 — Stateless → function. Stateful → estimator.
-
-The *only* decision rule for picking `apply_func` vs `apply`:
-
-- **Stateless** — output for a row depends only on that row (and
-  constants). No info borrowed across rows.
-- **Stateful** — needs statistics / vocabulary / learned
-  parameters fit on **training** data and re-applied unchanged to
-  **test** data.
-
-```python
-# Stateless — pure function + apply_func
-import numpy as np
-
-X = X.skb.apply_func(lambda df: df.assign(log_price=np.log1p(df["price"])))
-
-# Stateful — estimator + apply
-from sklearn.preprocessing import StandardScaler
-
-X = X.skb.apply(StandardScaler())
-```
-
-If a step would silently learn from the test set when called as
-a plain function, it is stateful — promote it.
-
-→ next: Rule 5 (leakage check).
-
-### Rule 5 — Leakage rule
-
-Any computation using statistics learned from the data (means,
-medians, quantiles, vocabularies, target distribution) MUST be
-stateful. Calling such a computation as a plain function over the
-whole frame leaks test into training.
-
-```python
-# WRONG — pct rank fits on the full frame, leaks test into training
-X = X.skb.apply_func(lambda df: df.assign(p=df["x"].rank(pct=True)))
-
-# RIGHT — quantile transformer learns on training fold only
-from sklearn.preprocessing import QuantileTransformer
-
-X = X.skb.apply(QuantileTransformer(output_distribution="uniform"))
-```
-
-Classic traps by name:
-
-- target encoding (must `fit` on training y only),
-- target-aware or quantile-based imputation,
-- quantile binning / `KBinsDiscretizer(strategy="quantile")`,
-- `OrdinalEncoder` / `LabelEncoder` whose categories come from
-  the full dataset rather than `fit` on training only,
-- vocabulary-building text tokenizers, TF-IDF, IDF weights.
-
-**Litmus test:** would this output change if I called it on the
-training subset alone vs the whole frame? If yes → stateful →
-`.skb.apply` with an estimator, never `.skb.apply_func`.
+**Litmus:** would the output change on the training subset vs the
+whole frame? Yes → stateful → `.skb.apply`. Means, medians,
+quantiles, vocabularies, target distribution, target encoding,
+quantile imputation / binning, full-data `OrdinalEncoder` /
+`LabelEncoder`, TF-IDF / IDF: all stateful.
 
 ```
 STOP — target encoding / apply_func. When the user asks for
@@ -549,119 +487,73 @@ STOP — target encoding / apply_func. When the user asks for
 the leaky function body "as requested" and then the fix. Cite
 statelessness + leakage. Propose sklearn TargetEncoder (or
 BaseEstimator + TransformerMixin) via `.skb.apply`. Mention
-python-api for the TargetEncoder signature.
+API CLI for the TargetEncoder signature.
 ```
 
-→ next: Decision flow.
+## Reproducibility
 
-## Decision flow for a new step
+`done` History rows must stay runnable. When touching
+`src/<pkg>/`, default behavior preserves prior experiments.
+Details: `references/reproducibility_mechanics.md`.
 
-1. Does the operation only need the current row (and constants)?
-   → **stateless** → pure Python function + `.skb.apply_func`.
-2. Otherwise it must learn from training data and reapply on test.
-   → **stateful** → sklearn-compatible estimator + `.skb.apply`.
+- **Option 1** — parametrize with a default-preserving flag
+  (small append). Example:
+  `include_calendar_features: bool = False`.
+- **Option 2** — new function called only from the new experiment.
+- **Option 3** — branch the module (last resort).
 
-→ next: Reproducibility (when touching shared modules).
-
-## Reproducibility — extending without breaking prior experiments
-
-`iterate-ml-experiment` enforces a hard rule: every `done` row in
-`JOURNAL.md` History must stay runnable on `main` and produce the
-same result. When touching a shared module under `src/<pkg>/`,
-**default behavior must preserve prior experiments' shape**.
-
-**Three options, picked by judgment** (full procedures + worked
-examples: → `references/reproducibility_mechanics.md`):
-
-- **Option 1 — parametrize the existing function** (with a
-  default-preserving flag). Pick when the change is small and
-  scoped: a step appended at the end, a single conditional, a
-  stateless transform that adds columns without reshaping
-  existing ones. **The flag's default mirrors prior behavior.**
-  Show it annotated:
-  `include_calendar_features: bool = False`. Mention
-  `tests/smoke/` (run **all** smoke tests) as the cheap check
-  that prior experiments still pass.
-- **Option 2 — add a new function called only from the new
-  experiment.** Pick when the change doesn't fit cleanly behind a
-  flag: new estimator at the tail, a step that reshapes the
-  graph, or Option 1 would grow ugly internal branching.
-- **Option 3 — branch the module.** Last resort. Only when the
-  change touches enough internal structure that Options 1 and 2
-  would obscure the diff. Usually a signal of a deeper layering
-  issue worth surfacing to the user.
-
-### Tripwires (load-bearing)
-
-- **3+ flags in one function** → parametrization is leaking;
-  reach for Option 2 next.
-- **Visible branching in the function body** that makes it hard
-  to read → reach for Option 2.
-- **A flag changes default behavior of an existing caller** →
-  STOP. Rule broken. Either keep the default preserving, or use
-  Option 2.
-
-### Cheap executable check
-
-`iterate-ml-experiment` § 3's smoke-test gate runs **all** of
-`tests/smoke/`, not just the new one. A prior smoke test going
-red after a change = default behavior not preserved. Fix before
-declaring the new experiment ready.
-
-→ next: Common patterns (for recurring shapes).
+Tripwires: 3+ flags or unreadable branching → Option 2. A flag
+that changes an existing caller's default → STOP. After the
+change, pytest **all** of `tests/smoke/`.
 
 ## Common patterns
 
-Short catalogue. Look up exact symbols in `python-api`. Full
-catalogue with code: → `references/common_patterns.md`.
+Look up symbols with `api get`. Code: `references/common_patterns.md`.
 
-1. **Heterogeneous columns** — skrub column selectors with `cols=`
-   on `.skb.apply` (one apply per group), not `ColumnTransformer`.
-2. **Default starting point for tabular data** — reach for
-   `skrub.tabular_pipeline(...)` or `TableVectorizer` + estimator
-   first; specialize column-by-column only when default is
-   insufficient.
-3. **Multi-table inputs** — one `skrub.var(...)` per table; join
-   with skrub `Joiner` / `AggJoiner` / `MultiAggJoiner` via
-   `.skb.apply(...)`.
-4. **Meta-estimator at the tail** — `StackingClassifier`,
-   `CalibratedClassifierCV`, `TransformedTargetRegressor`. Wrap
-   the predictor first, then attach via `.skb.apply` as the final
-   step.
-5. **Mark hyperparameter knobs in place** — wrap with
-   `skrub.choose_from` / `choose_int` / `choose_float` /
-   `optional` inside the declaration. Don't import `GridSearchCV`
-   here; the tuning skill owns search.
-6. **Custom sklearn transformer** — author only when (a) no
-   built-in fits and (b) the operation is stateful. Subclass
-   `BaseEstimator` + `TransformerMixin`. For a stateless op,
-   write a function and use `.skb.apply_func`.
+1. Heterogeneous columns — skrub `cols=` on `.skb.apply`, not
+   `ColumnTransformer`.
+2. Tabular default — `skrub.tabular_pipeline` / `TableVectorizer`
+   first; specialize only when that is not enough.
+3. Multi-table — one `skrub.var` per table; `Joiner` /
+   `AggJoiner` / `MultiAggJoiner` via `.skb.apply`.
+4. Meta-estimator at the tail — wrap the predictor, then
+   `.skb.apply`.
+5. Hyperparameter knobs — `skrub.choose_*` / `optional` in the
+   declaration. Do not import `GridSearchCV` here.
+6. Custom transformer — only if no built-in and the op is
+   stateful (`BaseEstimator` + `TransformerMixin`). Stateless →
+   `apply_func`.
+7. Custom DataOp scoring — on explicit request, attach
+   `.skb.with_scoring(...)` after prediction and before
+   `.skb.make_learner()`. Derive row-aligned metric kwargs from the
+   marked X DataOp; keep chained `with_scoring` calls adjacent at
+   the graph tail. Evaluate owns `metrics.score()` inspection and
+   `Project.put` persistence; see evaluate's
+   `references/custom-metrics.md`.
 
 ## Companion skills
 
 | Skill | Relationship |
 |---|---|
-| `python-api` | Authoritative lookup of sklearn / skrub / skore. Invoke whenever picking a symbol; cache hits first (Shape 0) |
-| `evaluate-ml-pipeline` | Owns `skore.evaluate`, CV selection, metric defaults. Consumes the `split_kwargs` wired at the X marker |
-| `smoke-test-ml-pipeline` | Executable proof of Rule 2's early-mark. Smoke failure → route back here; fix the topology, don't loosen the assertion |
-| `test-ml-pipeline` | Router for `tests/`. Smoke test pairs 1:1 with the experiment script |
-| `python-env-manager` | Detection + install commands. Invoke when `import skrub` raises |
-| `python-code-style` | **Must be invoked** after writing or editing `pipeline.py` / `features.py` / `data.py`. Direct `pixi run ruff check` drops the NumPyDoc convention |
+| `python -m skore_skills api get` | Symbol lookup; cache hits first |
+| `evaluate-ml-pipeline` | `skore.evaluate` and CV choice after `smoke run` `proceed` + `evaluate consent` (Evaluate HITL on `ask`). Pattern A/B: `references/metadata-routing.md` |
+| `smoke-test-ml-pipeline` | Sub-step. Load only if `status.skills.smoke-test-ml-pipeline` is true. Writes `tests/smoke/test_NN_*.py`. Missing skill → one-line skip; do not invent the pytest file |
+| `python -m skore_skills smoke run` | After the smoke file exists. JSON `proceed` / `stop` is the only green/red signal |
+| `add-python-package` | Missing `skrub` / sklearn / Graphviz companions |
+| `research-ml-practice` | Load if installed on FE / transform / leakage. Abstract the **problem class**, not the table name. Summarize `scratch/research/<slug>.md`. AskUserQuestion `allow_multiple` on **`declare`** rows that do not violate stops. `measure` → revisit EDA; do not edit `data_analysis.py`. Declaring id handling does **not** wire Pattern B — no `cv=` / `split_kwargs` / `GroupKFold` until grouping is an approved Method choice. `evaluate` → name `evaluate-ml-pipeline`. `confirm` → ask the user. Missing skill → one-line skip |
+| `python -m skore_skills style` | After writing/editing `pipeline.py` / `features.py` / `data.py` |
+| `python -m skore_skills env graphviz` | Optional DataOp SVG via `draw_graph`; not required for Method HTML |
+| `python -m skore_skills site build` | After the unfitted `pipeline.html` snapshot, before smoke and the Evaluate HITL, when `policy.site` (preview-before-MD-HITL; see `export-ml-site`). Skipped EDA does not defer it |
 
 ## References (load on demand)
 
-- `references/source-binding.md` — full catalogue of source-binding
-  patterns (encouraged / discouraged / OK-but-offer-upgrade) +
-  the `apply_func` vs `deferred` decision.
-- `references/layer_examples.md` — worked code for the IID
-  flat-table case, the loader-baked-shift counter-example, and
-  the history-dependent three-layer pattern.
-- `references/reproducibility_mechanics.md` — full Option 1 / 2 /
-  3 procedures with code, plus the tripwire criterion.
-- `references/common_patterns.md` — full catalogue of recurring
-  pipeline shapes with code snippets.
-
-> **Companion skill (planned): `review-ml-pipeline`** —
-> methodological review of an existing declaration (leakage audit,
-> statelessness check, step ordering, scope creep). When it flags
-> a problem, return here to fix.
+- `references/layer_examples.md` — IID, loader-baked Don't,
+  history-dependent JOIN / AlignXy. Read before proposing Layer 2.
+- `references/source-binding.md` — identifier vs materialized
+  roots; `apply_func` vs `deferred`.
+- `references/reproducibility_mechanics.md` — Option 1 / 2 / 3.
+- `references/common_patterns.md` — tabular shapes with code.
+- `evaluate-ml-pipeline/references/metadata-routing.md` — Pattern
+  A vs B (where `splitter=` vs DataOp `cv=` + `split_kwargs`).
+- `evaluate-ml-pipeline/references/custom-metrics.md` — report
+  registry vs DataOp scoring, metric kwargs, and persistence order.

@@ -1,0 +1,43 @@
+{
+  "mandatory": [
+    "ruff",
+    "ipython",
+    "ipykernel"
+  ],
+  "stage": [
+    "scikit-learn",
+    "skrub",
+    "skore",
+    "pytest"
+  ],
+    "export": [
+        "jupytext",
+        "nbclient",
+        "nbconvert",
+        "mkdocs-material"
+    ],
+  "competing": {
+    "tabular": ["pandas", "polars"],
+    "deep_learning_framework": ["pytorch", "keras"],
+    "sklearn_dl_wrapper": ["skorch", "keras"],
+    "serving": ["mlflow", "fastapi"]
+  },
+  "optional": [
+    "jupyterlab",
+    "ipykernel",
+    "pytorch",
+    "keras",
+    "skorch",
+    "mlflow",
+    "optuna"
+  ],
+  "transitive": [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "seaborn",
+    "plotly",
+    "joblib",
+    "pandas"
+  ]
+}

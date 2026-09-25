@@ -14,7 +14,7 @@ so the target can `read_file` the history-dependent JOIN example
 (the same file `SKILL.md` points at). Other cases stay single-turn.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
+violated. 19 cases; Must-NOT is all-or-nothing.
 
 ---
 
@@ -36,7 +36,8 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
   rooted at `skrub.var(...)`.
 - Cite Rule 1 ("Skrub DataOps is the pipeline entry point") or the
   TRIGGER bullet that catches bare sklearn pipelines.
-- Mention consulting `python-api` to confirm skrub symbols.
+- Name `python -m skore_skills api get` for the skrub symbols
+  before writing their calls.
 - Propose a `build_learner` function returning
   `predictions.skb.make_learner()` (not a `Pipeline` object).
 
@@ -47,6 +48,8 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
   from `build_learner` / `build_pipeline`. A docstring that only
   names the forbidden equivalent is not a violation.
 - Use `skrub.X(...)` / `skrub.y(...)` as graph roots.
+- Call `learner.report(...)` or `full_report` to snapshot the Method
+  diagram (that fits; use `_repr_html_` / `estimator_html_repr`).
 
 ---
 
@@ -179,8 +182,9 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
 - Propose a sklearn-compatible estimator (`BaseEstimator` +
   `TransformerMixin` or an existing `TargetEncoder`) attached via
   `.skb.apply`.
-- Mention `python-api` consultation to confirm
-  `sklearn.preprocessing.TargetEncoder` (or equivalent) signature.
+- Name `python -m skore_skills api get
+  sklearn.preprocessing.TargetEncoder` (or equivalent) before
+  writing its call.
 
 **Must NOT do:**
 - Accept `apply_func(target_encode)` as written.
@@ -227,23 +231,328 @@ violated. Overall: ≥ 6/7 cases pass and no Must NOT violated.
 > rows per customer. Build the pipeline.
 
 **Assumed workspace state:**
-- skrub installed at 0.9.0.
+- skrub installed at 0.10.x.
 - IID-shaped features (no cross-row history) but rows are grouped
   by customer.
 
 **Must do:**
 - Identify the group structure (multiple rows per `customer_id`).
-- Wire `mark_as_X(split_kwargs={"groups": data["customer_id"]})` at
-  the X marker.
-- Cite that `split_kwargs` is the metadata `evaluate-ml-pipeline`
-  consumes downstream for the splitter.
+- Wire `mark_as_X(cv=GroupKFold(), split_kwargs={"groups": data["customer_id"]})`
+  at the X marker (Pattern B; skrub requires `cv=` with
+  `split_kwargs`).
+- Cite that evaluate omits `splitter=` so skore reuses this `cv`
+  and `groups` (`evaluate-ml-pipeline/references/metadata-routing.md`).
 - Mention asking the user whether grouping is intended (named
   ask: "anything ending in `_id`, columns called `subject` /
   `session` / `region`").
 
 **Must NOT do:**
-- Pick the cross-validator in pipeline code (`splitter=GroupKFold(...)`,
-  `cv=GroupKFold`, `skore.evaluate(..., splitter=...)`). Naming
-  `GroupKFold` only as what `evaluate-ml-pipeline` owns later is
-  not a violation.
+- Call `skore.evaluate` from pipeline code.
+- Pick an IID splitter (`KFold`, `TimeSeriesSplit`) at the X
+  marker.
 - Leave `split_kwargs` empty without surfacing the group question.
+
+---
+
+## CASE_08 — Missing skrub/sklearn goes to add-python-package
+
+**User prompt:**
+> Declare the baseline learner.
+
+**Assumed workspace state:**
+- Design note approved.
+- `import skrub` raises `ModuleNotFoundError`.
+
+**Must do:**
+- STOP and load `add-python-package` for `skrub` and
+  `scikit-learn` (confirm).
+- Keep skrub DataOps as the graph; do not reopen vs Pipeline.
+
+**Must NOT do:**
+- Substitute `sklearn.Pipeline` / `make_pipeline`.
+- Call `env add` from this skill.
+
+---
+
+## CASE_09 — Research measure lane does not edit EDA
+
+**User prompt:**
+> Should I drop customer_id? Research the practice and declare
+> the pipeline.
+
+**Assumed workspace state:**
+- Design note approved.
+- `research-ml-practice` is installed.
+- Scratch research lists a `measure` row (plot id uniqueness)
+  and a `declare` row (drop id inside the graph, not on `data/`).
+
+**Must do:**
+- Load `research-ml-practice` if the concern is not already in
+  scratch.
+- AskUserQuestion `allow_multiple` on **`declare`** rows.
+- Treat `measure` as revisit-EDA / open question.
+
+**Must NOT do:**
+- Edit `data_analysis/data_analysis.py`.
+- Drop `customer_id` from raw files under `data/`.
+- Pick a cross-validator in pipeline code.
+
+---
+
+## CASE_10 — After declaration, smoke run then HITL
+
+**User prompt:**
+> The design is approved. Declare the learner and stop before
+> full-dataset CV.
+
+**Assumed workspace state:**
+- Approved `journal/01_baseline.md`.
+- Experiment shell `experiments/01_baseline.py` exists after
+  the declaration.
+- Workspace is scaffolded.
+
+**Must do:**
+- After design consent and before declaration, give a 1–3 sentence
+  preview: local preparation of an unfitted learner, experiment
+  Method cells, and pipeline snapshot, followed by smoke.
+- State that this declaration does not train or run full-dataset
+  evaluation, and do not invent a minute estimate.
+- Load `smoke-test-ml-pipeline` after the declaration.
+- Run `python -m skore_skills smoke run --stem 01_baseline`
+  after the smoke file exists.
+- After `smoke run` JSON `proceed`, narrate what was declared,
+  that smoke is green, and the learner; link
+  `journal/01_baseline.md` and `experiments/01_baseline.py`
+  before the Evaluate menu.
+- After `smoke run` JSON `proceed`, AskUserQuestion: Evaluate
+  (Recommended) / Modify / Stop (Evaluate first; extensive
+  computation on the full dataset).
+
+**Must NOT do:**
+- Present the declaration itself as model training or CV.
+- Author a `skore.evaluate(...)` call site before that
+  AskUserQuestion. Naming it in a docstring or "not written
+  now" sentence is allowed.
+- Skip `smoke run` and jump to CV.
+- Write skill ids, `skore_skills`, `site build`, or "marker is
+  durable" commentary into `experiments/<stem>.py` markdown cells,
+  `#` comments, or the design note.
+
+---
+
+## CASE_11 — Dummy remains an operational predictor
+
+**User prompt:**
+> Implement the approved dummy-predictor design for this
+> classification task.
+
+**Assumed workspace state:**
+- The approved Method names a dummy predictor.
+- No prior model exists.
+
+**Must do:**
+- Use `DummyClassifier` as the predictor in the skrub DataOps
+  graph and name `api get` for its installed signature.
+- Continue to `smoke run` and the normal Evaluate
+  (Recommended) / Modify / Stop gate.
+- State that this validates the operational path, not predictive
+  value.
+
+**Must NOT do:**
+- Substitute a stronger estimator.
+- Add domain feature engineering.
+- Skip `smoke run` because the predictor is trivial.
+
+---
+
+## CASE_12 — Standard baseline uses automatic preprocessing
+
+**User prompt:**
+> Implement the approved standard baseline for this mixed-type
+> tabular regression problem.
+
+**Assumed workspace state:**
+- The approved Method requests a quick traditional-ML baseline.
+
+**Must do:**
+- Use skrub automatic tabular preprocessing plus a
+  task-appropriate traditional regressor.
+- Name `api get` for the installed skrub entry point and estimator.
+
+**Must NOT do:**
+- Add EDA-specific domain features.
+- Hand-tune per-column preprocessing or run hyperparameter search.
+- Replace the DataOps graph with a bare sklearn Pipeline.
+
+---
+
+## CASE_13 — EDA-backed build stays within cited findings
+
+**User prompt:**
+> Implement the approved EDA-backed design.
+
+**Assumed workspace state:**
+- The Method cites high cardinality and a temporal grouping
+  finding from `data_analysis/data_analysis.md`.
+
+**Must do:**
+- Implement only the cited preprocessing/grouping decisions.
+- Stop and ask if a required choice is not established by the
+  approved Method.
+
+**Must NOT do:**
+- Invent another EDA finding or domain fact.
+- Re-run or edit EDA from this skill.
+- Add align / join / lag steps not named in the assumed Method.
+
+---
+
+## CASE_14 — Pydot/Graphviz stub is not a pipeline rewrite
+
+**User prompt:**
+> The learner cell printed "To display the DataOp graph, please
+> install Pydot and Graphviz" instead of a figure.
+
+**Assumed workspace state:**
+- Design note approved; `import skrub` succeeds.
+- Smoke is green.
+
+**Must do:**
+- STOP and load `add-python-package` for `skrub`.
+- Keep the skrub DataOps graph.
+
+**Must NOT do:**
+- Substitute `sklearn.Pipeline` / `make_pipeline`.
+- Run `pip install graphviz`.
+- Call `env add` or `env graphviz` from this skill.
+
+---
+
+## CASE_15 — Time ordering does not become split kwargs
+
+**User prompt:**
+> Build the approved temporal pipeline and put the timestamp on X.
+
+**Assumed workspace state:**
+- The journal records temporal ordering but no custom splitter
+  consumes a `times` keyword.
+
+**Must do:**
+- Keep `split_kwargs={}` at `mark_as_X`.
+- Leave time-splitter selection to evaluate (Pattern A).
+
+**Must NOT do:**
+- Put `times=` or `split_kwargs={"times": ...}` on the declared
+  `mark_as_X`. Quoting the user's request in a refusal heading is
+  not a violation.
+- Import `TimeSeriesSplit` into pipeline code.
+
+---
+
+## CASE_16 — Invalid times metadata is rejected
+
+**User prompt:**
+> Use `mark_as_X(split_kwargs={"times": data["timestamp"]})`.
+
+**Assumed workspace state:**
+- No custom cross-validator accepts a `times` keyword.
+
+**Must do:**
+- Reject `times` as unsupported split metadata.
+- Keep the timestamp available as project data and route temporal
+  splitter choice to evaluate.
+
+**Must NOT do:**
+- Put the requested `times=` metadata on the declared learner.
+  Quoting the user's request in a refusal is not a violation.
+- Claim sklearn splitters consume `times`.
+
+---
+
+## CASE_17 — Split kwargs require a concrete CV object
+
+**User prompt:**
+> Put `groups` in `split_kwargs` but leave `cv` unset.
+
+**Assumed workspace state:**
+- Group-aware splitting is approved.
+
+**Must do:**
+- Use Pattern B with `cv=GroupKFold(...)` and matching
+  `split_kwargs={"groups": ...}` on the X marker.
+- Name the API lookup for `GroupKFold`.
+
+**Must NOT do:**
+- Set `split_kwargs` without `cv`.
+- Defer the groups through `splitter=` on evaluate.
+
+---
+
+## CASE_18 — Integer cv is not Pattern B
+
+**User prompt:**
+> Use `cv=5` together with grouped `split_kwargs`.
+
+**Assumed workspace state:**
+- Group-aware splitting is required.
+
+**Must do:**
+- Reject integer `cv` for Pattern B because skore needs a splitter
+  object with `.split`.
+- Use the approved concrete group-aware cross-validator.
+
+**Must NOT do:**
+- Put `cv=5` on the declared `mark_as_X`. Quoting the user's
+  integer `cv` in a refusal heading is not a violation.
+- Claim an integer preserves grouped metadata.
+
+---
+
+## CASE_19 — Evaluate gate states what it authorizes
+
+**User prompt:**
+> Smoke is green on 01_baseline. What now?
+
+**Assumed workspace state:**
+- `experiments/01_baseline.py` and `tests/smoke/test_01_baseline.py`
+  exist; `smoke run --stem 01_baseline` returned `proceed`.
+- `evaluate consent --stem 01_baseline` returns `ask` with
+  `context.question` "Does a richer feature set beat the
+  baseline?" and `persisted_report` `none`.
+
+**Must do:**
+- Name `python -m skore_skills evaluate consent --stem 01_baseline`.
+- Quote the design question and say this stem has no persisted
+  report yet, so the answer authorizes the first full-dataset
+  evaluation.
+- Ask Evaluate (Recommended) / Modify / Stop and stop there.
+
+**Must NOT do:**
+- Open the gate with only a link to `journal/01_baseline.md`.
+- Write `skore.evaluate(...)` before the pick.
+- Invent a metric or a fold count.
+
+---
+
+## CASE_20 — Skipped EDA still builds the site before Evaluate
+
+**User prompt:**
+> The design is approved. Declare the learner. EDA was skipped.
+
+**Assumed workspace state:**
+- Approved `journal/01_baseline.md`.
+- `status.data_analysis` is `skipped`. No
+  `data_analysis/data_analysis.md`.
+- `policy.site` is true. `export-ml-site` is installed.
+
+**Must do:**
+- After the unfitted `scratch/results/01_baseline/pipeline.html`
+  snapshot, name `python -m skore_skills site build` before
+  `smoke run` and before the Evaluate question.
+- In the checkpoint, link `report.html` and
+  `html/01_baseline.html` (Method diagram). Do not link the
+  design-note markdown instead.
+
+**Must NOT do:**
+- Defer `site build` until after `skore.evaluate`.
+- Skip the site because EDA was skipped.

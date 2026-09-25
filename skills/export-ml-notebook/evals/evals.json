@@ -1,0 +1,84 @@
+{
+  "skill_name": "export-ml-notebook",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Convert EDA percent file",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.py` exists.\n- `policy.notebooks` is true.\n- `jupytext` and `nbclient` are installed.]\n\nGive me an executed notebook of the EDA.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills notebook convert data_analysis/data_analysis.py`. It must NOT: - Rewrite `data_analysis/data_analysis.py` from a `.ipynb`. - Run `git commit`. - Run `cells run` as a substitute for convert.",
+      "files": [],
+      "expectations": [
+        "Name `python -m skore_skills notebook convert data_analysis/data_analysis.py`.",
+        "The response does NOT: Rewrite `data_analysis/data_analysis.py` from a `.ipynb`.",
+        "The response does NOT: Run `git commit`.",
+        "The response does NOT: Run `cells run` as a substitute for convert.",
+        "The response does NOT: Pass `--html` unless the user asked for HTML or a site viewer."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "Null gate asks then installs",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.notebooks` is null.\n- `add-python-package` is installed.]\n\nMake an ipynb from data_analysis/data_analysis.py.",
+      "expected_output": "Behavioural response satisfying: - AskUserQuestion executed notebooks (default off). - If the user says yes: persist `notebooks true`, load `add-python-package` for `jupytext` and `nbclient`, then convert. It must NOT: - Convert while the gate is still null or false. - Run `pixi add` / `uv add` from this skill.",
+      "files": [],
+      "expectations": [
+        "AskUserQuestion executed notebooks (default off).",
+        "If the user says yes: persist `notebooks true`, load `add-python-package` for `jupytext` and `nbclient`, then convert.",
+        "The response does NOT: Convert while the gate is still null or false.",
+        "The response does NOT: Run `pixi add` / `uv add` from this skill."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "Convert without HTML does not rebuild site",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.notebooks` is true.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nConvert data_analysis/data_analysis.py to a notebook.",
+      "expected_output": "Behavioural response satisfying: - Convert the percent file without `--html`. It must NOT: - Name `python -m skore_skills site build`. - Run `git end-turn`.",
+      "files": [],
+      "expectations": [
+        "Convert the percent file without `--html`.",
+        "The response does NOT: Name `python -m skore_skills site build`.",
+        "The response does NOT: Run `git end-turn`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 4,
+      "title": "Notebook page on the site on explicit request",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `data_analysis/data_analysis.py` exists.\n- `policy.notebooks` is true.\n- `jupytext` and `nbclient` are installed.\n- `add-python-package` is installed.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nPut the executed EDA notebook on the site.",
+      "expected_output": "Behavioural response satisfying: - Load `add-python-package` for `nbconvert`. - Name `python -m skore_skills notebook convert data_analysis/data_analysis.py --html`. - Name `python -m skore_skills site build`. It must NOT: - Run `cells run` as a substitute for convert. - Run `git end-turn`.",
+      "files": [],
+      "expectations": [
+        "Load `add-python-package` for `nbconvert`.",
+        "Name `python -m skore_skills notebook convert data_analysis/data_analysis.py --html`.",
+        "Name `python -m skore_skills site build`.",
+        "The response does NOT: Run `cells run` as a substitute for convert.",
+        "The response does NOT: Run `git end-turn`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 5,
+      "title": "Gate off",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.notebooks` is false.]\n\nConvert data_analysis/data_analysis.py to a notebook.",
+      "expected_output": "Behavioural response satisfying: - Say the executed-notebooks gate is off and offer to turn it on. It must NOT: - Run `notebook convert` while the flag is false.",
+      "files": [],
+      "expectations": [
+        "Say the executed-notebooks gate is off and offer to turn it on.",
+        "The response does NOT: Run `notebook convert` while the flag is false."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}
