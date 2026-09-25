@@ -11,14 +11,15 @@
 - Existing scaffold with no specific task requested.
 - No `.skore` file.
 - `status.data_analysis` is `missing`.
-- `status.skills` reports the usual entry skills `true`.
+- `status.skills` reports the usual entry skills `true`, including
+  `review-ml-experiment`.
 
 **Must do:**
 - Name `python -m skore_skills status`.
 - AskUserQuestion listing installed entry skills
   (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
-  `manage-ml-backlog`, `export-ml-project`, `sync-ml-reports` if
-  installed). One pick.
+  `review-ml-experiment`, `manage-ml-backlog`, `export-ml-project`,
+  `sync-ml-reports` if installed). One pick.
 - Name `explore-ml-data` as the recommended next stage; do not
   auto-load it.
 - Do not treat the missing `.skore` as an empty project despite
@@ -32,6 +33,10 @@
   skills.
 - Put `evaluate-ml-pipeline` or `audit-ml-pipeline` on the
   uncertain entry board.
+- Put `shape-user-idea` or `search-ml-literature` on the
+  uncertain entry board.
+- Auto-load `review-ml-experiment` while `data_analysis` is
+  `missing`.
 
 ---
 
@@ -331,3 +336,126 @@
 **Must NOT do:**
 - Load `evaluate-ml-pipeline` as the certain skill.
 - Ask which entry skill to run.
+
+---
+
+## CASE_17 — Certain next-experiment request loads the backlog
+
+**User prompt:**
+> What should we try next?
+
+**Assumed workspace state:**
+- `status.data_analysis` is `present`.
+- `loop_stage` is `backlog`.
+- `status.skills.manage-ml-backlog` is `true`.
+- `journal/ideas/` has one idea file.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `manage-ml-backlog` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `review-ml-experiment` or `audit-ml-pipeline`.
+- Design the next experiment in triage.
+- Ask which entry skill to run.
+
+---
+
+## CASE_18 — Backlog stage recommends the backlog skill
+
+**User prompt:**
+> What can you help me with on this machine learning project?
+
+**Assumed workspace state:**
+- `status.data_analysis` is `present`.
+- `loop_stage` is `backlog`.
+- `status.skills.manage-ml-backlog` is `true`.
+- The usual entry skills are `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- AskUserQuestion listing installed entry skills, including
+  `manage-ml-backlog` and `review-ml-experiment`. One pick.
+- Name `manage-ml-backlog` as the recommended next stage. Do
+  not auto-load it.
+
+**Must NOT do:**
+- Auto-load `manage-ml-backlog`.
+- Put `audit-ml-pipeline` on the uncertain entry board.
+- Start designing the next experiment.
+
+---
+
+## CASE_19 — Missing backlog skill is a one-line skip
+
+**User prompt:**
+> What should we try next?
+
+**Assumed workspace state:**
+- `loop_stage` is `backlog`.
+- `status.skills.manage-ml-backlog` is `false`.
+
+**Must do:**
+- Skip in one line because `manage-ml-backlog` is not installed.
+
+**Must NOT do:**
+- Invent idea-file triage (promote / dismiss / leave).
+- Load `review-ml-experiment` from memory.
+
+---
+
+## CASE_20 — Certain review request loads review
+
+**User prompt:**
+> Review experiment 02.
+
+**Assumed workspace state:**
+- `status.skills.review-ml-experiment` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `review-ml-experiment` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `audit-ml-pipeline` from triage.
+- Ask which entry skill to run.
+- Write a design note in triage.
+
+---
+
+## CASE_21 — Certain idea loads shape-user-idea
+
+**User prompt:**
+> I want to try a monotonic constraint on the target.
+
+**Assumed workspace state:**
+- `status.skills.shape-user-idea` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `shape-user-idea` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `search-ml-literature`.
+- Ask which entry skill to run.
+- Write a design note in triage.
+
+---
+
+## CASE_22 — Certain literature query loads literature search
+
+**User prompt:**
+> What do people do for censored regression?
+
+**Assumed workspace state:**
+- No design note is in progress.
+- `status.skills.search-ml-literature` is `true`.
+
+**Must do:**
+- Name `python -m skore_skills status`.
+- Load `search-ml-literature` without listing the catalog menu.
+
+**Must NOT do:**
+- Load `research-ml-practice`.
+- Load `model-ml-pipeline` as the certain skill.
+- Invent papers in triage.

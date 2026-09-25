@@ -222,13 +222,14 @@
 - Preview this route as LLM discussion over recorded project
   facts, with no model fit, smoke test, or CV before confirmation.
 - Discuss what to learn, why now, and what changes.
-- Once an idea is agreed, summarize it and ask the user to
-  confirm before creating/populating a design note.
+- Once an idea is agreed, restate it and wait for an explicit yes
+  before creating a design note.
 
 **Must NOT do:**
 - Claim local model computation is running during the discussion.
-- Force the article/resource/free-text entry menu.
+- Force a free-text / artifact entry menu.
 - Emit a proposal or model code before confirmation.
+- Create the design note before that explicit yes.
 
 ---
 
@@ -250,7 +251,7 @@
 
 ---
 
-## CASE_11 — Implement loop records the outcome after audit
+## CASE_11 — Implement loop gates review before record-outcome
 
 **User prompt:**
 > Evaluate it.
@@ -258,28 +259,35 @@
 **Assumed workspace state:**
 - `01_baseline` design note approved; smoke green.
 - The user chose Evaluate at the post-smoke gate.
-- `evaluate-ml-pipeline` and `audit-ml-pipeline` are installed.
+- `evaluate-ml-pipeline` and `review-ml-experiment` are installed.
+- `review consent` returns `ask`.
 - `policy.notebooks` and `policy.site` are both true.
 
 **Must do:**
-- Run evaluate, then audit, then load `manage-ml-backlog` in
-  record-outcome mode with the audit digest.
+- Run evaluate, then `review consent`.
+- On `ask`, let `review-ml-experiment` preview the audit cost and
+  ask Review / Skip / Stop. Do not load `audit-ml-pipeline` from
+  this dispatcher.
+- After Review, load `manage-ml-backlog` in record-outcome mode
+  with the returned digest, locator, and G-AUDIT-FINDING.
 - Record before `notebook convert` and `site build`.
-- Write 2–6 sentences from the digest, link `journal/01_baseline.md`,
-  name `<package>.html` and `html/01_baseline.html`, and include
-  locator plus G-AUDIT-FINDING in the user-facing close.
+- Write 2–6 sentences from the digest, name `report.html` and
+  `html/01_baseline.html` instead of the design-note markdown,
+  and include locator plus G-AUDIT-FINDING in the user-facing
+  close.
 - Name `python -m skore_skills git end-turn --stage implement`
   last.
 
 **Must NOT do:**
+- Run `cells run` from this dispatcher before Review.
 - Leave History `planned` in any journal excerpt you author.
 - Convert `audit/01_baseline.py` here — the audit skill did it.
-- Open the next-lever Backlog menu in record-outcome mode.
+- Open idea triage inside record-outcome mode.
 - Write the journal files directly instead of dispatching.
 
 ---
 
-## CASE_12 — Model close preserves the report locator
+## CASE_12 — Skip review still records the locator
 
 **User prompt:**
 > Finish the successful baseline evaluation.
@@ -287,24 +295,77 @@
 **Assumed workspace state:**
 - Smoke is green and evaluate returned
   `[Open report](https://example.invalid/report/42) · hub · id: 42`.
-- Audit is unavailable, so it was skipped.
+- The user answered Skip at the review gate.
 
 **Must do:**
-- Pass the exact locator to `manage-ml-backlog` record-outcome even
-  though audit was skipped.
+- Pass the exact locator to `manage-ml-backlog` record-outcome.
+- Pass G-AUDIT-FINDING `n/a — audit not run`.
 - Write 2–6 sentences of the result and link `journal/<stem>.md`.
 - Include the same locator in the user-facing close (first among
-  tokens) and G-AUDIT-FINDING `n/a — audit not run`.
+  tokens).
 - Record before convert, site build, and git end-turn.
 
 **Must NOT do:**
+- Run the skore-check audit after Skip.
+- Write `journal/ideas/` files.
 - Drop the locator because there is no audit digest.
 - Invent a headline metric.
-- Open the next-lever Backlog menu.
+- Open idea triage.
 
 ---
 
-## CASE_13 — Design approval states the note's facts inline
+## CASE_13 — Planned design note uses one approval gate
+
+**User prompt:**
+> The design note is written. Approve it and implement.
+
+**Assumed workspace state:**
+- `journal/02_target_transform.md` exists with State `planned`.
+- Question, Motivation, Method, and Risks are filled.
+- `design consent` returns `ask` with choices approve, modify, stop.
+
+**Must do:**
+- Ask one AskUserQuestion, in order: Approve / Modify / Stop.
+- On Approve, set State to `approved` and Approved by user on to
+  a `YYYY-MM-DD` date, then require `design consent` `proceed`
+  before code.
+
+**Must NOT do:**
+- Also ask in chat whether the note looks right.
+- Treat "Approve it and implement" as approval before the gate.
+- Write model code while State is still `planned`.
+
+---
+
+## CASE_14 — Skipped EDA still site-builds before Evaluate
+
+**User prompt:**
+> The baseline design is approved. Implement and test the model.
+
+**Assumed workspace state:**
+- Matching approved design note and experiment shell exist.
+- `status.data_analysis` is `skipped`. No
+  `data_analysis/data_analysis.md`.
+- `policy.site` is true. `export-ml-site` is installed.
+- `build-ml-pipeline` is installed.
+
+**Must do:**
+- Dispatch `build-ml-pipeline`.
+- Require `python -m skore_skills site build` after the unfitted
+  `pipeline.html` snapshot and before the Evaluate question,
+  inside that build.
+- Keep the post-loop `site build` for the fitted diagram.
+- Name `report.html` when each site build runs.
+
+**Must NOT do:**
+- Defer the first `site build` until after `skore.evaluate`.
+- Skip the pre-Evaluate site build because EDA was skipped.
+- Point the user at the design-note markdown instead of
+  `report.html` after a site build.
+
+---
+
+## CASE_15 — Design approval states the note's facts inline
 
 **User prompt:**
 > Build a dummy predictor to check the pipeline runs.
@@ -334,7 +395,7 @@
 
 ---
 
-## CASE_14 — Unpopulated design note is not ready for approval
+## CASE_16 — Unpopulated design note is not ready for approval
 
 **User prompt:**
 > The note for 02_target_transform is created. Approve and build it.
@@ -358,7 +419,7 @@
 
 ---
 
-## CASE_15 — Site on rebuilds before design approval
+## CASE_17 — Site on rebuilds before design approval
 
 **User prompt:**
 > Build a dummy predictor to check the pipeline runs.
@@ -375,7 +436,7 @@
 **Must do:**
 - Name `python -m skore_skills site build` after the note is
   populated and before Approve / Modify / Stop.
-- Name `<package>.html` and `html/01_dummy.html`.
+- Name `report.html` and `html/01_dummy.html`.
 - State the design question, planned change, and recorded risk
   inline, then ask Approve / Modify / Stop and stop there.
 

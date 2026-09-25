@@ -38,6 +38,9 @@ RESULTS_SECTION = re.compile(
 METHOD_SECTION = re.compile(
     r"(?ms)^## Method\s*\n.*?(?=^## |\Z)",
 )
+DATA_UNDERSTANDING_SECTION = re.compile(
+    r"(?ms)^## Data understanding\s*\n.*?(?=^## |\Z)",
+)
 RESULT_ITEMS = (
     ("report", "Report overview"),
     ("checks", "Checks"),
@@ -180,14 +183,18 @@ def collect_pages(root: Path) -> list[Page]:
     return pages
 
 
+LAUNCHER_NAME = "report.html"
+
+
 def site_title(root: Path) -> str:
-    """Return the project name used as site title and launcher stem."""
+    """Return the project name used as the site title."""
     return package_name(root) or root.name
 
 
 def launcher_name(root: Path) -> str:
     """Return the workspace-root HTML launcher filename."""
-    return f"{site_title(root)}.html"
+    del root
+    return LAUNCHER_NAME
 
 
 def render_launcher(title: str) -> str:
@@ -615,10 +622,16 @@ def stage_docs(root: Path) -> tuple[Path, list[Page], bool]:
     pages = collect_pages(root)
     dest_names = {page.dest_name for page in pages}
     dest_names.add("index.md")
+    analysis_exists = (root / "data_analysis" / "data_analysis.md").is_file()
     for page in pages:
-        text = rewrite_markdown_links(
-            page.source.read_text(encoding="utf-8"), dest_names
-        )
+        text = page.source.read_text(encoding="utf-8")
+        if (
+            page.dest_name == "index.md"
+            and page.source.name == "JOURNAL.md"
+            and not analysis_exists
+        ):
+            text = DATA_UNDERSTANDING_SECTION.sub("", text, count=1)
+        text = rewrite_markdown_links(text, dest_names)
         text = inject_results(inject_notebook(embed_assets(text), page), page, root)
         (docs / page.dest_name).write_text(text, encoding="utf-8")
         if page.notebook is not None:

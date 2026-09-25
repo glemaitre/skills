@@ -62,7 +62,7 @@ def test_site_init_writes_gitignore(
     text = (tmp_path / ".gitignore").read_text(encoding="utf-8")
     assert "_build/" in text
     assert "html/" in text
-    assert "claim_predictor.html" in text
+    assert "report.html" in text
     assert not (tmp_path / "mkdocs.yml").exists()
 
 
@@ -140,13 +140,46 @@ def test_site_build_runs_mkdocs(
     assert "](data_analysis.md)" in journal
     index = tmp_path / "html" / "index.html"
     assert index.is_file()
-    launcher = tmp_path / "claim_predictor.html"
+    launcher = tmp_path / "report.html"
     assert launcher.is_file()
     assert "url=html/index.html" in launcher.read_text(encoding="utf-8")
     assert str(launcher) in result.output
-    assert "claim_predictor.html" in (tmp_path / ".gitignore").read_text(
-        encoding="utf-8"
+    assert "report.html" in (tmp_path / ".gitignore").read_text(encoding="utf-8")
+
+
+def test_site_build_omits_data_understanding_without_eda(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A missing analysis report drops Data understanding from the home page."""
+    _scaffold(tmp_path)
+    journal = (
+        "# JOURNAL\n\n"
+        "## Status\n\n"
+        "| Variable | Value |\n"
+        "|---|---|\n"
+        "| Goal | predict |\n\n"
+        "## Data understanding\n\n"
+        "| Variable | Value |\n"
+        "|---|---|\n"
+        "| Status | skipped — 2026-09-24 |\n"
+        "| Report | [data_analysis/data_analysis.md]"
+        "(../data_analysis/data_analysis.md) |\n\n"
+        "## History\n\n"
+        "| Stem | Intent |\n"
+        "|---|---|\n"
     )
+    source = tmp_path / "journal" / "JOURNAL.md"
+    source.write_text(journal, encoding="utf-8")
+    monkeypatch.setattr(site_mod.subprocess, "run", _ok_mkdocs(tmp_path))
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["site", "build"])
+    assert result.exit_code == 0, result.output
+    staged = (tmp_path / "_build" / "docs" / "index.md").read_text(encoding="utf-8")
+    assert "## Data understanding" not in staged
+    assert "data_analysis.md" not in staged
+    assert "## History" in staged
+    assert "## Status" in staged
+    assert source.read_text(encoding="utf-8") == journal
 
 
 def test_site_build_groups_experiments_and_writes_top_nav(

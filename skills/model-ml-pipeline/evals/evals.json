@@ -156,15 +156,16 @@
       "id": 9,
       "title": "Discussion becomes a confirmed proposal",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The user selected Discuss the next step.]\n\nI want to talk through what to model next.",
-      "expected_output": "Behavioural response satisfying: - Preview this route as LLM discussion over recorded project facts, with no model fit, smoke test, or CV before confirmation. - Discuss what to learn, why now, and what changes. - Once an idea is agreed, summarize it and ask the user to confirm before creating/populating a design note. It must NOT: - Claim local model computation is running during the discussion. - Force the article/resource/free-text entry menu. - Emit a proposal or model code before confirmation.",
+      "expected_output": "Behavioural response satisfying: - Preview this route as LLM discussion over recorded project facts, with no model fit, smoke test, or CV before confirmation. - Discuss what to learn, why now, and what changes. - Once an idea is agreed, restate it and wait for an explicit yes before creating a design note. It must NOT: - Claim local model computation is running during the discussion. - Force a free-text / artifact entry menu. - Emit a proposal or model code before confirmation.",
       "files": [],
       "expectations": [
         "Preview this route as LLM discussion over recorded project facts, with no model fit, smoke test, or CV before confirmation.",
         "Discuss what to learn, why now, and what changes.",
-        "Once an idea is agreed, summarize it and ask the user to confirm before creating/populating a design note.",
+        "Once an idea is agreed, restate it and wait for an explicit yes before creating a design note.",
         "The response does NOT: Claim local model computation is running during the discussion.",
-        "The response does NOT: Force the article/resource/free-text entry menu.",
-        "The response does NOT: Emit a proposal or model code before confirmation."
+        "The response does NOT: Force a free-text / artifact entry menu.",
+        "The response does NOT: Emit a proposal or model code before confirmation.",
+        "The response does NOT: Create the design note before that explicit yes."
       ],
       "tools": false,
       "sandbox": [],
@@ -188,18 +189,21 @@
     },
     {
       "id": 11,
-      "title": "Implement loop records the outcome after audit",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `01_baseline` design note approved; smoke green.\n- The user chose Evaluate at the post-smoke gate.\n- `evaluate-ml-pipeline` and `audit-ml-pipeline` are installed.\n- `policy.notebooks` and `policy.site` are both true.]\n\nEvaluate it.",
-      "expected_output": "Behavioural response satisfying: - Run evaluate, then audit, then load `manage-ml-backlog` in record-outcome mode with the audit digest. - Record before `notebook convert` and `site build`. - Write 2\u20136 sentences from the digest, link `journal/01_baseline.md`, name `<package>.html` and `html/01_baseline.html`, and include locator plus G-AUDIT-FINDING in the user-facing close. It must NOT: - Leave History `planned` in any journal excerpt you author. - Convert `audit/01_baseline.py` here \u2014 the audit skill did it. - Open the next-lever Backlog menu in record-outcome mode.",
+      "title": "Implement loop gates review before record-outcome",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `01_baseline` design note approved; smoke green.\n- The user chose Evaluate at the post-smoke gate.\n- `evaluate-ml-pipeline` and `review-ml-experiment` are installed.\n- `review consent` returns `ask`.\n- `policy.notebooks` and `policy.site` are both true.]\n\nEvaluate it.",
+      "expected_output": "Behavioural response satisfying: - Run evaluate, then `review consent`. - On `ask`, let `review-ml-experiment` preview the audit cost and ask Review / Skip / Stop. Do not load `audit-ml-pipeline` from this dispatcher. - After Review, load `manage-ml-backlog` in record-outcome mode with the returned digest, locator, and G-AUDIT-FINDING. It must NOT: - Run `cells run` from this dispatcher before Review. - Leave History `planned` in any journal excerpt you author. - Convert `audit/01_baseline.py` here \u2014 the audit skill did it.",
       "files": [],
       "expectations": [
-        "Run evaluate, then audit, then load `manage-ml-backlog` in record-outcome mode with the audit digest.",
+        "Run evaluate, then `review consent`.",
+        "On `ask`, let `review-ml-experiment` preview the audit cost and ask Review / Skip / Stop. Do not load `audit-ml-pipeline` from this dispatcher.",
+        "After Review, load `manage-ml-backlog` in record-outcome mode with the returned digest, locator, and G-AUDIT-FINDING.",
         "Record before `notebook convert` and `site build`.",
-        "Write 2\u20136 sentences from the digest, link `journal/01_baseline.md`, name `<package>.html` and `html/01_baseline.html`, and include locator plus G-AUDIT-FINDING in the user-facing close.",
+        "Write 2\u20136 sentences from the digest, name `report.html` and `html/01_baseline.html` instead of the design-note markdown, and include locator plus G-AUDIT-FINDING in the user-facing close.",
         "Name `python -m skore_skills git end-turn --stage implement` last.",
+        "The response does NOT: Run `cells run` from this dispatcher before Review.",
         "The response does NOT: Leave History `planned` in any journal excerpt you author.",
         "The response does NOT: Convert `audit/01_baseline.py` here \u2014 the audit skill did it.",
-        "The response does NOT: Open the next-lever Backlog menu in record-outcome mode.",
+        "The response does NOT: Open idea triage inside record-outcome mode.",
         "The response does NOT: Write the journal files directly instead of dispatching."
       ],
       "tools": false,
@@ -208,18 +212,21 @@
     },
     {
       "id": 12,
-      "title": "Model close preserves the report locator",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Smoke is green and evaluate returned\n  `[Open report](https://example.invalid/report/42) \u00b7 hub \u00b7 id: 42`.\n- Audit is unavailable, so it was skipped.]\n\nFinish the successful baseline evaluation.",
-      "expected_output": "Behavioural response satisfying: - Pass the exact locator to `manage-ml-backlog` record-outcome even though audit was skipped. - Write 2\u20136 sentences of the result and link `journal/<stem>.md`. - Include the same locator in the user-facing close (first among tokens) and G-AUDIT-FINDING `n/a \u2014 audit not run`. It must NOT: - Drop the locator because there is no audit digest. - Invent a headline metric. - Open the next-lever Backlog menu.",
+      "title": "Skip review still records the locator",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Smoke is green and evaluate returned\n  `[Open report](https://example.invalid/report/42) \u00b7 hub \u00b7 id: 42`.\n- The user answered Skip at the review gate.]\n\nFinish the successful baseline evaluation.",
+      "expected_output": "Behavioural response satisfying: - Pass the exact locator to `manage-ml-backlog` record-outcome. - Pass G-AUDIT-FINDING `n/a \u2014 audit not run`. - Write 2\u20136 sentences of the result and link `journal/<stem>.md`. It must NOT: - Run the skore-check audit after Skip. - Write `journal/ideas/` files. - Drop the locator because there is no audit digest.",
       "files": [],
       "expectations": [
-        "Pass the exact locator to `manage-ml-backlog` record-outcome even though audit was skipped.",
+        "Pass the exact locator to `manage-ml-backlog` record-outcome.",
+        "Pass G-AUDIT-FINDING `n/a \u2014 audit not run`.",
         "Write 2\u20136 sentences of the result and link `journal/<stem>.md`.",
-        "Include the same locator in the user-facing close (first among tokens) and G-AUDIT-FINDING `n/a \u2014 audit not run`.",
+        "Include the same locator in the user-facing close (first among tokens).",
         "Record before convert, site build, and git end-turn.",
+        "The response does NOT: Run the skore-check audit after Skip.",
+        "The response does NOT: Write `journal/ideas/` files.",
         "The response does NOT: Drop the locator because there is no audit digest.",
         "The response does NOT: Invent a headline metric.",
-        "The response does NOT: Open the next-lever Backlog menu."
+        "The response does NOT: Open idea triage."
       ],
       "tools": false,
       "sandbox": [],
@@ -227,6 +234,42 @@
     },
     {
       "id": 13,
+      "title": "Planned design note uses one approval gate",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_target_transform.md` exists with State `planned`.\n- Question, Motivation, Method, and Risks are filled.\n- `design consent` returns `ask` with choices approve, modify, stop.]\n\nThe design note is written. Approve it and implement.",
+      "expected_output": "Behavioural response satisfying: - Ask one AskUserQuestion, in order: Approve / Modify / Stop. - On Approve, set State to `approved` and Approved by user on to a `YYYY-MM-DD` date, then require `design consent` `proceed` before code. It must NOT: - Also ask in chat whether the note looks right. - Treat \"Approve it and implement\" as approval before the gate. - Write model code while State is still `planned`.",
+      "files": [],
+      "expectations": [
+        "Ask one AskUserQuestion, in order: Approve / Modify / Stop.",
+        "On Approve, set State to `approved` and Approved by user on to a `YYYY-MM-DD` date, then require `design consent` `proceed` before code.",
+        "The response does NOT: Also ask in chat whether the note looks right.",
+        "The response does NOT: Treat \"Approve it and implement\" as approval before the gate.",
+        "The response does NOT: Write model code while State is still `planned`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 14,
+      "title": "Skipped EDA still site-builds before Evaluate",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Matching approved design note and experiment shell exist.\n- `status.data_analysis` is `skipped`. No\n  `data_analysis/data_analysis.md`.\n- `policy.site` is true. `export-ml-site` is installed.\n- `build-ml-pipeline` is installed.]\n\nThe baseline design is approved. Implement and test the model.",
+      "expected_output": "Behavioural response satisfying: - Dispatch `build-ml-pipeline`. - Require `python -m skore_skills site build` after the unfitted `pipeline.html` snapshot and before the Evaluate question, inside that build. - Keep the post-loop `site build` for the fitted diagram. It must NOT: - Defer the first `site build` until after `skore.evaluate`. - Skip the pre-Evaluate site build because EDA was skipped. - Point the user at the design-note markdown instead of `report.html` after a site build.",
+      "files": [],
+      "expectations": [
+        "Dispatch `build-ml-pipeline`.",
+        "Require `python -m skore_skills site build` after the unfitted `pipeline.html` snapshot and before the Evaluate question, inside that build.",
+        "Keep the post-loop `site build` for the fitted diagram.",
+        "Name `report.html` when each site build runs.",
+        "The response does NOT: Defer the first `site build` until after `skore.evaluate`.",
+        "The response does NOT: Skip the pre-Evaluate site build because EDA was skipped.",
+        "The response does NOT: Point the user at the design-note markdown instead of `report.html` after a site build."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 15,
       "title": "Design approval states the note's facts inline",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace; no prior experiment.\n- `journal/01_dummy.md` exists with State `planned`, question\n  \"Does the loading and fit/predict path work end to end?\",\n  Files touched `src/pkg/pipeline.py`, change \"first pipeline; a\n  DummyClassifier inside the skrub DataOps declaration\", and the\n  risk \"the dummy adds no predictive value; it only proves the\n  path\".\n- `python -m skore_skills design consent --stem 01_dummy` returns\n  `action` `ask` with those facts in its JSON `context`.]\n\nBuild a dummy predictor to check the pipeline runs.",
       "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills design consent --stem 01_dummy`. - State the design question, the planned change and files touched, and the recorded risk in the approval message itself. - Ask Approve / Modify / Stop and stop there. It must NOT: - Ask for approval by only pointing at `journal/01_dummy.md` without stating what the note says. - Write model, experiment, or pytest code before approval. - Invent a question, method, or risk the note does not state.",
@@ -244,7 +287,7 @@
       "expect_files": []
     },
     {
-      "id": 14,
+      "id": 16,
       "title": "Unpopulated design note is not ready for approval",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_target_transform.md` is the scaffolded shell: State\n  `planned`, every content section still a template comment.\n- `design consent --stem 02_target_transform` returns `ask` with\n  every `context` field empty.]\n\nThe note for 02_target_transform is created. Approve and build it.",
       "expected_output": "Behavioural response satisfying: - Say the note states no question, method change, or risk yet, so it is not ready for approval. - Offer to populate Question / Motivation / Method / Risks first. It must NOT: - Treat \"approve and build it\" as design approval. - Fill the note's sections from memory as if they were recorded. - Write model or experiment code.",
@@ -262,14 +305,14 @@
       "expect_files": []
     },
     {
-      "id": 15,
+      "id": 17,
       "title": "Site on rebuilds before design approval",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace; no prior experiment.\n- `journal/01_dummy.md` was just populated (State `planned`) with\n  question, files touched, planned change, and a recorded risk.\n- `python -m skore_skills design consent --stem 01_dummy` returns\n  `action` `ask` with those facts in its JSON `context`.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nBuild a dummy predictor to check the pipeline runs.",
-      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills site build` after the note is populated and before Approve / Modify / Stop. - Name `<package>.html` and `html/01_dummy.html`. - State the design question, planned change, and recorded risk inline, then ask Approve / Modify / Stop and stop there. It must NOT: - Write model, experiment, or pytest code before approval. - Run `notebook convert` or `git end-turn` on this preview rebuild. - Fail the approval gate if site build errors; name the error.",
+      "expected_output": "Behavioural response satisfying: - Name `python -m skore_skills site build` after the note is populated and before Approve / Modify / Stop. - Name `report.html` and `html/01_dummy.html`. - State the design question, planned change, and recorded risk inline, then ask Approve / Modify / Stop and stop there. It must NOT: - Write model, experiment, or pytest code before approval. - Run `notebook convert` or `git end-turn` on this preview rebuild. - Fail the approval gate if site build errors; name the error.",
       "files": [],
       "expectations": [
         "Name `python -m skore_skills site build` after the note is populated and before Approve / Modify / Stop.",
-        "Name `<package>.html` and `html/01_dummy.html`.",
+        "Name `report.html` and `html/01_dummy.html`.",
         "State the design question, planned change, and recorded risk inline, then ask Approve / Modify / Stop and stop there.",
         "The response does NOT: Write model, experiment, or pytest code before approval.",
         "The response does NOT: Run `notebook convert` or `git end-turn` on this preview rebuild.",

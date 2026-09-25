@@ -10,7 +10,8 @@ description: >
   `.skb.mark_as_X(split_kwargs=...)`. Writes `skore.evaluate` and
   the persisted-report locator. When `model-ml-pipeline` dispatched
   this turn, return after the locator — the dispatcher owns
-  `loop artifacts`, audit, record-outcome, convert, site, and git.
+  `review consent`, `review-ml-experiment`, record-outcome,
+  convert, site, and git.
   Standalone also owns that evaluate-stage close. Defaults
   (metrics, plots, SKD checks) come from skore; only override
   metrics or add custom checks on explicit user request.
@@ -237,10 +238,9 @@ hints stay in this skill. `style` is ruff only.
   § "Scratch is read-only") and `audit/<stem>.py` files (owned by
   `audit-ml-pipeline`, executed via its bundled in-process IPython
   runner; output digest at `scratch/audit/<stem>/audit.md`).
-  Neither calls `evaluate(...)` or `put(...)`. A third consumer,
-  `iterate-from-skore`, does not open the Project at all — it
-  reads the audit's digest as text and converts the surfaced
-  checks into Backlog candidates. The trap the two Project-side
+  Neither calls `evaluate(...)` or `put(...)`. `review-ml-experiment`
+  does not open the Project at all — it reads the audit digest as
+  text and writes one idea file per candidate. The trap the two Project-side
   consumers share: `project.get(key)` raising `KeyError` reads as
   "the report is missing" but actually means "the lookup shape is
   wrong — `get` is by id, not
@@ -288,8 +288,8 @@ hints stay in this skill. `style` is ruff only.
   `add-python-package` § "Where does the package belong?",
   `choose-python-library` (polars vs pandas; policy from
   `python -m skore_skills env stack`),
-  `manage-ml-backlog` (sourcing menu), `iterate-from-user`
-  § "The entry-point AskUserQuestion". When in doubt: the user's
+  `manage-ml-backlog` (idea triage), `review-ml-experiment`
+  (audit cost gate). When in doubt: the user's
   approval is the gate, not the harness's instruction text.
 
 ## Pre-flight — emit this checklist as visible text before any code
@@ -633,8 +633,9 @@ API CLI is only for the signature after the name.
   On a **standalone** evaluate, or when `loop artifacts` returns
   `audit`, it fires after successful evaluate and before
   record-outcome. When `model-ml-pipeline` dispatched this turn,
-  do not load it — the dispatcher owns `loop artifacts` and
-  audit. Its digest is an input to `manage-ml-backlog`.
+  do not load it — the dispatcher owns `review consent` and
+  `review-ml-experiment`. Its digest is an input to
+  `manage-ml-backlog`.
 - **`add-python-package`** — detection + install commands for the
   project's environment manager (pixi / uv / poetry / hatch / conda
   / pip+venv). **Invoke whenever** the Stop condition on
@@ -673,7 +674,8 @@ When `model-ml-pipeline` dispatched this turn, pass JSON
 `locator` up and **return immediately**. Do not run
 `loop artifacts`. Do not load `audit-ml-pipeline`. Do not run
 record-outcome, convert, site, or `git end-turn`. The dispatcher
-owns that close. Do not preview it.
+owns `review consent` / `review-ml-experiment` and that close.
+Do not preview it.
 
 Otherwise this skill owns the close. Run
 `python -m skore_skills loop artifacts --stem <stem>`.
@@ -696,11 +698,11 @@ dump of `report.txt` / the design note, and not locator alone.
    `scratch/results/<stem>/report.txt`. Do not invent a metric.
    If audit ran this turn, ground the story in the digest
    (Checks + Metrics), not a paste of `audit.md`.
-2. **Open these** — markdown links plus the resolved absolute
-   path for local files: `[journal/<stem>.md](journal/<stem>.md)`.
-   If `policy.site` is true and `site build` ran or is about to:
-   `[<package>.html](<workspace>/<package>.html)` and
-   `html/<stem>.html`.
+2. **Open these** — resolved absolute paths. When `site build`
+   ran or is about to, link the site and not the design note:
+   `[report.html](<workspace>/report.html)` and
+   `html/<stem>.html`. Otherwise
+   `[journal/<stem>.md](journal/<stem>.md)`.
 3. **Normalized tokens second** — JSON `locator` verbatim first
    among tokens (local: also the absolute `reports/` path), then
    G-AUDIT-FINDING verbatim (`n/a — audit not run` when skipped).
@@ -733,8 +735,9 @@ the matching design note's single `## Notebooks` section.
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build`. Skip in one line otherwise.
 Name a build error; do not fail the evaluate turn. Name
-`<package>.html` (and `html/<stem>.html`) in the User-facing
-close when the build ran.
+`report.html` (and `html/<stem>.html`) in the User-facing
+close when the build ran. Do not also send the user to the
+markdown.
 
 Run `python -m skore_skills git end-turn --stage evaluate`. If JSON
 `action` is `invoke`, load `persist-ml-git` only if

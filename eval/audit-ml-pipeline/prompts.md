@@ -9,17 +9,18 @@
 
 **Assumed workspace state:**
 - The design is approved, smoke is green, and the persisted report exists.
-- `evaluate-ml-pipeline` dispatched this audit.
+- `review consent` returns `ask`. The user has not answered yet.
 
 **Must do:**
-- Before writing/running the audit, give a 1–3 sentence preview:
-  local read-only loading of the persisted report, checks /
-  metrics / view rendering, and the audit digest / HTML outputs.
-- State explicitly that audit does not retrain or re-evaluate the
-  model; timing depends on report size and requested views, with
-  no invented minute estimate.
-- Confirm the report with `project.summarize()` and load it with
-  `project.get(id)`.
+- Run `python -m skore_skills review consent --stem <stem>` before
+  the first `cells run`.
+- On `ask`, give a 1–3 sentence preview: local read of the
+  persisted report, every skore check, writes `audit/<stem>.py`
+  and `scratch/audit/<stem>/audit.md`, can be slow. Do not invent
+  minutes. Ask Review / Skip / Stop. Do not `cells run` until
+  Review.
+- After Review, confirm the report with `project.summarize()` and
+  load it with `project.get(id)`.
 - Render checks and metrics into the audit digest.
 - Write `scratch/results/<stem>/{report,checks,metrics}.html`; leave
   the bare Display last on checks and metrics, with no text snapshot.
@@ -54,6 +55,8 @@
 - The report exists and smoke is green.
 
 **Must do:**
+- Ask the review gate again before `cells run`, because a re-audit
+  re-runs the checks.
 - Run `python -m skore_skills loop artifacts --stem 03_*`
   (`record` expected) and `loop locator --stem 03_*`.
 - Write 2–6 sentences from Checks + Metrics in the digest and
@@ -67,7 +70,7 @@
 
 **Must NOT do:**
 - Paste `scratch/audit/<stem>/audit.md` wholesale into chat.
-- Open the next-lever menu from record-outcome mode.
+- Open idea triage from record-outcome mode.
 - Call record-outcome before audit.
 - Run `git commit`.
 
@@ -79,7 +82,8 @@
 > Continue the model loop and audit the evaluated baseline.
 
 **Assumed workspace state:**
-- `model-ml-pipeline` dispatched the audit.
+- `model-ml-pipeline` dispatched `review-ml-experiment`, which
+  loaded this audit.
 - `cells run` already produced the digest.
 - The user picked Close audit at the post-audit gate.
 - Normalized locator is

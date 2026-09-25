@@ -2,11 +2,11 @@
 name: manage-ml-backlog
 description: >
   Canonical backlog loop step. Record an experiment outcome in
-  History, refresh Backlog, and name next-lever options. Also
+  History and triage idea files into Backlog rows. Also
   supports the model-entry selection mode: show real B<N> rows
   supplied by the deterministic CLI and consume one into a
   proposal. Trigger after audit, when a run finishes, when the
-  user asks what to try next, or when model-ml-pipeline routes its
+  user asks what to try next or to triage idea files, or when model-ml-pipeline routes its
   Backlog choice here. This is cadence, not a methodology owner.
 ---
 
@@ -82,8 +82,9 @@ Run Procedure steps 1-3 and nothing else:
    `Last experiment` and `Last result`. Insert or replace `## Results`
    between Status and Notebooks from digest text, not HTML.
 
-Then return to the caller. Skip step 4 (Backlog rescan) and step 5
-(the sourcing menu) — the caller did not ask what to try next.
+Then return to the caller. Do not read `journal/ideas/` and do
+not open the idea-triage menu — the caller did not ask what to
+try next.
 
 Do not dispatch `audit-ml-pipeline` in this mode; the digest is
 already in hand and dispatching would bounce back here. Do not run
@@ -149,35 +150,24 @@ locator.
    cell's output; do not copy G-AUDIT-FINDING, do not parse
    `*.html`, and do not paste iframes (site build injects those). If
    no subsection has a source, skip the Results section.
-4. Perform a full Backlog rescan. Resolve rows the run answered or
-   killed, preserving stable indices.
-5. After History / Backlog / Results markdown is on disk, if
-   `policy.site` is true and `export-ml-site` is installed, run
-   `python -m skore_skills site build` (skip in one line
-   otherwise; name a build error; do not fail the gate). Link
-   `journal/JOURNAL.md` plus `<package>.html` when the build
-   ran. Do not `notebook convert` or `git end-turn` on this
-   preview. Then fire one single-choice **AskUserQuestion** — the
-   sourcing menu — with these options in this order (omit a child
-   whose `status.skills.<id>` is false; say so in one line; do not
-   invent that skill's steps):
-   - **`skore`** — Mine the latest audit digest into Backlog rows.
-     Load `iterate-from-skore`.
-   - **`user`** — Propose from an article, resource, or free text.
-     Load `iterate-from-user`.
-   - Each current `B<N>` row (Item + Source as the option
-     description) — return that row to `model-ml-pipeline`.
-   - **`stop`** — End the backlog turn; no new design note.
-
-   After `iterate-from-skore` or `iterate-from-user` returns,
-   write the candidates/proposals into `JOURNAL.md` yourself, then
-   re-present this same sourcing menu (enriched Backlog visible).
-   When a `B<N>` row is selected, return it to
-   `model-ml-pipeline`, which can create its design-note shell with
+4. Idea triage, separate from record-outcome. Read
+   `journal/ideas/*.md`. Drop a file whose Source is already a
+   Backlog row. For each remaining file, ask promote / dismiss /
+   leave. Promote appends a stable `B<N>` row (Item from Question,
+   Source copied verbatim) and deletes the file. Dismiss deletes
+   the file. Leave keeps it. Do not create a design note here.
+   An empty folder does not fabricate `B1`. When the user wants
+   a new idea, or asks what to try next and the folder is empty,
+   load `shape-user-idea` for an idea, question, or artifact, and
+   `search-ml-literature` for a literature query, only if that id
+   is true. Missing skill → one-line skip; do not invent that
+   skill's search or shaping steps. Those skills write idea files
+   and return here; triage the new files in this same mode.
+   When the user picks an existing `B<N>` to draft, return that
+   row to `model-ml-pipeline`, which can create its design-note
+   shell with
    `python -m skore_skills scaffold --journal --stem <NN_short_name>`.
-   Do not draft that template in this backlog turn. Returned
-   candidates/proposals are written by this parent, not by either
-   sourcing child.
+   Do not draft that template in this backlog turn.
 
 ## Stop conditions
 

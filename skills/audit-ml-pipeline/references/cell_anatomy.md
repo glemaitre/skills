@@ -8,7 +8,7 @@ contract — overview".
 The template core is task-agnostic: persisted-report locator +
 checks summary + metrics summary + a `help()` tree per namespace.
 The rendered digest at `scratch/audit/<stem>/audit.md`
-is what `iterate-from-skore` reads — only `## Checks summary`
+is what `review-ml-experiment` reads — only `## Checks summary`
 and `## Metrics summary`. Do not name extra Display headings
 like those two. Per-task accessors are appended after the user
 picks Additional report view from names in the trees.
@@ -168,8 +168,8 @@ the user picks a name from the `help()` trees.
    ```
    The repr opens with the severity counts, then lists issues,
    tips, passed, and not-applicable checks with codes like
-   `SKD003`. Actionable lines end with the documentation URL that
-   `iterate-from-skore` follows to draft Backlog rows.
+   `SKD003`. Actionable lines carry the documentation URL the
+   review cites in an idea file.
    Verified on `CrossValidationReport` and `EstimatorReport`.
 
 8. **Metrics summary (code cell, bare Display last).**

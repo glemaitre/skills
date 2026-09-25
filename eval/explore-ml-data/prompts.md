@@ -170,10 +170,10 @@
 - `jupytext`, `nbclient`, and `nbconvert` are installed.
 
 **Must do:**
-- Write 2–6 sentences of EDA findings and link
-  `data_analysis/data_analysis.md`.
-- Name `<package>.html` and `html/data_analysis.html` in the
-  user-facing close.
+- Write 2–6 sentences of EDA findings.
+- Name `report.html` and `html/data_analysis.html` in the
+  user-facing close. Do not send the user to
+  `data_analysis/data_analysis.md` instead.
 - Name `python -m skore_skills notebook convert
   data_analysis/data_analysis.py --html` before site build.
 - Name `python -m skore_skills site build` before git end-turn.
@@ -203,7 +203,7 @@
 - Name `python -m skore_skills git end-turn --stage data_analysis`.
 
 **Must NOT do:**
-- Name `<package>.html` or `html/data_analysis.html` as if the
+- Name `report.html` or `html/data_analysis.html` as if the
   site was built.
 - Run `python -m skore_skills site build`.
 
@@ -382,7 +382,7 @@
 **Must do:**
 - Name `python -m skore_skills site build` after the md and
   before keep exploring vs close.
-- Name `<package>.html` and `html/data_analysis.html`.
+- Name `report.html` and `html/data_analysis.html`.
 - After **Keep exploring**, AskUserQuestion four picks, none
   recommended: Choose additional pre-defined option; Provide a
   query to extend the exploration; Automatic exploration related
@@ -657,7 +657,7 @@
 **Must do:**
 - After `data_analysis.md` and JOURNAL, name
   `python -m skore_skills site build`.
-- Name `<package>.html` and `html/data_analysis.html`.
+- Name `report.html` and `html/data_analysis.html`.
 - Then AskUserQuestion keep exploring vs close (neither option
   recommended or preselected).
 

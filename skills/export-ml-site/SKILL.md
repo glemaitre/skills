@@ -2,7 +2,7 @@
 name: export-ml-site
 description: >
   Package JOURNAL, exploratory data analysis markdown, and design notes into an offline
-  MkDocs site opened via <package>.html at the workspace root. Embeds existing notebook HTML
+  MkDocs site opened via report.html at the workspace root. Embeds existing notebook HTML
   companions in their associated reports. Never executes Python. Trigger
   when the user asks for a website, mkdocs, or documentation site.
 ---
@@ -35,7 +35,7 @@ left rail beside a 1200px report column. Mobile uses a drawer.
 2. If `policy.site` is `null`: AskUserQuestion documentation site
    on/off (default off). Say in 2–4 lines what the answer
    authorizes — the `mkdocs-material` install, `site init`, and a
-   rebuilt `<package>.html` on later turns — plus what each option
+   rebuilt `report.html` on later turns — plus what each option
    does; a file link is an addition, never the context. Persist.
    If true, load
    `add-python-package` for `mkdocs-material` (agent) then
@@ -46,11 +46,12 @@ left rail beside a 1200px report column. Mobile uses a drawer.
    only). Later turns only `site build`.
 5. `python -m skore_skills site build`. Do not run
    `notebook convert`. Name a build error; the markdown sources
-   remain the record. Tell the user to open `<package>.html` at
-   the workspace root (`status.package`; double-click; no server).
-   Stage owners that just ran `site build` must name that
-   launcher (and the stage page: `html/data_analysis.html` or
-   `html/<stem>.html`) in the same User-facing close.
+   remain the record. Tell the user to open `report.html` at
+   the workspace root (double-click; no server). Do not send
+   them to the markdown instead. Stage owners that just ran
+   `site build` must name that launcher (and the stage page:
+   `html/data_analysis.html` or `html/<stem>.html`) in the same
+   User-facing close.
 
 ## Preview before markdown-review gates
 
@@ -62,7 +63,7 @@ that AskUserQuestion / consent stop — not only at End of turn.
    `python -m skore_skills site build`. Skip in one line
    otherwise. Name a build error; do not fail the gate.
 2. In the same message as the gate, **Open these**: the `.md`
-   path, plus `<package>.html` and the stage page
+   path, plus `report.html` and the stage page
    (`html/<stem>.html`, `html/data_analysis.html`, or the home
    page for `JOURNAL.md`) when the build ran. A file link is an
    addition, never the context.

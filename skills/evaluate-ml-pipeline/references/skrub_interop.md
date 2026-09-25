@@ -138,7 +138,7 @@ see `references/custom-metrics.md`.
 Every report goes under a **stable key** in the workspace's
 `skore.Project` so future runs can read it back (the
 `audit-ml-pipeline` skill renders each report to a markdown
-digest, and `iterate-from-skore` mines that digest for Backlog
+digest, and `review-ml-experiment` reads that digest to write idea
 candidates).
 
 The Project init form depends on the workspace's `skore mode:`
@@ -344,8 +344,6 @@ version — the kwargs differ between `EstimatorReport` (uses
   source-bound vars vs materialized `(X, y)` bindings.
 - `evaluate-ml-pipeline` — the methodology side: cross-validator
   choice, Pattern A vs B (`references/metadata-routing.md`).
-- `iterate-from-skore` — reads the audit digest at
+- `review-ml-experiment` — reads the audit digest at
   `scratch/audit/<stem>/audit.md` (produced by `audit-ml-pipeline`)
-  and converts each `Issues:` / `Tips:` line in `## Checks summary`
-  into a Backlog candidate, following the check's documentation
-  URL for the mitigation.
+  and writes one idea file per `issue` / `tip` line.

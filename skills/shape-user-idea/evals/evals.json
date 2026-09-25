@@ -1,0 +1,56 @@
+{
+  "skill_name": "shape-user-idea",
+  "evals": [
+    {
+      "id": 1,
+      "title": "Confirmed idea writes one file",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The last History stem is `01_baseline`.\n- The user already stated the idea, so the free-text / artifact\n  menu is skipped.\n- The user answers the three shaping questions, then says yes.]\n\nI want to try a monotonic constraint on the target.",
+      "expected_output": "Behavioural response satisfying: - Walk what to learn, why now, and what changes. - Restate the idea and wait for an explicit yes before writing. - On yes, write `journal/ideas/<slug>.md` with Source `user`, Experiment `01_baseline`, Question, Why now, What changes, and Open gaps. It must NOT: - Write the file before yes. - Write `JOURNAL.md` or a design note. - Append a `B<N>` row.",
+      "files": [],
+      "expectations": [
+        "Walk what to learn, why now, and what changes.",
+        "Restate the idea and wait for an explicit yes before writing.",
+        "On yes, write `journal/ideas/<slug>.md` with Source `user`, Experiment `01_baseline`, Question, Why now, What changes, and Open gaps.",
+        "Return that path.",
+        "The response does NOT: Write the file before yes.",
+        "The response does NOT: Write `JOURNAL.md` or a design note.",
+        "The response does NOT: Append a `B<N>` row.",
+        "The response does NOT: Add acceptance criteria."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 2,
+      "title": "A project question writes no idea file",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- History has one done row. The headline cell is `0.81`.]\n\nWhat was the headline of the last run?",
+      "expected_output": "Behavioural response satisfying: - Answer from `JOURNAL.md`. It must NOT: - Write `journal/ideas/`. - Invent a metric that is not in History.",
+      "files": [],
+      "expectations": [
+        "Answer from `JOURNAL.md`.",
+        "The response does NOT: Write `journal/ideas/`.",
+        "The response does NOT: Invent a metric that is not in History."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 3,
+      "title": "A topic with no artifact loads literature search",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- No URL, issue, or file was named.\n- `status.skills.search-ml-literature` is `true`.]\n\nWhat do people do for censored regression?",
+      "expected_output": "Behavioural response satisfying: - Load `search-ml-literature`. It must NOT: - `WebSearch` for a paper from this skill. - Write an idea file in this skill. - Invent papers or URLs.",
+      "files": [],
+      "expectations": [
+        "Load `search-ml-literature`.",
+        "The response does NOT: `WebSearch` for a paper from this skill.",
+        "The response does NOT: Write an idea file in this skill.",
+        "The response does NOT: Invent papers or URLs."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    }
+  ]
+}

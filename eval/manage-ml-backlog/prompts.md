@@ -17,8 +17,8 @@
 - Name `python -m skore_skills status`.
 - Copy the headline result, locator, and G-AUDIT-FINDING into
   History / the design-note Status block.
-- Rescan the Backlog, then ask the sourcing menu (`skore` /
-  `user` / `B<N>` / `stop`). Do not ask triage which lever to take.
+- Do not open idea triage in this record. An empty `journal/ideas/`
+  is a one-line skip.
 - Name `python -m skore_skills git end-turn --stage backlog`.
 - If that command returns `invoke`, load `persist-ml-git`.
 
@@ -29,21 +29,28 @@
 
 ---
 
-## CASE_02 — Do not implement next experiment
+## CASE_02 — Promote one idea file
 
 **User prompt:**
 > What should we try next?
 
 **Assumed workspace state:**
-- One `done` History row and two Backlog rows `B1`, `B2`.
+- `journal/ideas/01_baseline-calibration.md` exists.
+- Its Source is `audit:01_baseline:checks.SKD003`.
+- That Source is not already a Backlog row.
+- The highest Backlog index is `B2`.
+- The user answers promote.
 
 **Must do:**
-- Surface the sourcing menu (`skore` / `user` / `B<N>` / `stop`)
-  with the Backlog rows visible.
+- Append a stable `B3` row. Item comes from the file's Question.
+  Source is copied verbatim.
+- Delete `journal/ideas/01_baseline-calibration.md`.
 
 **Must NOT do:**
-- Silently pick `B1`.
+- Silently pick an existing Backlog row.
 - Start `build-ml-pipeline`.
+- Write a design note in this turn.
+- Renumber `B1` or `B2`.
 
 ---
 
@@ -75,7 +82,6 @@
 > The 01_baseline run finished. Record it.
 
 **Assumed workspace state:**
-- This is a full backlog turn, not record-outcome dispatch.
 - Audit digest exists with a headline ROC-AUC.
 - Smoke tests passed.
 - History row for `01_baseline` is `running`.
@@ -84,18 +90,12 @@
 
 **Must do:**
 - Copy the headline result into the History row.
-  from the refreshed Backlog or stop.
-- Name `python -m skore_skills site build` after History / Backlog
-  / Results markdown is on disk and before asking the sourcing
-  menu (`skore` / `user` / `B<N>` / `stop`).
-- Name `<package>.html`.
-- Name `python -m skore_skills site build` before git end-turn
-  (a second build at End of turn is fine).
+- Name `python -m skore_skills site build` before git end-turn.
 - Name `python -m skore_skills git end-turn --stage backlog`.
 
 **Must NOT do:**
 - Fail the backlog turn if site build errors.
-- Run `notebook convert` on the preview rebuild.
+- Run `notebook convert`.
 - Run `git commit` in this skill or `git push`.
 
 ---
@@ -164,7 +164,7 @@
 
 **Must NOT do:**
 - Rescan the Backlog or add/resolve `B1` / `B2` rows.
-- Ask the next-lever triage question.
+- Ask the idea-triage question.
 - Dispatch `audit-ml-pipeline`.
 - Run `site build` or `git end-turn --stage backlog` — the caller
   owns the close.
@@ -200,7 +200,7 @@
 **Must NOT do:**
 - Invent or estimate a metric.
 - Mark the row `done` without a result.
-- Ask the next-lever triage question.
+- Ask the idea-triage question.
 - Parse report HTML to fill Results.
 
 ---
@@ -223,3 +223,27 @@
 **Must NOT do:**
 - Guess a Hub, MLflow, or local artifact URL.
 - Omit the Report cell from the History row.
+
+---
+
+## CASE_09 — Empty idea folder does not invent a row
+
+**User prompt:**
+> What should we try next?
+
+**Assumed workspace state:**
+- `journal/ideas/` exists and is empty.
+- The Backlog table has no rows.
+- `status.skills.shape-user-idea` is `true`.
+- `status.skills.search-ml-literature` is `true`.
+
+**Must do:**
+- Skip in one line because there are no idea files to triage.
+- When `shape-user-idea` and `search-ml-literature` are installed,
+  offer those as the way to add an idea. Do not load them until
+  the user picks one.
+
+**Must NOT do:**
+- Fabricate a `B1` row.
+- Write a design note.
+- Invent a literature search or a shaping menu from this skill.

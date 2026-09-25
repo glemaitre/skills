@@ -46,14 +46,9 @@ criteria" section. Keep `## Notebooks` with Evaluation then Audit.
    current design, run
    `python -m skore_skills design consent --stem <stem>`. Treat
    JSON `action` as authoritative. `proceed` → resume that stem
-   directly; do not ask how to start again. `ask` → render the
-   JSON `context` inline (see Gate context). If `policy.site` is
-   true and `export-ml-site` is installed, run
-   `python -m skore_skills site build` first (skip in one line
-   otherwise; name a build error; do not fail the gate). Link
-   `journal/<stem>.md` plus `<package>.html` and
-   `html/<stem>.html` when the build ran, then **stop** for
-   approval; do not write code. `stop` → missing
+   directly; do not ask how to start again. `ask` → Design
+   approval below (render JSON `context` inline per § Gate
+   context); do not write code. `stop` → missing
    note: name `scaffold --journal --stem` (or abandoned: explain
    and do not implement). Do not infer approval from "build it".
    Missing shell: no `site build`, no fill from memory.
@@ -97,9 +92,10 @@ never fill it from memory. Do not `site build` an empty shell.
 ## Choice contracts
 
 Every choice first produces a user-confirmed proposal and an
-approved design note. No branch writes model code before approval.
-Use the next available numeric stem; never overwrite an existing
-note.
+approved design note. The proposal yes agrees the idea. The note
+is approved only by Design approval below. No branch writes model
+code before that gate is `proceed`. Use the next available numeric
+stem; never overwrite an existing note.
 
 - **Dummy predictor (`dummy`).** Determine classification vs
   regression from recorded project facts; ask if unknown. Propose
@@ -112,12 +108,12 @@ note.
   traditional-ML baseline: skrub automatic preprocessing plus a
   task-appropriate standard estimator, with no domain feature
   engineering. It establishes a real comparison point. Confirm the
-  proposal and design before build.
+  proposal, write the note, then Design approval, before build.
 - **EDA proposal (`eda_proposal`).** Read
   `data_analysis/data_analysis.md` and the project goal. Cite the
   EDA findings that motivate one pipeline proposal. Do not invent
   findings or present multiple silent alternatives. Confirm the
-  proposal and design before build.
+  proposal, write the note, then Design approval, before build.
 - **Backlog (`backlog`).** Load `manage-ml-backlog` only if
   `status.skills.manage-ml-backlog` is true. Else one-line skip;
   do not invent a Backlog. Pass the
@@ -125,12 +121,10 @@ note.
   `B<N>`, consume only that row into a proposal/design stem, then
   return here. Do not add a new Backlog idea in this branch.
 - **Discussion (`discuss`).** Have an open conversation about what
-  to learn, why now, and what changes. Once an idea is agreed,
-  summarize it as a Proposal using `iterate-from-user`'s three
-  shaping questions and confirmation contract, but do not force
-  its article/resource/free-text entry menu. Only after explicit
-  confirmation create/populate the design note and seek approval.
-  If no idea is agreed, return to the entry choices.
+  to learn, why now, and what changes. Restate the agreed idea and
+  wait for an explicit yes before any design note. Only after that
+  confirmation create/populate the design note, then Design
+  approval. If no idea is agreed, return to the entry choices.
 
 ## Before execution
 
@@ -145,9 +139,9 @@ duplicate a child's detailed preview.
 - For an approved implementation, say which child comes next and
   the broad sequence: local pipeline preparation → small
   real-data smoke fit/predict → optional full-dataset evaluation
-  → read-only audit. Then let `build-ml-pipeline`,
+  → gated review. Then let `build-ml-pipeline`,
   `smoke-test-ml-pipeline`, `evaluate-ml-pipeline`, and
-  `audit-ml-pipeline` each own the single detailed Before
+  `review-ml-experiment` each own the single detailed Before
   execution preview at its actual compute boundary.
 
 Do not invent minute estimates at dispatcher level. Name a known
@@ -160,8 +154,23 @@ If the design-note shell is missing, this turn only names
 `python -m skore_skills scaffold --journal --stem <NN_short>`
 and stops. Do not fill Question / Motivation / Method / Risks
 from memory. Populate those sections only after that command
-has created the shell, then preview `site build` if
-`policy.site` and stop for explicit design approval.
+has created the shell, then Design approval.
+
+## Design approval
+
+One gate approves a populated note. Run
+`python -m skore_skills design consent --stem <stem>`.
+`proceed` → already approved; do not ask again. `ask` → render
+the JSON `context` inline (§ Gate context), including the site
+preview when `policy.site`, then **AskUserQuestion** (single
+choice), in order: **Approve** / **Modify** / **Stop**. Do not
+also ask in chat whether the note looks right.
+- **Approve** → set `**State:**` to `approved` and
+  `**Approved by user on:**` to today's date (`YYYY-MM-DD`).
+  Re-run `design consent`; code starts only on `proceed`.
+- **Modify** → leave `State` `planned`, edit the note, and ask
+  this gate again.
+- **Stop** → do not implement.
 
 ## Approved-design implement loop
 
@@ -177,8 +186,11 @@ has created the shell, then preview `site build` if
    (Evaluate / Modify / Stop on `ask`, with that JSON `context`
    rendered inline per § Gate context). Build also writes the
    unfitted `scratch/results/<stem>/pipeline.html` and, when
-   `policy.site` is true, runs `site build` so Method shows the
-   diagram **before** Evaluate. Do not convert
+   `policy.site` is true and `export-ml-site` is installed, runs
+   `site build` after that snapshot and before Evaluate so Method
+   shows the diagram. Missing or skipped EDA does not defer it.
+   The post-loop rebuild is the fitted diagram; it does not
+   replace this one. Do not convert
    `experiments/<stem>.py` at that point if it already contains
    `skore.evaluate`.
 2. Only if the user chose **Evaluate** and `smoke run` is `proceed`: load
@@ -189,35 +201,37 @@ has created the shell, then preview `site build` if
    <stem>`. Consent JSON is authoritative, not the user's wording
    alone. Missing `evaluate-ml-pipeline` → one-line skip. Do not
    invent that skill's steps.
-3. After a successful dispatched evaluate (locator returned):
-   this dispatcher runs
-   `python -m skore_skills loop artifacts --stem <stem>`. `audit` →
-   load `audit-ml-pipeline` only if
-   `status.skills.audit-ml-pipeline` is true (same stem). Missing
-   skill → one-line skip. `evaluate_incomplete` / `stop` → do
-   not invent an audit. The audit owns its deterministic
-   follow-up gate and returns only after Close audit, with the
-   digest, G-AUDIT-FINDING from `audit finding`, locator, and
-   optional headline.
-4. After audit — or after evaluate when artifacts JSON is `record`
-   or audit was skipped — load
-   `manage-ml-backlog` only if `status.skills.manage-ml-backlog`
-   is true, in **record-outcome mode**, handing it the
-   JSON locator from `loop locator --stem <stem>`, optional headline, and
-   G-AUDIT-FINDING from `audit finding` (or
-   `n/a — audit not run`). Else one-line skip; do not write History from this
-   meta. It writes the `JOURNAL.md` History row and design-note
-   Status block plus `## Results` from the digest text
-   (`### Report overview`, then `### Checks` / `### Metrics` when
-   those sections exist — required for site injection),
-   then returns; it does not rescan the Backlog or
-   open the sourcing menu. Never mark `done` while `smoke run`
-   is `stop`.
-   Audit-skipped runs still record the locator; missing headline
-   becomes `n/a`, never an invented metric. The Evaluate
-   branch's visible close is that dispatch sequence. Do not claim
-   History remains `planned` because a child was not executed
-   in-process.
+3. After a successful dispatched evaluate (locator returned): run
+   `python -m skore_skills review consent --stem <stem>`. Treat
+   JSON `action` as authoritative.
+   - `stop` — no `report.html`. Do not review. Name the missing
+     file. Do not record-outcome.
+   - `ask` — the review skill owns the cost preview and
+     Review (Recommended) / Skip / Stop question. Load
+     `review-ml-experiment` only if
+     `status.skills.review-ml-experiment` is true so it can ask.
+     Missing skill → one-line skip and record-outcome with
+     `n/a — audit not run`.
+   - **Review** or `proceed` — load `review-ml-experiment` (same
+     gate). It returns the digest, G-AUDIT-FINDING, locator, and
+     idea paths. Do not load `audit-ml-pipeline` from this
+     dispatcher.
+   - **Skip** — no idea files. Record-outcome with
+     `n/a — audit not run`.
+   - **Stop** — do not record-outcome and do not audit. Return
+     to triage when `status.skills.triage-ml-task` is true.
+4. After **Review** or `proceed`, or after **Skip** / a missing
+   review skill: load `manage-ml-backlog` only if
+   `status.skills.manage-ml-backlog` is true, in **record-outcome
+   mode**, handing it the locator, optional headline, and
+   G-AUDIT-FINDING (`n/a — audit not run` when skipped). Else
+   one-line skip; do not write History from this meta. It writes
+   the `JOURNAL.md` History row and design-note Status block plus
+   `## Results`, then returns. It does not triage idea files in
+   this mode. Never mark `done` while `smoke run` is `stop`.
+   Missing headline becomes `n/a`, never an invented metric. Do
+   not claim History remains `planned` because a child was not
+   executed in-process.
 
 Do not duplicate child-skill methodology. Before new library
 symbols are written, children use
@@ -233,11 +247,11 @@ symbols are written, children use
   `python -m skore_skills scaffold --journal --stem
   <NN_short>` and stops. Do not recreate or fill the template
   from memory. Populate Question / Motivation / Method / Risks
-  only after that command has created the shell, then preview
-  `site build` if `policy.site` and stop for user approval.
-  Do not `site build` before the shell exists.
+  only after that command has created the shell, then Design
+  approval. Do not `site build` before the shell exists.
 - Require `design consent` `proceed` before code. Do not treat
-  "the user asked to build" as approval.
+  "the user asked to build", or a chat yes on the drafted note,
+  as approval.
 - Do not open an approval gate whose only context is a file path;
   render the `context` facts inline (§ Gate context).
 - Preserve identical stems across design, experiment, smoke, audit.
@@ -273,11 +287,12 @@ script; say so when it is slow. Missing jupytext / nbclient /
 nbconvert → one-line skip naming `add-python-package`; do not
 fail the turn.
 
-After **Evaluate** (and audit if it ran), implement-loop step 4
-(record-outcome) runs first, so the journal files are on disk
-before anything is staged. This dispatcher owns the User-facing
-close. Children return locator / digest / finding and do not
-preview this close.
+After **Review** or **Skip** (or a missing review skill),
+implement-loop step 4 (record-outcome) runs first, so the journal
+files are on disk before anything is staged. **Stop** skips
+record-outcome. This dispatcher owns the User-facing close.
+Children return locator / digest / finding and do not preview
+this close.
 
 ### User-facing close
 
@@ -288,11 +303,11 @@ locator/finding alone.
 1. **Narrative first** — 2–6 sentences of the result, grounded in
    the audit digest when present (Checks + Metrics), else the
    user's headline / `report.txt`. Do not invent a metric.
-2. **Open these** — markdown links plus the resolved absolute
-   path for local files: `[journal/<stem>.md](journal/<stem>.md)`.
-   If `policy.site` is true and `site build` ran or is about to:
-   `[<package>.html](<workspace>/<package>.html)` and
-   `html/<stem>.html`.
+2. **Open these** — resolved absolute paths. When `site build`
+   ran or is about to, link the site and not the design note:
+   `[report.html](<workspace>/report.html)` and
+   `html/<stem>.html`. Otherwise
+   `[journal/<stem>.md](journal/<stem>.md)`.
 3. **Normalized tokens second** — G-REPORT-LOCATOR evaluate
    passed up (or `n/a — backend did not expose a locator`) first
    among tokens, then G-AUDIT-FINDING (`n/a — audit not run`
@@ -308,8 +323,9 @@ Then, if `policy.site` is true, `export-ml-site` is installed, run
 diagram (and Results) replace the construct-time snapshot. Skip in
 one line otherwise.
 Name a build error; do not fail the model turn. Name
-`<package>.html` (and `html/<stem>.html`) in the User-facing
-close when the build ran.
+`report.html` (and `html/<stem>.html`) in the User-facing
+close when the build ran. Do not also send the user to the
+markdown.
 
 Then run
 `python -m skore_skills git end-turn --stage implement`. If JSON

@@ -14,7 +14,7 @@ so the target can `read_file` the history-dependent JOIN example
 (the same file `SKILL.md` points at). Other cases stay single-turn.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. 18 cases; Must-NOT is all-or-nothing.
+violated. 19 cases; Must-NOT is all-or-nothing.
 
 ---
 
@@ -531,3 +531,28 @@ violated. 18 cases; Must-NOT is all-or-nothing.
 - Open the gate with only a link to `journal/01_baseline.md`.
 - Write `skore.evaluate(...)` before the pick.
 - Invent a metric or a fold count.
+
+---
+
+## CASE_20 — Skipped EDA still builds the site before Evaluate
+
+**User prompt:**
+> The design is approved. Declare the learner. EDA was skipped.
+
+**Assumed workspace state:**
+- Approved `journal/01_baseline.md`.
+- `status.data_analysis` is `skipped`. No
+  `data_analysis/data_analysis.md`.
+- `policy.site` is true. `export-ml-site` is installed.
+
+**Must do:**
+- After the unfitted `scratch/results/01_baseline/pipeline.html`
+  snapshot, name `python -m skore_skills site build` before
+  `smoke run` and before the Evaluate question.
+- In the checkpoint, link `report.html` and
+  `html/01_baseline.html` (Method diagram). Do not link the
+  design-note markdown instead.
+
+**Must NOT do:**
+- Defer `site build` until after `skore.evaluate`.
+- Skip the site because EDA was skipped.

@@ -348,6 +348,22 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 20,
+      "title": "Skipped EDA still builds the site before Evaluate",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved `journal/01_baseline.md`.\n- `status.data_analysis` is `skipped`. No\n  `data_analysis/data_analysis.md`.\n- `policy.site` is true. `export-ml-site` is installed.]\n\nThe design is approved. Declare the learner. EDA was skipped.",
+      "expected_output": "Behavioural response satisfying: - After the unfitted `scratch/results/01_baseline/pipeline.html` snapshot, name `python -m skore_skills site build` before `smoke run` and before the Evaluate question. - In the checkpoint, link `report.html` and `html/01_baseline.html` (Method diagram). Do not link the design-note markdown instead. It must NOT: - Defer `site build` until after `skore.evaluate`. - Skip the site because EDA was skipped.",
+      "files": [],
+      "expectations": [
+        "After the unfitted `scratch/results/01_baseline/pipeline.html` snapshot, name `python -m skore_skills site build` before `smoke run` and before the Evaluate question.",
+        "In the checkpoint, link `report.html` and `html/01_baseline.html` (Method diagram). Do not link the design-note markdown instead.",
+        "The response does NOT: Defer `site build` until after `skore.evaluate`.",
+        "The response does NOT: Skip the site because EDA was skipped."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

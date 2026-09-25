@@ -112,6 +112,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | Skill | Description |
 | --- | --- |
 | [triage-ml-task](skills/triage-ml-task/SKILL.md) | Session owner: list installed entry skills and ask which to run. |
+| [review-ml-experiment](skills/review-ml-experiment/SKILL.md) | Gate the skore-check audit, then write one idea file per candidate. |
 | [setup-ml-project](skills/setup-ml-project/SKILL.md) | Coordinate workspace, environment, and git setup. |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
 | [setup-python-env](skills/setup-python-env/SKILL.md) | Detect the env manager, persist managed vs user-managed, and bootstrap agent tools. |
@@ -132,13 +133,13 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [smoke-test-ml-pipeline](skills/smoke-test-ml-pipeline/SKILL.md) | Structural pytest: prediction count must match the predict-grid row count. |
 | [audit-ml-pipeline](skills/audit-ml-pipeline/SKILL.md) | Once testing and the experiment are done, audit the model by loading a skore report and investigate. |
 
-### Iteration loop
+### Ideas and backlog
 
 | Skill | Description |
 | --- | --- |
-| [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md) | Record experiment outcomes and next-lever backlog rows. |
-| [iterate-from-skore](skills/iterate-from-skore/SKILL.md) | Mine the audit digest into Backlog rows. |
-| [iterate-from-user](skills/iterate-from-user/SKILL.md) | As a user, be in the loop and propose new experiments — free-text, a scientific article URL, or a resource link (GitHub issue / spec / reference repo). |
+| [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md) | Record experiment outcomes and triage idea files into backlog rows. |
+| [shape-user-idea](skills/shape-user-idea/SKILL.md) | Shape a user idea or a named artifact into one idea file after they confirm. |
+| [search-ml-literature](skills/search-ml-literature/SKILL.md) | Search scientific and technical sources and write one idea file for the direction the user confirms. |
 
 ### Workspace and tooling
 

@@ -97,7 +97,8 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   option does. A file link is an addition, never the context.
 - **G-DATA-ANALYSIS run | skip.** AskUserQuestion. "Go fast" does
   not skip. Skip → JOURNAL Status row `skipped — <date>` and stop.
-  Do not run `site build` on skip.
+  Do not run `site build` on skip. The unfitted snapshot build in
+  `build-ml-pipeline` still runs before Evaluate.
 - **IPython on the run path.** Missing → `add-python-package` for
   `ipython` (`env route` agent). Decline → skip path. Do not
   `pixi add` / fabricate output.
@@ -255,7 +256,7 @@ not write or execute the notebook.
    is true and `export-ml-site` is installed, run
    `python -m skore_skills site build` first (skip in one line
    otherwise; name a build error; do not fail the gate). Link
-   `data_analysis/data_analysis.md` plus `<package>.html` and
+   `data_analysis/data_analysis.md` plus `report.html` and
    `html/data_analysis.html` when the build ran. Do not
    `notebook convert` or `git end-turn` on this preview. Then
    **AskUserQuestion** one pick. Neither option is recommended
@@ -386,12 +387,13 @@ alone.
    stage, grounded in Modelling implications / the JSON facts
    (shape, target, leakage or duplicates that shape modelling).
    Do not invent columns. Do not paste `data_analysis.md`.
-2. **Open these** — markdown links plus the resolved absolute
-   path for local files (TUI clickability):
+2. **Open these** — resolved absolute paths (TUI clickability).
+   When `site build` ran or is about to, link the site and not
+   the markdown:
+   `[report.html](<workspace>/report.html)` and
+   `html/data_analysis.html`. Otherwise
    `[data_analysis/data_analysis.md](data_analysis/data_analysis.md)`.
-   If `policy.site` is true and `site build` ran or is about to:
-   `[<package>.html](<workspace>/<package>.html)` and
-   `html/data_analysis.html`. No Skore locator on this stage.
+   No Skore locator on this stage.
 3. **Normalized tokens second** — none for EDA (no
    G-REPORT-LOCATOR / G-AUDIT-FINDING).
 
@@ -409,9 +411,9 @@ do not fail the turn, do not `pixi add`.
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` after durable files are on
 disk. Skip in one line otherwise. Name a build error; do not fail
-the data-analysis turn. Name `<package>.html` and
+the data-analysis turn. Name `report.html` and
 `html/data_analysis.html` in the User-facing close when the
-build ran.
+build ran. Do not also send the user to the markdown.
 
 `python -m skore_skills git end-turn --stage data_analysis`. If
 JSON `action` is `invoke`, load `persist-ml-git` only if
