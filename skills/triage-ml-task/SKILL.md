@@ -52,6 +52,7 @@ context.
    | set up / bootstrap this project (generic) | `setup-ml-project` |
    | “is this leakage” on the table | `explore-ml-data` (even if `data_analysis` is present). Do not load `research-ml-practice`. |
    | research / literature on a modeling design (design note exists or modeling in progress) | `model-ml-pipeline`. Do not load `research-ml-practice`. |
+   | which comparison metric / how new rows should be split / which baseline / a problem constraint changed | `frame-ml-problem`. Not a request to run evaluation. |
 
    Certain EDA: name `python -m skore_skills status`, load
    `explore-ml-data`, stop. Do not inventory `data/`, list
@@ -96,8 +97,8 @@ context.
 
    Do not put internals on this board (`build-ml-pipeline`,
    `smoke-test-ml-pipeline` except as a **certain** debug load,
-   `choose-python-library`, `research-ml-practice`,
-   `plot-ml-figure`, stack refs).
+   `frame-ml-problem`, `choose-python-library`,
+   `research-ml-practice`, `plot-ml-figure`, stack refs).
 
 ## Stop conditions
 
@@ -115,6 +116,9 @@ context.
   a one-line skip. Do not invent that skill's procedure.
 - Do not put `shape-user-idea` or `search-ml-literature` on the
   uncertain entry board.
+- Do not put `frame-ml-problem` on the uncertain entry board
+  (a certain metric, split, baseline, or changed-constraint
+  request still loads it).
 - Certain generic export: name `python -m skore_skills status`,
   load `export-ml-project` only — no sibling-skill menu.
 

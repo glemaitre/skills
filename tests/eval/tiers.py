@@ -29,6 +29,7 @@ SKILL_TIER: dict[str, str] = {
     "shape-user-idea": "medium",
     "search-ml-literature": "medium",
     "explore-ml-data": "medium",
+    "frame-ml-problem": "medium",
     "research-ml-practice": "medium",
     "plot-ml-figure": "medium",
     "audit-ml-pipeline": "medium",

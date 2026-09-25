@@ -10,6 +10,7 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
+from skore_skills.frame import modeling_decisions_state
 from skore_skills.installed_skills import installed_skills
 from skore_skills.policy import infer_loop_stage, load_policy
 
@@ -27,6 +28,7 @@ STATUS_KEYS = (
     "has_journal",
     "has_tests",
     "data_analysis",
+    "modeling_decisions",
     "ruff_toml",
     "git",
     "last_history_stem",
@@ -223,6 +225,7 @@ def snapshot(root: Path) -> dict[str, Any]:
         "has_journal": (root / "journal").is_dir(),
         "has_tests": (root / "tests").is_dir(),
         "data_analysis": data_analysis_state(root),
+        "modeling_decisions": modeling_decisions_state(root),
         "ruff_toml": ruff_is_configured(root),
         "git": (root / ".git").exists(),
         "last_history_stem": last_history_stem(root),

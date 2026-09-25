@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "a3e3783a17d7b5a124c52f380c90d1240e1148826cecc23a86d449d8311181be",
+  "catalog_hash": "48004b60d89d124efdd0b72e151a0c16f456fd7c4b6ba299b1590793afc22b64",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -13,6 +13,15 @@
       "category": "methodology",
       "subcategory": null,
       "hash": "25c70d098620cda3a9448ac7ab62330a97d6d0b37eed0fd9609fceb7dda211a2"
+    },
+    {
+      "id": "frame-ml-problem",
+      "path": "skills/frame-ml-problem",
+      "title": "Frame ML Problem",
+      "summary": "Lock the problem, metric, baseline, and validation scheme before any model code.",
+      "category": "methodology",
+      "subcategory": null,
+      "hash": "8ff5ab40e01225f394a709f6a01acf186bbbe3308fe8b3cd4478e2a14119b823"
     },
     {
       "id": "build-ml-pipeline",
@@ -84,7 +93,7 @@
       "summary": "Route an ambiguous ML request to a focused workflow pack.",
       "category": "meta",
       "subcategory": null,
-      "hash": "4d9ee3e6ef2e3cb5636b64d431b261bb7b98a30241a36cfc19c3a48badb73694"
+      "hash": "ffe84a51bbcc9fead993f4e86d620b28ac45e201888a88c5499002c8143f2fc9"
     },
     {
       "id": "review-ml-experiment",
@@ -288,6 +297,7 @@
       "includes": [
         "model-ml-pipeline",
         "manage-ml-backlog",
+        "frame-ml-problem",
         "build-ml-pipeline",
         "smoke-test-ml-pipeline",
         "evaluate-ml-pipeline",
@@ -307,6 +317,7 @@
         "triage-ml-task",
         "model-ml-pipeline",
         "manage-ml-backlog",
+        "frame-ml-problem",
         "review-ml-experiment",
         "shape-user-idea",
         "search-ml-literature",

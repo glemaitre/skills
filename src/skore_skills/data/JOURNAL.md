@@ -17,6 +17,26 @@
 | Summary | <2–4 lines — dataset shape, target balance/skew, and the one or two findings that most shape the modelling choices. "n/a" until the data has been explored.> |
 | Report | [data_analysis/data_analysis.md](../data_analysis/data_analysis.md) |
 
+## Modeling decisions
+
+| Variable | Value |
+|---|---|
+| Status | <missing \| draft \| locked> |
+| Revised on | <date or n/a> |
+| Prediction goal | <probabilities \| point_labels \| intervals \| point_predictions> |
+| Deployment | <iid \| time \| groups> |
+| Horizon | <n/a or number and unit> |
+| Gap | <n/a or number and unit> |
+| Generalize to | <n/a or column> |
+| Known at predict | <n/a or columns> |
+| Time role | <n/a \| sort_key \| covariate> |
+| Metric role | <imposed \| proper_score \| ranking \| thresholded \| point_error> |
+| Metric | <comparison name> |
+| Baseline | <seasonal_naive \| group_mean \| logistic \| production \| dummy> |
+| Baseline note | <short note> |
+| Validation | <cv \| holdout> |
+| Folds | <integer or n/a> |
+
 ## History
 
 | Stem | Intent (one line) | Status | Headline result | Report | Design note |

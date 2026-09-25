@@ -127,6 +127,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | Skill | Description |
 | --- | --- |
 | [explore-ml-data](skills/explore-ml-data/SKILL.md) | Explore the dataset before designing any model. |
+| [frame-ml-problem](skills/frame-ml-problem/SKILL.md) | Lock the problem, metric, baseline, and validation scheme before any model code. |
 | [research-ml-practice](skills/research-ml-practice/SKILL.md) | Literature research for an ML methodology concern. |
 | [build-ml-pipeline](skills/build-ml-pipeline/SKILL.md) | Build a machine learning pipeline from the data source to the learner, including multi-tables engineering. |
 | [evaluate-ml-pipeline](skills/evaluate-ml-pipeline/SKILL.md) | Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics. |

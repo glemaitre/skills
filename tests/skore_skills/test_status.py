@@ -104,6 +104,7 @@ def test_status_organized_fixture(
         "has_journal": True,
         "has_tests": True,
         "data_analysis": "present",
+        "modeling_decisions": "missing",
         "ruff_toml": True,
         "git": True,
         "last_history_stem": "01_baseline",

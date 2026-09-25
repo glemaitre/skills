@@ -25,8 +25,9 @@ Notes
 -----
 - File path inside a skill is hashed as a POSIX path so digests are
   stable across operating systems.
-- ``.DS_Store``, ``__pycache__/``, ``.pytest_cache/``, and ``*.pyc``
-  files are skipped: they're build artefacts, not part of the skill.
+- ``.DS_Store``, ``__pycache__/``, ``.pytest_cache/``, ``*.pyc``, and
+  ``.skore-skill.json`` files are skipped: they're build artefacts or
+  local install sidecars, not part of the skill.
 """
 
 from __future__ import annotations
@@ -38,7 +39,13 @@ import sys
 from pathlib import Path
 
 # Files / directory names that must never contribute to a skill hash.
-EXCLUDED_NAMES = {".DS_Store", "__pycache__", ".pytest_cache", ".mypy_cache"}
+EXCLUDED_NAMES = {
+    ".DS_Store",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".skore-skill.json",
+}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 

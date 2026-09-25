@@ -12,6 +12,7 @@ from skore_skills.api import get_symbol, package_version
 from skore_skills.check import render_workspace_check
 from skore_skills.design_consent import render_design_consent
 from skore_skills.evaluate_consent import render_evaluate_consent
+from skore_skills.frame import render_frame_show
 from skore_skills.model_choices import render_model_choices
 from skore_skills.review_consent import render_review_consent
 from skore_skills.status import render_status
@@ -216,6 +217,22 @@ def review_consent_cmd(stem: str) -> None:
         click.echo(render_review_consent(Path.cwd(), stem), nl=False)
     except ValueError as exc:
         raise click.UsageError(str(exc)) from exc
+
+
+@cli.group("frame")
+def frame_group() -> None:
+    """Inspect the modeling-decisions gate."""
+
+
+@frame_group.command("show")
+@click.option(
+    "--revise",
+    is_flag=True,
+    help="Ask to edit a locked block instead of proceeding.",
+)
+def frame_show_cmd(revise: bool) -> None:
+    """Print the next modeling-decisions gate as JSON."""
+    click.echo(render_frame_show(Path.cwd(), revise=revise), nl=False)
 
 
 @cli.group("design")
