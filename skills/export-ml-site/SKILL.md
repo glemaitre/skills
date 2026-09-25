@@ -9,6 +9,13 @@ description: >
 
 # Export ML Site
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Ask about a documentation site in those words. Tell the user to
+open `report.html`. Do not quote `site init` / `site build` as
+something they should run.
+
 The site is a derived index of files other skills already write.
 Markdown is the report: its figures, TableReport HTML, and existing
 converted notebooks (`<stem>.nb.html`, written only by
@@ -40,8 +47,9 @@ left rail beside a 1200px report column. Mobile uses a drawer.
    If true, load
    `add-python-package` for `mkdocs-material` (agent) then
    `python -m skore_skills site init`. If false, stop.
-3. If `policy.site` is false: say the gate is off; offer to turn
-   it on. Do not init or build until it is true.
+3. If `policy.site` is false: say the documentation site is
+   off; offer to turn it on. Do not init or build until it is
+   true.
 4. If this is the first site turn, run `site init` (gitignore
    only). Later turns only `site build`.
 5. `python -m skore_skills site build`. Do not run

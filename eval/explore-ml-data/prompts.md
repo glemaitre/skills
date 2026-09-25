@@ -14,10 +14,11 @@
 - Write 2–6 sentences of EDA findings (shape / target /
   leakage or duplicates that shape modelling).
 - Link `data_analysis/data_analysis.md`.
-- Name `python -m skore_skills git end-turn --stage data_analysis`.
+- Run `python -m skore_skills git end-turn --stage data_analysis`.
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Paste the full `data_analysis.md` into chat.
 - Run `git commit` in this skill.
 - Run `git push`.
@@ -36,15 +37,17 @@
 - `choose-python-library` and `add-python-package` are installed.
 
 **Must do:**
-- Read `status.policy.tabular` and fire G-TABULAR (pandas vs
-  polars, recommend pandas) via `choose-python-library` or ask
-  here if that skill is missing.
+- Read `status.policy.tabular` and ask pandas vs polars
+  (recommend pandas) via `choose-python-library` or ask here if
+  that skill is missing.
 - Persist `policy set tabular` after confirmation.
 - Load `add-python-package` for the chosen frame library,
   `skrub`, `matplotlib`, and `seaborn`.
-- Do not place `data_analysis/data_analysis.py` before the gate resolves.
+- Do not place `data_analysis/data_analysis.py` before the library
+  choice is confirmed.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Silent-default pandas and write `data_analysis.py` first.
 - Install sklearn, skore, or pytest in this turn.
 - Call `env add` from this skill instead of `add-python-package`.
@@ -67,6 +70,7 @@
 - Stop without placing `data_analysis/data_analysis.py`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `python -m skore_skills cells run`.
 - Write `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`.
 - Pick a package name or start modeling.
@@ -89,6 +93,7 @@
 - Stop without overwriting `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Re-run `cells run` or rewrite the report.
 - Design a model in this skill.
 - Treat a methodology concern (“is this leakage”) as this stop
@@ -128,6 +133,7 @@
   and extras under `scratch/data_analysis/extras.json`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Describe this EDA execution as model training or smoke testing.
 - Put unique-ratio / column-dict / `report.json()` cells in
   `data_analysis/data_analysis.py`.
@@ -153,6 +159,7 @@
   scope). Do not place a fabricated digest.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `pixi add ipython` / `uv add ipython` from this skill.
 - Hand-write expected exploratory data analysis output.
 
@@ -174,12 +181,13 @@
 - Name `report.html` and `html/data_analysis.html` in the
   user-facing close. Do not send the user to
   `data_analysis/data_analysis.md` instead.
-- Name `python -m skore_skills notebook convert
+- Run `python -m skore_skills notebook convert
   data_analysis/data_analysis.py --html` before site build.
-- Name `python -m skore_skills site build` before git end-turn.
-- Name `python -m skore_skills git end-turn --stage data_analysis`.
+- Run `python -m skore_skills site build` before git end-turn.
+- Run `python -m skore_skills git end-turn --stage data_analysis`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Paste the full `data_analysis.md` into chat.
 - Fail the data-analysis turn if site build errors; name the error.
 - Run `cells run` as a substitute for convert.
@@ -200,9 +208,10 @@
 - Write 2–6 sentences of EDA findings and link
   `data_analysis/data_analysis.md`.
 - Skip site build in one line.
-- Name `python -m skore_skills git end-turn --stage data_analysis`.
+- Run `python -m skore_skills git end-turn --stage data_analysis`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Name `report.html` or `html/data_analysis.html` as if the
   site was built.
 - Run `python -m skore_skills site build`.
@@ -221,11 +230,12 @@
 - `jupytext` and `nbclient` are installed.
 
 **Must do:**
-- Name `python -m skore_skills notebook convert
+- Run `python -m skore_skills notebook convert
   data_analysis/data_analysis.py`.
-- Name `python -m skore_skills git end-turn --stage data_analysis`.
+- Run `python -m skore_skills git end-turn --stage data_analysis`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Pass `--html` when the site gate is off.
 - Run `python -m skore_skills site build`.
 
@@ -246,9 +256,10 @@
 **Must do:**
 - Skip the convert in one line, naming `add-python-package` for
   `jupytext` and `nbclient`.
-- Name `python -m skore_skills git end-turn --stage data_analysis`.
+- Run `python -m skore_skills git end-turn --stage data_analysis`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Fail the data-analysis turn because convert failed.
 - Run `pixi add` / `uv add` from this skill.
 
@@ -280,6 +291,7 @@
   close (neither option recommended or preselected).
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Re-plot TableReport univariate histograms or the association
   matrix in extra cells.
 - Add a **second** target histogram / extra `displot` besides
@@ -317,6 +329,7 @@
   yet") before writing target-aware cells.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Guess a target column silently.
 - Skip the duplicate-row cell when the user picks "no target yet".
 - Write target-distribution / bivariate / leakage cells when the
@@ -339,6 +352,7 @@
 - Do not re-ask PCA on the pre-defined-option board.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Treat PCA as a pipeline preprocessor in this skill.
 - Run `pixi add scikit-learn` from this skill.
 
@@ -359,10 +373,11 @@
   recommended or preselected).
 - After Close, write 2–6 sentences of findings and link
   `data_analysis/data_analysis.md`.
-- Name `python -m skore_skills git end-turn --stage data_analysis`
+- Run `python -m skore_skills git end-turn --stage data_analysis`
   after Close.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Paste the full `data_analysis.md` into chat.
 - Load `add-python-package` for sklearn / scipy / statsmodels.
 
@@ -380,7 +395,7 @@
 - User picks **Keep exploring the data**.
 
 **Must do:**
-- Name `python -m skore_skills site build` after the md and
+- Run `python -m skore_skills site build` after the md and
   before keep exploring vs close.
 - Name `report.html` and `html/data_analysis.html`.
 - After **Keep exploring**, AskUserQuestion four picks, none
@@ -390,7 +405,8 @@
 - Stay in `explore-ml-data`.
 
 **Must NOT do:**
-- Name `python -m skore_skills git end-turn`.
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Run `python -m skore_skills git end-turn`.
 - Invent a domain-specific checklist skill or `references/domains/`.
 - Run `python -m skore_skills site build` again on the four-pick
   extras board.
@@ -422,6 +438,7 @@
 - AskUserQuestion `allow_multiple` on `measure` rows only.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Drop the correlated column from the raw data.
 - Run `git end-turn` in this keep-exploring pass.
 - Copy literature into modelling implications as if it were
@@ -447,6 +464,7 @@
   that board.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Invent papers or leakage thresholds from memory.
 - Run `git end-turn` in this keep-exploring pass.
 
@@ -465,14 +483,14 @@
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**
-- Skip G-DATA-ANALYSIS; do not overwrite
-  `data_analysis/data_analysis.py`.
+- Do not overwrite `data_analysis/data_analysis.py`.
 - Load `research-ml-practice` (Keep exploring § Automatic
   exploration; named concern — skip the canned extra-analysis
   survey).
 - Summarize the scratch note in chat.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Stop as CASE_04 (EDA already recorded, no refresh).
 - Run `git end-turn` in this pass.
 - Re-run `cells run` or rewrite the default notebook.
@@ -495,6 +513,7 @@
   `templates/target_classification.py`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Write `if TARGET is None` / `if TASK` branches for unused
   tasks.
 - Call `plt.close`.
@@ -522,6 +541,7 @@
   sourced **`measure`** extras from that note.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Search `california_housing`, `sklearn.datasets`, or a
   sklearn fetcher name.
 - Offer pipeline / learner / `GridSearch` extras on the EDA
@@ -551,6 +571,7 @@
   the grouping — before placing `data_analysis/data_analysis.py`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Place `data_analysis/data_analysis.py` or concat shards on
   disk before the user answers the grouping ask. Do not treat
   `family_a` / `family_b` as confirmed until that pick. Proposing
@@ -588,6 +609,7 @@
   `tables[]`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Append join-coverage cells on the default pass.
 - Install sklearn, skore, or pytest.
 - Write a joined frame to disk.
@@ -613,6 +635,7 @@
 - Refresh facts and rewrite `data_analysis.md` from results.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Write a joined frame to disk.
 - Replace `FRAME` with the merge or add a TableReport on the
   join.
@@ -636,6 +659,7 @@
   grouping board.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - AskUserQuestion grouping (Use a proposed grouping / Profile
   every file separately / I will describe the grouping).
 - Append join-coverage cells.
@@ -662,6 +686,7 @@
   recommended or preselected).
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `notebook convert` or `git end-turn` before the user picks
   Close.
 - Fail the keep-vs-close gate if site build errors; name the

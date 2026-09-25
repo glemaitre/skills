@@ -15,6 +15,12 @@ artifact the user already named. Show a few directions, then write
 one `journal/ideas/<slug>.md` for the direction they confirm.
 `manage-ml-backlog` triages that file later.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Directions and the pick question are scientific options for this
+project — not skill ids or the wrapper CLI.
+
 ## Procedure
 
 1. Run `python -m skore_skills status`. Read `JOURNAL.md` Status,

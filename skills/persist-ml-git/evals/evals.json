@@ -5,12 +5,13 @@
       "id": 1,
       "title": "Hook said invoke",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `python -m skore_skills git end-turn --stage data_analysis` already returned\n  `action: invoke`, `reason: persist`, autocommit `on`.\n- Dirty paths include `data_analysis/data_analysis.py` and `data_analysis/data_analysis.md`.]\n\nPersist this EDA turn.",
-      "expected_output": "Behavioural response satisfying: - Run `git status`. - Stage with `git add` (not `.env` / `.skore`). - Run `git commit -m` with a one-line subject from this turn. It must NOT: - Run `git push`. - Call `python -m skore_skills git end-turn` to create the commit. - Ask about hidden paths when `ambiguous_dotfiles` is empty or `reason` is `persist`.",
+      "expected_output": "Behavioural response satisfying: - Run `git status`. - Stage with `git add` (not `.env` / `.skore`). - Run `git commit -m` with a one-line subject from this turn. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `git push`. - Call `python -m skore_skills git end-turn` to create the commit.",
       "files": [],
       "expectations": [
         "Run `git status`.",
         "Stage with `git add` (not `.env` / `.skore`).",
         "Run `git commit -m` with a one-line subject from this turn.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Run `git push`.",
         "The response does NOT: Call `python -m skore_skills git end-turn` to create the commit.",
         "The response does NOT: Ask about hidden paths when `ambiguous_dotfiles` is empty or `reason` is `persist`."
@@ -23,11 +24,12 @@
       "id": 2,
       "title": "Hook said skip off",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The end-turn hook returned `action: skip`, `reason: off`.]\n\nCommit the pipeline changes.",
-      "expected_output": "Behavioural response satisfying: - Refuse to commit. - Load `triage-ml-task` if installed, else stop. It must NOT: - Run `git commit`. - Run `git push`.",
+      "expected_output": "Behavioural response satisfying: - Refuse to commit. - Load `triage-ml-task` if installed, else stop. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `git commit`. - Run `git push`.",
       "files": [],
       "expectations": [
         "Refuse to commit.",
         "Load `triage-ml-task` if installed, else stop.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Run `git commit`.",
         "The response does NOT: Run `git push`."
       ],
@@ -39,11 +41,12 @@
       "id": 3,
       "title": "Triage not installed",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `python -m skore_skills git end-turn --stage data_analysis` already returned\n  `action: invoke`, `reason: persist`, autocommit `on`.\n- `status.skills.triage-ml-task` is `false`.]\n\nPersist this EDA turn.",
-      "expected_output": "Behavioural response satisfying: - Run `git status` and `git commit -m`. - Stop after the commit because triage is not installed. It must NOT: - Invent a triage procedure from memory. - Run `git push`.",
+      "expected_output": "Behavioural response satisfying: - Run `git status` and `git commit -m`. - Stop after the commit because triage is not installed. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Invent a triage procedure from memory. - Run `git push`.",
       "files": [],
       "expectations": [
         "Run `git status` and `git commit -m`.",
         "Stop after the commit because triage is not installed.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Invent a triage procedure from memory.",
         "The response does NOT: Run `git push`."
       ],

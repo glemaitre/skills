@@ -15,6 +15,14 @@ Copy reports with the `skore` CLI. Switch the default destination
 only when the user asked to. Do not evaluate, audit, or invent
 `Project.sync` Python.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Ask where reports live (disk, Hub, MLflow) in those words. Do not
+name `G-SKORE-MODE`, skill ids, or the wrapper CLI in the
+question. `skore sync` output may appear in the close as the
+sync table.
+
 ## Procedure
 
 1. Run `python -m skore_skills status`. Read `policy.skore_mode`

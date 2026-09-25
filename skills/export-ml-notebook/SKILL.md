@@ -14,6 +14,14 @@ Source of truth stays the `# %%` `.py`. This skill only writes
 derived `.ipynb` (and optional `.nb.html`). Do not rewrite the
 `.py` from the notebook. `cells run` is not a substitute.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Ask about executed notebooks in those words. Tell the user the
+written `.ipynb` (and HTML viewer) paths. Do not quote
+`notebook convert`, `--html`, or `site build` as something they
+should run.
+
 While `policy.notebooks` is true, `explore-ml-data`,
 `model-ml-pipeline`, and `audit-ml-pipeline` already convert the
 percent file they wrote that turn. This skill owns on-demand
@@ -31,8 +39,9 @@ conversions, other sources, and the gate itself.
    is an addition, never the context. Persist `true`/`false`. If
    true, load `add-python-package` for `jupytext` and `nbclient`
    (agent). If false, stop.
-3. If `policy.notebooks` is false: say the gate is off; offer to
-   turn it on. Do not convert until it is true.
+3. If `policy.notebooks` is false: say executed notebooks are
+   off; offer to turn them on. Do not convert until the policy
+   is true.
 4. Convert the requested percent file (default `data_analysis/data_analysis.py` when
    the user did not name one):
 
@@ -57,15 +66,17 @@ conversions, other sources, and the gate itself.
    the user asks `setup-git` to track them.
 
    Convert-only requests (executed notebook / ipynb / convert,
-   no HTML or site viewer): name **only** that `notebook convert`
-   line, with no `--html`. Do not mention `--html` or `site
-   build` as an optional aside.
-5. After `--html`, if `policy.site` is true, `export-ml-site`
+   no HTML or site viewer): run **only** that `notebook convert`
+   line, with no `--html`. Tell the user the written `.ipynb`
+   path. Do not mention `--html` or `site build` as an optional
+   aside.
+5.    After `--html`, if `policy.site` is true, `export-ml-site`
    is installed, run `python -m skore_skills site build` so the
-   viewer is packaged. Name `--html` and `site build` **only**
+   viewer is packaged. Run `--html` and `site build` **only**
    when the user asked for HTML or a site viewer. Convert
    without `--html` does not rebuild the site. Skip in one line
-   otherwise. Name a build error; do not fail the convert.
+   otherwise. Name a build error; do not fail the convert. Point
+   the user at the HTML viewer / `report.html`, not the CLI.
 
 ## Stop conditions
 
@@ -74,4 +85,5 @@ conversions, other sources, and the gate itself.
 - Do not `pixi add` / `uv add`; load `add-python-package`.
 - Missing skill or missing source → one-line skip.
 - Do not name `--html` or `python -m skore_skills site build`
-  unless the user asked for HTML or a site viewer.
+  unless the user asked for HTML or a site viewer. Tell the user
+  paths, not the CLI.

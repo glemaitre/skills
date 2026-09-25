@@ -14,6 +14,12 @@ idea, a question, or an artifact. This skill writes
 `journal/ideas/<slug>.md` only after they confirm. The backlog
 triages that file later.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Questions and the confirmation paragraph describe this idea in
+data-science terms — not skill ids or the wrapper CLI.
+
 ## Procedure
 
 1. Run `python -m skore_skills status`. Read `JOURNAL.md` Status

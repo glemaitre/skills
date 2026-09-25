@@ -21,9 +21,10 @@ evaluate, or audit methodology.
 Details: `setup-workspace` `references/human_facing_prose.md`.
 JOURNAL rows, design-note Status / Results, and `#` comments
 describe **this** experiment's outcome — not the skills framework,
-the CLI, or the command that produced an output.
-`<!-- results-embed: … -->` is a site marker. Authoring hints stay
-in this skill. `style` is ruff only.
+the CLI, or the command that produced an output. Questions and
+replies use the same data-science language — not skill ids, `G-*`
+names, or the wrapper CLI. `<!-- results-embed: … -->` is a site
+marker. Authoring hints stay in this skill. `style` is ruff only.
 
 The CLI writes JOURNAL with four sections in order: Status, Data
 understanding, History, Backlog. History and Backlog start as

@@ -17,12 +17,13 @@
   `references/prediction-goal.md`.
 
 **Must do:**
-- Name `python -m skore_skills frame show`.
+- Run `python -m skore_skills frame show`.
 - Read `references/prediction-goal.md` and no other file under
   `references/`.
 - Ask only `probabilities`, `point_labels`, and `uncovered`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Write Python, a pipeline, or a splitter constructor.
 - Ask about horizon, the baseline, or the fold count in this turn.
 - Open `references/horizon-gap.md` or `references/baseline.md`.
@@ -46,6 +47,7 @@
   deployment delay, and ask for the horizon as a number and a unit.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Ask for a generalize-to column.
 - Write `TimeSeriesSplit` or `gap=` into the journal.
 - Invent a fold count.
@@ -71,6 +73,7 @@
 - Write Prediction goal `uncovered` plus those two prose cells.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Ask for `probabilities` or `point_labels`.
 - Write a splitter class or Python.
 
@@ -91,6 +94,7 @@
   goal `uncovered`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Invent `probabilities`, `iid`, or `KFold`.
 - Open `references/prediction-goal.md` or
   `references/metric-role.md`.
@@ -114,6 +118,7 @@
 - On lock, set Status to `locked`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Write Python or a class constructor.
 - Treat the user's sentence as the lock before the choice.
 - Load `build-ml-pipeline`.
@@ -136,6 +141,7 @@
   then stop for the next `frame show`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Leave Status `locked` after modify.
 - Treat the locked table as frozen.
 - Write a model or a splitter.

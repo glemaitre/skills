@@ -60,9 +60,12 @@ reading the digest. Read-only against the skore Project.
 Details: `setup-workspace` `references/human_facing_prose.md`.
 Audit markdown and `#` comments describe **this** report's findings
 — not the skills framework, the CLI, or the command that produced
-an output. Do not put API tutorials, version floors, or locator
-recipes in `audit/<stem>.py`. `<!-- results-embed: … -->` is a site
-marker. Authoring hints stay in this skill. `style` is ruff only.
+an output. Questions, replies, and the close narrative use the
+same data-science language — not skill ids, `G-*` names, or the
+wrapper CLI. Trailing locator tokens stay index strings. Do not
+put API tutorials, version floors, or locator recipes in
+`audit/<stem>.py`. `<!-- results-embed: … -->` is a site marker.
+Authoring hints stay in this skill. `style` is ruff only.
 
 ## Next-step pointers
 
