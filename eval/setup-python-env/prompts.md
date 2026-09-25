@@ -19,27 +19,30 @@ violated.
 **Must do:**
 - Emit the Pre-flight then run the commands (do not stop after
   listing boxes).
-- Name `python -m skore_skills env detect` and treat this as
+- Run `python -m skore_skills env detect` and treat this as
   bootstrap, not a package add.
-- Fire G-ENV-MGR using `recommended` (pixi first unless `.skore`
-  recorded another manager or `provenance.manager` names one).
-  PATH of other tools is not permission.
+- AskUserQuestion which env manager to use, using `recommended`
+  order (pixi first unless `.skore` recorded another manager or
+  `provenance.manager` names one). PATH of other tools is not
+  permission.
 - Ask whether we manage the env (default yes) and persist
   `env.managed`.
-- After the user picks a manager and managed=true, name
+- After the user picks a manager and managed=true, run
   `python -m skore_skills env init --manager <manager>` (not
   hand-edited TOML).
-- After init, name `python -m skore_skills env sync --execute`
+- After init, run `python -m skore_skills env sync --execute`
   (do not invent `pixi install` / `pixi init`).
 - Install plain Skore immediately afterward with
   `python -m skore_skills env add-skore --mode local --execute`.
-  Do not ask G-SKORE-MODE during bootstrap.
-- Name `python -m skore_skills env verify --execute`.
+  Do not ask where to store reports (Hub / local / MLflow) during
+  bootstrap.
+- Run `python -m skore_skills env verify --execute`.
 - Narrate default, agent, and composed dev: plain skore belongs to
   default; ruff, ipython, and ipykernel belong to agent. Do not
   narrate `skore-skills` to the user.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Install scikit-learn, skrub, or pandas in this turn.
 - Install `skore-skills` directly.
 - Run `pixi init` before the gates resolve.
@@ -58,13 +61,14 @@ violated.
 - `env.managed` is unset.
 
 **Must do:**
-- Name `env detect` and put `uv` first in the recommendation.
-- Still ask G-ENV-MGR (nothing is on disk yet).
+- Run `env detect` and put `uv` first in the recommendation.
+- Still ask which env manager to use (nothing is on disk yet).
 - After confirmation, `policy set env_manager` and
   `env init --manager uv`, then `env sync --execute`, then
   `env add-skore --mode local --execute`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Silently run `pixi init` because pixi is the static default.
 - Pick from PATH alone.
 
@@ -88,6 +92,7 @@ violated.
 - Stop without `env init` or `env sync`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `env init`, `env sync`, or `env add`.
 - Wait for the user to install agent tools before returning.
 
@@ -108,6 +113,7 @@ violated.
   name it if that skill is missing), not bootstrap init.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `pip install scikit-learn`.
 - `env init` as a substitute for adding sklearn.
 
@@ -124,10 +130,11 @@ violated.
 **Must do:**
 - Direct the turn to `add-python-package` (this skill is
   bootstrap-only).
-- Mention G-ENV-SCOPE lives there (project runtime vs a named
-  optional extra).
+- Say package scope (project runtime vs a named optional extra)
+  is handled when adding the package.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Silently `pixi add optuna` from this skill.
 - Re-run `env init`.
 
@@ -145,9 +152,10 @@ violated.
 - `status.skills.add-python-package` is `false`.
 
 **Must do:**
-- Name `python -m skore_skills env verify --execute`.
+- Run `python -m skore_skills env verify --execute`.
 - Name ruff / ipython / ipykernel and stop.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Invent `env add` for sklearn.
 - Invent the `add-python-package` procedure from memory.

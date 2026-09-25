@@ -72,7 +72,12 @@ files / empty) separately from `must-do-weak`.
    `**Expect cli:**` (argv substring of a `run_skore_skills` call,
    e.g. `api get sklearn.model_selection.KFold`),
    `**Expect tools:**` (tool-trace names, e.g. `AskUserQuestion`).
-   Document
+   User-facing Must-NOT: questions and the close narrative must not
+   quote catalog skill ids, HITL, `G-*` ask names, or
+   `python -m skore_skills` / `env add`. Score wrapper CLI via
+   `**Expect cli:**` or internal **Run**; trailing locator tokens
+   and unmanaged `pixi add` / `uv add` / `pip install` lines are
+   allowed. Document
    `python -m skore_skills` until `skore skills run` ships; do not
    require the forwarder in evals yet.
 2. Regenerate the skill-creator schema file:

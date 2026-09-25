@@ -46,9 +46,11 @@ them, and a JOURNAL index row.
 Details: `setup-workspace` `references/human_facing_prose.md`.
 Notebook markdown, `data_analysis.md`, JOURNAL text, and `#`
 comments describe **this** dataset — not the skills framework, the
-CLI, or the command that produced an output. `<!-- results-embed:
-… -->` is a site marker. Authoring hints stay in this skill.
-`style` is ruff only.
+CLI, or the command that produced an output. Questions, replies,
+and the close narrative use the same data-science language — not
+skill ids, `G-*` names, or the wrapper CLI.
+`<!-- results-embed: … -->` is a site marker. Authoring hints stay
+in this skill. `style` is ruff only.
 
 ## Artifacts
 

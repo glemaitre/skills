@@ -57,9 +57,11 @@ evaluate here.
 Details: `setup-workspace` `references/human_facing_prose.md`.
 Experiment markdown, design-note Method text, and `#` comments
 describe **this** pipeline — not the skills framework, the CLI, or
-the command that produced an output. `<!-- results-embed: … -->` is
-a site marker. Authoring hints stay in this skill. `style` is ruff
-only.
+the command that produced an output. Questions, replies, and the
+checkpoint close use the same data-science language — not skill
+ids, `G-*` names, or the wrapper CLI. `<!-- results-embed: … -->`
+is a site marker. Authoring hints stay in this skill. `style` is
+ruff only.
 
 **Terms.** **X marker** = `.skb.mark_as_X()` (predict-time slice).
 **Predict grid** = rows to score (IID: the loaded frame; panels:
@@ -95,8 +97,9 @@ it does not fit or test a model.
 
 Every question that gates work carries its own context. Before
 asking, state in 2–4 lines what the answer authorizes, the facts
-it rests on — echoed inline — and what each option does. A file
-link is an addition, never the context.
+it rests on — echoed inline — and what each option does, in
+data-science terms. Do not name skill ids or `G-*` tokens in the
+question. A file link is an addition, never the context.
 
 `evaluate consent` `ask` returns a `context` with `question`,
 `experiment`, `smoke`, and `persisted_report`: quote the design

@@ -27,7 +27,9 @@ not evaluate one.
 
 Details: `setup-workspace` `references/human_facing_prose.md`.
 Journal cells describe this dataset. Do not name the skills
-framework, the CLI, or a splitter class in the table.
+framework, the CLI, or a splitter class in the table. Questions
+use data-science language — not skill ids, `G-*` names, or the
+wrapper CLI.
 
 ## Procedure
 

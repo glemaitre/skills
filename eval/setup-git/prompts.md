@@ -17,13 +17,14 @@
 - Emit the Pre-flight then run the commands (do not stop after
   listing boxes).
 - Name `git init`.
-- Name `python -m skore_skills git ignore-merge`.
+- Run `python -m skore_skills git ignore-merge`.
 - Ask once whether later stages may autocommit (`on` vs `off`) and
   persist with `python -m skore_skills policy set git.autocommit`.
 - After `on`, use `git add` and `git commit -m` without a second
   confirm.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Stage `.env` or raw data.
 - Ask a second time before the first commit after `on`.
 - Push or create a remote.
@@ -42,10 +43,11 @@
 - `policy.git.autocommit` is already `on`.
 
 **Must do:**
-- Run or name `python -m skore_skills git ignore-merge`.
+- Run or run `python -m skore_skills git ignore-merge`.
 - Skip the autocommit policy question because it is already `on`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Re-ask whether later stages may autocommit.
 - Invent another `git commit` on this turn.
 - Run `git push`.
@@ -64,10 +66,11 @@
 
 **Must do:**
 - Name `git init`.
-- Name `python -m skore_skills git ignore-merge`.
+- Run `python -m skore_skills git ignore-merge`.
 - Persist `python -m skore_skills policy set git.autocommit off`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `git commit`.
 - Run `git push`.
 - Use `python -m skore_skills git end-turn` to create a commit.
@@ -87,12 +90,13 @@
 - No HEAD yet.
 
 **Must do:**
-- Name `python -m skore_skills git ignore-merge`.
+- Run `python -m skore_skills git ignore-merge`.
 - Ask which hidden paths to keep, then re-run
   `python -m skore_skills git ignore-merge --decide --keep .cursor`.
 - After autocommit `on` and no HEAD, `git add` and `git commit`.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - `--keep` `.env` or `.skore`.
 - Use `python -m skore_skills git end-turn` to create the first
   commit.

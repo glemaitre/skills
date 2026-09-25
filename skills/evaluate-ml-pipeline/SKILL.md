@@ -55,8 +55,11 @@ read the report. The pipeline declaration is out of scope (see
 Details: `setup-workspace` `references/human_facing_prose.md`.
 Experiment markdown and `#` comments describe **this** evaluation
 — not the skills framework, the CLI, or the command that produced
-an output. `<!-- results-embed: … -->` is a site marker. Authoring
-hints stay in this skill. `style` is ruff only.
+an output. Questions, replies, and the close narrative use the
+same data-science language — not skill ids, `G-*` names, or the
+wrapper CLI. Trailing locator tokens stay index strings.
+`<!-- results-embed: … -->` is a site marker. Authoring hints
+stay in this skill. `style` is ruff only.
 
 ## Stop conditions — read before anything else
 
@@ -376,8 +379,9 @@ the model.
 
 Every gate question carries its own context. Before asking, state
 in 2–4 lines what the answer authorizes, the facts it rests on —
-echoed inline — and what each option does. A file link is an
-addition, never the context.
+echoed inline — and what each option does, in data-science terms.
+Do not name `G-CV-SPLITTER` or skill ids in the question. A file
+link is an addition, never the context.
 
 `evaluate consent` `ask` returns a `context` with `question`,
 `experiment`, `smoke`, and `persisted_report`: quote the design

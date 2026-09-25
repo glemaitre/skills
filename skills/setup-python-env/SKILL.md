@@ -27,6 +27,13 @@ Bootstrap only. Direct packages this turn: `ruff`, `ipython`,
 mandatory dependency. Other stage libraries go through
 `add-python-package`.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+Ask which manager to use and whether we manage the env in
+plain language. Do not name `G-ENV-MGR`, skill ids, or the
+wrapper CLI to the user. Do not mention `skore-skills`.
+
 ## Pre-flight
 
 Tick, then immediately run the matching sequence step. Do not stop

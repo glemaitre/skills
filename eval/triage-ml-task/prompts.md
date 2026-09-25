@@ -15,22 +15,23 @@
   `review-ml-experiment`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
-- AskUserQuestion listing installed entry skills
-  (`setup-ml-project`, `explore-ml-data`, `model-ml-pipeline`,
-  `review-ml-experiment`, `manage-ml-backlog`, `export-ml-project`,
-  `sync-ml-reports` if installed). One pick.
-- Name `explore-ml-data` as the recommended next stage; do not
-  auto-load it.
+- Run `python -m skore_skills status`.
+- AskUserQuestion with human labels for installed entry work
+  (Set up the project, Explore the data, Build a model, Review
+  the last experiment, Record / decide what next, Export, Sync
+  reports if installed). One pick. Do not put skill ids on the
+  labels.
+- Recommend exploring the data first; do not auto-load it.
 - Do not treat the missing `.skore` as an empty project despite
   the existing scaffold.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Start designing the next experiment.
 - Claim to have loaded or executed every skill.
 - Auto-load a stage skill without asking.
-- Ask only stay / go deeper / next stage without naming entry
-  skills.
+- Ask only stay / go deeper / next stage without offering the
+  entry work.
 - Put `evaluate-ml-pipeline` or `audit-ml-pipeline` on the
   uncertain entry board.
 - Put `shape-user-idea` or `search-ml-literature` on the
@@ -50,10 +51,11 @@
 - `status.skills.setup-git` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `setup-git` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Ask which entry skill to run.
 - Invent `git init` procedure in triage instead of loading
   `setup-git`.
@@ -73,6 +75,7 @@
 - Skip in one line because `setup-git` is not installed.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `git init` or invent the `setup-git` procedure from memory.
 - Treat the missing skill as an error that aborts the session.
 
@@ -89,10 +92,11 @@
 - `status.skills.setup-python-env` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `setup-ml-project` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `setup-python-env` as the certain skill.
 - Ask which entry skill to run.
 
@@ -108,10 +112,11 @@
 - `status.skills.setup-python-env` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `setup-python-env` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `setup-ml-project` as the certain skill.
 - Ask which entry skill to run.
 
@@ -127,10 +132,11 @@
 - `status.skills.explore-ml-data` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `explore-ml-data` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Ask which entry skill to run.
 - Start exploratory data analysis methodology in triage instead of loading the skill.
 
@@ -148,12 +154,13 @@
 - `status.skills.model-ml-pipeline` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - AskUserQuestion: run exploratory data analysis first (default) vs proceed to modeling
   with user-supplied facts.
 - Do not invent dataset facts.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Auto-load `model-ml-pipeline`.
 - Auto-load `explore-ml-data` without asking.
 
@@ -170,10 +177,11 @@
 - `status.skills.model-ml-pipeline` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `model-ml-pipeline` without an exploratory data analysis AskUserQuestion.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Ask which entry skill to run.
 - Load `explore-ml-data` first.
 
@@ -189,10 +197,11 @@
 - `status.skills.export-ml-notebook` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `export-ml-notebook` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `export-ml-project` as the certain skill.
 - Ask which entry skill to run.
 
@@ -208,10 +217,11 @@
 - `status.skills.export-ml-site` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `export-ml-site` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `export-ml-project` as the certain skill.
 - Ask which entry skill to run.
 
@@ -227,10 +237,11 @@
 - `status.skills.export-ml-project` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `export-ml-project` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `export-ml-notebook` as the certain skill.
 - Ask which entry skill to run.
 
@@ -246,10 +257,11 @@
 - `status.skills.export-ml-notebook` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `export-ml-notebook` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `export-ml-project` as the certain skill.
 - Load `export-ml-site` as the certain skill.
 - Ask which entry skill to run.
@@ -268,10 +280,11 @@
 - `status.skills.explore-ml-data` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `explore-ml-data` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `research-ml-practice` as the certain skill.
 - Put `research-ml-practice` on the uncertain entry board.
 - Ask which entry skill to run.
@@ -290,10 +303,11 @@
 - `status.skills.model-ml-pipeline` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `model-ml-pipeline` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `research-ml-practice` as the certain skill.
 - Load `explore-ml-data` as the certain skill.
 - Ask which entry skill to run.
@@ -311,10 +325,11 @@
 - `status.skills.model-ml-pipeline` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `audit-ml-pipeline` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `model-ml-pipeline` as the certain skill.
 - Ask which entry skill to run.
 
@@ -330,10 +345,11 @@
 - `status.skills.sync-ml-reports` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `sync-ml-reports` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `evaluate-ml-pipeline` as the certain skill.
 - Ask which entry skill to run.
 
@@ -351,10 +367,11 @@
 - `journal/ideas/` has one idea file.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `manage-ml-backlog` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `review-ml-experiment` or `audit-ml-pipeline`.
 - Design the next experiment in triage.
 - Ask which entry skill to run.
@@ -373,13 +390,15 @@
 - The usual entry skills are `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
-- AskUserQuestion listing installed entry skills, including
-  `manage-ml-backlog` and `review-ml-experiment`. One pick.
-- Name `manage-ml-backlog` as the recommended next stage. Do
-  not auto-load it.
+- Run `python -m skore_skills status`.
+- AskUserQuestion with human labels for installed entry work,
+  including Record / decide what next and Review the last
+  experiment. One pick.
+- Recommend recording the run / deciding what next. Do not
+  auto-load it.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Auto-load `manage-ml-backlog`.
 - Put `audit-ml-pipeline` on the uncertain entry board.
 - Start designing the next experiment.
@@ -399,6 +418,7 @@
 - Skip in one line because `manage-ml-backlog` is not installed.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Invent idea-file triage (promote / dismiss / leave).
 - Load `review-ml-experiment` from memory.
 
@@ -413,10 +433,11 @@
 - `status.skills.review-ml-experiment` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `review-ml-experiment` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `audit-ml-pipeline` from triage.
 - Ask which entry skill to run.
 - Write a design note in triage.
@@ -432,10 +453,11 @@
 - `status.skills.shape-user-idea` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `shape-user-idea` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `search-ml-literature`.
 - Ask which entry skill to run.
 - Write a design note in triage.
@@ -452,10 +474,11 @@
 - `status.skills.search-ml-literature` is `true`.
 
 **Must do:**
-- Name `python -m skore_skills status`.
+- Run `python -m skore_skills status`.
 - Load `search-ml-literature` without listing the catalog menu.
 
 **Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `research-ml-practice`.
 - Load `model-ml-pipeline` as the certain skill.
 - Invent papers in triage.

@@ -11,6 +11,13 @@ description: >
 
 Ordering only. Children own convert and site commands.
 
+## Human-facing prose
+
+Details: `setup-workspace` `references/human_facing_prose.md`.
+The multi-select uses **Executed notebooks** and **Documentation
+site**. Do not put skill ids, convert flags, or the wrapper CLI
+in the question.
+
 ## Sequence
 
 1. `python -m skore_skills status`. Read `policy.notebooks`,

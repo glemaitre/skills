@@ -20,8 +20,11 @@ Do not load `smoke-test-ml-pipeline` as a sibling of evaluate.
 Details: `setup-workspace` `references/human_facing_prose.md`.
 Design notes, JOURNAL text, and `#` comments describe **this**
 experiment — not the skills framework, the CLI, or the command that
-produced an output. `<!-- results-embed: … -->` is a site marker.
-Authoring hints stay in this skill. `style` is ruff only.
+produced an output. Questions, replies, and the close narrative
+use the same data-science language — not skill ids, `G-*` names,
+or the wrapper CLI. Trailing locator tokens stay index strings.
+`<!-- results-embed: … -->` is a site marker. Authoring hints
+stay in this skill. `style` is ruff only.
 
 ## Design note shell
 
@@ -74,7 +77,9 @@ empty. Discussion is always present.
 
 Every approval question carries its own context. Before asking,
 state in 2–4 lines what the answer authorizes, the facts it rests
-on — echoed inline — and what each option does. A file link is an
+on — echoed inline — and what each option does, in data-science
+terms (Approve / Modify / Stop; dummy vs baseline). Do not name
+skill ids or `G-*` tokens in the question. A file link is an
 addition, never the context: "read `journal/<stem>.md` and
 approve" is not an approval request.
 
