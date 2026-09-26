@@ -55,7 +55,9 @@ criteria" section. Keep `## Notebooks` with Evaluation then Audit.
    When the table is `locked`, run
    `python -m skore_skills frame show`. A `proceed` whose
    `translation` is null has no splitter translation: say so and
-   stop. Do not write model code.
+   stop. Do not write model code. Do not present a choice list:
+   no dummy predictor, standard baseline, EDA-driven proposal,
+   Backlog row, or discussion.
 3. **Resume beats menu.** If the user names an experiment stem, or
    `status.policy.loop.stem` / `last_history_stem` identifies a
    current design, run
@@ -159,7 +161,13 @@ duplicate a child's detailed preview.
   → gated review. Then let `build-ml-pipeline`,
   `smoke-test-ml-pipeline`, `evaluate-ml-pipeline`, and
   `review-ml-experiment` each own the single detailed Before
-  execution preview at its actual compute boundary.
+  execution preview at its actual compute boundary. The dispatcher
+  preview is those four phase names only, one short line each. Do
+  not mention `pipeline.html`, a site rebuild, a row-count
+  assertion, `skore.evaluate`, or Review / Skip / Stop. Do not list
+  their commands (`status`, `frame show`, `design consent`,
+  `smoke run`) or a DataOps declaration in this preview. With
+  no shell, that four-phase paragraph is the whole answer.
 
 Do not invent minute estimates at dispatcher level. Name a known
 duration only when explicit measured evidence is available;
@@ -197,6 +205,8 @@ also ask in chat whether the note looks right.
    after the experiment file exists and runs
    `python -m skore_skills smoke run --stem <stem>`. JSON `stop`
    stays in build (modify the pipeline, re-run `smoke run`).
+   Do not tell the user to edit the smoke test's expected row
+   count so it matches the sample.
    `proceed`: build reports the
    design, then
    `python -m skore_skills evaluate consent --stem <stem>`

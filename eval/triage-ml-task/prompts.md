@@ -138,7 +138,10 @@
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Ask which entry skill to run.
-- Start exploratory data analysis methodology in triage instead of loading the skill.
+- Start exploratory data analysis methodology in triage instead of
+  loading the skill. Saying the request routes to exploration and
+  that the exploration skill is loaded next turn is not starting
+  the methodology. Writing profiling steps is.
 
 ---
 
@@ -373,7 +376,9 @@
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `review-ml-experiment` or `audit-ml-pipeline`.
-- Design the next experiment in triage.
+- Design the next experiment in triage. Restating the user's
+  request, or saying the backlog will turn the existing idea
+  into the next step, is not that design.
 - Ask which entry skill to run.
 
 ---
@@ -405,7 +410,7 @@
 
 ---
 
-## CASE_19 — Missing backlog skill is a one-line skip
+## CASE_19 — Missing backlog skill still offers the other entries
 
 **User prompt:**
 > What should we try next?
@@ -413,14 +418,19 @@
 **Assumed workspace state:**
 - `loop_stage` is `backlog`.
 - `status.skills.manage-ml-backlog` is `false`.
+- The other usual entry skills are `true`.
 
 **Must do:**
-- Skip in one line because `manage-ml-backlog` is not installed.
+- Say in one line that `manage-ml-backlog` is not installed.
+- Offer the other installed entry points, each with a short
+  description.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Invent idea-file triage (promote / dismiss / leave).
-- Load `review-ml-experiment` from memory.
+- Load `review-ml-experiment` from memory. A one-sentence
+  description of review, build, or explore is not loading that
+  skill. Writing the review steps as this turn's work still is.
 
 ---
 

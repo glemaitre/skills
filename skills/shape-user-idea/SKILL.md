@@ -52,7 +52,10 @@ data-science terms — not skill ids or the wrapper CLI.
    claim this dataset does not establish stays in Open gaps.
 8. Restate the idea in one short paragraph and wait for an
    explicit yes. "Maybe" is not yes. No or stop writes nothing.
-9. On yes, write `journal/ideas/<slug>.md`:
+9. On yes, the only file this skill writes is
+   `journal/ideas/<slug>.md`. Do not create or edit
+   `journal/JOURNAL.md` or a design note. Write
+   `journal/ideas/<slug>.md`:
 
 ```
 # <slug>

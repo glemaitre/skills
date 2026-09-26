@@ -120,8 +120,12 @@ locator.
    #, Item, Source). A planned History row uses `n/a` in Report.
    Stable `B<N>` indices. Do not renumber on removal.
 3. If recording a run: copy the headline metric from the audit
-   digest or the user's value. Do not invent numbers. Update the
-   matching History row (`planned` → `done` only if smoke passed).
+   digest or the user's value. Do not invent numbers. With no
+   digest and no user headline, skip the headline in one line and
+   leave the History status unchanged. Do not write `done` with
+   headline `n/a`. Update the
+   matching History row (`planned` → `done` only if smoke passed
+   and a headline result exists).
    Headline metric remains the source for History and Last result;
    never substitute G-AUDIT-FINDING for performance. Copy the
    digest's persisted-report locator into the History `Report`
@@ -157,13 +161,14 @@ locator.
    leave. Promote appends a stable `B<N>` row (Item from Question,
    Source copied verbatim) and deletes the file. Dismiss deletes
    the file. Leave keeps it. Do not create a design note here.
-   An empty folder does not fabricate `B1`. When the user wants
-   a new idea, or asks what to try next and the folder is empty,
-   load `shape-user-idea` for an idea, question, or artifact, and
-   `search-ml-literature` for a literature query, only if that id
-   is true. Missing skill → one-line skip; do not invent that
-   skill's search or shaping steps. Those skills write idea files
-   and return here; triage the new files in this same mode.
+   An empty folder is a one-line skip: there are no idea files to
+   triage, and it does not fabricate `B1`. The only follow-up is
+   offering to shape an idea or search the literature when those
+   skills are installed. Do not load either skill, and do not start
+   a search or a shaping menu, until the user picks one. Missing
+   skill → one-line skip; do not invent that skill's search or
+   shaping steps. After the user picks, that skill writes the idea
+   file and returns here; triage the new file in this same mode.
    When the user picks an existing `B<N>` to draft, return that
    row to `model-ml-pipeline`, which can create its design-note
    shell with

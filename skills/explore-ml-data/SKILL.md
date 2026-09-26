@@ -140,7 +140,9 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   notebook = those templates only (plus the matching target
   snippet). Do not add extra histograms, `sns.heatmap` /
   association matrices, unique-ratio (`nunique()/n`),
-  column-dicts, or `report.json()` cells. Leakage is the
+  column-dicts, or `report.json()` cells. The duplicate cell
+  prints the duplicate count only, not a uniqueness percentage
+  and not `nunique()/n`. Leakage is the
   template table, not a comment. Default figures: seaborn
   `displot` for the target only inside
   `templates/target_regression.py` /

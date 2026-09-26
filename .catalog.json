@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "c547af8af0bb2600588e70d03406dd0da145e8acd742699dbf224dcd242df82b",
+  "catalog_hash": "b4044a78d70c2eb779dfd36276223f358264f3957c321943955aeabefc7778fd",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "7f28ff62a4d43facd2afdf905d7cca14af0c6344cb4960452f4b26425d98f2c8"
+      "hash": "603fe0fffe3b265905c98ebc91b986853478a19d2004dd7a7186636457445f79"
     },
     {
       "id": "frame-ml-problem",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "dd37d80e2974613e078d5a16fef37c5adf8690f0e51afef98b0cb388884a489e"
+      "hash": "d18fad66a94e7e8f1ff466063d0d11529278b57062911110d0a08bab85362bed"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "720736826237ccbc2a830fcc651495fa1396168012239d98c5419c71071f61fa"
+      "hash": "3f0833efb433af2d59744e2424ff97675f64540fc779c2d52cbdaa9dea110886"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -66,7 +66,7 @@
       "summary": "Record experiment outcomes and triage idea files into backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "130a053574b7909dbd5e4523683d2cd1bb6ee1c12897b2d27aeab32474d46782"
+      "hash": "e2640214dce16c493ad6104c9b7ed49f6552097a66e04e4089200e0a870d1df2"
     },
     {
       "id": "organize-ml-workspace",
@@ -93,7 +93,7 @@
       "summary": "Session owner: list installed entry skills and ask which to run.",
       "category": "meta",
       "subcategory": null,
-      "hash": "b0dc3b9d0559814e80da1c62ff2483eb79d961a37ee85932cb0e76adb07ce9a2"
+      "hash": "960ea88df48f52f7fe9af38a506170ab2a278b763c480884402668c464207ac6"
     },
     {
       "id": "review-ml-experiment",
@@ -111,7 +111,7 @@
       "summary": "Shape a user idea or a named artifact into one idea file after they confirm.",
       "category": "meta",
       "subcategory": null,
-      "hash": "b7787e03e91a7f4f813fe06b9782521b227b6fcff303b3e07b7fc50d0275fbc3"
+      "hash": "eed8bfc6e988ef46a8e0f94b1e025a3383467148060417b770eb517610df6acc"
     },
     {
       "id": "search-ml-literature",
@@ -120,7 +120,7 @@
       "summary": "Search scientific and technical sources and write one idea file for the direction the user confirms.",
       "category": "meta",
       "subcategory": null,
-      "hash": "4d57b60baf87c636da44e65f4d957f0a4b259e57a8217c5e553727de5ef4f30b"
+      "hash": "66559d06c9164e794f5b3d8db27cf6b0f63f5cdab895d1dfac66fac87403da0a"
     },
     {
       "id": "setup-ml-project",
@@ -156,7 +156,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "8851c55f5158c4dc4e6fbf321f95dff6d518e46746762fd0252b4923a31d292c"
+      "hash": "da06feebf0bc3a1838e41dbba1897ac6861d7652e23865b00110e9ebc66b311c"
     },
     {
       "id": "choose-python-library",
@@ -192,7 +192,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
-      "hash": "d6226a47be1cfbe73c5b0224f23c2b44c5ef2c5608e17ac06edc8490abb05f93"
+      "hash": "f0fa89049726d192b24a424622103199f6605f4291565a2b50212a634458d632"
     },
     {
       "id": "setup-workspace",
@@ -201,7 +201,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "cf31a3f9a9e55ea6f69353fb199919a55dfc5d3eef60ee9661228b60fd43e13d"
+      "hash": "bc3fd594db11c87d4c89cddf69e04b19cb25bfdb668a0d668c09f1d511a6fb90"
     },
     {
       "id": "setup-python-env",

@@ -325,6 +325,8 @@ violated.
 - Author `skore.evaluate` / `project.put` call sites this turn
   (naming them in a STOP sentence is allowed).
 - Say CV can still be produced while smoke is failing.
+  Explaining why CV must not run while smoke is red, including
+  naming `skore.evaluate` in that STOP sentence, is allowed.
 
 ---
 
@@ -360,7 +362,9 @@ violated.
 - Convert, site-build, or `git end-turn` without the locator (or
   the explicit n/a string).
 - End the turn without convert or site build while both gates are
-  true.
+  true. This turn has no tools, so naming `notebook convert` and
+  then `site build` in that order is the close, including inside a
+  later-turn list. Omitting those two names is the violation.
 - Run `site build` before the journal is recorded.
 - Write `journal/JOURNAL.md` or the design note directly.
 - Run `git commit` in this skill.
@@ -422,7 +426,8 @@ violated.
   an id. Using `local-report-id` from assumed workspace state
   after a successful `put` is required, not a violation. Saying
   the live shell did not re-run `put` this turn is not a
-  violation.
+  violation. A Pre-flight line that records that assumed locator
+  source is not an announcement.
 - Convert, site-build, or `git end-turn` without the locator.
 
 ---
@@ -690,7 +695,8 @@ violated.
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Ask for a cross-validator.
-- Write `skore.evaluate`.
+- Write a `skore.evaluate` call. Naming it in a STOP sentence
+  is allowed.
 
 
 ---

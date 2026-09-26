@@ -95,13 +95,13 @@
       "id": 5,
       "title": "Smoke red or Stop does not start evaluate",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved design and experiment script exist.\n- `tests/smoke/test_01_baseline.py` fails pytest (row count).]\n\nThe baseline design is approved. Implement the model. Pytest\nsmoke is red on row count.",
-      "expected_output": "Behavioural response satisfying: - Stay with `build-ml-pipeline` / `smoke run` to fix topology. - Name that JSON `stop` keeps the loop in build. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Load `evaluate-ml-pipeline` or write `skore.evaluate`. - Load `audit-ml-pipeline`.",
+      "expected_output": "Behavioural response satisfying: - Stay with `build-ml-pipeline` / `smoke run` to fix topology. - Name that JSON `stop` keeps the loop in build. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Load `evaluate-ml-pipeline` or write `skore.evaluate`. Describing the post-green sequence, and saying it is unreachable while smoke is red, is not starting it. Writing the call this turn is. - Load `audit-ml-pipeline`.",
       "files": [],
       "expectations": [
         "Stay with `build-ml-pipeline` / `smoke run` to fix topology.",
         "Name that JSON `stop` keeps the loop in build.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
-        "The response does NOT: Load `evaluate-ml-pipeline` or write `skore.evaluate`.",
+        "The response does NOT: Load `evaluate-ml-pipeline` or write `skore.evaluate`. Describing the post-green sequence, and saying it is unreachable while smoke is red, is not starting it. Writing the call this turn is.",
         "The response does NOT: Load `audit-ml-pipeline`.",
         "The response does NOT: Loosen the smoke assertion so pytest passes."
       ],

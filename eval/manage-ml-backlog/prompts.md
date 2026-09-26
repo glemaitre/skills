@@ -171,12 +171,15 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Rescan the Backlog or add/resolve `B1` / `B2` rows.
 - Ask the idea-triage question.
-- Dispatch `audit-ml-pipeline`.
+- Dispatch `audit-ml-pipeline`. Naming the caller when returning
+  is not dispatching it.
 - Run `site build` or `git end-turn --stage backlog` — the caller
   owns the close.
 - Rewrite or shorten the supplied Hub URL. Pasting the digest
   string unchanged is required, not a violation.
 - Merge the audit finding into the headline metric or Last result.
+  Copying the supplied G-AUDIT-FINDING unchanged, including the
+  `ROC-AUC 0.86` already inside that string, is required.
 - Parse `scratch/results/` HTML when writing `## Results`.
 - Invent extra Display subsections without a matching digest cell.
 
@@ -255,4 +258,6 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Fabricate a `B1` row.
 - Write a design note.
-- Invent a literature search or a shaping menu from this skill.
+- Start a literature search or a shaping questionnaire. Offering
+  to shape an idea or search the literature, without loading
+  either skill, is required.

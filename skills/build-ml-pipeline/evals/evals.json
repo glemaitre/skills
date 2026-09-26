@@ -249,13 +249,13 @@
       "id": 13,
       "title": "EDA-backed build stays within cited findings",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The Method cites high cardinality and a temporal grouping\n  finding from `data_analysis/data_analysis.md`.]\n\nImplement the approved EDA-backed design.",
-      "expected_output": "Behavioural response satisfying: - Implement only the cited preprocessing/grouping decisions. - Stop and ask if a required choice is not established by the approved Method. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Invent another EDA finding or domain fact. - Re-run or edit EDA from this skill.",
+      "expected_output": "Behavioural response satisfying: - Implement only the cited preprocessing/grouping decisions. - Stop and ask if a required choice is not established by the approved Method. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Invent another EDA finding or domain fact. Using the high-cardinality and temporal-grouping findings named in the assumed Method is required. - Re-run or edit EDA from this skill.",
       "files": [],
       "expectations": [
         "Implement only the cited preprocessing/grouping decisions.",
         "Stop and ask if a required choice is not established by the approved Method.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
-        "The response does NOT: Invent another EDA finding or domain fact.",
+        "The response does NOT: Invent another EDA finding or domain fact. Using the high-cardinality and temporal-grouping findings named in the assumed Method is required.",
         "The response does NOT: Re-run or edit EDA from this skill.",
         "The response does NOT: Add align / join / lag steps not named in the assumed Method."
       ],

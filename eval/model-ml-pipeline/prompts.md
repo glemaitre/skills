@@ -152,6 +152,9 @@ and `frame show` already returned `proceed` with a non-null
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `evaluate-ml-pipeline` or write `skore.evaluate`.
+  Describing the post-green sequence, and saying it is unreachable
+  while smoke is red, is not starting it. Writing the call this
+  turn is.
 - Load `audit-ml-pipeline`.
 - Loosen the smoke assertion so pytest passes.
 
