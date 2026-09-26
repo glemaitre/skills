@@ -440,7 +440,7 @@ def test_probability_baseline_includes_logistic(tmp_path: Path) -> None:
     assert payload["candidates"] == ["logistic", "production", "dummy"]
 
 
-def test_unparseable_horizon_stays_missing(tmp_path: Path) -> None:
+def test_unparsable_horizon_stays_missing(tmp_path: Path) -> None:
     """A horizon that is not a quantity is asked again."""
     _journal(
         tmp_path,

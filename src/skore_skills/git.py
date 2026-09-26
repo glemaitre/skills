@@ -13,10 +13,9 @@ from collections.abc import Sequence
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from skore_skills.policy import load_policy
+from skore_skills.policy import LOOP_STAGES, load_policy
 from skore_skills.scaffold import template_root
 
-END_TURN_STAGES = ("setup", "data_analysis", "implement", "evaluate", "backlog")
 PERSIST_SKILL = "persist-ml-git"
 
 KEEP_EXCEPTIONS = frozenset({".gitignore", ".gitattributes"})
@@ -159,22 +158,28 @@ def _resolved_from_gitignore(root: Path) -> set[str]:
     return keys
 
 
-def _append_resolved(root: Path, names: Sequence[str]) -> None:
+def _append_resolved_line(
+    root: Path,
+    names: Sequence[str],
+    *,
+    prefix: str,
+    current: set[str],
+) -> None:
+    """Replace the single ``prefix`` comment in ``.gitignore`` with ``names``."""
     if not names:
         return
     dest = root / ".gitignore"
     existing = dest.read_text(encoding="utf-8") if dest.is_file() else ""
-    current = _resolved_from_gitignore(root)
     current.update(_dotfile_key(name) for name in names)
     rendered: list[str] = []
     for key in sorted(current):
         suffix = "/" if (root / key).is_dir() else ""
         rendered.append(f"{key}{suffix}")
-    new_line = f"{RESOLVED_DOTFILES_PREFIX} {' '.join(rendered)}"
+    new_line = f"{prefix} {' '.join(rendered)}"
     out: list[str] = []
     found = False
     for line in existing.splitlines():
-        if line.strip().startswith(RESOLVED_DOTFILES_PREFIX):
+        if line.strip().startswith(prefix):
             if not found:
                 out.append(new_line)
                 found = True
@@ -183,6 +188,15 @@ def _append_resolved(root: Path, names: Sequence[str]) -> None:
     if not found:
         out.append(new_line)
     dest.write_text("\n".join(out) + "\n", encoding="utf-8")
+
+
+def _append_resolved(root: Path, names: Sequence[str]) -> None:
+    _append_resolved_line(
+        root,
+        names,
+        prefix=RESOLVED_DOTFILES_PREFIX,
+        current=set() if not names else _resolved_from_gitignore(root),
+    )
 
 
 def _append_keep_exceptions(root: Path, keep: Sequence[str]) -> list[str]:
@@ -344,29 +358,12 @@ def _is_resolved_review(rel: str, resolved: set[str]) -> bool:
 
 
 def _append_resolved_review(root: Path, names: Sequence[str]) -> None:
-    if not names:
-        return
-    dest = root / ".gitignore"
-    existing = dest.read_text(encoding="utf-8") if dest.is_file() else ""
-    current = _resolved_review_from_gitignore(root)
-    current.update(_dotfile_key(name) for name in names)
-    rendered: list[str] = []
-    for key in sorted(current):
-        suffix = "/" if (root / key).is_dir() else ""
-        rendered.append(f"{key}{suffix}")
-    new_line = f"{RESOLVED_REVIEW_PREFIX} {' '.join(rendered)}"
-    out: list[str] = []
-    found = False
-    for line in existing.splitlines():
-        if line.strip().startswith(RESOLVED_REVIEW_PREFIX):
-            if not found:
-                out.append(new_line)
-                found = True
-            continue
-        out.append(line)
-    if not found:
-        out.append(new_line)
-    dest.write_text("\n".join(out) + "\n", encoding="utf-8")
+    _append_resolved_line(
+        root,
+        names,
+        prefix=RESOLVED_REVIEW_PREFIX,
+        current=set() if not names else _resolved_review_from_gitignore(root),
+    )
 
 
 def _append_ignore_lines(root: Path, paths: Sequence[str]) -> list[str]:
@@ -569,8 +566,8 @@ def run_ignore_merge(
 
 def run_end_turn(root: Path, stage: str) -> tuple[dict[str, Any], int]:
     """Print whether to load ``persist-ml-git``. Never commits."""
-    if stage not in END_TURN_STAGES:
-        raise ValueError(f"stage must be one of {', '.join(END_TURN_STAGES)}")
+    if stage not in LOOP_STAGES:
+        raise ValueError(f"stage must be one of {', '.join(LOOP_STAGES)}")
     policy = load_policy(root)
     autocommit = policy.get("git", {}).get("autocommit")
     if not _has_repo(root):
