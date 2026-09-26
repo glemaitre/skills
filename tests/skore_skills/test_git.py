@@ -11,7 +11,15 @@ import pytest
 from click.testing import CliRunner
 
 from skore_skills.cli import cli
-from skore_skills.git import merge_gitignore
+from skore_skills.git import (
+    RESOLVED_DOTFILES_PREFIX,
+    RESOLVED_REVIEW_PREFIX,
+    list_ambiguous_dotfiles,
+    list_review_paths,
+    merge_gitignore,
+    run_end_turn,
+    run_review,
+)
 from skore_skills.policy import set_policy_value
 
 pytestmark = pytest.mark.skipif(shutil.which("git") is None, reason="git not installed")
@@ -509,3 +517,218 @@ def test_review_notebook_when_present(
     assert result.exit_code == 2, result.output
     paths = _review_by_path(json.loads(result.output))
     assert paths["notes.ipynb"]["kind"] == "notebook"
+
+
+def _failed_git(stderr: str = "fatal: not a git repository\n"):
+    def fake_run(argv: list[str], **kwargs: object) -> object:
+        return type(
+            "Result",
+            (),
+            {"returncode": 128, "stdout": "", "stderr": stderr},
+        )()
+
+    return fake_run
+
+
+def test_keep_absolute_directory_and_rejects_outside(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An absolute in-repo directory is kept; paths outside the root are refused."""
+    monkeypatch.chdir(tmp_path)
+    hidden = tmp_path / ".hidden"
+    hidden.mkdir()
+    _write(hidden / "note.txt", "x\n")
+    kept = CliRunner().invoke(cli, ["git", "ignore-merge", "--keep", str(hidden)])
+    assert kept.exit_code == 0, kept.output
+    text = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    assert "!.hidden/" in text
+    assert "!.hidden/**" in text
+
+    outside = CliRunner().invoke(
+        cli, ["git", "ignore-merge", "--keep", str(tmp_path.parent / "nope")]
+    )
+    assert outside.exit_code != 0
+    assert "outside workspace" in outside.output
+    parent = CliRunner().invoke(cli, ["git", "ignore-merge", "--keep", "../nope"])
+    assert parent.exit_code != 0
+    assert "outside workspace" in parent.output
+
+
+def test_gitignore_glob_exception_and_missing_root_are_settled(tmp_path: Path) -> None:
+    """``!**`` counts as a decision, and a missing root has nothing to ask."""
+    (tmp_path / ".gitignore").write_text("!.cache/**\n", encoding="utf-8")
+    (tmp_path / ".cache").mkdir()
+    assert list_ambiguous_dotfiles(tmp_path) == []
+    assert list_ambiguous_dotfiles(tmp_path / "missing") == []
+
+
+def test_decide_replaces_the_resolved_dotfile_line(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A second ``--decide`` rewrites the resolved line instead of duplicating it."""
+    monkeypatch.chdir(tmp_path)
+    quiet = CliRunner().invoke(cli, ["git", "ignore-merge", "--decide"])
+    assert quiet.exit_code == 0, quiet.output
+    assert RESOLVED_DOTFILES_PREFIX not in (tmp_path / ".gitignore").read_text(
+        encoding="utf-8"
+    )
+
+    _write(tmp_path / ".extra", "a\n")
+    first = CliRunner().invoke(cli, ["git", "ignore-merge", "--decide"])
+    assert first.exit_code == 0, first.output
+    _write(tmp_path / ".more", "b\n")
+    second = CliRunner().invoke(cli, ["git", "ignore-merge", "--decide"])
+    assert second.exit_code == 0, second.output
+    lines = [
+        line
+        for line in (tmp_path / ".gitignore").read_text(encoding="utf-8").splitlines()
+        if line.startswith(RESOLVED_DOTFILES_PREFIX)
+    ]
+    assert len(lines) == 1
+    assert ".extra" in lines[0]
+    assert ".more" in lines[0]
+
+
+def test_porcelain_parses_renames_quotes_and_status_errors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Porcelain skips short rows, follows renames, and unquotes paths."""
+    from skore_skills.git import _porcelain_paths, _run_git
+
+    stdout = "\n".join(
+        [
+            " M",
+            "R  old.py -> new.py",
+            'A  "weird file.py"',
+            "?? ok.py",
+        ]
+    )
+
+    def fake_run(argv: list[str], **kwargs: object) -> object:
+        return type(
+            "Result",
+            (),
+            {"returncode": 0, "stdout": stdout, "stderr": ""},
+        )()
+
+    monkeypatch.setattr("skore_skills.git.subprocess.run", fake_run)
+    assert _porcelain_paths(tmp_path) == ["new.py", "weird file.py", "ok.py"]
+
+    monkeypatch.setattr("skore_skills.git.subprocess.run", _failed_git())
+    with pytest.raises(ValueError, match="not a git repository"):
+        _porcelain_paths(tmp_path)
+
+    def missing_git(argv: list[str], **kwargs: object) -> object:
+        raise FileNotFoundError
+
+    monkeypatch.setattr("skore_skills.git.subprocess.run", missing_git)
+    with pytest.raises(ValueError, match="not installed"):
+        _run_git(tmp_path, "status")
+
+
+def test_review_skips_missing_paths_and_unreadable_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Gone paths are dropped; an unreadable file is treated as empty."""
+    assert list_review_paths(tmp_path, ["gone.pkl"]) == []
+    _write(tmp_path / "locked.bin", "x" * 20)
+    real_stat = Path.stat
+    real_exists = Path.exists
+
+    def exists(self: Path) -> bool:
+        if self.name == "locked.bin":
+            return True
+        return real_exists(self)
+
+    def stat(self: Path, *args: object, **kwargs: object):
+        if self.name == "locked.bin":
+            raise OSError("denied")
+        return real_stat(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "exists", exists)
+    monkeypatch.setattr(Path, "stat", stat)
+    assert list_review_paths(tmp_path, ["locked.bin"]) == []
+
+
+def test_review_html_notebook_and_mixed_folder(tmp_path: Path) -> None:
+    """``.nb.html`` is a notebook, and a mixed folder keeps the dominant kind."""
+    _write(tmp_path / "report.nb.html", "<p></p>\n")
+    entries = list_review_paths(tmp_path, ["report.nb.html"])
+    assert entries[0]["kind"] == "notebook"
+
+    _write(tmp_path / "notes" / "model.pkl", "x\n")
+    _write(tmp_path / "notes" / "view.ipynb", "{}\n")
+    mixed = list_review_paths(tmp_path, ["notes/model.pkl", "notes/view.ipynb"])
+    assert [item["path"] for item in mixed] == ["notes/"]
+    assert mixed[0]["kind"] == "artifact"
+
+
+def test_end_turn_rejects_unknown_stage(tmp_path: Path) -> None:
+    """Library callers cannot invent a stage the CLI choice already rejects."""
+    with pytest.raises(ValueError, match="stage must be one of"):
+        run_end_turn(tmp_path, "audit")
+
+
+def test_review_without_a_repo_is_ready(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """No ``.git`` means there is nothing to classify."""
+    monkeypatch.chdir(tmp_path)
+    payload, code = run_review(tmp_path)
+    assert code == 0
+    assert payload["reason"] == "no_repo"
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output)["reason"] == "no_repo"
+
+
+def test_git_commands_surface_status_failures(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Review and end-turn turn a failing ``git status`` into a CLI error."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    monkeypatch.setattr("skore_skills.git.subprocess.run", _failed_git())
+    review = CliRunner().invoke(cli, ["git", "review"])
+    assert review.exit_code != 0
+    assert "not a git repository" in review.output
+    end = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "implement"])
+    assert end.exit_code != 0
+    assert "not a git repository" in end.output
+
+
+def test_review_decide_overlap_and_remaining_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A path cannot be kept and ignored, and leftover paths stay unresolved."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    _write(tmp_path / "a.pkl", "a\n")
+    _write(tmp_path / "b.pkl", "b\n")
+    empty = CliRunner().invoke(cli, ["git", "review-decide"])
+    assert empty.exit_code == 2
+    gitignore = tmp_path / ".gitignore"
+    recorded = gitignore.read_text(encoding="utf-8") if gitignore.is_file() else ""
+    assert RESOLVED_REVIEW_PREFIX not in recorded
+
+    both = CliRunner().invoke(
+        cli, ["git", "review-decide", "--keep", "a.pkl", "--ignore", "a.pkl"]
+    )
+    assert both.exit_code != 0
+    assert "both keep and ignore" in both.output
+
+    kept = CliRunner().invoke(cli, ["git", "review-decide", "--keep", "a.pkl"])
+    assert kept.exit_code == 2
+    payload = json.loads(kept.output)
+    assert [item["path"] for item in payload["review_paths"]] == ["b.pkl"]
+
+    ignored = CliRunner().invoke(cli, ["git", "review-decide", "--ignore", "b.pkl"])
+    assert ignored.exit_code == 0, ignored.output
+    lines = [
+        line
+        for line in (tmp_path / ".gitignore").read_text(encoding="utf-8").splitlines()
+        if line.startswith(RESOLVED_REVIEW_PREFIX)
+    ]
+    assert len(lines) == 1
+    assert "a.pkl" in lines[0]
+    assert "b.pkl" in lines[0]
