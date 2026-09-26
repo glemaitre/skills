@@ -43,12 +43,16 @@ dramatic misses:
   judge. The harness checks it on the question and close narrative
   only. Pre-flight, State at close, Post-close, Mechanical, Run,
   Commands, Checklist, agent, internal, harness, handoff, sequence,
-  actions, and end-of-turn sections are ignored, as is a plain
-  Pre-flight block until the next heading. Fenced wrapper-CLI blocks
-  and any line that records `python -m skore_skills` or `env add`
-  are ignored (`**Expect cli:**` scores those). Backtick-wrapped
-  procedure names and parenthetical gate labels are not the close
-  narrative. `AskUserQuestion` is the tool name, not a violation.
+  actions, end-of-turn, and gate sections are ignored, as is a plain
+  Pre-flight block until the next heading. Fenced blocks, code
+  comments, import lines, checklist rows, and a heading or bullet
+  whose label is only a `G-*` ask name are ignored. Any line that
+  records `python -m skore_skills` or `env add` is ignored
+  (`**Expect cli:**` scores those). Backtick-wrapped procedure
+  names, bold procedure names, and parenthetical gate labels are
+  not the close   narrative. A `G-*` ask name in a later step is not the question.
+  Asking the user about that name still is. `AskUserQuestion` is the
+  tool name, not a violation.
   Trailing `G-REPORT-LOCATOR` /
   `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` /
   `pip install` lines stay allowed.

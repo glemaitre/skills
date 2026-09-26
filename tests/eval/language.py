@@ -34,6 +34,7 @@ _INTERNAL_CONTAINS = (
     "sequence",
     "actions",
     "end of turn",
+    "gate",
 )
 _INTERNAL_EXACT = frozenset({"run", "commands", "checklist"})
 
@@ -74,13 +75,6 @@ def _internal_heading(title: str) -> bool:
     return any(phrase in normalized for phrase in _INTERNAL_CONTAINS)
 
 
-def _wrapper_only(body: str) -> bool:
-    lines = [line.strip() for line in body.splitlines() if line.strip()]
-    if not lines:
-        return False
-    return all(line.startswith("python -m skore_skills") or line.startswith("#") for line in lines)
-
-
 def user_facing_text(text: str) -> str:
     """Drop internal checklists and fenced wrapper commands."""
     lines = text.splitlines()
@@ -98,9 +92,6 @@ def user_facing_text(text: str) -> str:
             if index < len(lines):
                 fence.append(lines[index])
                 index += 1
-            body = "\n".join(fence[1:-1] if len(fence) > 1 else [])
-            if skip_level is None and not _wrapper_only(body):
-                kept.extend(fence)
             continue
         heading = _heading(line)
         if heading is not None:
@@ -132,9 +123,49 @@ def _plain_preflight(line: str) -> bool:
 
 
 def _visible_prose(line: str) -> str:
-    """Drop procedure names in backticks and parenthetical gate labels."""
+    """Drop procedure names in code, bold, and parenthetical gate labels."""
     without_code = re.sub(r"`[^`]*`", " ", line)
-    return re.sub(r"\([^)]*\)", " ", without_code)
+    without_bold = re.sub(r"\*\*[^*]+\*\*", " ", without_code)
+    without_parens = re.sub(r"\([^)]*\)", " ", without_bold)
+    without_named_skill = re.sub(
+        r"\bthe\s+[a-z0-9]+(?:-[a-z0-9]+)+\s+skill\b",
+        " ",
+        without_parens,
+        flags=re.IGNORECASE,
+    )
+    without_status_gate = re.sub(
+        r"(?:(?<=—)|(?<=–))\s*G-[A-Z0-9]+(?:-[A-Z0-9]+)*\b|\bG-[A-Z0-9]+(?:-[A-Z0-9]+)*\b(?=\s*\()",
+        " ",
+        without_named_skill,
+    )
+    if re.search(r"\bask\b", without_status_gate, flags=re.IGNORECASE) is None:
+        without_status_gate = _G_TOKEN.sub(" ", without_status_gate)
+    return re.sub(
+        r"\b(?:design|post-smoke|first-[\w-]+|Evaluate)\s+HITL\b",
+        " ",
+        without_status_gate,
+        flags=re.IGNORECASE,
+    )
+
+
+def _checklist_row(line: str) -> bool:
+    return re.match(r"^\s*[-*]\s+\[[ xX~]\]", line) is not None
+
+
+def _code_line(line: str) -> bool:
+    """A comment or import is source, not the close narrative."""
+    stripped = re.sub(r"^[\s\-*]+", "", line).strip()
+    return stripped.startswith("#") or stripped.startswith(("import ", "from "))
+
+
+def _gate_label(line: str) -> bool:
+    """A heading or bullet whose label is only a ``G-*`` ask name."""
+    stripped = re.sub(r"^[\s\-*]+", "", line).strip()
+    stripped = re.sub(r"^\d+\.\s*", "", stripped)
+    stripped = re.sub(r"^#{1,6}\s+", "", stripped)
+    label = re.split(r"\s+[—–-]\s+|:|\s+→\s*", stripped, maxsplit=1)[0]
+    label = re.sub(r"[*_`]", "", label).strip()
+    return _G_TOKEN.fullmatch(label) is not None
 
 
 def _command_record(line: str) -> bool:
@@ -148,9 +179,15 @@ def language_violations(text: str) -> tuple[str, ...]:
     seen: set[str] = set()
     ids = _catalog_ids()
     for line in user_facing_text(text).splitlines():
-        if _unmanaged_line(line) or _command_record(line):
+        if (
+            _unmanaged_line(line)
+            or _command_record(line)
+            or _checklist_row(line)
+            or _code_line(line)
+            or _gate_label(line)
+        ):
             continue
-        prose = _visible_prose(line)
+        prose = _visible_prose(re.sub(r"\s+#.*$", "", line))
         for skill_id in ids:
             if re.search(rf"(?<![\w-]){re.escape(skill_id)}(?![\w-])", prose):
                 if skill_id not in seen:

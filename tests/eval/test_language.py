@@ -48,6 +48,31 @@ G-REPORT-LOCATOR
     assert score_user_facing_language(text).passed is True
 
 
+def test_gate_labels_checklist_rows_and_code_are_not_the_close() -> None:
+    text = """
+## Gate status
+- **G-SKORE-MODE** — read `status.policy.skore_mode`
+- [x] G-PKG-NAME: churnlab
+
+## `experiments/02_load_forecast.py`
+from load_forecast.pipeline import learner  # owned by build-ml-pipeline
+
+# pipeline declaration owned by build-ml-pipeline
+"""
+    assert language_violations(text) == ()
+
+
+def test_bold_procedure_names_and_gate_phrases_are_not_the_close() -> None:
+    text = """
+The next child is **build-ml-pipeline**.
+1. Confirm **G-SKORE-MODE** before writing the call.
+3. G-CV-SPLITTER → read the locked translation.
+The post-smoke HITL is skipped. The first-evaluation HITL is not consent.
+The persist-ml-git skill stops on skip.
+"""
+    assert language_violations(text) == ()
+
+
 def test_procedure_names_and_plain_preflight_are_not_the_close() -> None:
     text = """
 Pre-flight (evaluate-ml-pipeline):
@@ -74,6 +99,11 @@ Next, load explore-ml-data before writing the notebook.
     assert outcome.score == 0.0
     assert "explore-ml-data" in outcome.reason
     assert "G-TABULAR" not in outcome.reason
+
+
+def test_bare_ask_name_in_the_question_fails() -> None:
+    text = "Ask about G-SKORE-MODE before you continue."
+    assert "G-SKORE-MODE" in language_violations(text)
 
 
 def test_stretched_labels_are_not_catalog_ids() -> None:

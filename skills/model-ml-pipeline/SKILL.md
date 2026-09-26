@@ -199,6 +199,8 @@ also ask in chat whether the note looks right.
    after the experiment file exists and runs
    `python -m skore_skills smoke run --stem <stem>`. JSON `stop`
    stays in build (modify the pipeline, re-run `smoke run`).
+   Do not tell the user to edit the smoke test's expected row
+   count so it matches the sample.
    `proceed`: build reports the
    design, then
    `python -m skore_skills evaluate consent --stem <stem>`

@@ -50,7 +50,9 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Pass `--execute` on `env add`.
 - Mention `python -m skore_skills` or `env add` in the user-facing
-  ask.
+  ask. The two-option ask must not tell the user to run `env add`.
+  A sentence that the print-only `env add` could not run this turn
+  is not that ask.
 - Treat unmanaged as silent skip without naming the package.
 
 ---

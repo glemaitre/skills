@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "651e4411152603d0f31d29873dac84371b1613256abe6a5c8bf380c808cd6f28",
+  "catalog_hash": "f12b318559dfe89d6a4c520e9f33247907ecd426e828d06449729cffa039b33e",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "7f28ff62a4d43facd2afdf905d7cca14af0c6344cb4960452f4b26425d98f2c8"
+      "hash": "603fe0fffe3b265905c98ebc91b986853478a19d2004dd7a7186636457445f79"
     },
     {
       "id": "frame-ml-problem",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "dd37d80e2974613e078d5a16fef37c5adf8690f0e51afef98b0cb388884a489e"
+      "hash": "d18fad66a94e7e8f1ff466063d0d11529278b57062911110d0a08bab85362bed"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "6e67a6ad77207a1721628d167d60b5137982f416f822f892567a6f137e181331"
+      "hash": "3f0833efb433af2d59744e2424ff97675f64540fc779c2d52cbdaa9dea110886"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -66,7 +66,7 @@
       "summary": "Record experiment outcomes and triage idea files into backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "3a5fdb44776e80d168fe3dc7bbec6ad993512963b9c488c270a49b93de5e3aff"
+      "hash": "8a74223eada709c117ef7126aa5c59a36dc0b2ff13a3e0a438d2add3a3408f6d"
     },
     {
       "id": "organize-ml-workspace",
@@ -93,7 +93,7 @@
       "summary": "Session owner: list installed entry skills and ask which to run.",
       "category": "meta",
       "subcategory": null,
-      "hash": "f1b92db81a23f8a1f74bc3c2b59bf0cf3e6c9a7ee539748f01d7756fee903e1d"
+      "hash": "960ea88df48f52f7fe9af38a506170ab2a278b763c480884402668c464207ac6"
     },
     {
       "id": "review-ml-experiment",
@@ -156,7 +156,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "dfc444cd7e7fa26837737fb976794c9b76fa61d5bfd7b9d677fc515178f76739"
+      "hash": "2cd43cbe0e82b33e05592c0b82e5eb47999aca36d3b1429c8ec30e8f4a371fb6"
     },
     {
       "id": "choose-python-library",
@@ -192,7 +192,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
-      "hash": "d6226a47be1cfbe73c5b0224f23c2b44c5ef2c5608e17ac06edc8490abb05f93"
+      "hash": "f0fa89049726d192b24a424622103199f6605f4291565a2b50212a634458d632"
     },
     {
       "id": "setup-workspace",

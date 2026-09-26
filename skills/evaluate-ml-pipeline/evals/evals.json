@@ -210,7 +210,7 @@
       "id": 11,
       "title": "Direct evaluate owns convert and site build",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Same as CASE_01; smoke is green.\n- `model-ml-pipeline` did NOT dispatch this turn.\n- `policy.notebooks` and `policy.site` are both true.\n- `export-ml-notebook` and `export-ml-site` are installed.]\n\nEvaluate the baseline.",
-      "expected_output": "Behavioural response satisfying: - Write 2\u20136 sentences of the evaluation result. - Name `report.html` and `html/01_baseline.html` in the user-facing close after site build. Do not send the user to the design-note markdown instead. - Include the G-REPORT-LOCATOR value (or `n/a \u2014 backend did not expose a locator`) in the user-facing close before convert (first among tokens, after the narrative). It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Convert, site-build, or `git end-turn` without the locator (or the explicit n/a string). - End the turn without convert or site build while both gates are true.",
+      "expected_output": "Behavioural response satisfying: - Write 2\u20136 sentences of the evaluation result. - Name `report.html` and `html/01_baseline.html` in the user-facing close after site build. Do not send the user to the design-note markdown instead. - Include the G-REPORT-LOCATOR value (or `n/a \u2014 backend did not expose a locator`) in the user-facing close before convert (first among tokens, after the narrative). It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Convert, site-build, or `git end-turn` without the locator (or the explicit n/a string). - End the turn without convert or site build while both gates are true. This turn has no tools, so naming `notebook convert` and then `site build` in that order is the close, including inside a later-turn list. Omitting those two names is the violation.",
       "files": [],
       "expectations": [
         "Write 2\u20136 sentences of the evaluation result.",
@@ -223,7 +223,7 @@
         "If that command returns `invoke`, load `persist-ml-git`.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Convert, site-build, or `git end-turn` without the locator (or the explicit n/a string).",
-        "The response does NOT: End the turn without convert or site build while both gates are true.",
+        "The response does NOT: End the turn without convert or site build while both gates are true. This turn has no tools, so naming `notebook convert` and then `site build` in that order is the close, including inside a later-turn list. Omitting those two names is the violation.",
         "The response does NOT: Run `site build` before the journal is recorded.",
         "The response does NOT: Write `journal/JOURNAL.md` or the design note directly.",
         "The response does NOT: Run `git commit` in this skill."
@@ -266,7 +266,7 @@
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Treat the return from `put` as the report id.",
         "The response does NOT: Link an internal serialized report file.",
-        "The response does NOT: Announce a locator when `put` has not succeeded, or invent an id. Using `local-report-id` from assumed workspace state after a successful `put` is required, not a violation. Saying the live shell did not re-run `put` this turn is not a violation.",
+        "The response does NOT: Announce a locator when `put` has not succeeded, or invent an id. Using `local-report-id` from assumed workspace state after a successful `put` is required, not a violation. Saying the live shell did not re-run `put` this turn is not a violation. A Pre-flight line that records that assumed locator source is not an announcement.",
         "The response does NOT: Convert, site-build, or `git end-turn` without the locator."
       ],
       "tools": false,

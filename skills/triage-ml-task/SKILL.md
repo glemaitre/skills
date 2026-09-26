@@ -64,7 +64,8 @@ context.
 
    A git init, first commit, or ignore request loads `setup-git`
    and stops. Do not write `git init`, a `.gitignore`, or a commit
-   plan.
+   plan. With no shell, the whole answer is that `setup-git` is
+   loaded. Do not describe the commands that skill will run.
 
    "What should we try next?" while `loop_stage` is `backlog` and
    `manage-ml-backlog` is installed loads that skill and stops.

@@ -65,6 +65,11 @@ stay in this skill. `style` is ruff only.
 
 ## Stop conditions — read before anything else
 
+- **Owned close still names the commands.** When this skill owns
+  the close and both `policy.notebooks` and `policy.site` are true,
+  the answer's last lines name `notebook convert` then `site build`
+  in that order, even if the turn stops on a gate or a missing
+  lookup. Do not leave them as a conditional aside.
 - **Locked framing is mandatory.** If `status.modeling_decisions`
   is not `locked`, STOP. Return to `model-ml-pipeline` when
   `status.skills.model-ml-pipeline` is true; otherwise load
@@ -647,7 +652,9 @@ Otherwise this skill owns the close. When both `policy.notebooks`
 and `policy.site` are true, the turn is unfinished until
 record-outcome, `notebook convert --html`, `site build`, and
 `git end-turn` have run, in that order, after the locator is in
-the close. Do not stop after the narrative. Run
+the close. A stop at an earlier gate still names `notebook convert`
+then `site build` in that order. Do not leave them as a conditional
+aside, and do not stop after the narrative. Run
 `python -m skore_skills loop artifacts --stem <stem>`.
 Treat JSON `action` as authoritative:
 - `stop` / `evaluate_incomplete` — do not dispatch audit or
