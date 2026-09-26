@@ -36,17 +36,18 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 - Mention scaffolding the default layout: `src/<pkg>/`,
   `journal/`, `experiments/`, `data_analysis/`, `data/`, `audit/`,
   `tests/smoke/`, `scratch/`, each with `README.md`.
-- After scaffold, AskUserQuestion executed notebooks +
-  documentation site (`allow_multiple`, both **unchecked** by
-  default). Persist `false` when left unchecked.
+- After scaffold, persist `policy set notebooks true` and
+  `policy set site true`. Do not AskUserQuestion for notebooks
+  or site.
 - Run `python -m skore_skills git end-turn --stage setup` at the
   end of this standalone turn.
 - If that command returns `invoke`, load `persist-ml-git`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Skip persisting `notebooks` / `site` after the notebooks/site
-  question.
+- Skip persisting `notebooks` / `site` true after scaffold.
+- AskUserQuestion for executed notebooks or the documentation
+  site.
 - Ask which environment manager to use, or pick one in this skill.
 - Run `pixi init` / `uv init` / `poetry init` on the user's behalf.
 - Pick a package name silently from the folder name.
@@ -252,8 +253,9 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
   existing layout.
 - Run `python -m skore_skills scaffold --package churnlab`.
 - State that the existing `pyproject.toml` is kept (no `--force`).
-- After scaffold, AskUserQuestion notebooks + site (both off by
-  default) unless those flags are already set.
+- After scaffold, persist `policy set notebooks true` and
+  `policy set site true` unless those flags are already set.
+  Do not AskUserQuestion for notebooks or site.
 - Return control to `setup-ml-project` at the end of the turn.
 
 **Must NOT do:**
@@ -266,7 +268,7 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 
 ---
 
-## CASE_09 — Yes executed notebooks after scaffold
+## CASE_09 — Default notebooks and site on after scaffold
 
 **User prompt:**
 > Set up a fresh ML workspace in this folder.
@@ -274,15 +276,18 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 **Assumed workspace state:**
 - Empty folder. Fresh layout.
 - `policy.notebooks` and `policy.site` are `null`.
+- `policy.env.managed` is true.
 - `add-python-package` is installed.
-- After G-PKG-NAME and scaffold, the user checks **Executed
-  notebooks** and leaves the site off.
 
 **Must do:**
-- AskUserQuestion notebooks + site with both off by default,
-  after scaffold.
-- Persist `policy set notebooks true` and `policy set site false`.
-- Load `add-python-package` for `jupytext` and `nbclient`.
+- After scaffold, persist `policy set notebooks true` and
+  `policy set site true`. Do not AskUserQuestion for notebooks
+  or site.
+- Load `add-python-package` for `jupytext`, `nbclient`, and
+  `nbconvert` (agent) — stage turns write the notebook viewer
+  with `--html`.
+- Load `add-python-package` for `mkdocs-material` (agent).
+- Run `python -m skore_skills site init`.
 - Name `env add` with the agent feature (do not leave `env route`
   as ask).
 
@@ -291,38 +296,36 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 - Leave `jupytext` as `env route` ask / optional extra.
 - Run `pixi add` / `uv add` from this skill.
 - Run `notebook convert` during setup.
-- Install `nbconvert` while the site gate is off.
-- Ask the gate before scaffold.
+- AskUserQuestion for notebooks or site before or after scaffold.
 
 ---
 
-## CASE_10 — Yes documentation site after scaffold
+## CASE_10 — Already-off flags are not overwritten
 
 **User prompt:**
 > Set up a fresh ML workspace in this folder.
 
 **Assumed workspace state:**
 - Empty folder. Fresh layout.
-- `policy.notebooks` and `policy.site` are `null`.
+- `policy.package` is already set; G-PKG-NAME is already answered.
+- Scaffold has run.
+- `policy.notebooks` is false. `policy.site` is false.
 - `add-python-package` is installed.
-- After G-PKG-NAME and scaffold, the user checks **Documentation
-  site** and leaves notebooks off.
 
 **Must do:**
-- Persist `policy set site true` and `notebooks false`.
-- Load `add-python-package` for `mkdocs-material` (agent).
-- Run `python -m skore_skills site init`.
+- Leave `policy.notebooks` and `policy.site` false. Do not persist
+  `true`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Run `pixi add mkdocs-material` from this skill.
-- Load `add-python-package` for `nbconvert` for the site gate.
-- Skip init after the user opted into the site.
-- Ask the gate on an existing layout.
+- AskUserQuestion for notebooks or site.
+- Load `add-python-package` for `jupytext`, `nbclient`,
+  `nbconvert`, or `mkdocs-material` from this persist step.
+- Run `python -m skore_skills site init`.
 
 ---
 
-## CASE_11 — Both gates on install the HTML toolchain
+## CASE_11 — Both defaults on install the HTML toolchain
 
 **User prompt:**
 > Set up a fresh ML workspace in this folder.
@@ -332,11 +335,12 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 - `policy.package` is already set; G-PKG-NAME is already answered.
 - Scaffold has run.
 - `policy.notebooks` and `policy.site` are `null`.
+- `policy.env.managed` is true.
 - `add-python-package` is installed.
-- The user checks **both** notebooks and site boxes.
 
 **Must do:**
 - Persist `policy set notebooks true` and `policy set site true`.
+  Do not AskUserQuestion for notebooks or site.
 - Load `add-python-package` for `jupytext`, `nbclient`, and
   `nbconvert` (agent) — stage turns write the notebook viewer
   with `--html`.

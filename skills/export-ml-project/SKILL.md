@@ -28,8 +28,9 @@ in the question.
    policy. A file link is an addition, never the context.
 
    - Executed notebooks — preselected iff `policy.notebooks` is
-     true
-   - Documentation site — preselected iff `policy.site` is true
+     not false (`true` or `null`)
+   - Documentation site — preselected iff `policy.site` is not
+     false (`true` or `null`)
 
 3. Persist each box this turn: checked →
    `python -m skore_skills policy set notebooks true` (or `site`);

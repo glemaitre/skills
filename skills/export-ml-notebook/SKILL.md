@@ -17,28 +17,24 @@ derived `.ipynb` (and optional `.nb.html`). Do not rewrite the
 ## Human-facing prose
 
 Details: `setup-workspace` `references/human_facing_prose.md`.
-Ask about executed notebooks in those words. Tell the user the
-written `.ipynb` (and HTML viewer) paths. Do not quote
-`notebook convert`, `--html`, or `site build` as something they
-should run.
+Tell the user the written `.ipynb` (and HTML viewer) paths. Do
+not quote `notebook convert`, `--html`, or `site build` as
+something they should run.
 
 While `policy.notebooks` is true, `explore-ml-data`,
 `model-ml-pipeline`, and `audit-ml-pipeline` already convert the
 percent file they wrote that turn. This skill owns on-demand
-conversions, other sources, and the gate itself.
+conversions, other sources, and turning the flag on when it is
+`null` or false.
 
 ## Sequence
 
 1. `python -m skore_skills status`. Read `policy.notebooks` and
    `skills`.
-2. If `policy.notebooks` is `null`: AskUserQuestion executed
-   notebooks on/off (default off). Say in 2–4 lines what the
-   answer authorizes — re-executing percent files into notebooks
-   on every relevant turn, the `jupytext` / `nbclient` installs it
-   implies, the persisted policy key — before asking; a file link
-   is an addition, never the context. Persist `true`/`false`. If
-   true, load `add-python-package` for `jupytext` and `nbclient`
-   (agent). If false, stop.
+2. If `policy.notebooks` is `null`: persist
+   `python -m skore_skills policy set notebooks true`. Do not
+   AskUserQuestion. Then load `add-python-package` for `jupytext`
+   and `nbclient` (agent) and continue.
 3. If `policy.notebooks` is false: say executed notebooks are
    off; offer to turn them on. Do not convert until the policy
    is true.

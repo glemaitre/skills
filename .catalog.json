@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "7d702293e6f8df1ad3af7a51f99c7e75d4e826c06dcdcfe17e08e51219059070",
+  "catalog_hash": "383515144245e856955f0b6d9c32f4377338453f00e489f2d5cb162b1b7f2cc4",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -201,7 +201,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "83edb95ce5035643bcdedd03f51c03ae4f294b1800b787d453b845ade4a13bec"
+      "hash": "cf31a3f9a9e55ea6f69353fb199919a55dfc5d3eef60ee9661228b60fd43e13d"
     },
     {
       "id": "setup-python-env",
@@ -219,7 +219,7 @@
       "summary": "Convert a jupytext percent file into an executed notebook.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "c938ef539cfee29a428ba2acf9c042aa29f2c9db7eaff691bff84ea537f7b3e0"
+      "hash": "3fefd56f1f4955be48b119bdd23e9c7d23d08a189b2b8043f883f3fb78d6d5d1"
     },
     {
       "id": "export-ml-site",
@@ -228,7 +228,7 @@
       "summary": "Initialize and build an offline MkDocs documentation site from workspace markdown.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "2a24ea0b3b005e1d58cb44e20bb203f6c6bea11c0cb38c4010c6561446e1eef9"
+      "hash": "6917ce0dfe5903ec3a5e3cb11dee86eed73f06d8aab6bc20a91e15dba1c63e95"
     },
     {
       "id": "export-ml-project",
@@ -237,7 +237,7 @@
       "summary": "Coordinate executed notebooks and an offline MkDocs documentation site.",
       "category": "meta",
       "subcategory": null,
-      "hash": "815ce65597d1ad7e497cfcacd7ea83276eeeff0db17ae22535216e95d5705bf2"
+      "hash": "d35285038ddd7f0ac095ad1b855e4ca976f3c2a4b2780084c3dd9dfddbe6dcfb"
     },
     {
       "id": "sync-ml-reports",
