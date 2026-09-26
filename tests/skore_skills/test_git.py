@@ -33,7 +33,9 @@ def _init_repo(root: Path) -> None:
 
 def _write(path: Path, text: str = "x\n") -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    # ``newline="\n"`` keeps byte counts stable: Windows text mode would
+    # otherwise turn each ``\n`` into ``\r\n``.
+    path.write_text(text, encoding="utf-8", newline="\n")
 
 
 def test_end_turn_no_repo_skips(
@@ -243,3 +245,267 @@ def test_ignore_merge_decide_still_reports_new_hidden(
     assert payload["action"] == "resolve-dotfiles"
     assert ".foo" in payload["ambiguous_dotfiles"]
     assert ".python-version" not in payload["ambiguous_dotfiles"]
+
+
+def _review_by_path(payload: dict[str, object]) -> dict[str, dict[str, object]]:
+    review = payload["review_paths"]
+    assert isinstance(review, list)
+    return {str(item["path"]): item for item in review}
+
+
+def test_review_flags_large_file_and_fat_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A big file and a heavy directory are each one review entry."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("skore_skills.git.LARGE_FILE_BYTES", 8)
+    monkeypatch.setattr("skore_skills.git.LARGE_DIR_COUNT", 3)
+    _init_repo(tmp_path)
+    _write(tmp_path / "blob.bin", "x" * 8)
+    for name in ("a.txt", "b.txt", "c.txt"):
+        _write(tmp_path / "bulk" / name, "x\n")
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 2, result.output
+    paths = _review_by_path(json.loads(result.output))
+    assert paths["blob.bin"]["kind"] == "large"
+    assert paths["blob.bin"]["bytes"] == 8
+    assert paths["bulk/"]["kind"] == "large"
+    assert paths["bulk/"]["bytes"] == 6
+    assert "bulk/a.txt" not in paths
+
+
+def test_review_small_sample_csv_is_not_flagged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A small sample table stays committable without a question."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    _write(tmp_path / "data" / "sample.csv", "a,b\n")
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["action"] == "ready"
+    assert payload["review_paths"] == []
+
+
+def test_review_raw_and_dataset_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``data/raw/`` is one folder; a large table elsewhere stays a file."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("skore_skills.git.DATASET_MIN_BYTES", 4)
+    _init_repo(tmp_path)
+    _write(tmp_path / "data" / "sample.csv", "a\n")
+    _write(tmp_path / "data" / "big.csv", "abcd")
+    _write(tmp_path / "data" / "raw" / "tiny.csv", "x\n")
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 2, result.output
+    paths = _review_by_path(json.loads(result.output))
+    assert "data/sample.csv" not in paths
+    assert "data/" not in paths
+    assert paths["data/big.csv"]["kind"] == "dataset"
+    assert paths["data/raw/"]["kind"] == "dataset"
+    assert "data/raw/tiny.csv" not in paths
+
+
+def test_review_artifact_folders(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Joblib siblings and a checkpoints directory collapse to folders."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    _write(tmp_path / "weights" / "a.joblib", "x\n")
+    _write(tmp_path / "weights" / "b.joblib", "y\n")
+    _write(tmp_path / "checkpoints" / "note.txt", "x\n")
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 2, result.output
+    paths = _review_by_path(json.loads(result.output))
+    assert paths["weights/"]["kind"] == "artifact"
+    assert paths["weights/"]["bytes"] == 4
+    assert paths["checkpoints/"]["kind"] == "artifact"
+    assert "weights/a.joblib" not in paths
+    assert "checkpoints/note.txt" not in paths
+
+
+def test_review_pkl_next_to_source_stays_a_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """One model file beside source does not select the parent folder."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    _write(tmp_path / "src" / "pkg" / "model.pkl", "x\n")
+    _write(tmp_path / "src" / "pkg" / "data.py", "y\n")
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 2, result.output
+    paths = _review_by_path(json.loads(result.output))
+    assert set(paths) == {"src/pkg/model.pkl"}
+    assert paths["src/pkg/model.pkl"]["kind"] == "artifact"
+    decided = CliRunner().invoke(
+        cli, ["git", "review-decide", "--ignore", "src/pkg/model.pkl"]
+    )
+    assert decided.exit_code == 0, decided.output
+    lines = (tmp_path / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert lines.count("src/pkg/model.pkl") == 1
+    assert "src/pkg/" not in lines
+
+
+def test_review_one_large_file_does_not_select_parent(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """One large file under ``data/`` does not ignore the whole folder."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("skore_skills.git.LARGE_FILE_BYTES", 8)
+    _init_repo(tmp_path)
+    _write(tmp_path / "data" / "blob.bin", "x" * 8)
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 2, result.output
+    paths = _review_by_path(json.loads(result.output))
+    assert set(paths) == {"data/blob.bin"}
+    assert paths["data/blob.bin"]["kind"] == "large"
+
+
+def test_review_decide_ignore_folder_persists(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ignoring a folder writes one directory pattern and is not re-asked."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    set_policy_value(tmp_path, "git.autocommit", "on")
+    _write(tmp_path / "weights" / "a.joblib", "x\n")
+    _write(tmp_path / "weights" / "b.joblib", "y\n")
+    _write(tmp_path / "src" / "pkg" / "data.py")
+    decided = CliRunner().invoke(cli, ["git", "review-decide", "--ignore", "weights/"])
+    assert decided.exit_code == 0, decided.output
+    lines = (tmp_path / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert lines.count("weights/") == 1
+    assert any(
+        line.startswith("# skore-skills resolved-review:") and "weights/" in line
+        for line in lines
+    )
+    end = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "implement"])
+    assert end.exit_code == 0, end.output
+    payload = json.loads(end.output)
+    assert payload["action"] == "invoke"
+    assert payload["reason"] == "persist"
+    assert payload["review_paths"] == []
+    assert "src/pkg/data.py" in payload["staged"]
+    assert all(not path.startswith("weights/") for path in payload["status"])
+
+
+def test_review_decide_keep_persists(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A kept file stays staged and is not asked again."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("skore_skills.git.LARGE_FILE_BYTES", 100)
+    _init_repo(tmp_path)
+    set_policy_value(tmp_path, "git.autocommit", "on")
+    _write(tmp_path / "model.bin", "x" * 100)
+    decided = CliRunner().invoke(cli, ["git", "review-decide", "--keep", "model.bin"])
+    assert decided.exit_code == 0, decided.output
+    lines = (tmp_path / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert "model.bin" not in lines
+    assert any("model.bin" in line for line in lines)
+    end = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "implement"])
+    assert end.exit_code == 0, end.output
+    payload = json.loads(end.output)
+    assert payload["reason"] == "persist"
+    assert payload["review_paths"] == []
+    assert "model.bin" in payload["staged"]
+
+
+def test_review_decide_refuses_env(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``.env`` cannot be kept through the review decision."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    _write(tmp_path / ".env", "TOKEN=1\n")
+    result = CliRunner().invoke(cli, ["git", "review-decide", "--keep", ".env"])
+    assert result.exit_code != 0
+    assert "blocked" in result.output
+
+
+def test_review_skips_ignored_mlruns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Packaged ignore rules hide ``mlruns/`` from review."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    CliRunner().invoke(cli, ["git", "ignore-merge"])
+    _write(tmp_path / "mlruns" / "0" / "meta.yaml", "x\n")
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["review_paths"] == []
+    assert all("mlruns" not in path for path in payload["status"])
+
+
+def test_end_turn_omits_undecided_review_from_staged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Undecided review paths are invoked, and left out of ``staged``."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("skore_skills.git.LARGE_FILE_BYTES", 8)
+    _init_repo(tmp_path)
+    set_policy_value(tmp_path, "git.autocommit", "on")
+    _write(tmp_path / "src" / "pkg" / "data.py")
+    _write(tmp_path / "blob.bin", "x" * 8)
+    result = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "implement"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["action"] == "invoke"
+    assert payload["reason"] == "resolve-review"
+    assert "src/pkg/data.py" in payload["staged"]
+    assert "blob.bin" not in payload["staged"]
+    assert "blob.bin" in payload["status"]
+
+
+def test_end_turn_off_beats_review(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Autocommit ``off`` skips before a review question."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("skore_skills.git.LARGE_FILE_BYTES", 8)
+    _init_repo(tmp_path)
+    set_policy_value(tmp_path, "git.autocommit", "off")
+    _write(tmp_path / "blob.bin", "x" * 8)
+    result = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "implement"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["action"] == "skip"
+    assert payload["reason"] == "off"
+    assert payload["review_paths"][0]["path"] == "blob.bin"
+
+
+def test_end_turn_dotfiles_keep_review_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hidden-path resolution still reports review paths in the same payload."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("skore_skills.git.LARGE_FILE_BYTES", 10_000)
+    _init_repo(tmp_path)
+    CliRunner().invoke(cli, ["git", "ignore-merge"])
+    set_policy_value(tmp_path, "git.autocommit", "on")
+    _write(tmp_path / ".python-version", "3.12\n")
+    _write(tmp_path / "blob.bin", "x" * 10_000)
+    result = CliRunner().invoke(cli, ["git", "end-turn", "--stage", "data_analysis"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["reason"] == "resolve-dotfiles"
+    assert ".python-version" in payload["ambiguous_dotfiles"]
+    assert payload["review_paths"][0]["path"] == "blob.bin"
+    assert "blob.bin" not in payload["staged"]
+
+
+def test_review_notebook_when_present(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An ``.ipynb`` that git status shows is a notebook review path."""
+    monkeypatch.chdir(tmp_path)
+    _init_repo(tmp_path)
+    _write(tmp_path / "notes.ipynb", "{}\n")
+    result = CliRunner().invoke(cli, ["git", "review"])
+    assert result.exit_code == 2, result.output
+    paths = _review_by_path(json.loads(result.output))
+    assert paths["notes.ipynb"]["kind"] == "notebook"

@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "383515144245e856955f0b6d9c32f4377338453f00e489f2d5cb162b1b7f2cc4",
+  "catalog_hash": "4baf3bf66d34ecafccd7f4c78c9bb0e539a73b061ad9a4611dd257c4c8367d98",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -138,7 +138,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "7f823fff49f67eb136be26221ee258641f7f961a6403cff88818321cb48ffed0"
+      "hash": "b9c64c322cbb17a294538e87fddbbbfc0525b73548fcce1d9d351116197efadf"
     },
     {
       "id": "persist-ml-git",
@@ -147,7 +147,7 @@
       "summary": "Commit the current loop stage with the real git CLI when the end-turn hook says invoke.",
       "category": "action",
       "subcategory": null,
-      "hash": "991a721fbf34948592dcc990c2bce891efe05ee2bc664902f38c562d7b79bf13"
+      "hash": "6ab4fc0d1e15c261d6d3d98c2a6461c5cf35d97ed395b6c95d0f19f0c572b209"
     },
     {
       "id": "model-ml-pipeline",
