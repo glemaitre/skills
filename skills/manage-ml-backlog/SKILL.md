@@ -120,8 +120,12 @@ locator.
    #, Item, Source). A planned History row uses `n/a` in Report.
    Stable `B<N>` indices. Do not renumber on removal.
 3. If recording a run: copy the headline metric from the audit
-   digest or the user's value. Do not invent numbers. Update the
-   matching History row (`planned` → `done` only if smoke passed).
+   digest or the user's value. Do not invent numbers. With no
+   digest and no user headline, skip the headline in one line and
+   leave the History status unchanged. Do not write `done` with
+   headline `n/a`. Update the
+   matching History row (`planned` → `done` only if smoke passed
+   and a headline result exists).
    Headline metric remains the source for History and Last result;
    never substitute G-AUDIT-FINDING for performance. Copy the
    digest's persisted-report locator into the History `Report`

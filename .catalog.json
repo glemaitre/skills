@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "f12b318559dfe89d6a4c520e9f33247907ecd426e828d06449729cffa039b33e",
+  "catalog_hash": "b4044a78d70c2eb779dfd36276223f358264f3957c321943955aeabefc7778fd",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -66,7 +66,7 @@
       "summary": "Record experiment outcomes and triage idea files into backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "8a74223eada709c117ef7126aa5c59a36dc0b2ff13a3e0a438d2add3a3408f6d"
+      "hash": "e2640214dce16c493ad6104c9b7ed49f6552097a66e04e4089200e0a870d1df2"
     },
     {
       "id": "organize-ml-workspace",
@@ -156,7 +156,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "2cd43cbe0e82b33e05592c0b82e5eb47999aca36d3b1429c8ec30e8f4a371fb6"
+      "hash": "da06feebf0bc3a1838e41dbba1897ac6861d7652e23865b00110e9ebc66b311c"
     },
     {
       "id": "choose-python-library",
@@ -201,7 +201,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "cf31a3f9a9e55ea6f69353fb199919a55dfc5d3eef60ee9661228b60fd43e13d"
+      "hash": "bc3fd594db11c87d4c89cddf69e04b19cb25bfdb668a0d668c09f1d511a6fb90"
     },
     {
       "id": "setup-python-env",

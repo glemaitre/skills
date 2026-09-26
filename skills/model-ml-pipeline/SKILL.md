@@ -161,7 +161,13 @@ duplicate a child's detailed preview.
   → gated review. Then let `build-ml-pipeline`,
   `smoke-test-ml-pipeline`, `evaluate-ml-pipeline`, and
   `review-ml-experiment` each own the single detailed Before
-  execution preview at its actual compute boundary.
+  execution preview at its actual compute boundary. The dispatcher
+  preview is those four phase names only, one short line each. Do
+  not mention `pipeline.html`, a site rebuild, a row-count
+  assertion, `skore.evaluate`, or Review / Skip / Stop. Do not list
+  their commands (`status`, `frame show`, `design consent`,
+  `smoke run`) or a DataOps declaration in this preview. With
+  no shell, that four-phase paragraph is the whole answer.
 
 Do not invent minute estimates at dispatcher level. Name a known
 duration only when explicit measured evidence is available;

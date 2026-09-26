@@ -29,7 +29,8 @@ notes, JOURNAL, and folder READMEs describe **this** workspace's
 analysis — not the skills framework, the CLI, or the command that
 produced an output. Questions and replies use the same
 data-science language (import name, notebooks, documentation
-site) — not `G-*` names or the wrapper CLI.
+site) — not `G-*` names, catalog skill ids, or the wrapper CLI.
+Say "workspace setup", not `setup-workspace`.
 `<!-- results-embed: … -->` is a site marker. Authoring hints
 stay in this skill. `style` is ruff only.
 
