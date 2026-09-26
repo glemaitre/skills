@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "First repository, autocommit on",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `.env` and raw data are present and must remain untracked.\n- `policy.git.autocommit` is `null` (never asked).\n- The user answers the autocommit question with `on`.]\n\nInitialize git here and make the first commit.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `.env` is present and must remain untracked. Raw inputs are\n  already ignored and are not in `git status`.\n- `policy.git.autocommit` is `null` (never asked).\n- The user answers the autocommit question with `on`.\n- `python -m skore_skills git review` returns `review_paths` empty.]\n\nInitialize git here and make the first commit.",
       "expected_output": "Behavioural response satisfying: - Emit the Pre-flight then run the commands (do not stop after listing boxes). - Name `git init`. - Run `python -m skore_skills git ignore-merge`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Stage `.env` or raw data. - Ask a second time before the first commit after `on`.",
       "files": [],
       "expectations": [
@@ -12,10 +12,12 @@
         "Name `git init`.",
         "Run `python -m skore_skills git ignore-merge`.",
         "Ask once whether later stages may autocommit (`on` vs `off`) and persist with `python -m skore_skills policy set git.autocommit`.",
-        "After `on`, use `git add` and `git commit -m` without a second confirm.",
+        "Run `python -m skore_skills git review` before the first commit.",
+        "After `on`, and with `review_paths` empty, use `git add` and `git commit -m` without a second confirm.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Stage `.env` or raw data.",
         "The response does NOT: Ask a second time before the first commit after `on`.",
+        "The response does NOT: Ask which review paths to keep when `review_paths` is empty.",
         "The response does NOT: Push or create a remote.",
         "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
       ],
@@ -72,6 +74,27 @@
         "After autocommit `on` and no HEAD, `git add` and `git commit`.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: `--keep` `.env` or `.skore`.",
+        "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 5,
+      "title": "Ignore a review folder",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- A git repository exists and has no HEAD yet.\n- `policy.git.autocommit` is already `on`.\n- `python -m skore_skills git ignore-merge` returns no\n  `ambiguous_dotfiles`.\n- `python -m skore_skills git review` returns\n  `action: resolve-review` with `checkpoints/` kind `artifact`.\n- `src/pkg/data.py` is also dirty.]\n\nSet up git and make the first commit. Do not track `checkpoints/`.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills git review`. - Ask which review paths to keep, listing `checkpoints/` and kind `artifact`, and saying the rest are ignored. - Run `python -m skore_skills git review-decide --ignore checkpoints/`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - `--keep` `checkpoints/`. - Stage `checkpoints/`.",
+      "files": [],
+      "expectations": [
+        "Run `python -m skore_skills git review`.",
+        "Ask which review paths to keep, listing `checkpoints/` and kind `artifact`, and saying the rest are ignored.",
+        "Run `python -m skore_skills git review-decide --ignore checkpoints/`.",
+        "`git add` and `git commit` the source file.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: `--keep` `checkpoints/`.",
+        "The response does NOT: Stage `checkpoints/`.",
+        "The response does NOT: Choose the ignore path by size or extension instead of the JSON.",
         "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
       ],
       "tools": false,

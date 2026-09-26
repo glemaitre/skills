@@ -652,7 +652,7 @@ def policy_set(key: str, value: str) -> None:
 
 @cli.group("git")
 def git_group() -> None:
-    """Merge ignore rules and print the end-of-turn persist hook."""
+    """Merge ignore rules, classify review paths, and print the end-turn hook."""
 
 
 @git_group.command("ignore-merge")
@@ -696,6 +696,50 @@ def git_end_turn_cmd(stage: str) -> None:
 
     try:
         payload, code = run_end_turn(Path.cwd(), stage)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(render_git_json(payload), nl=False)
+    if code:
+        raise SystemExit(code)
+
+
+@git_group.command("review")
+def git_review_cmd() -> None:
+    """Print dirty paths that need a keep-or-ignore decision."""
+    from skore_skills.git import render_git_json, run_review
+
+    try:
+        payload, code = run_review(Path.cwd())
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(render_git_json(payload), nl=False)
+    if code:
+        raise SystemExit(code)
+
+
+@git_group.command("review-decide")
+@click.option(
+    "--keep",
+    "keep_paths",
+    multiple=True,
+    help="Track a review path the user chose to keep.",
+)
+@click.option(
+    "--ignore",
+    "ignore_paths",
+    multiple=True,
+    help="Ignore a review path the user chose not to keep.",
+)
+def git_review_decide_cmd(
+    keep_paths: tuple[str, ...], ignore_paths: tuple[str, ...]
+) -> None:
+    """Record review choices in ``.gitignore``. No git add or commit."""
+    from skore_skills.git import render_git_json, run_review_decide
+
+    try:
+        payload, code = run_review_decide(
+            Path.cwd(), keep=keep_paths, ignore=ignore_paths
+        )
     except ValueError as exc:
         raise click.ClickException(str(exc)) from exc
     click.echo(render_git_json(payload), nl=False)
