@@ -33,7 +33,9 @@ def _init_repo(root: Path) -> None:
 
 def _write(path: Path, text: str = "x\n") -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    # ``newline="\n"`` keeps byte counts stable: Windows text mode would
+    # otherwise turn each ``\n`` into ``\r\n``.
+    path.write_text(text, encoding="utf-8", newline="\n")
 
 
 def test_end_turn_no_repo_skips(
