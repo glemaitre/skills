@@ -145,3 +145,42 @@
 - Leave Status `locked` after modify.
 - Treat the locked table as frozen.
 - Write a model or a splitter.
+
+---
+
+## CASE_07 — Dispatched lock returns to modeling
+
+**User prompt:**
+> Lock the table.
+
+**Assumed workspace state:**
+- `model-ml-pipeline` dispatched this turn.
+- `frame show` returns `proceed` with a non-null `translation`.
+
+**Must do:**
+- Return to `model-ml-pipeline` and stop.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Load `build-ml-pipeline` or write a design note.
+- Run `python -m skore_skills git end-turn --stage implement`.
+
+---
+
+## CASE_08 — Standalone lock still closes the turn
+
+**User prompt:**
+> Lock the table.
+
+**Assumed workspace state:**
+- This turn was not dispatched by `model-ml-pipeline`.
+- `frame show` returns `proceed` with a non-null `translation`.
+
+**Must do:**
+- Run `python -m skore_skills git end-turn --stage implement`.
+- If that command returns `invoke`, load `persist-ml-git` when installed.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Load `build-ml-pipeline`.
+

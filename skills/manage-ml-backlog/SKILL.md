@@ -79,8 +79,8 @@ Run Procedure steps 1-3 and nothing else:
 3. Step 3 — update the matching History row and design-note Status
    block from the digest or user-supplied headline when available.
    Paste G-REPORT-LOCATOR and G-AUDIT-FINDING verbatim into their
-   separate Status lines. Also refresh the `JOURNAL.md` Status rows
-   `Last experiment` and `Last result`. Insert or replace `## Results`
+   separate Status lines. Also refresh the `journal/JOURNAL.md`
+   Status rows `Last experiment` and `Last result`. Insert or replace `## Results`
    between Status and Notebooks from digest text, not HTML.
 
 Then return to the caller. Do not read `journal/ideas/` and do

@@ -70,8 +70,9 @@ after listing the boxes.
    `git commit`.
 9. If autocommit is already `on` and HEAD exists, stop after
    ignore-merge. Do not invent another commit. Later stages use
-   `python -m skore_skills git end-turn` then `persist-ml-git`;
-   when that skill is not installed, those stages report the
+   `python -m skore_skills git end-turn --stage <stage>` then
+   `persist-ml-git`, where `<stage>` is `setup`, `data_analysis`,
+   `implement`, `evaluate`, or `backlog`. When that skill is not installed, those stages report the
    pending paths instead of committing.
 10. When `setup-ml-project` dispatched this turn and is in this
    session, return control to it. Otherwise load `triage-ml-task`
@@ -84,5 +85,5 @@ after listing the boxes.
 - Never stage `.env`, `.skore`, or a review path that was not
   kept.
 - Never push, create a remote, amend, rebase, or set git identity.
-- Do not call `python -m skore_skills git end-turn` to create the
-  first commit.
+- Do not call `python -m skore_skills git end-turn --stage …` to
+  create the first commit.

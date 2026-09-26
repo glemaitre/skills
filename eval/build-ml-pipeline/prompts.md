@@ -1,5 +1,9 @@
 # build-ml-pipeline eval — golden prompts
 
+Unless a case says otherwise, `status.modeling_decisions` is `locked`
+and `frame show` returned `proceed` with a non-null `translation`
+whose `groups` is null.
+
 Behavioural prompts scored manually against Must / Must NOT bullets.
 
 ## How a case is scored
@@ -14,7 +18,7 @@ so the target can `read_file` the history-dependent JOIN example
 (the same file `SKILL.md` points at). Other cases stay single-turn.
 
 Pass criterion per case: every `Must do` ticked, zero `Must NOT do`
-violated. 19 cases; Must-NOT is all-or-nothing.
+violated.
 
 ---
 
@@ -238,26 +242,24 @@ violated. 19 cases; Must-NOT is all-or-nothing.
 
 **Assumed workspace state:**
 - skrub installed at 0.10.x.
-- IID-shaped features (no cross-row history) but rows are grouped
-  by customer.
+- IID-shaped features (no cross-row history).
+- `frame show` `translation.groups` is `customer_id`.
 
 **Must do:**
-- Identify the group structure (multiple rows per `customer_id`).
+- Use that locked group column. Do not ask a new validation scheme.
 - Wire `mark_as_X(cv=GroupKFold(), split_kwargs={"groups": data["customer_id"]})`
   at the X marker (Pattern B; skrub requires `cv=` with
   `split_kwargs`).
 - Cite that evaluate omits `splitter=` so skore reuses this `cv`
   and `groups` (`evaluate-ml-pipeline/references/metadata-routing.md`).
-- Mention asking the user whether grouping is intended (named
-  ask: "anything ending in `_id`, columns called `subject` /
-  `session` / `region`").
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Call `skore.evaluate` from pipeline code.
 - Pick an IID splitter (`KFold`, `TimeSeriesSplit`) at the X
   marker.
-- Leave `split_kwargs` empty without surfacing the group question.
+- Leave `split_kwargs` empty.
+- Ask whether grouping is intended.
 
 ---
 
@@ -448,12 +450,14 @@ violated. 19 cases; Must-NOT is all-or-nothing.
 > Build the approved temporal pipeline and put the timestamp on X.
 
 **Assumed workspace state:**
+- `frame show` `translation.splitter` is `TimeSeriesSplit` and
+  `translation.groups` is null.
 - The journal records temporal ordering but no custom splitter
   consumes a `times` keyword.
 
 **Must do:**
 - Keep `split_kwargs={}` at `mark_as_X`.
-- Leave time-splitter selection to evaluate (Pattern A).
+- Leave `TimeSeriesSplit` to evaluate (Pattern A).
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -576,3 +580,24 @@ violated. 19 cases; Must-NOT is all-or-nothing.
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Defer `site build` until after `skore.evaluate`.
 - Skip the site because EDA was skipped.
+
+---
+
+## CASE_21 — Unlocked framing stops before declaration
+
+**User prompt:**
+> Declare the baseline learner.
+
+**Assumed workspace state:**
+- Approved design note.
+- `status.modeling_decisions` is `missing`.
+- `frame-ml-problem` is installed.
+
+**Must do:**
+- Stop before writing pipeline code.
+- Load `frame-ml-problem`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Declare `build_learner` or pick a splitter.
+

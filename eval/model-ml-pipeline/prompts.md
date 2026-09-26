@@ -1,5 +1,9 @@
 # model-ml-pipeline eval
 
+Unless a case says otherwise, `status.modeling_decisions` is `locked`
+and `frame show` already returned `proceed` with a non-null
+`translation`.
+
 ---
 
 ## CASE_01 — Approved model implementation
@@ -463,3 +467,46 @@
 - Write model, experiment, or pytest code before approval.
 - Run `notebook convert` or `git end-turn` on this preview rebuild.
 - Fail the approval gate if site build errors; name the error.
+
+---
+
+## CASE_18 — Unlocked framing stops before modeling
+
+**User prompt:**
+> Let us start modeling. What can we do?
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.modeling_decisions` is `draft`.
+- `frame-ml-problem` is installed.
+
+**Must do:**
+- Run `python -m skore_skills status`.
+- Load `frame-ml-problem` and stop.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Run `python -m skore_skills model choices`.
+- Write a design note or model code.
+
+---
+
+## CASE_19 — A null translation does not start model code
+
+**User prompt:**
+> The modeling decisions are locked. Build the first model.
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.modeling_decisions` is `locked`.
+- `python -m skore_skills frame show` returns `proceed` with
+  `translation` null.
+
+**Must do:**
+- Run `python -m skore_skills frame show`.
+- Say the lock has no splitter translation and stop.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Offer model choices or dispatch `build-ml-pipeline`.
+

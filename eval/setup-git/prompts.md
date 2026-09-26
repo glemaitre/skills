@@ -21,7 +21,7 @@
 - Name `git init`.
 - Run `python -m skore_skills git ignore-merge`.
 - Ask once whether later stages may autocommit (`on` vs `off`) and
-  persist with `python -m skore_skills policy set git.autocommit`.
+  persist with `python -m skore_skills policy set git.autocommit on`.
 - Run `python -m skore_skills git review` before the first commit.
 - After `on`, and with `review_paths` empty, use `git add` and
   `git commit -m` without a second confirm.
