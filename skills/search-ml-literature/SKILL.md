@@ -45,7 +45,10 @@ project — not skill ids or the wrapper CLI.
 7. Restate the picked direction and wait for an explicit yes.
    Until yes, that paragraph is the whole message. No or stop
    writes nothing.
-8. On yes, write `journal/ideas/<slug>.md`:
+8. On yes, the only file this skill writes is
+   `journal/ideas/<slug>.md`. Do not create or edit
+   `journal/JOURNAL.md` or a design note. Write
+   `journal/ideas/<slug>.md`:
 
 ```
 # <slug>

@@ -643,7 +643,11 @@ record-outcome, convert, site, or `git end-turn`. The dispatcher
 owns `review consent` / `review-ml-experiment` and that close.
 Do not preview it.
 
-Otherwise this skill owns the close. Run
+Otherwise this skill owns the close. When both `policy.notebooks`
+and `policy.site` are true, the turn is unfinished until
+record-outcome, `notebook convert --html`, `site build`, and
+`git end-turn` have run, in that order, after the locator is in
+the close. Do not stop after the narrative. Run
 `python -m skore_skills loop artifacts --stem <stem>`.
 Treat JSON `action` as authoritative:
 - `stop` / `evaluate_incomplete` — do not dispatch audit or

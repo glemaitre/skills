@@ -62,6 +62,14 @@ context.
    | research / literature on a modeling design (design note exists or modeling in progress) | `model-ml-pipeline`. Do not load `research-ml-practice`. |
    | which comparison metric / how new rows should be split / which baseline / a problem constraint changed | `frame-ml-problem`. Not a request to run evaluation. |
 
+   A git init, first commit, or ignore request loads `setup-git`
+   and stops. Do not write `git init`, a `.gitignore`, or a commit
+   plan.
+
+   "What should we try next?" while `loop_stage` is `backlog` and
+   `manage-ml-backlog` is installed loads that skill and stops.
+   Do not ask the user to choose explore, build, review, or export.
+
    Certain EDA: run `python -m skore_skills status`, load
    `explore-ml-data`, stop. Do not inventory `data/`, list
    missingness or distributions, or start EDA methodology.

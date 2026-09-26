@@ -55,7 +55,9 @@ criteria" section. Keep `## Notebooks` with Evaluation then Audit.
    When the table is `locked`, run
    `python -m skore_skills frame show`. A `proceed` whose
    `translation` is null has no splitter translation: say so and
-   stop. Do not write model code.
+   stop. Do not write model code. Do not present a choice list:
+   no dummy predictor, standard baseline, EDA-driven proposal,
+   Backlog row, or discussion.
 3. **Resume beats menu.** If the user names an experiment stem, or
    `status.policy.loop.stem` / `last_history_stem` identifies a
    current design, run

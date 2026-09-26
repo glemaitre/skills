@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "c547af8af0bb2600588e70d03406dd0da145e8acd742699dbf224dcd242df82b",
+  "catalog_hash": "651e4411152603d0f31d29873dac84371b1613256abe6a5c8bf380c808cd6f28",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "720736826237ccbc2a830fcc651495fa1396168012239d98c5419c71071f61fa"
+      "hash": "6e67a6ad77207a1721628d167d60b5137982f416f822f892567a6f137e181331"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -66,7 +66,7 @@
       "summary": "Record experiment outcomes and triage idea files into backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "130a053574b7909dbd5e4523683d2cd1bb6ee1c12897b2d27aeab32474d46782"
+      "hash": "3a5fdb44776e80d168fe3dc7bbec6ad993512963b9c488c270a49b93de5e3aff"
     },
     {
       "id": "organize-ml-workspace",
@@ -93,7 +93,7 @@
       "summary": "Session owner: list installed entry skills and ask which to run.",
       "category": "meta",
       "subcategory": null,
-      "hash": "b0dc3b9d0559814e80da1c62ff2483eb79d961a37ee85932cb0e76adb07ce9a2"
+      "hash": "f1b92db81a23f8a1f74bc3c2b59bf0cf3e6c9a7ee539748f01d7756fee903e1d"
     },
     {
       "id": "review-ml-experiment",
@@ -111,7 +111,7 @@
       "summary": "Shape a user idea or a named artifact into one idea file after they confirm.",
       "category": "meta",
       "subcategory": null,
-      "hash": "b7787e03e91a7f4f813fe06b9782521b227b6fcff303b3e07b7fc50d0275fbc3"
+      "hash": "eed8bfc6e988ef46a8e0f94b1e025a3383467148060417b770eb517610df6acc"
     },
     {
       "id": "search-ml-literature",
@@ -120,7 +120,7 @@
       "summary": "Search scientific and technical sources and write one idea file for the direction the user confirms.",
       "category": "meta",
       "subcategory": null,
-      "hash": "4d57b60baf87c636da44e65f4d957f0a4b259e57a8217c5e553727de5ef4f30b"
+      "hash": "66559d06c9164e794f5b3d8db27cf6b0f63f5cdab895d1dfac66fac87403da0a"
     },
     {
       "id": "setup-ml-project",
@@ -156,7 +156,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "8851c55f5158c4dc4e6fbf321f95dff6d518e46746762fd0252b4923a31d292c"
+      "hash": "dfc444cd7e7fa26837737fb976794c9b76fa61d5bfd7b9d677fc515178f76739"
     },
     {
       "id": "choose-python-library",
