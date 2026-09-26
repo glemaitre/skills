@@ -12,9 +12,8 @@ description: >
 ## Human-facing prose
 
 Details: `setup-workspace` `references/human_facing_prose.md`.
-Ask about a documentation site in those words. Tell the user to
-open `report.html`. Do not quote `site init` / `site build` as
-something they should run.
+Tell the user to open `report.html`. Do not quote `site init` /
+`site build` as something they should run.
 
 The site is a derived index of files other skills already write.
 Markdown is the report: its figures, TableReport HTML, and existing
@@ -39,14 +38,11 @@ left rail beside a 1200px report column. Mobile uses a drawer.
 ## Sequence
 
 1. `python -m skore_skills status`. Read `policy.site`.
-2. If `policy.site` is `null`: AskUserQuestion documentation site
-   on/off (default off). Say in 2–4 lines what the answer
-   authorizes — the `mkdocs-material` install, `site init`, and a
-   rebuilt `report.html` on later turns — plus what each option
-   does; a file link is an addition, never the context. Persist.
-   If true, load
-   `add-python-package` for `mkdocs-material` (agent) then
-   `python -m skore_skills site init`. If false, stop.
+2. If `policy.site` is `null`: persist
+   `python -m skore_skills policy set site true`. Do not
+   AskUserQuestion. Then load `add-python-package` for
+   `mkdocs-material` (agent) then
+   `python -m skore_skills site init`. Continue to build.
 3. If `policy.site` is false: say the documentation site is
    off; offer to turn it on. Do not init or build until it is
    true.

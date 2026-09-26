@@ -4,8 +4,8 @@ description: >
   Detect an existing ML workspace or scaffold a fresh one via
   `python -m skore_skills scaffold --package <pkg>`. Cookiecutter
   only: directories, README.md files, and src/<pkg>/ stubs. After
-  a first scaffold, ask once for executed notebooks and/or a
-  documentation site.
+  a first scaffold, turn executed notebooks and the documentation
+  site on by default (no ask).
 
   TRIGGER for a new ML project layout or first scaffold.
 
@@ -14,8 +14,8 @@ description: >
 
   HOW TO USE: detect first. For a fresh or manager-only layout,
   resolve G-PKG-NAME only via `AskUserQuestion`, then scaffold,
-  then the notebooks/site gate. For an existing layout, stop
-  without scaffolding or inventing files.
+  then persist notebooks/site true when both are still null. For
+  an existing layout, stop without scaffolding or inventing files.
 ---
 
 # Set Up Workspace
@@ -50,7 +50,7 @@ after listing the boxes.
 - [ ] Layout: fresh | manager-only | existing
 - [ ] G-PKG-NAME: ask if fresh/manager-only (unless src/<pkg>/ already matches)
 - [ ] scaffold --package <pkg> | existing: no scaffold, no invent
-- [ ] fresh/manager-only: notebooks + site gate; persist; install
+- [ ] fresh/manager-only: persist notebooks + site true; install
 - [ ] dispatched → return | standalone → git end-turn --stage setup
 ```
 
@@ -76,21 +76,21 @@ after listing the boxes.
    The CLI writes the tree and each folder `README.md`. Do not
    recreate those files from memory.
 3. Existing: do not scaffold again. Do not invent files. No
-   rename, no overwrite, no `--force`. Do not ask the
-   notebooks/site gate.
+   rename, no overwrite, no `--force`. Do not persist or ask
+   notebooks/site.
 4. After scaffold on fresh or manager-only, if
    `policy.notebooks` and `policy.site` are both `null`
-   (never asked): **AskUserQuestion** with `allow_multiple`, both
-   boxes **unchecked** by default:
+   (never set): persist both on this turn —
 
-   - Executed notebooks
-   - Documentation site
+   `python -m skore_skills policy set notebooks true`
 
-   Persist each box this turn: checked →
-   `python -m skore_skills policy set notebooks true` (or `site`);
-   unchecked → `false`. Do not leave them `null` while waiting on
-   an earlier gate that workspace state already passed. Do not
-   write notebooks or site into JOURNAL; policy is the record.
+   `python -m skore_skills policy set site true`
+
+   Do not AskUserQuestion for notebooks or site. Do not leave
+   them `null`. Do not write notebooks or site into JOURNAL;
+   policy is the record. One short user-facing line: executed
+   notebooks and the documentation site are on; the user can
+   turn either off later. Do not ask.
 
    Same turn after persist:
 
@@ -111,7 +111,8 @@ after listing the boxes.
    - site true → `add-python-package` for `mkdocs-material`
      (agent), then `python -m skore_skills site init`.
 
-   If either flag is already `true` or `false`, do not re-ask.
+   If either flag is already `true` or `false`, do not overwrite
+   and do not install from this step.
 5. If `setup-ml-project` dispatched this turn and is in this
    session, return to it; else stop. Standalone:
    `python -m skore_skills git end-turn --stage setup`. If JSON
@@ -127,11 +128,12 @@ after listing the boxes.
 - Do not run `pixi init` / `uv init`.
 - Do not env-bootstrap or editable-install. Export toolchain
   (`jupytext`, `nbclient`, `nbconvert`, `mkdocs-material`) only
-  via `add-python-package` after the notebooks/site gate. Never
-  `pixi add` / `uv add` from this skill.
+  via `add-python-package` after persisting notebooks/site.
+  Never `pixi add` / `uv add` from this skill.
 - Do not write experiment or exploratory data analysis bodies.
 - Never `git commit` here.
-- Do not ask notebooks/site on an existing layout.
+- Do not AskUserQuestion for notebooks or site.
+- Do not persist notebooks/site on an existing layout.
 
 ## Layout (CLI writes this)
 
