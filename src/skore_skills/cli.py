@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import click
 
@@ -14,6 +16,7 @@ from skore_skills.design_consent import render_design_consent
 from skore_skills.evaluate_consent import render_evaluate_consent
 from skore_skills.frame import render_frame_show
 from skore_skills.model_choices import render_model_choices
+from skore_skills.policy import LOOP_STAGES
 from skore_skills.review_consent import render_review_consent
 from skore_skills.status import render_status
 
@@ -24,6 +27,19 @@ def _reexec_library_command(argv: list[str]) -> None:
 
     code = reexec_in_dev(Path.cwd(), argv=argv)
     if code is not None:
+        raise SystemExit(code)
+
+
+def _emit_git(load: Callable[[], tuple[dict[str, Any], int]]) -> None:
+    """Print a git command payload and exit when its code is non-zero."""
+    from skore_skills.git import render_git_json
+
+    try:
+        payload, code = load()
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(render_git_json(payload), nl=False)
+    if code:
         raise SystemExit(code)
 
 
@@ -669,52 +685,31 @@ def git_group() -> None:
 )
 def git_ignore_merge_cmd(keep_paths: tuple[str, ...], decide: bool) -> None:
     """Union packaged ignore rules into ``.gitignore``. No git commands."""
-    from skore_skills.git import render_git_json, run_ignore_merge
+    from skore_skills.git import run_ignore_merge
 
-    try:
-        payload, code = run_ignore_merge(Path.cwd(), keep=keep_paths, decide=decide)
-    except ValueError as exc:
-        raise click.ClickException(str(exc)) from exc
-    click.echo(render_git_json(payload), nl=False)
-    if code:
-        raise SystemExit(code)
+    _emit_git(lambda: run_ignore_merge(Path.cwd(), keep=keep_paths, decide=decide))
 
 
 @git_group.command("end-turn")
 @click.option(
     "--stage",
     required=True,
-    type=click.Choice(
-        ["setup", "data_analysis", "implement", "evaluate", "backlog"],
-        case_sensitive=True,
-    ),
+    type=click.Choice(LOOP_STAGES, case_sensitive=True),
     help="Loop stage that just finished.",
 )
 def git_end_turn_cmd(stage: str) -> None:
     """Print whether to load ``persist-ml-git``. Never commits."""
-    from skore_skills.git import render_git_json, run_end_turn
+    from skore_skills.git import run_end_turn
 
-    try:
-        payload, code = run_end_turn(Path.cwd(), stage)
-    except ValueError as exc:
-        raise click.ClickException(str(exc)) from exc
-    click.echo(render_git_json(payload), nl=False)
-    if code:
-        raise SystemExit(code)
+    _emit_git(lambda: run_end_turn(Path.cwd(), stage))
 
 
 @git_group.command("review")
 def git_review_cmd() -> None:
     """Print dirty paths that need a keep-or-ignore decision."""
-    from skore_skills.git import render_git_json, run_review
+    from skore_skills.git import run_review
 
-    try:
-        payload, code = run_review(Path.cwd())
-    except ValueError as exc:
-        raise click.ClickException(str(exc)) from exc
-    click.echo(render_git_json(payload), nl=False)
-    if code:
-        raise SystemExit(code)
+    _emit_git(lambda: run_review(Path.cwd()))
 
 
 @git_group.command("review-decide")
@@ -734,17 +729,11 @@ def git_review_decide_cmd(
     keep_paths: tuple[str, ...], ignore_paths: tuple[str, ...]
 ) -> None:
     """Record review choices in ``.gitignore``. No git add or commit."""
-    from skore_skills.git import render_git_json, run_review_decide
+    from skore_skills.git import run_review_decide
 
-    try:
-        payload, code = run_review_decide(
-            Path.cwd(), keep=keep_paths, ignore=ignore_paths
-        )
-    except ValueError as exc:
-        raise click.ClickException(str(exc)) from exc
-    click.echo(render_git_json(payload), nl=False)
-    if code:
-        raise SystemExit(code)
+    _emit_git(
+        lambda: run_review_decide(Path.cwd(), keep=keep_paths, ignore=ignore_paths)
+    )
 
 
 def main() -> None:

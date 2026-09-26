@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from click.testing import CliRunner
 
 from skore_skills.cli import cli
@@ -347,3 +348,115 @@ def test_cli_prints_json(tmp_path: Path, monkeypatch) -> None:
 
     assert result.exit_code == 0, result.output
     assert json.loads(result.output)["reason"] == "missing_scaffold"
+
+
+def test_alignment_row_and_corrupt_task_file(tmp_path: Path) -> None:
+    """A colon alignment row is not a value, and corrupt extras.json is ignored."""
+    _journal(tmp_path, **_locked_iid())
+    path = tmp_path / "journal" / "JOURNAL.md"
+    path.write_text(
+        path.read_text(encoding="utf-8").replace("|---|---|", "|:---|:---|"),
+        encoding="utf-8",
+    )
+    assert frame_show(tmp_path)["action"] == "proceed"
+
+    _journal(tmp_path)
+    _write(tmp_path / "scratch" / "data_analysis" / "extras.json", "{")
+    payload = frame_show(tmp_path)
+    assert payload["reason"] == "missing_keys"
+    assert payload["missing"] == ["prediction_goal"]
+    assert payload["candidates"] == [
+        "probabilities",
+        "point_labels",
+        "intervals",
+        "point_predictions",
+        "uncovered",
+    ]
+
+
+def test_regression_task_offers_interval_goals(tmp_path: Path) -> None:
+    """A recorded regression task asks for intervals or point predictions."""
+    _journal(tmp_path)
+    _write(
+        tmp_path / "scratch" / "data_analysis" / "extras.json",
+        json.dumps({"task": "regression"}) + "\n",
+    )
+    payload = frame_show(tmp_path)
+    assert payload["candidates"] == ["intervals", "point_predictions", "uncovered"]
+
+
+@pytest.mark.parametrize(
+    ("goal", "expected"),
+    [
+        ("probabilities", ["proper_score", "ranking", "imposed"]),
+        ("point_labels", ["thresholded", "ranking", "imposed"]),
+        ("intervals", ["proper_score", "imposed"]),
+    ],
+)
+def test_metric_role_candidates_follow_the_goal(
+    tmp_path: Path, goal: str, expected: list[str]
+) -> None:
+    """The metric-role menu depends on the locked prediction goal."""
+    _journal(
+        tmp_path,
+        **{
+            "Prediction goal": goal,
+            "Deployment": "iid",
+            "Known at predict": "n/a",
+        },
+    )
+    payload = frame_show(tmp_path)
+    assert payload["missing"] == ["metric_role"]
+    assert payload["candidates"] == expected
+
+
+def test_uncovered_goal_metric_menu_is_the_full_list() -> None:
+    """A goal outside the four named ones gets every metric role."""
+    from skore_skills.frame import _metric_candidates
+
+    assert _metric_candidates("uncovered") == [
+        "imposed",
+        "proper_score",
+        "ranking",
+        "thresholded",
+        "point_error",
+    ]
+
+
+def test_probability_baseline_includes_logistic(tmp_path: Path) -> None:
+    """Probabilities add a logistic baseline to the menu."""
+    _journal(
+        tmp_path,
+        **{
+            "Prediction goal": "probabilities",
+            "Deployment": "iid",
+            "Known at predict": "n/a",
+            "Metric role": "proper_score",
+            "Metric": "log loss",
+        },
+    )
+    payload = frame_show(tmp_path)
+    assert payload["missing"] == ["baseline"]
+    assert payload["candidates"] == ["logistic", "production", "dummy"]
+
+
+def test_unparsable_horizon_stays_missing(tmp_path: Path) -> None:
+    """A horizon that is not a quantity is asked again."""
+    _journal(
+        tmp_path,
+        **{
+            "Prediction goal": "point_predictions",
+            "Deployment": "time",
+            "Horizon": "soon",
+        },
+    )
+    payload = frame_show(tmp_path)
+    assert payload["missing"] == ["horizon"]
+
+
+def test_partial_uncovered_block_uses_the_fallback(tmp_path: Path) -> None:
+    """An uncovered goal with a blank metric cites the fallback note."""
+    _journal(tmp_path, **{"Prediction goal": "uncovered"})
+    payload = frame_show(tmp_path)
+    assert payload["missing"] == ["metric"]
+    assert payload["reference"] == "references/fallback.md"
