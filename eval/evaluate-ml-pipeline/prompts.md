@@ -1,5 +1,9 @@
 # evaluate-ml-pipeline eval — golden prompts
 
+Unless a case says otherwise, `status.modeling_decisions` is `locked`
+and `frame show` returned `proceed` with `translation.splitter`
+`KFold`, `n_splits` 5, `groups` null, and `metric` `MAE`.
+
 Behavioural prompts. Pass = every Must do ticked, zero Must NOT
 violated.
 
@@ -32,8 +36,8 @@ violated.
   a minute estimate.
 - Pick **`skore.evaluate(learner, data={...}, splitter=...)`** as
   the entry point (not `cross_val_score`, not `cross_validate`).
-- Map empty `split_kwargs` + IID → **`KFold`** per the mapping table
-  (Pattern A: pass `splitter=KFold(...)`).
+- Map the locked translation → **`KFold`** (Pattern A: pass
+  `splitter=KFold(n_splits=5)`). Do not ask for another splitter.
 - Run `python -m skore_skills api get` for `skore.evaluate` and
   `KFold` signatures (or Read the matching caches already listed).
 - Mention `data={...}` (env-dict) for `SkrubLearner`, NOT
@@ -64,7 +68,7 @@ violated.
 
 ---
 
-## CASE_02 — Time-ordered data, mandatory AskUserQuestion
+## CASE_02 — Time-ordered data uses the locked translation
 
 **User prompt:**
 > Wire `experiments/02_load_forecast.py` for the 24h-ahead load
@@ -72,43 +76,28 @@ violated.
 
 **Assumed workspace state:**
 - `journal/02_load_forecast.md` approved.
+- `status.modeling_decisions` is `locked`.
+- `frame show` returns `proceed` with `translation.splitter`
+  `TimeSeriesSplit`, `n_splits` 5, `gap` 24, and `groups` null.
 - `pipeline.py` X-marker has empty `split_kwargs` (no `cv=`).
   Rows are already time-ordered. `TimeSeriesSplit` needs no
   extra `split()` kwargs (Pattern A).
-- Forecast horizon is 24h.
 - Matching smoke pytest is green.
 - Cache hit at `scratch/api/sklearn/1.8.0/cv_splitters.md` covering
   `KFold` / `GroupKFold` / `TimeSeriesSplit` — the splitter lookup
   is already satisfied.
 
 **Must do:**
-- Name **`AskUserQuestion`** (or a narrative equivalent that lists
-  the picks and waits) as the mandatory gate before a splitter is
-  locked in. No tools this turn: enumerating the options in the
-  message counts as firing the gate.
-- Present the **four canonical options** (wording need not be
-  verbatim):
-  1. `TimeSeriesSplit(gap=horizon)` — safe default
-  2. `TimeSeriesSplit(gap=0)` — only on explicit user pick; warn
-     about leakage
-  3. Custom splitter (purged-and-embargoed / blocked calendar /
-     walk-forward)
-  4. `KFold` ignoring time — only with explicit user reason
-- Cite that `TimeSeriesSplit(n_splits=5)` from memory defaults to
-  `gap=0` which silently leaks at non-trivial horizons. Any
-  sentence that `gap=0` is the memory default / leaks is enough;
-  do not require the exact constructor spelling if `gap=0` is
-  named.
+- Use `TimeSeriesSplit(n_splits=5, gap=24)` from the translation.
+- Keep time out of `split_kwargs`.
+- Confirm the signature from the cache or `api get` before writing it.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Skip the four-option ask and lock a splitter with no user pick.
-  Naming a **recommended** option (e.g. `TimeSeriesSplit(gap=horizon)`)
-  next to the menu, or drafting `experiments/02_load_forecast.py`
-  labeled pending confirmation, is not a silent pick.
-- Default to `KFold` because empty `gap` "feels safer".
-- Treat harness "no clarifying questions" hint as waiving the
-  mandatory ask.
+- Ask the four time-series splitter options or any replacement menu.
+- Use `gap=0` or `KFold` instead of the locked translation.
+- Treat a harness "no clarifying questions" hint as permission to
+  drop the locked gap.
 
 ---
 
@@ -119,14 +108,16 @@ violated.
 > are grouped by customer.
 
 **Assumed workspace state:**
+- `status.modeling_decisions` is `locked`.
+- `frame show` `translation.groups` is `customer_id` and
+  `translation.splitter` is `GroupKFold`.
 - `pipeline.py` X-marker has
   `cv=GroupKFold()` and
   `split_kwargs={"groups": data["customer_id"]}` (Pattern B).
 - No temporal structure.
 
 **Must do:**
-- Paste **`GroupKFold`** from the mapping table (`groups` →
-  `GroupKFold`). That identifier is the mapping; do not withhold it.
+- Paste **`GroupKFold`** from the locked translation. Do not withhold it.
 - Call `skore.evaluate(learner, data={...})` **without**
   `splitter=` so skore reuses the DataOp `cv` and `groups`
   (`references/metadata-routing.md` Pattern B).
@@ -154,21 +145,22 @@ violated.
 
 **Assumed workspace state:**
 - `pipeline.py` X-marker has empty `split_kwargs`.
-- `region` is a potential group key but wasn't wired in.
+- `status.modeling_decisions` is `locked`.
+- `frame show` `translation.groups` is `region`.
 
 **Must do:**
 - **Refuse to default** to `KFold` silently.
 - Route back to `build-ml-pipeline` (NOT this skill) to wire
-  `split_kwargs` properly first, OR ask the user whether to treat
-  `region` as a group.
-- Cite the Stop condition: empty `split_kwargs` plus possible
-  **groups** → return to `build-ml-pipeline`.
+  `split_kwargs` for `region` first.
+- Cite the stop: `translation.groups` is set and `split_kwargs`
+  is empty → return to `build-ml-pipeline`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Default to `KFold` and proceed.
 - Auto-wire `split_kwargs={"groups": data["region"]}` from this
   skill (that's `build-ml-pipeline`'s job).
+- Ask whether `region` should be a group.
 - Pick `StratifiedKFold` because "stratified is safer".
 
 ---
@@ -678,5 +670,27 @@ violated.
 - Define a `Check` subclass or call `report.checks.add`.
 - Pass `scoring=` to `skore.evaluate`.
 - Call `report.metrics.add` without an explicit metric request.
+
+---
+
+## CASE_23 — Unlocked framing does not choose a splitter
+
+**User prompt:**
+> Evaluate the baseline.
+
+**Assumed workspace state:**
+- Approved design, green smoke, declared learner.
+- `status.modeling_decisions` is `draft`.
+- `model-ml-pipeline` is installed.
+
+**Must do:**
+- Stop before choosing a splitter or writing `skore.evaluate`.
+- Return to `model-ml-pipeline`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Ask for a cross-validator.
+- Write `skore.evaluate`.
+
 
 ---

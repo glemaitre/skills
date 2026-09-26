@@ -74,7 +74,10 @@ wrapper CLI.
    - `stop` writes nothing further.
 7. `proceed` — the table is locked. If `translation` is null, say
    that this lock has no splitter translation. Do not load
-   `build-ml-pipeline`. Run
+   `build-ml-pipeline` and do not return to `model-ml-pipeline`.
+   Stop. If `model-ml-pipeline` dispatched this turn, return to
+   that coordinator and stop. Do not start build, write a design
+   note, or run the git close from here. Otherwise run
    `python -m skore_skills git end-turn --stage implement`. If
    JSON `action` is `invoke`, load `persist-ml-git` only if
    `status.skills.persist-ml-git` is true and stop. Otherwise

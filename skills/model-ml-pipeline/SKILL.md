@@ -1,13 +1,15 @@
 ---
 name: model-ml-pipeline
 description: >
-  Deterministic entry point for modeling. On a generic landing,
-  offer only the choices justified by the workspace (first-model
-  dummy / standard baseline, EDA proposal, Backlog, discussion).
-  After a design is approved, coordinate build (pytest smoke is a
-  build sub-step), the user's Evaluate (Recommended) / Modify /
-  Stop gate, evaluation, and audit. Not for a single action
-  already owned by evaluate, audit, or smoke debugging.
+  Deterministic entry point for modeling. Locked problem framing
+  is mandatory before a proposal or model code. On a generic
+  landing, offer only the choices justified by the workspace
+  (first-model dummy / standard baseline, EDA proposal, Backlog,
+  discussion). After a design is approved, coordinate build
+  (pytest smoke is a build sub-step), the user's Evaluate
+  (Recommended) / Modify / Stop gate, evaluation, and audit. Not
+  for a single action already owned by evaluate, audit, or smoke
+  debugging.
 ---
 
 # Model ML Pipeline
@@ -44,7 +46,17 @@ criteria" section. Keep `## Notebooks` with Evaluation then Audit.
 1. Run `python -m skore_skills status`. If `has_src` and
    `has_journal` are both false, STOP: explain and send the user
    to `setup-ml-project` / triage. Do not require `git`.
-2. **Resume beats menu.** If the user names an experiment stem, or
+2. **Framing is mandatory.** If `status.modeling_decisions` is not
+   `locked`, load `frame-ml-problem` only if
+   `status.skills.frame-ml-problem` is true and stop. Do not invent
+   the table, offer model choices, write a design note, or declare
+   a pipeline. Missing skill → stop in one line. This includes an
+   approved-stem resume: do not build until the table is locked.
+   When the table is `locked`, run
+   `python -m skore_skills frame show`. A `proceed` whose
+   `translation` is null has no splitter translation: say so and
+   stop. Do not write model code.
+3. **Resume beats menu.** If the user names an experiment stem, or
    `status.policy.loop.stem` / `last_history_stem` identifies a
    current design, run
    `python -m skore_skills design consent --stem <stem>`. Treat
@@ -55,7 +67,7 @@ criteria" section. Keep `## Notebooks` with Evaluation then Audit.
    note: name `scaffold --journal --stem` (or abandoned: explain
    and do not implement). Do not infer approval from "build it".
    Missing shell: no `site build`, no fill from memory.
-3. Otherwise run `python -m skore_skills model choices`. Treat its
+4. Otherwise run `python -m skore_skills model choices`. Treat its
    JSON as authoritative. Present exactly `choices[]`, in returned
    order, in one single-choice **AskUserQuestion**:
    - `dummy` → **Build a dummy predictor**
@@ -209,8 +221,9 @@ also ask in chat whether the note looks right.
 3. After a successful dispatched evaluate (locator returned): run
    `python -m skore_skills review consent --stem <stem>`. Treat
    JSON `action` as authoritative.
-   - `stop` — no `report.html`. Do not review. Name the missing
-     file. Do not record-outcome.
+   - `stop` — no `scratch/results/<stem>/report.html`. Do not
+     review. Name that file. This is the evaluation snapshot, not
+     the site launcher `report.html`. Do not record-outcome.
    - `ask` — the review skill owns the cost preview and
      Review (Recommended) / Skip / Stop question. Load
      `review-ml-experiment` only if
@@ -231,7 +244,7 @@ also ask in chat whether the note looks right.
    mode**, handing it the locator, optional headline, and
    G-AUDIT-FINDING (`n/a — audit not run` when skipped). Else
    one-line skip; do not write History from this meta. It writes
-   the `JOURNAL.md` History row and design-note Status block plus
+   the `journal/JOURNAL.md` History row and design-note Status block plus
    `## Results`, then returns. It does not triage idea files in
    this mode. Never mark `done` while `smoke run` is `stop`.
    Missing headline becomes `n/a`, never an invented metric. Do

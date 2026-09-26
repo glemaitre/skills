@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "4baf3bf66d34ecafccd7f4c78c9bb0e539a73b061ad9a4611dd257c4c8367d98",
+  "catalog_hash": "c547af8af0bb2600588e70d03406dd0da145e8acd742699dbf224dcd242df82b",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -18,34 +18,34 @@
       "id": "frame-ml-problem",
       "path": "skills/frame-ml-problem",
       "title": "Frame ML Problem",
-      "summary": "Lock the problem, metric, baseline, and validation scheme before any model code.",
+      "summary": "Lock the problem, deployment setting, metric, baseline, and validation scheme before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "18b6b239412f02a6fb7af7ce257d92db91ad2b38e6a86d6d5e51c2e919b90f37"
+      "hash": "8f5cc5045ac4c0ab1f84e3ec5b3bd1085266d5c38a6411d210c604b4b652bd6d"
     },
     {
       "id": "build-ml-pipeline",
       "path": "skills/build-ml-pipeline",
       "title": "Build ML Pipeline",
-      "summary": "Build a machine learning pipeline from the data source to the learner, including multi-tables engineering.",
+      "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "61023e497ad5001b73655bb5970a0ceaedf2199120c8c80bebe73c20057a186b"
+      "hash": "dd37d80e2974613e078d5a16fef37c5adf8690f0e51afef98b0cb388884a489e"
     },
     {
       "id": "evaluate-ml-pipeline",
       "path": "skills/evaluate-ml-pipeline",
       "title": "Evaluate ML Pipeline",
-      "summary": "Evaluate a complex machine learning pipeline and get structured reports including metrics, plots, and diagnostics.",
+      "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b74b32f256417fa2f7949e7d4d8e34eeccfe8d021047cc54adc479e2cedca44b"
+      "hash": "720736826237ccbc2a830fcc651495fa1396168012239d98c5419c71071f61fa"
     },
     {
       "id": "smoke-test-ml-pipeline",
       "path": "skills/smoke-test-ml-pipeline",
       "title": "Smoke Test ML Pipeline",
-      "summary": "Stress test your machine learning pipeline on future data to make sure it works.",
+      "summary": "Structural pytest: prediction count must match the predict-grid row count.",
       "category": "methodology",
       "subcategory": null,
       "hash": "fdf795d0696399dab57285ed16abff83b56c37b74203d7e6f0021d278e80c57d"
@@ -54,25 +54,25 @@
       "id": "audit-ml-pipeline",
       "path": "skills/audit-ml-pipeline",
       "title": "Audit ML Pipeline",
-      "summary": "Once testing and the experiment is done, audit by loading a skore report and investigate.",
+      "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "4f4561ad26c1931420b910937b295acb37ebb198d2b39a4cd3b02edcf9a09a21"
+      "hash": "322f69ebac126c37482c8357ee36e438997fdb0f70e1b05b574b212dd95f53dd"
     },
     {
       "id": "manage-ml-backlog",
       "path": "skills/manage-ml-backlog",
       "title": "Manage ML Backlog",
-      "summary": "Record experiment outcomes and next-lever backlog rows.",
+      "summary": "Record experiment outcomes and triage idea files into backlog rows.",
       "category": "action",
       "subcategory": null,
-      "hash": "c855d7944ecde2b00f8221a06ba76a7e5a802ad454c331df9b93c8520c1801c1"
+      "hash": "130a053574b7909dbd5e4523683d2cd1bb6ee1c12897b2d27aeab32474d46782"
     },
     {
       "id": "organize-ml-workspace",
       "path": "skills/organize-ml-workspace",
       "title": "Organize ML Workspace",
-      "summary": "An organized workspace to keep track of your experiments.",
+      "summary": "Deprecated compatibility skill; use setup-workspace.",
       "category": "tooling",
       "subcategory": "project-setup",
       "hash": "533b0d5e5a7691bbfe09c12444f3e5290f1a0ef439ba21666779c2c7153f0db6"
@@ -81,7 +81,7 @@
       "id": "data-science-python-stack",
       "path": "skills/data-science-python-stack",
       "title": "Data Science Python Stack",
-      "summary": "Opinionated one-library-per-job Python stack, organized into mandatory / user-choice / optional / transitive tiers.",
+      "summary": "Deprecated compatibility skill; use choose-python-library and the canonical package policy.",
       "category": "reference",
       "subcategory": null,
       "hash": "930f5fee8f3e977bd8bc3e228a78bd9f4b5ca79706e2e00bd069bb8d37306433"
@@ -90,7 +90,7 @@
       "id": "triage-ml-task",
       "path": "skills/triage-ml-task",
       "title": "Triage ML Task",
-      "summary": "Route an ambiguous ML request to a focused workflow pack.",
+      "summary": "Session owner: list installed entry skills and ask which to run.",
       "category": "meta",
       "subcategory": null,
       "hash": "b0dc3b9d0559814e80da1c62ff2483eb79d961a37ee85932cb0e76adb07ce9a2"
@@ -111,7 +111,7 @@
       "summary": "Shape a user idea or a named artifact into one idea file after they confirm.",
       "category": "meta",
       "subcategory": null,
-      "hash": "6c07d35abc9f1f20222bd7b5f145307b5090b7bfdd9a42ba3cab200d08e77130"
+      "hash": "b7787e03e91a7f4f813fe06b9782521b227b6fcff303b3e07b7fc50d0275fbc3"
     },
     {
       "id": "search-ml-literature",
@@ -120,7 +120,7 @@
       "summary": "Search scientific and technical sources and write one idea file for the direction the user confirms.",
       "category": "meta",
       "subcategory": null,
-      "hash": "4996d63158c4970b4ffb0563c6ec64bf4ff687ea70a1782a4f3c5fb372fbbafb"
+      "hash": "4d57b60baf87c636da44e65f4d957f0a4b259e57a8217c5e553727de5ef4f30b"
     },
     {
       "id": "setup-ml-project",
@@ -138,7 +138,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "b9c64c322cbb17a294538e87fddbbbfc0525b73548fcce1d9d351116197efadf"
+      "hash": "ba0f7ca62766e326238c8b3aa667a955329aa8b6b878998420ddb4f262457f21"
     },
     {
       "id": "persist-ml-git",
@@ -147,16 +147,16 @@
       "summary": "Commit the current loop stage with the real git CLI when the end-turn hook says invoke.",
       "category": "action",
       "subcategory": null,
-      "hash": "6ab4fc0d1e15c261d6d3d98c2a6461c5cf35d97ed395b6c95d0f19f0c572b209"
+      "hash": "c768482b04482c61e4a85b81bdd1ab447bd7bec17e08afe0ad7720950866039e"
     },
     {
       "id": "model-ml-pipeline",
       "path": "skills/model-ml-pipeline",
       "title": "Model ML Pipeline",
-      "summary": "Coordinate build (pytest smoke), evaluation, and audit.",
+      "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "bf5cfb917fcd43568289906c5d54e998de5e2926cad6b5ca5cdd9a3ab69f5def"
+      "hash": "8851c55f5158c4dc4e6fbf321f95dff6d518e46746762fd0252b4923a31d292c"
     },
     {
       "id": "choose-python-library",
@@ -189,7 +189,7 @@
       "id": "add-python-package",
       "path": "skills/add-python-package",
       "title": "Add Python Package",
-      "summary": "Add a dependency through the project env manager, or ask the user when the env is unmanaged.",
+      "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
       "hash": "d6226a47be1cfbe73c5b0224f23c2b44c5ef2c5608e17ac06edc8490abb05f93"
@@ -207,7 +207,7 @@
       "id": "setup-python-env",
       "path": "skills/setup-python-env",
       "title": "Set Up Python Environment",
-      "summary": "Detect the env manager, persist managed vs user-managed, and init two envs plus agent tools.",
+      "summary": "Detect the env manager and bootstrap the runtime, agent-tools, and composed development environments.",
       "category": "action",
       "subcategory": null,
       "hash": "15b35d66a471029bc2d9b34bd217671572544a2df5f174911dfca514941e2bda"
@@ -225,7 +225,7 @@
       "id": "export-ml-site",
       "path": "skills/export-ml-site",
       "title": "Export ML Site",
-      "summary": "Initialize and build an offline MkDocs documentation site from workspace markdown.",
+      "summary": "Package workspace markdown and existing notebook HTML into an offline MkDocs site.",
       "category": "tooling",
       "subcategory": "project-setup",
       "hash": "6917ce0dfe5903ec3a5e3cb11dee86eed73f06d8aab6bc20a91e15dba1c63e95"
@@ -293,7 +293,7 @@
     {
       "id": "model",
       "title": "Model an ML Pipeline",
-      "summary": "Build, smoke-test with pytest, evaluate, and audit an ML pipeline.",
+      "summary": "Frame, build, smoke-test with pytest, evaluate, and audit an ML pipeline.",
       "includes": [
         "model-ml-pipeline",
         "manage-ml-backlog",
@@ -347,6 +347,7 @@
         "setup-git",
         "persist-ml-git",
         "model-ml-pipeline",
+        "frame-ml-problem",
         "choose-python-library",
         "research-ml-practice",
         "plot-ml-figure",

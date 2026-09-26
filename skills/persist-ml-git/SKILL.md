@@ -3,8 +3,8 @@ name: persist-ml-git
 description: >
   Persist the current loop stage with the real git CLI when the
   end-turn hook says invoke. Trigger after
-  `python -m skore_skills git end-turn` returns action invoke, or
-  when the user asks to commit this turn's work.
+  `python -m skore_skills git end-turn --stage <stage>` returns
+  action invoke, or when the user asks to commit this turn's work.
 ---
 
 # Persist ML Git
@@ -54,5 +54,5 @@ The hook already ran this turn. Follow its JSON. Run `git` yourself.
 - Do not `git push`, amend, rebase, or `git config`.
 - Do not invent a commit when the hook was `skip` (`off`,
   `unanswered`, `no_repo`, `clean`).
-- Do not call `python -m skore_skills git end-turn` to perform the
-  commit; that command only prints facts.
+- Do not call `python -m skore_skills git end-turn --stage <stage>`
+  to perform the commit; that command only prints facts.

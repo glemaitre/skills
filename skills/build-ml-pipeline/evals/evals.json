@@ -132,18 +132,18 @@
     {
       "id": 7,
       "title": "`split_kwargs` group structure",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- skrub installed at 0.10.x.\n- IID-shaped features (no cross-row history) but rows are grouped\n  by customer.]\n\nTabular regression on (customer_id, claim_amount, ...). Multiple\nrows per customer. Build the pipeline.",
-      "expected_output": "Behavioural response satisfying: - Identify the group structure (multiple rows per `customer_id`). - Wire `mark_as_X(cv=GroupKFold(), split_kwargs={\"groups\": data[\"customer_id\"]})` at the X marker (Pattern B; skrub requires `cv=` with `split_kwargs`). - Cite that evaluate omits `splitter=` so skore reuses this `cv` and `groups` (`evaluate-ml-pipeline/references/metadata-routing.md`). It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Call `skore.evaluate` from pipeline code. - Pick an IID splitter (`KFold`, `TimeSeriesSplit`) at the X marker.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- skrub installed at 0.10.x.\n- IID-shaped features (no cross-row history).\n- `frame show` `translation.groups` is `customer_id`.]\n\nTabular regression on (customer_id, claim_amount, ...). Multiple\nrows per customer. Build the pipeline.",
+      "expected_output": "Behavioural response satisfying: - Use that locked group column. Do not ask a new validation scheme. - Wire `mark_as_X(cv=GroupKFold(), split_kwargs={\"groups\": data[\"customer_id\"]})` at the X marker (Pattern B; skrub requires `cv=` with `split_kwargs`). - Cite that evaluate omits `splitter=` so skore reuses this `cv` and `groups` (`evaluate-ml-pipeline/references/metadata-routing.md`). It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Call `skore.evaluate` from pipeline code. - Pick an IID splitter (`KFold`, `TimeSeriesSplit`) at the X marker.",
       "files": [],
       "expectations": [
-        "Identify the group structure (multiple rows per `customer_id`).",
+        "Use that locked group column. Do not ask a new validation scheme.",
         "Wire `mark_as_X(cv=GroupKFold(), split_kwargs={\"groups\": data[\"customer_id\"]})` at the X marker (Pattern B; skrub requires `cv=` with `split_kwargs`).",
         "Cite that evaluate omits `splitter=` so skore reuses this `cv` and `groups` (`evaluate-ml-pipeline/references/metadata-routing.md`).",
-        "Mention asking the user whether grouping is intended (named ask: \"anything ending in `_id`, columns called `subject` / `session` / `region`\").",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Call `skore.evaluate` from pipeline code.",
         "The response does NOT: Pick an IID splitter (`KFold`, `TimeSeriesSplit`) at the X marker.",
-        "The response does NOT: Leave `split_kwargs` empty without surfacing the group question."
+        "The response does NOT: Leave `split_kwargs` empty.",
+        "The response does NOT: Ask whether grouping is intended."
       ],
       "tools": false,
       "sandbox": [],
@@ -284,12 +284,12 @@
     {
       "id": 15,
       "title": "Time ordering does not become split kwargs",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The journal records temporal ordering but no custom splitter\n  consumes a `times` keyword.]\n\nBuild the approved temporal pipeline and put the timestamp on X.",
-      "expected_output": "Behavioural response satisfying: - Keep `split_kwargs={}` at `mark_as_X`. - Leave time-splitter selection to evaluate (Pattern A). It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Put `times=` or `split_kwargs={\"times\": ...}` on the declared `mark_as_X`. Quoting the user's request in a refusal heading is not a violation. - Import `TimeSeriesSplit` into pipeline code.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `frame show` `translation.splitter` is `TimeSeriesSplit` and\n  `translation.groups` is null.\n- The journal records temporal ordering but no custom splitter\n  consumes a `times` keyword.]\n\nBuild the approved temporal pipeline and put the timestamp on X.",
+      "expected_output": "Behavioural response satisfying: - Keep `split_kwargs={}` at `mark_as_X`. - Leave `TimeSeriesSplit` to evaluate (Pattern A). It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Put `times=` or `split_kwargs={\"times\": ...}` on the declared `mark_as_X`. Quoting the user's request in a refusal heading is not a violation. - Import `TimeSeriesSplit` into pipeline code.",
       "files": [],
       "expectations": [
         "Keep `split_kwargs={}` at `mark_as_X`.",
-        "Leave time-splitter selection to evaluate (Pattern A).",
+        "Leave `TimeSeriesSplit` to evaluate (Pattern A).",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Put `times=` or `split_kwargs={\"times\": ...}` on the declared `mark_as_X`. Quoting the user's request in a refusal heading is not a violation.",
         "The response does NOT: Import `TimeSeriesSplit` into pipeline code."
@@ -380,6 +380,22 @@
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Defer `site build` until after `skore.evaluate`.",
         "The response does NOT: Skip the site because EDA was skipped."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 21,
+      "title": "Unlocked framing stops before declaration",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved design note.\n- `status.modeling_decisions` is `missing`.\n- `frame-ml-problem` is installed.]\n\nDeclare the baseline learner.",
+      "expected_output": "Behavioural response satisfying: - Stop before writing pipeline code. - Load `frame-ml-problem`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Declare `build_learner` or pick a splitter.",
+      "files": [],
+      "expectations": [
+        "Stop before writing pipeline code.",
+        "Load `frame-ml-problem`.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Declare `build_learner` or pick a splitter."
       ],
       "tools": false,
       "sandbox": [],

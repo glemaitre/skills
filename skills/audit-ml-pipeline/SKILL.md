@@ -502,7 +502,7 @@ audit/NN_<short_name>.py             — audit  ← this skill
 ```
 
 Identical stems, 1:1. By the time the experiment shows `done` in
-`JOURNAL.md`, all four exist.
+`journal/JOURNAL.md`, all four exist.
 
 ## Dispatching in and out
 
@@ -612,7 +612,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 - Open or write the skore Project's reports (`evaluate-ml-pipeline`).
 - Install `ipython` (`add-python-package` owns).
 - Write `journal/ideas/` files (`review-ml-experiment` owns that).
-- Write or edit `journal/NN_*.md` or `JOURNAL.md` directly. At end
+- Write or edit `journal/NN_*.md` or `journal/JOURNAL.md` directly. At end
   of turn, dispatch `manage-ml-backlog` record-outcome mode
   instead — that skill owns every journal write.
 - Run pytest / smoke tests (`smoke-test-ml-pipeline`).

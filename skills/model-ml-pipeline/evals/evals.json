@@ -338,6 +338,39 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 18,
+      "title": "Unlocked framing stops before modeling",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.modeling_decisions` is `draft`.\n- `frame-ml-problem` is installed.]\n\nLet us start modeling. What can we do?",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - Load `frame-ml-problem` and stop. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `python -m skore_skills model choices`. - Write a design note or model code.",
+      "files": [],
+      "expectations": [
+        "Run `python -m skore_skills status`.",
+        "Load `frame-ml-problem` and stop.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Run `python -m skore_skills model choices`.",
+        "The response does NOT: Write a design note or model code."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 19,
+      "title": "A null translation does not start model code",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.modeling_decisions` is `locked`.\n- `python -m skore_skills frame show` returns `proceed` with\n  `translation` null.]\n\nThe modeling decisions are locked. Build the first model.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills frame show`. - Say the lock has no splitter translation and stop. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Offer model choices or dispatch `build-ml-pipeline`.",
+      "files": [],
+      "expectations": [
+        "Run `python -m skore_skills frame show`.",
+        "Say the lock has no splitter translation and stop.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Offer model choices or dispatch `build-ml-pipeline`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

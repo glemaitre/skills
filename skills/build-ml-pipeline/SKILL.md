@@ -27,9 +27,11 @@ description: >
     classifier / regressor for X.
 
   STOP when `python -m skore_skills status` shows no scaffold
-  (`has_src` and `has_journal` both false), no approved design,
-  or no data contract: explain the missing fact and send the user
-  to setup/triage. Do not require `git`.   After the declaration
+  (`has_src` and `has_journal` both false), modeling decisions
+  are not `locked`, `frame show` has a null `translation`, no
+  approved design, or no data contract: explain the missing fact
+  and send the user to setup/triage or `frame-ml-problem`. Do not
+  require `git`.   After the declaration
   exists, load `smoke-test-ml-pipeline` only if
   `status.skills.smoke-test-ml-pipeline` is true and iterate on
   pytest; else one-line skip and do not invent the pytest file.
@@ -112,7 +114,15 @@ question instead of pointing at a file.
 ## Procedure
 
 1. `python -m skore_skills status`. Missing scaffold → setup/triage
-   (S0). Then `python -m skore_skills design consent --stem
+   (S0). If `status.modeling_decisions` is not `locked`, STOP (S0b):
+   load `frame-ml-problem` when installed, else name the missing
+   lock. Do not declare the pipeline. When locked, run
+   `python -m skore_skills frame show`. A `proceed` with null
+   `translation` stops: there is no splitter translation. A
+   non-null `translation.groups` is Pattern B for that column.
+   Time stays out of `split_kwargs`; do not choose
+   `TimeSeriesSplit` here. Do not ask a new validation scheme.
+   Then `python -m skore_skills design consent --stem
    <stem>`. Treat JSON `action` as authoritative. `ask` / `stop`
    → do not declare the pipeline ("build it" is not approval).
    `proceed` continues. Missing data contract → S0.
@@ -253,6 +263,14 @@ Scan top to bottom; any match means STOP.
   known and journal is the only gap). Missing data contract:
   explain and stop.
 
+### S0b. Modeling decisions are not locked
+
+- **Rule:** `status.modeling_decisions` must be `locked`, and
+  `python -m skore_skills frame show` must return `proceed` with
+  a non-null `translation`, before any declaration.
+- **Recovery:** load `frame-ml-problem` when installed. A null
+  `translation` stops with no pipeline. Do not invent the table.
+
 ### S1. Missing dependency
 
 - **Rule:** `import skrub` / `sklearn` failure, or a DataOp HTML
@@ -385,7 +403,8 @@ Pre-flight (build-ml-pipeline):
 - [ ] Preview value handling
       Evidence: `data_dir_preview=None` kwarg; no path literal
 - [ ] split_kwargs at the X marker: groups | none
-      Evidence: column(s) wired OR "n/a — i.i.d., no group structure"
+      Evidence: `translation.groups` column wired
+                | "n/a — translation.groups is null"
 - [ ] Pre-flight re-emitted with evidence before final message.
 ```
 
@@ -432,11 +451,10 @@ Three layers when **Yes** (code: `references/layer_examples.md`):
 `value=` is preview only. Expose `data_dir_preview=None` on
 `build_learner`; never bake a relative path into `pipeline.py`.
 
-**CV metadata at the X marker.** Groups (subjects, sessions,
-customer IDs): Pattern B — `cv=` **and** `split_kwargs`. skrub
-requires `cv=` whenever `split_kwargs` is set; `cv=<int>` is not
-a splitter. `G-CV-SPLITTER` still owns KFold vs time; this is
-only the mapping-table placeholder for `groups`.
+**CV metadata at the X marker.** When `frame show` `translation.groups`
+is set, that column is Pattern B — `cv=` **and** `split_kwargs`.
+skrub requires `cv=` whenever `split_kwargs` is set; `cv=<int>` is
+not a splitter. Do not choose `KFold` versus `TimeSeriesSplit` here.
 
 ```python
 from sklearn.model_selection import GroupKFold

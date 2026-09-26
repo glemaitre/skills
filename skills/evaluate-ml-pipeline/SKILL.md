@@ -26,14 +26,16 @@ description: >
   already-persisted report belong to `audit-ml-pipeline`.
 
   STOP when `python -m skore_skills status` shows no scaffold
-  (`has_src` and `has_journal` both false), no declared learner,
-  no approved design, or smoke not green: explain the missing
-  prerequisite and send the user to setup/triage or
-  `build-ml-pipeline` (it owns pytest smoke). Do not require
-  `git`. Do not write `skore.evaluate` while smoke is red or
-  missing on a history-dependent pipeline. Also stop for
-  hyperparameter search, final-model serving, or multi-run
-  tracking. Do not require another action skill to be installed.
+  (`has_src` and `has_journal` both false), modeling decisions
+  are not `locked`, `frame show` has a null `translation`, no
+  declared learner, no approved design, or smoke not green:
+  explain the missing prerequisite and send the user to
+  setup/triage, `model-ml-pipeline`, or `build-ml-pipeline` (it
+  owns pytest smoke). Do not require `git`. Do not write
+  `skore.evaluate` while smoke is red or missing on a
+  history-dependent pipeline. Also stop for hyperparameter
+  search, final-model serving, or multi-run tracking. Do not
+  require another action skill to be installed.
 
   HOW TO USE: invoke before any evaluation call. **First, resolve
   G-SKORE-MODE** (`status.policy.skore_mode`; ask local/hub/mlflow
@@ -63,6 +65,17 @@ stay in this skill. `style` is ruff only.
 
 ## Stop conditions — read before anything else
 
+- **Locked framing is mandatory.** If `status.modeling_decisions`
+  is not `locked`, STOP. Return to `model-ml-pipeline` when
+  `status.skills.model-ml-pipeline` is true; otherwise load
+  `frame-ml-problem` when that skill is installed. Do not pick a
+  splitter. When the table is locked, run
+  `python -m skore_skills frame show`. A `proceed` with null
+  `translation` stops evaluation. A non-null `translation` is the
+  splitter contract: use its `splitter`, `n_splits`, `gap`,
+  `groups`, and `metric`. Do not ask which splitter to use. The
+  design note does not own the splitter. Confirm the signature
+  with `api get` before writing it.
 - **Workspace not scaffolded.** Run `python -m skore_skills status`
   first. If `has_src` and `has_journal` are both false, STOP and
   send the user to `setup-ml-project` / triage. Do not require
@@ -154,24 +167,21 @@ stay in this skill. `style` is ruff only.
     post-smoke HITL, then G-CV-SPLITTER / `api get` / write.
   - `stop` — `tests/smoke/test_<stem>.py` is missing. Do not
     evaluate. Route to `build-ml-pipeline` (it loads smoke).
-- **Splitter choice is data-driven, not default-driven
-  (`G-CV-SPLITTER`).** This is the **G-CV-SPLITTER** gate — owned by
-  this skill, fired **after** green pytest smoke and Evaluate
-  consent (`evaluate consent` `action` is `proceed`, or the user
-  answered **Evaluate** on `ask`), **after** the design note
-  has passed `model-ml-pipeline`'s explicit approval gate, before
-  evaluation is written into
-  `experiments/NN_*.py`. The splitter
-  is NOT pre-committed in the design note. Pick from the
-  `split_kwargs` content at the X marker **and** time from EDA /
-  the journal via the table in rule 3 — never reach for `KFold(5)`
-  or `StratifiedKFold` out of habit. Empty `split_kwargs` plus
-  possible **groups** → return to `build-ml-pipeline`. Empty
-  `split_kwargs` plus **time** in the EDA/journal → fire the
-  time-ordered AskUserQuestion (Pattern A if they pick
-  `TimeSeriesSplit`); do not attach `times=` on `mark_as_X`.
-  Wiring the chosen splitter is Pattern A or B
+- **Splitter choice comes from the locked translation
+  (`G-CV-SPLITTER`).** This gate fires **after** green pytest
+  smoke and Evaluate consent (`evaluate consent` `action` is
+  `proceed`, or the user answered **Evaluate** on `ask`),
+  **after** the design note has passed `model-ml-pipeline`'s
+  explicit approval gate, and before evaluation is written into
+  `experiments/NN_*.py`. The splitter is NOT pre-committed in
+  the design note. Use the non-null `frame show` `translation`:
+  `splitter`, `n_splits`, `gap`, `groups`, and `metric`. Do not
+  ask the time-series splitter question again. Empty
+  `split_kwargs` while `translation.groups` is set → return to
+  `build-ml-pipeline` so it can place Pattern B. Time stays out
+  of `split_kwargs`. Wiring is Pattern A or B
   (`references/metadata-routing.md`), not "always `splitter=`".
+  Never reach for `KFold(5)` or `StratifiedKFold` from habit.
 - **No `Stratified*` for class imbalance.** It compresses across-fold
   variance and produces over-confident error bars. Imbalance does
   not change the splitter choice.
@@ -279,21 +289,20 @@ stay in this skill. `style` is ruff only.
   paste JSON `locator` verbatim — do not rephrase it. When
   `model-ml-pipeline` dispatched this turn, pass the locator up;
   do not write the full close — the dispatcher owns it.
-- **The time-ordered splitter AskUserQuestion is non-skippable,
-  even under harness-level "no clarifying questions"
-  instructions.** When the data is temporal, the four-option
-  pick from rule 3 is an operating-contract gate, not a
-  clarifying question. The harness's "no clarifying questions"
-  hint applies to agent-discretionary asks (ambiguous wording,
-  unclear intent); it never overrides a gate a skill explicitly
-  mandates. The same override rule applies to every other
-  mandatory `AskUserQuestion` in this stack —
+- **The locked translation is non-skippable, even under
+  harness-level "no clarifying questions" instructions.** Do not
+  re-ask a splitter, fold count, gap, grouping column, or
+  comparison metric that `frame show` already returned. The
+  harness hint applies to agent-discretionary asks; it never
+  overrides this contract. The same override rule applies to
+  every other mandatory `AskUserQuestion` in this stack —
   `add-python-package` § "Where does the package belong?",
   `choose-python-library` (polars vs pandas; policy from
   `python -m skore_skills env stack`),
   `manage-ml-backlog` (idea triage), `review-ml-experiment`
-  (audit cost gate). When in doubt: the user's
-  approval is the gate, not the harness's instruction text.
+  (audit cost gate). When in doubt: the locked table and the
+  user's approval are the gates, not the harness's instruction
+  text.
 
 ## Pre-flight — emit this checklist as visible text before any code
 
@@ -329,7 +338,8 @@ Pre-flight (evaluate-ml-pipeline):
                   with unchanged arguments, or Pattern B DataOp cv="
 - [ ] split_kwargs at the X marker read: <groups | none>
       Time is a data fact (EDA / journal), not a split_kwargs key.
-- [ ] Splitter chosen via rule 3 mapping table: <name + reason>
+- [ ] Splitter taken from `frame show` translation: <splitter,
+      n_splits, gap, groups, metric>
 - [ ] Data-passing form picked: <X, y> | <data={...}>
 - [ ] CV pattern: A (`splitter=` on evaluate) | B (DataOp cv +
       omit splitter=) — `references/metadata-routing.md`
@@ -458,26 +468,24 @@ named in the question itself.
    See `references/reports.md` for the escalation table; defer all
    API details to `python -m skore_skills api get`.
 
-3. **Pick the cross-validator from the structural facts of the data
-   — not by default (the `G-CV-SPLITTER` gate).** The data tells you
-   what splitter is correct.
-   The structural facts arrive at the X marker through
-   `split_kwargs` (set by `build-ml-pipeline` at declaration time)
-   **or** from EDA / the journal for time (time is not a
-   `split_kwargs` key). Mapping rules:
+3. **Use the locked `frame show` translation (`G-CV-SPLITTER`).**
+   Run `python -m skore_skills frame show` when this turn has not
+   already received `proceed`. A null `translation` stops. Otherwise
+   the translation names the splitter, fold count, gap, groups, and
+   comparison metric. Do not ask the user to pick again.
 
-   | Fact | Splitter |
+   | `translation` | What to write |
    |---|---|
-   | `split_kwargs` has `groups` | `GroupKFold` (Pattern B) |
-   | time-ordered rows (EDA / journal) | **ask the user** (see "Time-ordered data"; Pattern A if they pick `TimeSeriesSplit`) |
-   | none | `KFold` (or `RepeatedKFold` for small / noisy data) — Pattern A |
+   | `groups` set | Pattern B: `build-ml-pipeline` already placed that column on `split_kwargs`. Omit `splitter=` so skore reuses DataOp `cv`. |
+   | `splitter` is `TimeSeriesSplit` | Pattern A: `TimeSeriesSplit(n_splits=translation.n_splits, gap=translation.gap)`. Time is not a `split_kwargs` key. |
+   | `splitter` is `KFold` | Pattern A: `KFold(n_splits=translation.n_splits)`. |
+   | `splitter` is null and `report` is `EstimatorReport` | Holdout. Use `EstimatorReport`, not a cross-validator. |
 
-When `split_kwargs` contains `groups`, the next token in the reply
-is **`GroupKFold`**. The mapping table is the name source;
-API CLI is only for the signature after the name.
-
-   Imbalanced classification *does not* change the choice — use
-   plain `KFold` / `GroupKFold`. See "Avoid by default" below.
+   Confirm the signature with `api get` before writing it. Do not
+   substitute `StratifiedKFold`, `gap=0`, or `KFold(5)` from habit.
+   If `translation.groups` is set and the X marker has empty
+   `split_kwargs`, return to `build-ml-pipeline`. Do not attach
+   `times=` on `mark_as_X`.
 
    **Avoid by default:**
    - **Stratified variants** (`StratifiedKFold`,
@@ -486,67 +494,20 @@ API CLI is only for the signature after the name.
      by construction, producing over-confident error bars on the
      score. Don't reach for them on imbalance.
    - **`LeaveOneOut` / `LeaveOneGroupOut` / `LeavePGroupsOut`** —
-     high per-fold variance; aggregate hides the noise. Use
-     `KFold` / `GroupKFold` with 5–10 splits instead.
+     high per-fold variance; aggregate hides the noise.
 
    See `references/cross-validation.md` § "Avoid" for the reasoning.
    Wiring details: `references/metadata-routing.md`.
 
-   **Time-ordered data — `AskUserQuestion` is mandatory.** When
-   the data is temporal, fire `AskUserQuestion` *before* picking
-   a splitter. Paste these **four options verbatim** — keep the
-   token `gap=horizon` (do not substitute a numeric horizon such
-   as `gap=24`) and keep the phrase "safe default" on option 1:
-
-   1. **`TimeSeriesSplit(gap=horizon)`** — growing-window train,
-      contiguous test, embargo equal to the forecast horizon.
-      The safe default for any horizon-`h` forecasting task: it
-      prevents the train tail from leaking into the test head
-      by up to one horizon. Follow up to surface `n_splits` /
-      `test_size` / `max_train_size`.
-   2. **`TimeSeriesSplit(gap=0)`** — only on the user's explicit
-      pick. Warn in the option description that with horizon
-      `h > 0`, the last `h` rows of every training fold predict
-      values whose target time is *inside* the test fold; the
-      reported metric is optimistic.
-   3. **Custom splitter** — purged-and-embargoed (finance),
-      blocked calendar windows, walk-forward with refit
-      cadence. Pick this when the time structure has more shape
-      than `TimeSeriesSplit` captures. See
-      `references/custom-splitter.md`.
-   4. **`KFold` ignoring time** — only when the user confirms
-      the temporal structure shouldn't drive splitting (e.g.
-      the time column is a covariate but the task is treated
-      as IID). The skill should *not* recommend this option on
-      time-ordered data without an explicit user reason.
-
-   **No silent default.** Even if the data looks "obviously
-   `TimeSeriesSplit`", the user picks via `AskUserQuestion`.
-   The gap parameter is the one most often wrong by default —
-   `TimeSeriesSplit(n_splits=5)` from memory uses `gap=0`,
-   which silently leaks for any non-trivial horizon. Paste that
-   token in the reply (`TimeSeriesSplit(n_splits=5)` defaults
-   to `gap=0`). The structured pick exists to make that visible.
-   Ambiguous free text ("just pick something", "you decide")
-   routes to a clarifying `AskUserQuestion`; don't infer.
-
-   Separately, ask whether the time column should stay as a
-   covariate or be dropped from the feature matrix (encoders
-   can extract calendar patterns from a timestamp; the user's
-   call). This is a follow-up question, not a substitute for
-   the splitter pick.
-
-   If `split_kwargs` is empty *and* you cannot confirm there's no
-   **group** structure, return to `build-ml-pipeline` and ask.
-   Time-ordered data with empty `split_kwargs` is expected; use the
-   AskUserQuestion above, not a fake `times=` key.
-
-4. **Trust skore's metric defaults; override only on explicit user
-   request.** `skore.evaluate` picks task-appropriate metrics
-   automatically (regression: MSE/RMSE/MAE/R²; binary: accuracy,
-   precision, recall, F1, ROC-AUC; multiclass: macro/micro variants;
-   multilabel: per-label + averages). Override only when the user
-   says so — e.g., "use RMSE", "report ROC-AUC". Do not pass a
+4. **Trust skore's metric defaults; the locked comparison metric
+   is not a fresh choice.** `skore.evaluate` picks task-appropriate
+   metrics automatically (regression: MSE/RMSE/MAE/R²; binary:
+   accuracy, precision, recall, F1, ROC-AUC; multiclass:
+   macro/micro variants; multilabel: per-label + averages). Pass
+   `translation.metric` as the comparison metric the journal
+   already locked. Do not ask which metric to compare on. Override
+   other metrics only when the user says so — e.g., "also report
+   ROC-AUC". Do not pass a
    `scoring=...` argument to `skore.evaluate`; it has no such
    parameter.
 
@@ -588,8 +549,9 @@ API CLI is only for the signature after the name.
    - One → `skore.evaluate(...)` (default), escalate to
      `CrossValidationReport` or `EstimatorReport` only if needed.
    - ≥ 2 → `ComparisonReport`.
-2. Read `split_kwargs` at the X marker.
-3. Map to a splitter using the table in rule 3.
+2. Read the locked `frame show` translation and `split_kwargs` at
+   the X marker.
+3. Write the splitter from that translation (rule 3). Do not ask.
 4. Pick the data-passing form (rule 1): `data={"X": X, "y": y, ...}`
    for a `SkrubLearner`, positional `X, y` otherwise.
 5. Wire the splitter (see `references/metadata-routing.md`):

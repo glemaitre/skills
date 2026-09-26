@@ -23,8 +23,8 @@ project — not skill ids or the wrapper CLI.
 
 ## Procedure
 
-1. Run `python -m skore_skills status`. Read `JOURNAL.md` Status,
-   the last History headline, and the EDA summary when
+1. Run `python -m skore_skills status`. Read `journal/JOURNAL.md`
+   Status, the last History headline, and the EDA summary when
    `data_analysis/data_analysis.md` exists. If the query is too
    vague to search, ask once.
 2. Rewrite the query as a problem class before any search. Drop
