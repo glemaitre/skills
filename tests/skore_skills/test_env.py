@@ -1061,6 +1061,21 @@ def test_env_add_skore_rejects_invalid_mode() -> None:
     assert result.exit_code != 0
 
 
+def test_env_add_skore_omitted_mode_defaults_to_local(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Omitting ``--mode`` installs plain Skore when no destination is stored."""
+    (tmp_path / "pixi.toml").write_text(
+        '[workspace]\nname = "demo"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add-skore"])
+    assert result.exit_code == 0, result.output
+    assert "mlflow" not in result.output
+    assert "skore" in result.output
+
+
 def test_env_add_skore_omitted_mode_uses_recorded_destination(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

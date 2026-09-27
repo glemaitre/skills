@@ -151,6 +151,59 @@ def test_unset_mode_and_missing_frame_are_not_offered(
     assert payload["framing_reason"] == "not framed yet"
 
 
+def test_holdout_frame_does_not_offer_folds(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Folds stay off the board when validation is not cross-validation."""
+    _isolate_home(tmp_path, monkeypatch)
+    _install(tmp_path, "frame-ml-problem")
+    _journal(tmp_path)
+    path = tmp_path / "journal" / "JOURNAL.md"
+    text = path.read_text(encoding="utf-8")
+    text = text.replace("| Validation | cv |", "| Validation | holdout |")
+    text = text.replace("| Folds | 5 |", "| Folds | n/a |")
+    path.write_text(text, encoding="utf-8")
+
+    payload = review_choices(tmp_path)
+
+    assert "folds" not in _ids(payload["framing"])
+    assert "metric" in _ids(payload["framing"])
+
+
+def test_recorded_mode_without_sync_is_not_offered(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A stored destination is not changeable when its skill is absent."""
+    _isolate_home(tmp_path, monkeypatch)
+    _write(
+        tmp_path / ".skore",
+        json.dumps({"workspace": {"skore_mode": "hub"}}) + "\n",
+    )
+
+    payload = review_choices(tmp_path)
+
+    assert "skore_mode" not in _ids(payload["changeable"])
+    skipped = {row["id"]: row for row in payload["not_offered"]}
+    assert skipped["skore_mode"]["reason"] == "sync-ml-reports is not installed"
+
+
+def test_framing_rows_skip_non_text_values() -> None:
+    """A non-text cell is not a row the user can reopen."""
+    from skore_skills.review_choices import _framing_rows
+
+    rows = _framing_rows(
+        {
+            "deployment": "iid",
+            "validation": "cv",
+            "metric": 1,
+            "folds": "5",
+        }
+    )
+
+    assert "metric" not in _ids(rows)
+    assert "folds" in _ids(rows)
+
+
 def test_review_choices_cli_bad_argv_and_directory_policy(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

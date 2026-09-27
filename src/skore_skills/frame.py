@@ -422,11 +422,7 @@ def _blank_keys(cell: str, rows: dict[str, str]) -> list[str]:
         extra = ["metric"]
     elif cell == "baseline":
         extra = ["baseline_note"]
-    keys: list[str] = []
-    for key in (cell, *extra):
-        if key not in keys:
-            keys.append(key)
-    return keys
+    return [cell, *extra]
 
 
 def _section_span(text: str) -> tuple[int, int, str]:

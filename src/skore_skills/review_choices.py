@@ -47,18 +47,16 @@ def _framing_rows(source: dict[str, Any]) -> list[dict[str, str]]:
     return rows
 
 
-def _framing(root: Path, status: dict[str, Any]) -> tuple[list[dict[str, str]], str | None]:
+def _framing(
+    root: Path, status: dict[str, Any]
+) -> tuple[list[dict[str, str]], str | None]:
     skills = status["skills"]
     if status["modeling_decisions"] == "missing" or not _installed(
         skills, "frame-ml-problem"
     ):
         return [], "not framed yet"
     shown = frame_show(root)
-    if shown.get("action") == "stop":
-        return [], "not framed yet"
     source = shown["decisions"] if "decisions" in shown else shown.get("context") or {}
-    if not isinstance(source, dict):
-        return [], "not framed yet"
     return _framing_rows(source), None
 
 
