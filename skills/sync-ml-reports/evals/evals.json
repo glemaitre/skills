@@ -48,11 +48,12 @@
       "id": 3,
       "title": "Unset mode does not steal G-SKORE-MODE",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.skore_mode` is unset.\n- `evaluate-ml-pipeline` is installed.]\n\nUpload the reports to Hub.",
-      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - Stop because report destination must be chosen in the evaluate workflow first. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `skore sync`. - Persist `policy set skore_mode`.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - Stop because report destination must be chosen in the evaluate workflow first. - The close is only that stop: the destination is not chosen yet and is picked when a report is stored. Do not list local, Hub, or MLflow, a workspace name, or a tracking URI. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `skore sync`. - Persist `policy set skore_mode`.",
       "files": [],
       "expectations": [
         "Run `python -m skore_skills status`.",
         "Stop because report destination must be chosen in the evaluate workflow first.",
+        "The close is only that stop: the destination is not chosen yet and is picked when a report is stored. Do not list local, Hub, or MLflow, a workspace name, or a tracking URI.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Run `skore sync`.",
         "The response does NOT: Persist `policy set skore_mode`.",

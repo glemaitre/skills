@@ -44,11 +44,11 @@ wrapper CLI.
    changing a locked constraint and named one cell, add
    `--revise`. When they are changing a constraint and did not
    name a cell, ask which filled decision to change (skip
-   `n/a`) and stop. Do not `--revise` and do not edit the
-   journal on that turn. JSON `action` is authoritative. Do not
-   invent a menu. If the command is missing or exits without
-   JSON, read `references/fallback.md` and follow it. Do not
-   open another reference. Do not guess candidates.
+   `n/a`) and stop. Do not `--revise`, do not `frame clear`, and
+   do not edit the journal on that turn. JSON `action` is
+   authoritative. Do not invent a menu. If the command is missing
+   or exits without JSON, read `references/fallback.md` and follow
+   it. Do not open another reference. Do not guess candidates.
 3. `stop` — say the JSON `reason` and stop.
 4. `ask` / `uncovered` — read `references/fallback.md` only. Write
    Prediction goal `uncovered` and the prose cells it names. Set
@@ -70,31 +70,23 @@ wrapper CLI.
    fold count. Once any decision cell is filled and Status is
    not `locked`, set Status to `draft`. Stop this turn.
 6. When the user named one cell and Status is `draft`, do not
-   use the lock menu as the change. Blank that cell and only
-   the dependents listed in step 7, set Revised on to today's
-   date (`YYYY-MM-DD`), and leave Status `draft`. Do not write
-   the new value. Stop for the next `frame show`.
+   use the lock menu as the change. Run
+   `python -m skore_skills frame clear --cell <key>` for that
+   cell and stop. Do not write the new value. Do not name any
+   other cell as cleared. The command's JSON `blanked` list is
+   the record. Status stays `draft`. The next `frame show` asks
+   the first missing cell.
 7. `ask` / `confirm_lock` or `ask` / `revise` — quote JSON
-   `context` inline, then offer JSON `choices` only.
-   - `lock` sets Status to `locked`.
-   - `modify` on a revise, when the user named one cell, sets
-     Status to `draft` and Revised on to today's date
-     (`YYYY-MM-DD`). Blank that cell and only the dependents
-     below, and leave every other filled cell. Do not write the
-     new value in this turn. Then stop for the next `frame
-     show`, which asks the first missing cell. `modify` with no
-     named cell writes nothing: ask which filled decision to
-     change and stop.
-     - Prediction goal also blanks metric role and metric.
-     - Deployment also blanks horizon, gap, time role, and
-       generalize-to.
-     - Known at predict time also blanks baseline and baseline
-       note when the baseline is `group_mean`.
-     - Metric role also blanks metric.
-     - Baseline also blanks baseline note.
-     - Metric, baseline note, horizon, gap, time role,
-       generalize-to, validation, and folds blank only
-       themselves.
+   `context` inline, then offer JSON `choices` only and stop.
+   The user sentence that opened this screen is not a choice.
+   Do not set Status to `locked` in that same turn.
+   - `lock` on a later turn sets Status to `locked`.
+   - `modify` on a revise, when the user named one cell: run
+     `python -m skore_skills frame clear --cell <key>` and stop.
+     Do not write the new value. Do not blank any other cell by
+     hand. The next `frame show` asks the first missing cell.
+     `modify` with no named cell writes nothing and does not
+     `frame clear`: ask which filled decision to change and stop.
    - `keep` leaves the locked table unchanged.
    - `stop` writes nothing further.
 8. `proceed` — the table is locked. If `translation` is null, say
@@ -120,8 +112,8 @@ wrapper CLI.
   `references/fallback.md` when the command is missing.
 - A locked table changes only through `frame show --revise`, then
   the same fill and confirm gates. `keep` does not edit it.
-- On `modify`, do not blank a cell the user did not name, except
-  a dependent of that named cell. Do not rewrite `experiments/`,
+- On `modify`, `frame clear` is the only journal edit, and only
+  for the cell the user named. Do not rewrite `experiments/`,
   `audit/`, or a report in this skill.
 - After a cell is blanked, do not run an existing experiment
   script. Say that it still uses the previous splitter and

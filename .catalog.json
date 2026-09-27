@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "8c68110b9a1069a42f734b9c4dd9c3efa29a2b066228d6d82f8e901add9f2f70",
+  "catalog_hash": "ad169eea0a0fad8d85d4c9b7e219f2bd67d46a36c3b85d99ed76da9999d77d18",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and validation scheme before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "a278686b1d78d06a44cbc5bc5a84be952f8e2dee9f746b593a6f64bbfcb0e5ee"
+      "hash": "8a908649aaf496a39e235ce284bafac4ea40e23f7e486fad0d1041bf9cdf2bc1"
     },
     {
       "id": "build-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "3f0833efb433af2d59744e2424ff97675f64540fc779c2d52cbdaa9dea110886"
+      "hash": "d19b195dbbfb0abcd72535d483b0f3b1bf9a178785e259d4f2f209a6b2bbc1f1"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -102,7 +102,7 @@
       "summary": "Show stored project choices and re-enter the skill that can change one.",
       "category": "meta",
       "subcategory": null,
-      "hash": "c5569d0cd2a2a5c414708dfb7443826d5abafad894a9229bb058e5d43706da7a"
+      "hash": "0e962538b52d37065edd947c5be61f237b2b7e8a0676c8a644b9dc6a945bc13e"
     },
     {
       "id": "review-ml-experiment",
@@ -210,7 +210,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "bc3fd594db11c87d4c89cddf69e04b19cb25bfdb668a0d668c09f1d511a6fb90"
+      "hash": "d2a43ca8f19719dbd6fd0c571a5e9bd044632f56e38d376a61cfa75c484a1dda"
     },
     {
       "id": "setup-python-env",
@@ -219,7 +219,7 @@
       "summary": "Detect the env manager and bootstrap the runtime, agent-tools, and composed development environments.",
       "category": "action",
       "subcategory": null,
-      "hash": "132e9cacea7ca0c19a46333629d0865fb869b01389b1c9345e8d2b3ce5db16e3"
+      "hash": "9470d9baaa0518ab2616c1da298a4bc3de5b95b84da8ed772ff67da9971d9ae2"
     },
     {
       "id": "export-ml-notebook",
@@ -255,7 +255,7 @@
       "summary": "Copy skore reports between local, Hub, and MLflow, and optionally switch the upload destination.",
       "category": "action",
       "subcategory": null,
-      "hash": "f7dcb4aef946fac2f634047c660cc61d7d7eec476c9dddcbaa6ed26c830fdc3a"
+      "hash": "1f30038ce8dacbedde7b23dbe3fd09281d178919abcf3ab8614759da530ba450"
     }
   ],
   "workflows": [

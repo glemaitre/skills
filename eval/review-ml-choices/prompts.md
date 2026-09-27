@@ -13,7 +13,8 @@
 - `review-ml-choices` is the skill for this turn.
 
 **Must do:**
-- Run `python -m skore_skills status`.
+- Use the `review choices` JSON. Do not rebuild which rows are
+  offered.
 - Show the package name and say an existing tree is not renamed.
 
 **Must NOT do:**
@@ -35,7 +36,8 @@
 - `status.skills.evaluate-ml-pipeline` is `true`.
 
 **Must do:**
-- Run `python -m skore_skills status`.
+- Use the `review choices` JSON. Do not rebuild which rows are
+  offered.
 - Show that where reports go is not chosen yet.
 - Say the first choice happens when a report is stored.
 
@@ -57,9 +59,11 @@
 - The user picks the report-destination change.
 
 **Must do:**
-- Run `python -m skore_skills status`.
+- Use the `review choices` JSON. Do not rebuild which rows are
+  offered.
 - Show the current destination as local.
-- Load `sync-ml-reports` and stop.
+- Hand off to changing where reports go, and stop, without a
+  catalog id.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -80,9 +84,11 @@
 - The user picks that change.
 
 **Must do:**
-- Run `python -m skore_skills status`.
+- Use the `review choices` JSON. Do not rebuild which rows are
+  offered.
 - Show both current values.
-- Load `export-ml-project` and stop.
+- Hand off to changing notebooks and the site, and stop, without
+  a catalog id.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -102,10 +108,11 @@
 - `status.skills.explore-ml-data` is `true`.
 
 **Must do:**
-- Run `python -m skore_skills status`.
+- Use the `review choices` JSON. Do not rebuild which rows are
+  offered.
 - Say the written analysis stays and that the change is to run
   it again.
-- Load `explore-ml-data`.
+- Hand off to running it again, without a catalog id.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -127,10 +134,12 @@
 - The user picks the metric.
 
 **Must do:**
-- Run `python -m skore_skills status` and `frame show`.
+- Use the `review choices` JSON. Do not rebuild which rows are
+  offered.
 - Offer the metric (MAE) as its own choice, not one
   “modeling decisions” row.
-- Load `frame-ml-problem` naming the metric, and stop.
+- Hand off to re-asking that metric, and stop, without a
+  catalog id.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -153,8 +162,10 @@
 - The user picks that change.
 
 **Must do:**
-- Run `python -m skore_skills status`.
-- Load `setup-python-env` and stop.
+- Use the `review choices` JSON. Do not rebuild which rows are
+  offered.
+- Hand off to re-deciding who manages the environment, and stop,
+  without a catalog id.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).

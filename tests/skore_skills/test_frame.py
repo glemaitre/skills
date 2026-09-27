@@ -460,3 +460,93 @@ def test_partial_uncovered_block_uses_the_fallback(tmp_path: Path) -> None:
     payload = frame_show(tmp_path)
     assert payload["missing"] == ["metric"]
     assert payload["reference"] == "references/fallback.md"
+
+
+def test_frame_clear_metric_reopens_only_that_cell(tmp_path: Path) -> None:
+    """Clearing the metric blanks that cell and leaves the rest locked open."""
+    from datetime import date
+
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid())
+    original = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
+    payload = frame_clear(tmp_path, "metric", today=date(2026, 9, 27))
+
+    assert payload["blanked"] == ["metric"]
+    assert payload["revised_on"] == "2026-09-27"
+    rows = frame_show(tmp_path)
+    assert rows["reason"] == "missing_keys"
+    assert rows["missing"] == ["metric"]
+    text = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
+    assert "## History" in text
+    assert "intervals" not in text
+    assert original != text
+
+
+def test_frame_clear_goal_blanks_metric_dependents(tmp_path: Path) -> None:
+    """A prediction-goal reopen also clears the metric role and metric."""
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid())
+    payload = frame_clear(tmp_path, "prediction_goal")
+
+    assert payload["blanked"] == ["prediction_goal", "metric_role", "metric"]
+    assert payload["status"] == "draft"
+    shown = frame_show(tmp_path)
+    assert shown["missing"] == ["prediction_goal"]
+
+
+def test_frame_clear_group_mean_baseline_follows_known_at_predict(
+    tmp_path: Path,
+) -> None:
+    """A group-mean baseline is cleared with the known-at-predict cell."""
+    from skore_skills.frame import _raw_rows, frame_clear
+
+    _journal(
+        tmp_path,
+        **_locked_iid(
+            **{
+                "Known at predict": "store_id",
+                "Baseline": "group_mean",
+                "Baseline note": "store_id",
+            }
+        ),
+    )
+    payload = frame_clear(tmp_path, "known_at_predict")
+
+    assert payload["blanked"] == ["known_at_predict", "baseline", "baseline_note"]
+    rows = _raw_rows(tmp_path)
+    assert rows["deployment"] == "iid"
+    assert rows["baseline"] == ""
+
+
+def test_frame_clear_keeps_a_non_group_baseline(tmp_path: Path) -> None:
+    """Known-at-predict does not clear a baseline that is not group_mean."""
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid(**{"Known at predict": "none"}))
+    payload = frame_clear(tmp_path, "known_at_predict")
+
+    assert payload["blanked"] == ["known_at_predict"]
+
+
+def test_frame_clear_cli_rejects_unknown_and_empty(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Unknown keys and empty cells are usage errors and do not write."""
+    monkeypatch.chdir(tmp_path)
+    missing = CliRunner().invoke(cli, ["frame", "clear", "--cell", "metric"])
+    assert missing.exit_code != 0
+    assert "journal is missing" in missing.output
+
+    _journal(tmp_path, **_locked_iid(**{"Horizon": "n/a"}))
+    before = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
+    unknown = CliRunner().invoke(cli, ["frame", "clear", "--cell", "splitter"])
+    empty = CliRunner().invoke(cli, ["frame", "clear", "--cell", "horizon"])
+    assert unknown.exit_code != 0
+    assert "unknown framing cell" in unknown.output
+    assert empty.exit_code != 0
+    assert "horizon is empty" in empty.output
+    assert (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8") == before
+    bare = CliRunner().invoke(cli, ["frame", "clear"])
+    assert bare.exit_code != 0

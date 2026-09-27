@@ -642,11 +642,14 @@ Do not invent a URL here — the after-`put` rule above is the
 only source.
 
 When `model-ml-pipeline` dispatched this turn, pass JSON
-`locator` up and **return immediately**. Do not run
-`loop artifacts`. Do not load `audit-ml-pipeline`. Do not run
-record-outcome, convert, site, or `git end-turn`. The dispatcher
-owns `review consent` / `review-ml-experiment` and that close.
-Do not preview it.
+`locator` up and **return immediately**. A stop before `put`,
+including a turn with no tools, still returns the exact string
+`n/a — backend did not expose a locator`. Do not omit it, and
+do not say the return has no locator, because the dispatcher
+owns the close. Do not run `loop artifacts`. Do not load
+`audit-ml-pipeline`. Do not run record-outcome, convert, site,
+or `git end-turn`. The dispatcher owns `review consent` /
+`review-ml-experiment` and that close. Do not preview it.
 
 Otherwise this skill owns the close. When both `policy.notebooks`
 and `policy.site` are true, the turn is unfinished until

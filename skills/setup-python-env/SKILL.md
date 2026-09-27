@@ -45,8 +45,16 @@ after listing the boxes.
 - [ ] env detect + status
 - [ ] G-ENV-MGR: ask if none / ambiguous / mismatch; else keep recorded
 - [ ] env.managed: ask (default true) and persist
-- [ ] unmanaged → stop | managed → env init, env sync, add-skore for recorded hub/mlflow else local, env verify
+- [ ] unmanaged → stop | managed → env init, env sync, add-skore (no --mode), env verify
 ```
+
+## Not this skill
+
+A request to add a package outside `ruff`, `ipython`, `ipykernel`,
+and plain `skore` is not bootstrap. Do not `env init` and do not
+`pixi add`. Hand that package to the package-install step and
+stop. The close names the package and that step in plain language.
+Do not write the catalog id.
 
 ## Sequence
 
@@ -64,12 +72,12 @@ after listing the boxes.
    ```bash
    python -m skore_skills env init --manager <manager>
    python -m skore_skills env sync --execute
-   python -m skore_skills env add-skore --mode <mode> --execute
+   python -m skore_skills env add-skore --execute
    python -m skore_skills env verify --execute
    ```
 
-   `<mode>` is `policy.skore_mode` when that value is `hub` or
-   `mlflow`. Otherwise `<mode>` is `local` (unset or `local`).
+   Do not pass `--mode`. Omitting it installs for a recorded
+   `hub` or `mlflow` destination, and plain Skore otherwise.
 
    If the selected manager is pixi and `pixi.toml` already exists,
    skip `env init`; preserve that manifest and continue with
@@ -77,14 +85,12 @@ after listing the boxes.
    `[tool.pixi]` to `pyproject.toml`.
 
    Do not hand-edit TOML. Do not run `pixi init`. Do not create
-   `src/`. Do not ask where reports go. When `<mode>` is `local`,
-   plain Skore is the early install; `add-python-package` upgrades
-   it for Hub or MLflow after that choice is recorded. When
-   `<mode>` is already `hub` or `mlflow`, this install is that
-   destination. Do not follow it with `--mode local`.
+   `src/`. Do not ask where reports go. Plain Skore is the early
+   install when no destination is recorded; `add-python-package`
+   upgrades it for Hub or MLflow after that choice is recorded.
+   Do not pass `--mode local`.
    If verify reports missing `skore` or `skore_skills`, rerun
-   `env add-skore --mode <mode> --execute` with the same `<mode>`
-   as above; never add `skore-skills`
+   `env add-skore --execute` the same way; never add `skore-skills`
    directly. If verify reports missing agent tools, load
    `add-python-package` for ruff / ipython / ipykernel (agent feature)
    when that skill is installed, not a second `env init`.

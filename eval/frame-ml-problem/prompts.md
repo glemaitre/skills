@@ -114,13 +114,13 @@
 
 **Must do:**
 - Quote the JSON context, including MAE, in the question.
-- Offer only lock, modify, and stop.
-- On lock, set Status to `locked`.
+- Offer only lock, modify, and stop, then stop.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Write Python or a class constructor.
-- Treat the user's sentence as the lock before the choice.
+- Treat "Lock it" as the lock choice in this turn.
+- Set Status to `locked` in this turn.
 - Load `build-ml-pipeline`.
 
 ---
@@ -141,8 +141,9 @@
 
 **Must do:**
 - Name `frame show --revise`.
-- On modify, set Status to `draft` and Revised on to today's date.
-- Blank prediction goal, metric role, and metric.
+- On modify, run `frame clear --cell prediction_goal`.
+- That blanks prediction goal, metric role, and metric, and sets
+  Status to `draft` with Revised on today's date.
 - Leave deployment and validation filled.
 - Stop for the next `frame show`. Do not write `intervals` in
   this turn.
@@ -171,10 +172,10 @@
 
 **Must do:**
 - Name `frame show --revise`.
-- On modify, blank only the metric. Leave metric role, prediction
-  goal, validation, and folds filled.
-- Set Status to `draft` and Revised on to today's date, then stop
-  for the next `frame show`.
+- On modify, run `frame clear --cell metric`. That blanks only
+  the metric and leaves metric role, prediction goal, validation,
+  and folds filled.
+- Stop for the next `frame show`.
 - Say `experiments/01_baseline.py` still uses the previous metric
   and is not run. The next build or evaluate rewrites it after
   the table is locked again.
@@ -200,15 +201,13 @@
 - `frame show` returns `ask` / `confirm_lock`, not `revise`.
 
 **Must do:**
-- Blank only the metric. Leave Status `draft` and set Revised on
-  to today's date.
-- Stop for the next `frame show`. Do not write the replacement
-  metric.
+- Run `frame clear --cell metric` and stop.
+- Do not write the replacement metric.
+- Do not name metric role as cleared.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Set Status to `locked`.
-- Blank metric role.
 - Treat `confirm_lock` as the way to make this change.
 
 ---
@@ -224,7 +223,7 @@
   a cell.
 
 **Must do:**
-- Ask which filled decision to change.
+- Ask which filled decision to change. Do not run `frame clear`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
