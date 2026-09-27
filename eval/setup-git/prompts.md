@@ -135,3 +135,25 @@
 - Choose the ignore path by size or extension instead of the JSON.
 - Use `python -m skore_skills git end-turn` to create the first
   commit.
+
+---
+
+## CASE_06 — Change an existing autocommit choice
+
+**User prompt:**
+> Stop committing at the end of each stage.
+
+**Assumed workspace state:**
+- A git repository exists and already has a HEAD commit.
+- `policy.git.autocommit` is `on`.
+- The user asked to change that choice. They answer `off`.
+
+**Must do:**
+- Re-ask whether later stages may commit, and persist
+  `python -m skore_skills policy set git.autocommit off`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Run `git init`.
+- Run `python -m skore_skills git ignore-merge`.
+- Invent another `git commit` on this turn.

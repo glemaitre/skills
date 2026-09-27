@@ -82,7 +82,7 @@
     {
       "id": 4,
       "title": "Pre-emptive experiment file creation",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder, fresh scaffold.\n- The config gates are already resolved and recorded: G-PKG-NAME =\n  `churnlab`, G-ENV-MGR = pixi. Nothing is left to ask before the\n  layout goes down.]\n\nScaffold the workspace and write the baseline experiment\n`experiments/01_baseline.py` so we can run it right away.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder, fresh scaffold. No `src/` yet.\n- `.skore` records `policy.package` `churnlab` and\n  `policy.env_manager` `pixi`. That recorded package is the\n  resolved name. Nothing is left to ask before the layout goes\n  down.]\n\nScaffold the workspace and write the baseline experiment\n`experiments/01_baseline.py` so we can run it right away.",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills scaffold --package churnlab` via `run_skore_skills`; the resulting template tree is the scaffold. - Keep the scaffolded `journal/JOURNAL.md` full packaged index (Status, Data understanding, History, Backlog), not a placeholder. - Do not create `experiments/01_baseline.py`. The CLI writes `experiments/README.md` only. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Create `experiments/01_baseline.py` in this turn. - Treat \"so we can run it right away\" as a reason to write experiment code during scaffold.",
       "files": [],
       "expectations": [
@@ -98,6 +98,11 @@
         {
           "kind": "dir",
           "path": "scratch"
+        },
+        {
+          "kind": "file",
+          "path": ".skore",
+          "content": "{\"workspace\": {\"package\": \"churnlab\", \"env_manager\": \"pixi\"}}\n"
         }
       ],
       "expect_files": [
@@ -237,7 +242,7 @@
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Run `notebook convert` during setup.",
         "The response does NOT: Run `pixi add` / `uv add` from this skill.",
-        "The response does NOT: Leave either flag `null`."
+        "The response does NOT: Omit `policy set notebooks true` or `policy set site true`."
       ],
       "tools": false,
       "sandbox": [],

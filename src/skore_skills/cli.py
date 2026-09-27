@@ -225,6 +225,17 @@ def review_group() -> None:
     """Inspect deterministic review-workflow gates."""
 
 
+@review_group.command("choices")
+def review_choices_cmd() -> None:
+    """Print the stored-choice board as JSON. Does not write."""
+    from skore_skills.review_choices import render_review_choices
+
+    try:
+        click.echo(render_review_choices(Path.cwd()), nl=False)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+
+
 @review_group.command("consent")
 @click.option("--stem", required=True, help="Experiment stem, e.g. 01_baseline.")
 def review_consent_cmd(stem: str) -> None:
@@ -249,6 +260,18 @@ def frame_group() -> None:
 def frame_show_cmd(revise: bool) -> None:
     """Print the next modeling-decisions gate as JSON."""
     click.echo(render_frame_show(Path.cwd(), revise=revise), nl=False)
+
+
+@frame_group.command("clear")
+@click.option("--cell", required=True, help="Framing cell key to blank, e.g. metric.")
+def frame_clear_cmd(cell: str) -> None:
+    """Blank one framing cell and its dependents, then print JSON."""
+    from skore_skills.frame import render_frame_clear
+
+    try:
+        click.echo(render_frame_clear(Path.cwd(), cell), nl=False)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
 
 
 @cli.group("design")
@@ -525,19 +548,23 @@ def env_add(
 @env_group.command("add-skore")
 @click.option(
     "--mode",
-    required=True,
     type=click.Choice(["local", "hub", "mlflow"], case_sensitive=True),
+    help="Override the recorded destination. Omit to follow it.",
 )
 @click.option(
     "--execute",
     is_flag=True,
     help="Run the install command instead of printing it.",
 )
-def env_add_skore(mode: str, execute: bool) -> None:
+def env_add_skore(mode: str | None, execute: bool) -> None:
     """Print or run the manager-aware Skore install command."""
-    from skore_skills.env import add_skore
+    from skore_skills.env import add_skore, resolve_add_skore_mode
 
-    text, code = add_skore(Path.cwd(), mode, execute=execute)
+    try:
+        resolved = resolve_add_skore_mode(Path.cwd(), mode)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    text, code = add_skore(Path.cwd(), resolved, execute=execute)
     click.echo(text, nl=False)
     if code:
         raise SystemExit(code)

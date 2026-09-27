@@ -61,6 +61,11 @@ context.
    | “is this leakage” on the table | `explore-ml-data` (even if `data_analysis` is present). Do not load `research-ml-practice`. |
    | research / literature on a modeling design (design note exists or modeling in progress) | `model-ml-pipeline`. Do not load `research-ml-practice`. |
    | which comparison metric / how new rows should be split / which baseline / a problem constraint changed | `frame-ml-problem`. Not a request to run evaluation. |
+   | what did we decide / show stored choices / change a stored project choice | `review-ml-choices` |
+
+   An explicit sync, generic export, or changed modeling
+   constraint still uses those rows. Do not send them through
+   `review-ml-choices`.
 
    A git init, first commit, or ignore request loads `setup-git`
    and stops. Do not write `git init`, a `.gitignore`, or a commit
@@ -103,6 +108,7 @@ context.
    - Record / decide what next → `manage-ml-backlog`
    - Export → `export-ml-project`
    - Sync reports → `sync-ml-reports`
+   - Review choices → `review-ml-choices`
 
    If none of those ids are true, say so in one line; do not
    invent a menu.

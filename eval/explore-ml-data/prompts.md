@@ -90,11 +90,17 @@
 
 **Must do:**
 - Detect exploratory data analysis already recorded (`status.data_analysis` present).
-- Stop without overwriting `data_analysis/data_analysis.py` or `data_analysis/data_analysis.md`.
+- Say the written analysis stays and offer to run it again or
+  keep it.
+- Do not overwrite `data_analysis/data_analysis.py` or
+  `data_analysis/data_analysis.md` until the user accepts a
+  re-run.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Re-run `cells run` or rewrite the report.
+- Write a JOURNAL Data understanding Status of `skipped`.
+- Re-run `cells run` or rewrite the report before the user
+  accepts a re-run.
 - Design a model in this skill.
 - Treat a methodology concern (“is this leakage”) as this stop
   (see CASE_18).
@@ -691,3 +697,25 @@
   Close.
 - Fail the keep-vs-close gate if site build errors; name the
   error.
+
+---
+
+## CASE_26 — Present analysis cannot be marked skipped
+
+**User prompt:**
+> Skip the data analysis. We already wrote it.
+
+**Assumed workspace state:**
+- `data_analysis/data_analysis.md` exists.
+- `status.data_analysis` is `present`.
+
+**Must do:**
+- Say the written analysis stays.
+- Offer to run exploration again (overwrite
+  `data_analysis/data_analysis.*`) or keep it.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Write a JOURNAL Data understanding Status of `skipped`.
+- Overwrite `data_analysis/data_analysis.md` before the user
+  accepts a re-run.

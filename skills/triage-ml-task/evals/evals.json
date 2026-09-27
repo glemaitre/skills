@@ -4,12 +4,12 @@
     {
       "id": 1,
       "title": "Ambiguous capability request",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.\n- No `.skore` file.\n- `status.data_analysis` is `missing`.\n- `status.skills` reports the usual entry skills `true`, including\n  `review-ml-experiment`.]\n\nWhat can you help me with on this machine learning project?",
-      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - AskUserQuestion with human labels for installed entry work (Set up the project, Explore the data, Build a model, Review the last experiment, Record / decide what next, Export, Sync reports if installed). One pick. Do not put skill ids on the labels. - Recommend exploring the data first; do not auto-load it. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Start designing the next experiment. - Claim to have loaded or executed every skill.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Existing scaffold with no specific task requested.\n- No `.skore` file.\n- `status.data_analysis` is `missing`.\n- `status.skills` reports the usual entry skills `true`, including\n  `review-ml-experiment` and `review-ml-choices`.]\n\nWhat can you help me with on this machine learning project?",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - AskUserQuestion with human labels for installed entry work (Set up the project, Explore the data, Build a model, Review the last experiment, Record / decide what next, Export, Sync reports, Review choices if installed). One pick. Do not put skill ids on the labels. - Recommend exploring the data first; do not auto-load it. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Start designing the next experiment. - Claim to have loaded or executed every skill.",
       "files": [],
       "expectations": [
         "Run `python -m skore_skills status`.",
-        "AskUserQuestion with human labels for installed entry work (Set up the project, Explore the data, Build a model, Review the last experiment, Record / decide what next, Export, Sync reports if installed). One pick. Do not put skill ids on the labels.",
+        "AskUserQuestion with human labels for installed entry work (Set up the project, Explore the data, Build a model, Review the last experiment, Record / decide what next, Export, Sync reports, Review choices if installed). One pick. Do not put skill ids on the labels.",
         "Recommend exploring the data first; do not auto-load it.",
         "Do not treat the missing `.skore` as an empty project despite the existing scaffold.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
@@ -270,13 +270,14 @@
       "id": 16,
       "title": "Certain report sync loads sync-ml-reports",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.skills.sync-ml-reports` is `true`.]\n\nPush our skore reports to Hub.",
-      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - Load `sync-ml-reports` without listing the catalog menu. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Load `evaluate-ml-pipeline` as the certain skill. - Ask which entry skill to run.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - Load `sync-ml-reports` without listing the catalog menu. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Load `evaluate-ml-pipeline` as the certain skill. - Load `review-ml-choices`.",
       "files": [],
       "expectations": [
         "Run `python -m skore_skills status`.",
         "Load `sync-ml-reports` without listing the catalog menu.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Load `evaluate-ml-pipeline` as the certain skill.",
+        "The response does NOT: Load `review-ml-choices`.",
         "The response does NOT: Ask which entry skill to run."
       ],
       "tools": false,
@@ -386,6 +387,23 @@
         "The response does NOT: Load `research-ml-practice`.",
         "The response does NOT: Load `model-ml-pipeline` as the certain skill.",
         "The response does NOT: Invent papers in triage."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 23,
+      "title": "Certain stored-choice request loads the board",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.skills.review-ml-choices` is `true`.\n- `policy.skore_mode` is `local`.]\n\nWhat did we decide for this project?",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - Load `review-ml-choices` without listing the catalog menu. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Load `sync-ml-reports` as the certain skill. - Ask which entry skill to run.",
+      "files": [],
+      "expectations": [
+        "Run `python -m skore_skills status`.",
+        "Load `review-ml-choices` without listing the catalog menu.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Load `sync-ml-reports` as the certain skill.",
+        "The response does NOT: Ask which entry skill to run."
       ],
       "tools": false,
       "sandbox": [],

@@ -113,6 +113,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | Skill | Description |
 | --- | --- |
 | [triage-ml-task](skills/triage-ml-task/SKILL.md) | Session owner: list installed entry skills and ask which to run. |
+| [review-ml-choices](skills/review-ml-choices/SKILL.md) | Show stored project choices and re-enter the skill that can change one. |
 | [review-ml-experiment](skills/review-ml-experiment/SKILL.md) | Gate the skore-check audit, then write one idea file per candidate. |
 | [setup-ml-project](skills/setup-ml-project/SKILL.md) | Coordinate workspace, environment, and git setup. |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |

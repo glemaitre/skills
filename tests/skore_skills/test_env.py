@@ -1061,6 +1061,72 @@ def test_env_add_skore_rejects_invalid_mode() -> None:
     assert result.exit_code != 0
 
 
+def test_env_add_skore_omitted_mode_defaults_to_local(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Omitting ``--mode`` installs plain Skore when no destination is stored."""
+    (tmp_path / "pixi.toml").write_text(
+        '[workspace]\nname = "demo"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add-skore"])
+    assert result.exit_code == 0, result.output
+    assert "mlflow" not in result.output
+    assert "skore" in result.output
+
+
+def test_env_add_skore_omitted_mode_uses_recorded_destination(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Omitting ``--mode`` follows a recorded MLflow destination."""
+    (tmp_path / "pixi.toml").write_text(
+        '[workspace]\nname = "demo"\n',
+        encoding="utf-8",
+    )
+    (tmp_path / ".skore").write_text(
+        json.dumps({"workspace": {"skore_mode": "mlflow"}}) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add-skore"])
+    assert result.exit_code == 0, result.output
+    assert "mlflow>=3" in result.output
+
+
+def test_env_add_skore_refuses_local_over_recorded_hub(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``--mode local`` does not replace a recorded Hub destination."""
+    (tmp_path / "pixi.toml").write_text(
+        '[workspace]\nname = "demo"\n',
+        encoding="utf-8",
+    )
+    (tmp_path / ".skore").write_text(
+        json.dumps({"workspace": {"skore_mode": "hub"}}) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "local"])
+    assert result.exit_code != 0
+    assert "refusing --mode local" in result.output
+
+
+def test_env_add_skore_explicit_mode_overrides_recorded_local(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An explicit non-local mode still names that destination."""
+    (tmp_path / "uv.lock").write_text("", encoding="utf-8")
+    (tmp_path / ".skore").write_text(
+        json.dumps({"workspace": {"skore_mode": "local"}}) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["env", "add-skore", "--mode", "hub"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "uv add skore[hub]"
+
+
 def test_add_skore_rejects_invalid_mode_library(tmp_path: Path) -> None:
     """Library callers receive a usage error for an unknown mode."""
     from skore_skills.env import add_skore

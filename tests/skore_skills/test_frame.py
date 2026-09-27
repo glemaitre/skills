@@ -460,3 +460,189 @@ def test_partial_uncovered_block_uses_the_fallback(tmp_path: Path) -> None:
     payload = frame_show(tmp_path)
     assert payload["missing"] == ["metric"]
     assert payload["reference"] == "references/fallback.md"
+
+
+def test_frame_clear_metric_reopens_only_that_cell(tmp_path: Path) -> None:
+    """Clearing the metric blanks that cell and leaves the rest locked open."""
+    from datetime import date
+
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid())
+    original = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
+    payload = frame_clear(tmp_path, "metric", today=date(2026, 9, 27))
+
+    assert payload["blanked"] == ["metric"]
+    assert payload["revised_on"] == "2026-09-27"
+    rows = frame_show(tmp_path)
+    assert rows["reason"] == "missing_keys"
+    assert rows["missing"] == ["metric"]
+    text = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
+    assert "## History" in text
+    assert "intervals" not in text
+    assert original != text
+
+
+def test_frame_clear_goal_blanks_metric_dependents(tmp_path: Path) -> None:
+    """A prediction-goal reopen also clears the metric role and metric."""
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid())
+    payload = frame_clear(tmp_path, "prediction_goal")
+
+    assert payload["blanked"] == ["prediction_goal", "metric_role", "metric"]
+    assert payload["status"] == "draft"
+    shown = frame_show(tmp_path)
+    assert shown["missing"] == ["prediction_goal"]
+
+
+def test_frame_clear_group_mean_baseline_follows_known_at_predict(
+    tmp_path: Path,
+) -> None:
+    """A group-mean baseline is cleared with the known-at-predict cell."""
+    from skore_skills.frame import _raw_rows, frame_clear
+
+    _journal(
+        tmp_path,
+        **_locked_iid(
+            **{
+                "Known at predict": "store_id",
+                "Baseline": "group_mean",
+                "Baseline note": "store_id",
+            }
+        ),
+    )
+    payload = frame_clear(tmp_path, "known_at_predict")
+
+    assert payload["blanked"] == ["known_at_predict", "baseline", "baseline_note"]
+    rows = _raw_rows(tmp_path)
+    assert rows["deployment"] == "iid"
+    assert rows["baseline"] == ""
+
+
+def test_frame_clear_keeps_a_non_group_baseline(tmp_path: Path) -> None:
+    """Known-at-predict does not clear a baseline that is not group_mean."""
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid(**{"Known at predict": "none"}))
+    payload = frame_clear(tmp_path, "known_at_predict")
+
+    assert payload["blanked"] == ["known_at_predict"]
+
+
+def test_frame_clear_deployment_blanks_time_and_group_cells(tmp_path: Path) -> None:
+    """A deployment reopen clears horizon, gap, time role, and generalize-to."""
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid())
+    payload = frame_clear(tmp_path, "deployment")
+
+    assert payload["blanked"] == [
+        "deployment",
+        "horizon",
+        "gap",
+        "time_role",
+        "generalize_to",
+    ]
+
+
+def test_frame_clear_metric_role_blanks_the_metric(tmp_path: Path) -> None:
+    """A metric-role reopen also clears the metric."""
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid())
+    payload = frame_clear(tmp_path, "metric_role")
+
+    assert payload["blanked"] == ["metric_role", "metric"]
+
+
+def test_frame_clear_baseline_blanks_its_note(tmp_path: Path) -> None:
+    """A baseline reopen also clears the baseline note."""
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid())
+    payload = frame_clear(tmp_path, "baseline")
+
+    assert payload["blanked"] == ["baseline", "baseline_note"]
+
+
+def test_frame_clear_ignores_rows_that_are_not_pairs(tmp_path: Path) -> None:
+    """A pipe row that is not a label/value pair is left in place."""
+    from skore_skills.frame import frame_clear
+
+    _journal(tmp_path, **_locked_iid())
+    path = tmp_path / "journal" / "JOURNAL.md"
+    text = path.read_text(encoding="utf-8")
+    path.write_text(
+        text.replace("## History", "| leftover note |\n| a | b | c |\n\n## History"),
+        encoding="utf-8",
+    )
+
+    payload = frame_clear(tmp_path, "metric")
+    cleared = path.read_text(encoding="utf-8")
+
+    assert payload["blanked"] == ["metric"]
+    assert "| leftover note |" in cleared
+    assert "| a | b | c |" in cleared
+
+
+def test_frame_clear_rejects_a_table_missing_a_dependent(tmp_path: Path) -> None:
+    """Clearing a cell fails when a dependent row is absent, and does not write."""
+    from skore_skills.frame import frame_clear
+
+    path = tmp_path / "journal" / "JOURNAL.md"
+    _write(
+        path,
+        "\n".join(
+            [
+                "# JOURNAL",
+                "",
+                "## Modeling decisions",
+                "",
+                "| Variable | Value |",
+                "|---|---|",
+                "| Status | locked |",
+                "| Revised on | n/a |",
+                "| Prediction goal | point_predictions |",
+                "",
+                "## History",
+                "",
+            ]
+        ),
+    )
+    before = path.read_text(encoding="utf-8")
+
+    with pytest.raises(ValueError, match="missing metric_role, metric"):
+        frame_clear(tmp_path, "prediction_goal")
+
+    assert path.read_text(encoding="utf-8") == before
+
+
+def test_section_span_requires_the_modeling_block() -> None:
+    """A journal without the modeling section cannot be rewritten."""
+    from skore_skills.frame import _section_span
+
+    with pytest.raises(ValueError, match="modeling decisions section is missing"):
+        _section_span("# JOURNAL\n")
+
+
+def test_frame_clear_cli_rejects_unknown_and_empty(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Unknown keys and empty cells are usage errors and do not write."""
+    monkeypatch.chdir(tmp_path)
+    missing = CliRunner().invoke(cli, ["frame", "clear", "--cell", "metric"])
+    assert missing.exit_code != 0
+    assert "journal is missing" in missing.output
+
+    _journal(tmp_path, **_locked_iid(**{"Horizon": "n/a"}))
+    before = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
+    unknown = CliRunner().invoke(cli, ["frame", "clear", "--cell", "splitter"])
+    empty = CliRunner().invoke(cli, ["frame", "clear", "--cell", "horizon"])
+    assert unknown.exit_code != 0
+    assert "unknown framing cell" in unknown.output
+    assert empty.exit_code != 0
+    assert "horizon is empty" in empty.output
+    assert (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8") == before
+    bare = CliRunner().invoke(cli, ["frame", "clear"])
+    assert bare.exit_code != 0

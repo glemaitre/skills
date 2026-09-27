@@ -14,7 +14,7 @@ Tick, then immediately run the matching sequence step. Do not stop
 after listing the boxes.
 
 ```
-- [ ] status (skip autocommit ask if already on/off)
+- [ ] status (skip autocommit ask if already on/off, unless the user asked to change it)
 - [ ] git init if no .git
 - [ ] git ignore-merge (+ --decide / --keep if resolve-dotfiles)
 - [ ] git.autocommit ask if null
@@ -24,8 +24,16 @@ after listing the boxes.
 
 ## Sequence
 
-1. Run `python -m skore_skills status`. If
-   `policy.git.autocommit` is already `on` or `off`, do not ask
+1. Run `python -m skore_skills status`. If the user asked to
+   change the commit choice and `policy.git.autocommit` is
+   already `on` or `off`, re-ask that question and persist `on`
+   or `off`. Do not `git init`. Do not `git ignore-merge`. If
+   the new value is `on` and the repo has no HEAD yet, continue
+   at the first-commit review (step 6). If the new value is
+   `off`, or `on` and HEAD exists, stop this sequence: use the
+   return rule in step 10 and do not continue at step 2. Do not
+   invent another commit. Later stages follow the new value.
+   Otherwise, if autocommit is already `on` or `off`, do not ask
    that question again.
 2. If there is no `.git` directory, run `git init`. Do not run
    `git config`.

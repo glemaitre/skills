@@ -13,9 +13,10 @@ description: >
   choice.
 
   HOW TO USE: detect first. For a fresh or manager-only layout,
-  resolve G-PKG-NAME only via `AskUserQuestion`, then scaffold,
-  then persist notebooks/site true when both are still null. For
-  an existing layout, stop without scaffolding or inventing files.
+  resolve G-PKG-NAME via `AskUserQuestion` unless `policy.package`
+  or `src/<pkg>/` already names it, then scaffold, then persist
+  notebooks/site true when both are still unset. For an existing
+  layout, stop without scaffolding or inventing files.
 ---
 
 # Set Up Workspace
@@ -49,7 +50,7 @@ after listing the boxes.
 
 ```
 - [ ] Layout: fresh | manager-only | existing
-- [ ] G-PKG-NAME: ask if fresh/manager-only (unless src/<pkg>/ already matches)
+- [ ] G-PKG-NAME: ask if fresh/manager-only (unless policy.package or src/<pkg>/ already names it)
 - [ ] scaffold --package <pkg> | existing: no scaffold, no invent
 - [ ] fresh/manager-only: persist notebooks + site true; install
 - [ ] dispatched → return | standalone → git end-turn --stage setup
@@ -57,16 +58,20 @@ after listing the boxes.
 
 ## Sequence
 
-1. If fresh or manager-only, resolve **G-PKG-NAME** only via the
-   `AskUserQuestion` tool (the `src/<pkg>/` import name; folder
-   name as the default option). Each ask in this skill states in
+1. If fresh or manager-only, resolve **G-PKG-NAME**. Ask with
+   the `AskUserQuestion` tool when it is not already recorded
+   (the `src/<pkg>/` import name; folder name as the default
+   option). Each ask in this skill states in
    2–4 lines what the answer authorizes — the scaffolded tree, the
    persisted policy key, the toolchain a gate implies — and the
    detected facts it rests on; a file link is an addition, never
    the context. “You pick” / “go fast” does not
    resolve it. Do not confirm in prose instead of the tool. A
    matching `[project] name` + `src/<pkg>/` already resolves it —
-   do not re-ask. Persist the resolved import name with
+   do not re-ask. A recorded `policy.package` also resolves it.
+   Do not re-ask. When `src/<pkg>/` is absent, scaffold that
+   name. A `status` package of null does not reopen the ask.
+   Persist the resolved import name with
    `python -m skore_skills policy set package <pkg>`.
 2. Fresh / manager-only:
 
@@ -87,11 +92,12 @@ after listing the boxes.
 
    `python -m skore_skills policy set site true`
 
-   Do not AskUserQuestion for notebooks or site. Do not leave
-   them `null`. Do not write notebooks or site into JOURNAL;
-   policy is the record. One short user-facing line: executed
+   Do not AskUserQuestion for notebooks or site. Persist both
+   before the user-facing line. That line says executed
    notebooks and the documentation site are on; the user can
-   turn either off later. Do not ask.
+   turn either off later. Do not say they are still unset or
+   null. Do not write notebooks or site into JOURNAL; policy
+   is the record. Do not ask.
 
    Same turn after persist:
 

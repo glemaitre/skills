@@ -133,15 +133,20 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 > `experiments/01_baseline.py` so we can run it right away.
 
 **Assumed workspace state:**
-- Empty folder, fresh scaffold.
-- The config gates are already resolved and recorded: G-PKG-NAME =
-  `churnlab`, G-ENV-MGR = pixi. Nothing is left to ask before the
-  layout goes down.
+- Empty folder, fresh scaffold. No `src/` yet.
+- `.skore` records `policy.package` `churnlab` and
+  `policy.env_manager` `pixi`. That recorded package is the
+  resolved name. Nothing is left to ask before the layout goes
+  down.
 
 **Tools:** yes
 
 **Sandbox:**
 - dir: `scratch`
+- file: `.skore`
+```json
+{"workspace": {"package": "churnlab", "env_manager": "pixi"}}
+```
 
 **Expect files:**
 - `src/churnlab/pipeline.py`
@@ -350,4 +355,4 @@ violated. Overall: ≥ 9/10 cases pass and no Must NOT in any transcript.
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `notebook convert` during setup.
 - Run `pixi add` / `uv add` from this skill.
-- Leave either flag `null`.
+- Omit `policy set notebooks true` or `policy set site true`.

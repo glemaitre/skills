@@ -12,15 +12,15 @@
 - No `.skore` file.
 - `status.data_analysis` is `missing`.
 - `status.skills` reports the usual entry skills `true`, including
-  `review-ml-experiment`.
+  `review-ml-experiment` and `review-ml-choices`.
 
 **Must do:**
 - Run `python -m skore_skills status`.
 - AskUserQuestion with human labels for installed entry work
   (Set up the project, Explore the data, Build a model, Review
   the last experiment, Record / decide what next, Export, Sync
-  reports if installed). One pick. Do not put skill ids on the
-  labels.
+  reports, Review choices if installed). One pick. Do not put
+  skill ids on the labels.
 - Recommend exploring the data first; do not auto-load it.
 - Do not treat the missing `.skore` as an empty project despite
   the existing scaffold.
@@ -354,6 +354,7 @@
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `evaluate-ml-pipeline` as the certain skill.
+- Load `review-ml-choices`.
 - Ask which entry skill to run.
 
 ---
@@ -492,3 +493,24 @@
 - Load `research-ml-practice`.
 - Load `model-ml-pipeline` as the certain skill.
 - Invent papers in triage.
+
+---
+
+## CASE_23 — Certain stored-choice request loads the board
+
+**User prompt:**
+> What did we decide for this project?
+
+**Assumed workspace state:**
+- Scaffolded workspace.
+- `status.skills.review-ml-choices` is `true`.
+- `policy.skore_mode` is `local`.
+
+**Must do:**
+- Run `python -m skore_skills status`.
+- Load `review-ml-choices` without listing the catalog menu.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Load `sync-ml-reports` as the certain skill.
+- Ask which entry skill to run.
