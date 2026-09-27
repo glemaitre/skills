@@ -99,7 +99,14 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   option does. A file link is an addition, never the context.
 - **G-DATA-ANALYSIS run | skip.** AskUserQuestion. "Go fast" does
   not skip. Skip → JOURNAL Status row `skipped — <date>` and stop.
-  Do not run `site build` on skip. The unfitted snapshot build in
+  Skip is valid only when `data_analysis/data_analysis.md` is
+  absent (`status.data_analysis` `missing` or `skipped`). If
+  status is `present`, do not write `skipped`. Say the written
+  analysis stays, and offer to run exploration again (overwrites
+  `data_analysis/data_analysis.*`) or keep it. Do not overwrite
+  until the user accepts the re-run. A named methodology concern
+  while EDA is done still skips this gate. Do not run `site
+  build` on skip. The unfitted snapshot build in
   `build-ml-pipeline` still runs before Evaluate.
 - **IPython on the run path.** Missing → `add-python-package` for
   `ipython` (`env route` agent). Decline → skip path. Do not
@@ -160,7 +167,7 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 
 ```
 - [ ] Detect: status.data_analysis present|skipped|missing
-- [ ] G-DATA-ANALYSIS: run | skip (skip → JOURNAL only, STOP)
+- [ ] G-DATA-ANALYSIS: run | skip when the analysis file is absent (skip → JOURNAL only, STOP). present → keep or re-run; never write skipped
 - [ ] G-TABULAR + add frame lib + skrub + matplotlib + seaborn
 - [ ] Target: inferred | AskUserQuestion | none
 - [ ] Families: one file | AskUserQuestion grouping

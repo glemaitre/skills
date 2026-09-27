@@ -114,6 +114,24 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "Recorded Hub destination is not downgraded",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Managed pixi project. `pixi.toml` already exists.\n- `policy.env_manager` is `pixi`.\n- `policy.env.managed` is unset. The user answers yes.\n- `policy.skore_mode` is `hub`.]\n\nWe should manage the environment. Finish that setup.",
+      "expected_output": "Behavioural response satisfying: - Ask whether we manage the env and persist `env.managed`. - Skip `env init` because `pixi.toml` exists, then `env sync --execute`. - Install Skore with `python -m skore_skills env add-skore --mode hub --execute`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `env add-skore --mode local`. - Ask where to store reports (Hub / local / MLflow).",
+      "files": [],
+      "expectations": [
+        "Ask whether we manage the env and persist `env.managed`.",
+        "Skip `env init` because `pixi.toml` exists, then `env sync --execute`.",
+        "Install Skore with `python -m skore_skills env add-skore --mode hub --execute`.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Run `env add-skore --mode local`.",
+        "The response does NOT: Ask where to store reports (Hub / local / MLflow)."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

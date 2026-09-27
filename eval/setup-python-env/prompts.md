@@ -159,3 +159,28 @@ violated.
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Invent `env add` for sklearn.
 - Invent the `add-python-package` procedure from memory.
+
+---
+
+## CASE_07 — Recorded Hub destination is not downgraded
+
+**User prompt:**
+> We should manage the environment. Finish that setup.
+
+**Assumed workspace state:**
+- Managed pixi project. `pixi.toml` already exists.
+- `policy.env_manager` is `pixi`.
+- `policy.env.managed` is unset. The user answers yes.
+- `policy.skore_mode` is `hub`.
+
+**Must do:**
+- Ask whether we manage the env and persist `env.managed`.
+- Skip `env init` because `pixi.toml` exists, then
+  `env sync --execute`.
+- Install Skore with
+  `python -m skore_skills env add-skore --mode hub --execute`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Run `env add-skore --mode local`.
+- Ask where to store reports (Hub / local / MLflow).

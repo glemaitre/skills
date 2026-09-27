@@ -125,26 +125,61 @@
 
 ---
 
-## CASE_04 — Revise edits, then the lock is asked again
+## CASE_04 — Revise blanks the named goal and its metric cells
 
 **User prompt:**
 > The constraint changed: we now need intervals, not point predictions.
 
 **Assumed workspace state:**
 - Status is `locked`.
+- Prediction goal is `point_predictions`, metric role is
+  `point_error`, metric is `MAE`, deployment is `iid`, and
+  validation is `cv`.
 - `python -m skore_skills frame show --revise` returns `ask` /
   `revise` with choices `modify`, `keep`, `stop`.
+- The user chooses `modify`.
 
 **Must do:**
 - Name `frame show --revise`.
-- On modify, set Status to `draft` and Revised on to today's date,
-  then stop for the next `frame show`.
+- On modify, set Status to `draft` and Revised on to today's date.
+- Blank prediction goal, metric role, and metric.
+- Leave deployment and validation filled.
+- Stop for the next `frame show`. Do not write `intervals` in
+  this turn.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Leave Status `locked` after modify.
-- Treat the locked table as frozen.
+- Blank deployment or validation.
 - Write a model or a splitter.
+
+---
+
+## CASE_09 — Revise blanks only the named metric
+
+**User prompt:**
+> Change the comparison metric. Keep the rest of the framing.
+
+**Assumed workspace state:**
+- Status is `locked`.
+- Metric is `MAE`. Metric role is `point_error`. Prediction goal
+  is `point_predictions`. Validation is `cv` with 5 folds.
+- `python -m skore_skills frame show --revise` returns `ask` /
+  `revise` with choices `modify`, `keep`, `stop`.
+- The user chooses `modify`.
+
+**Must do:**
+- Name `frame show --revise`.
+- On modify, blank only the metric. Leave metric role, prediction
+  goal, validation, and folds filled.
+- Set Status to `draft` and Revised on to today's date, then stop
+  for the next `frame show`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Blank metric role, prediction goal, or folds.
+- Write the replacement metric in this turn.
+- Rewrite an experiment file or a report.
 
 ---
 

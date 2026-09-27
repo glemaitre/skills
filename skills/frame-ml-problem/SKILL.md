@@ -61,15 +61,29 @@ wrapper CLI.
    fact, quote it in the question. Write that Value cell. Do not
    rename Variable cells.
    When the deployment or the validation makes other rows
-   inapplicable, set those cells to `n/a` in the same edit. Once
-   any decision cell is filled and Status is not `locked`, set
-   Status to `draft`. Stop this turn.
+   inapplicable, set those cells to `n/a` in the same edit. A
+   new `holdout` sets Folds to `n/a`. A new `cv` keeps a valid
+   fold count. Once any decision cell is filled and Status is
+   not `locked`, set Status to `draft`. Stop this turn.
 6. `ask` / `confirm_lock` or `ask` / `revise` — quote JSON
    `context` inline, then offer JSON `choices` only.
    - `lock` sets Status to `locked`.
    - `modify` on a revise sets Status to `draft` and Revised on
-     to today's date (`YYYY-MM-DD`), then stop for the next
-     `frame show`.
+     to today's date (`YYYY-MM-DD`). When the user named one
+     cell, blank that cell and only the dependents below, and
+     leave every other filled cell. Do not write the new value
+     in this turn. Then stop for the next `frame show`, which
+     asks the first missing cell.
+     - Prediction goal also blanks metric role and metric.
+     - Deployment also blanks horizon, gap, time role, and
+       generalize-to.
+     - Known at predict time also blanks baseline and baseline
+       note when the baseline is `group_mean`.
+     - Metric role also blanks metric.
+     - Baseline also blanks baseline note.
+     - Metric, baseline note, horizon, gap, time role,
+       generalize-to, validation, and folds blank only
+       themselves.
    - `keep` leaves the locked table unchanged.
    - `stop` writes nothing further.
 7. `proceed` — the table is locked. If `translation` is null, say
@@ -95,3 +109,7 @@ wrapper CLI.
   `references/fallback.md` when the command is missing.
 - A locked table changes only through `frame show --revise`, then
   the same fill and confirm gates. `keep` does not edit it.
+- On `modify`, do not blank a cell the user did not name, except
+  a dependent of that named cell. Do not rewrite `experiments/`,
+  `audit/`, or a report. The journal is the contract the next
+  build or evaluate reads.

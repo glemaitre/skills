@@ -100,6 +100,23 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 6,
+      "title": "Change an existing autocommit choice",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- A git repository exists and already has a HEAD commit.\n- `policy.git.autocommit` is `on`.\n- The user asked to change that choice. They answer `off`.]\n\nStop committing at the end of each stage.",
+      "expected_output": "Behavioural response satisfying: - Re-ask whether later stages may commit, and persist `python -m skore_skills policy set git.autocommit off`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `git init`. - Run `python -m skore_skills git ignore-merge`.",
+      "files": [],
+      "expectations": [
+        "Re-ask whether later stages may commit, and persist `python -m skore_skills policy set git.autocommit off`.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Run `git init`.",
+        "The response does NOT: Run `python -m skore_skills git ignore-merge`.",
+        "The response does NOT: Invent another `git commit` on this turn."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "b4044a78d70c2eb779dfd36276223f358264f3957c321943955aeabefc7778fd",
+  "catalog_hash": "acf96737b98b1842c918511d6414e364a715eb85180139bc62d33822581c368c",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "603fe0fffe3b265905c98ebc91b986853478a19d2004dd7a7186636457445f79"
+      "hash": "5e52d22d2f53dce0a252d30a2789a29ee2d5c49bea3c1473f0920bd740d5e8c1"
     },
     {
       "id": "frame-ml-problem",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and validation scheme before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "8f5cc5045ac4c0ab1f84e3ec5b3bd1085266d5c38a6411d210c604b4b652bd6d"
+      "hash": "3e3cc31edbedb0e5b9973c6cdf1051f58537c99614ab59a7bc985bf22f7411d4"
     },
     {
       "id": "build-ml-pipeline",
@@ -93,7 +93,16 @@
       "summary": "Session owner: list installed entry skills and ask which to run.",
       "category": "meta",
       "subcategory": null,
-      "hash": "960ea88df48f52f7fe9af38a506170ab2a278b763c480884402668c464207ac6"
+      "hash": "acbdac7903980caab03634bf38449928d9e0f1fb6b402752490efc8e2fcbbdfc"
+    },
+    {
+      "id": "review-ml-choices",
+      "path": "skills/review-ml-choices",
+      "title": "Review ML Choices",
+      "summary": "Show stored project choices and re-enter the skill that can change one.",
+      "category": "meta",
+      "subcategory": null,
+      "hash": "c5569d0cd2a2a5c414708dfb7443826d5abafad894a9229bb058e5d43706da7a"
     },
     {
       "id": "review-ml-experiment",
@@ -138,7 +147,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "ba0f7ca62766e326238c8b3aa667a955329aa8b6b878998420ddb4f262457f21"
+      "hash": "0366c5afe3a9684eaed26b1e96f159ef87b902a52a37a216e2eae307db75d892"
     },
     {
       "id": "persist-ml-git",
@@ -210,7 +219,7 @@
       "summary": "Detect the env manager and bootstrap the runtime, agent-tools, and composed development environments.",
       "category": "action",
       "subcategory": null,
-      "hash": "15b35d66a471029bc2d9b34bd217671572544a2df5f174911dfca514941e2bda"
+      "hash": "132e9cacea7ca0c19a46333629d0865fb869b01389b1c9345e8d2b3ce5db16e3"
     },
     {
       "id": "export-ml-notebook",
@@ -261,6 +270,7 @@
         "setup-git",
         "persist-ml-git",
         "add-python-package",
+        "review-ml-choices",
         "export-ml-project",
         "export-ml-notebook",
         "export-ml-site"
@@ -272,6 +282,7 @@
       "summary": "Install the data exploration workflow.",
       "includes": [
         "explore-ml-data",
+        "review-ml-choices",
         "choose-python-library",
         "research-ml-practice",
         "plot-ml-figure",
@@ -297,6 +308,7 @@
       "includes": [
         "model-ml-pipeline",
         "manage-ml-backlog",
+        "review-ml-choices",
         "frame-ml-problem",
         "build-ml-pipeline",
         "smoke-test-ml-pipeline",
@@ -315,6 +327,7 @@
       "summary": "Triage the loop, build, smoke-test, evaluate, audit reports, and manage the experiment backlog.",
       "includes": [
         "triage-ml-task",
+        "review-ml-choices",
         "model-ml-pipeline",
         "manage-ml-backlog",
         "frame-ml-problem",
@@ -359,6 +372,7 @@
         "audit-ml-pipeline",
         "sync-ml-reports",
         "triage-ml-task",
+        "review-ml-choices",
         "manage-ml-backlog",
         "review-ml-experiment",
         "shape-user-idea",
