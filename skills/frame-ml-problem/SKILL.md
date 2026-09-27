@@ -41,10 +41,14 @@ wrapper CLI.
    facts. Do not ask this again once `data_analysis` is `present`
    or `skipped`.
 2. Run `python -m skore_skills frame show`. When the user is
-   changing a locked constraint, add `--revise`. JSON `action` is
-   authoritative. Do not invent a menu. If the command is missing
-   or exits without JSON, read `references/fallback.md` and follow
-   it. Do not open another reference. Do not guess candidates.
+   changing a locked constraint and named one cell, add
+   `--revise`. When they are changing a constraint and did not
+   name a cell, ask which filled decision to change (skip
+   `n/a`) and stop. Do not `--revise` and do not edit the
+   journal on that turn. JSON `action` is authoritative. Do not
+   invent a menu. If the command is missing or exits without
+   JSON, read `references/fallback.md` and follow it. Do not
+   open another reference. Do not guess candidates.
 3. `stop` — say the JSON `reason` and stop.
 4. `ask` / `uncovered` — read `references/fallback.md` only. Write
    Prediction goal `uncovered` and the prose cells it names. Set
@@ -65,15 +69,22 @@ wrapper CLI.
    new `holdout` sets Folds to `n/a`. A new `cv` keeps a valid
    fold count. Once any decision cell is filled and Status is
    not `locked`, set Status to `draft`. Stop this turn.
-6. `ask` / `confirm_lock` or `ask` / `revise` — quote JSON
+6. When the user named one cell and Status is `draft`, do not
+   use the lock menu as the change. Blank that cell and only
+   the dependents listed in step 7, set Revised on to today's
+   date (`YYYY-MM-DD`), and leave Status `draft`. Do not write
+   the new value. Stop for the next `frame show`.
+7. `ask` / `confirm_lock` or `ask` / `revise` — quote JSON
    `context` inline, then offer JSON `choices` only.
    - `lock` sets Status to `locked`.
-   - `modify` on a revise sets Status to `draft` and Revised on
-     to today's date (`YYYY-MM-DD`). When the user named one
-     cell, blank that cell and only the dependents below, and
-     leave every other filled cell. Do not write the new value
-     in this turn. Then stop for the next `frame show`, which
-     asks the first missing cell.
+   - `modify` on a revise, when the user named one cell, sets
+     Status to `draft` and Revised on to today's date
+     (`YYYY-MM-DD`). Blank that cell and only the dependents
+     below, and leave every other filled cell. Do not write the
+     new value in this turn. Then stop for the next `frame
+     show`, which asks the first missing cell. `modify` with no
+     named cell writes nothing: ask which filled decision to
+     change and stop.
      - Prediction goal also blanks metric role and metric.
      - Deployment also blanks horizon, gap, time role, and
        generalize-to.
@@ -86,7 +97,7 @@ wrapper CLI.
        themselves.
    - `keep` leaves the locked table unchanged.
    - `stop` writes nothing further.
-7. `proceed` — the table is locked. If `translation` is null, say
+8. `proceed` — the table is locked. If `translation` is null, say
    that this lock has no splitter translation. Do not load
    `build-ml-pipeline` and do not return to `model-ml-pipeline`.
    Stop. If `model-ml-pipeline` dispatched this turn, return to
@@ -111,5 +122,8 @@ wrapper CLI.
   the same fill and confirm gates. `keep` does not edit it.
 - On `modify`, do not blank a cell the user did not name, except
   a dependent of that named cell. Do not rewrite `experiments/`,
-  `audit/`, or a report. The journal is the contract the next
-  build or evaluate reads.
+  `audit/`, or a report in this skill.
+- After a cell is blanked, do not run an existing experiment
+  script. Say that it still uses the previous splitter and
+  metric. The next build or evaluate rewrites it after the table
+  is locked again.

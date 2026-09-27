@@ -164,6 +164,7 @@
 - Status is `locked`.
 - Metric is `MAE`. Metric role is `point_error`. Prediction goal
   is `point_predictions`. Validation is `cv` with 5 folds.
+- `experiments/01_baseline.py` exists.
 - `python -m skore_skills frame show --revise` returns `ask` /
   `revise` with choices `modify`, `keep`, `stop`.
 - The user chooses `modify`.
@@ -174,12 +175,62 @@
   goal, validation, and folds filled.
 - Set Status to `draft` and Revised on to today's date, then stop
   for the next `frame show`.
+- Say `experiments/01_baseline.py` still uses the previous metric
+  and is not run. The next build or evaluate rewrites it after
+  the table is locked again.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Blank metric role, prediction goal, or folds.
 - Write the replacement metric in this turn.
 - Rewrite an experiment file or a report.
+- Run `experiments/01_baseline.py`.
+
+---
+
+## CASE_10 — Draft table blanks the named metric
+
+**User prompt:**
+> Change the comparison metric. The table is not locked yet.
+
+**Assumed workspace state:**
+- Status is `draft`.
+- Metric is `MAE`. Metric role is `point_error`. The other
+  required cells are valid.
+- `frame show` returns `ask` / `confirm_lock`, not `revise`.
+
+**Must do:**
+- Blank only the metric. Leave Status `draft` and set Revised on
+  to today's date.
+- Stop for the next `frame show`. Do not write the replacement
+  metric.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Set Status to `locked`.
+- Blank metric role.
+- Treat `confirm_lock` as the way to make this change.
+
+---
+
+## CASE_11 — Unnamed change asks which decision
+
+**User prompt:**
+> A problem constraint changed.
+
+**Assumed workspace state:**
+- Status is `locked`.
+- Metric is `MAE` and validation is `cv`. The user did not name
+  a cell.
+
+**Must do:**
+- Ask which filled decision to change.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Set Status to `draft` or blank a cell on this turn.
+- Leave every cell filled and ask to lock again as if the change
+  were done.
 
 ---
 

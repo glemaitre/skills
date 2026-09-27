@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "acf96737b98b1842c918511d6414e364a715eb85180139bc62d33822581c368c",
+  "catalog_hash": "8c68110b9a1069a42f734b9c4dd9c3efa29a2b066228d6d82f8e901add9f2f70",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and validation scheme before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "3e3cc31edbedb0e5b9973c6cdf1051f58537c99614ab59a7bc985bf22f7411d4"
+      "hash": "a278686b1d78d06a44cbc5bc5a84be952f8e2dee9f746b593a6f64bbfcb0e5ee"
     },
     {
       "id": "build-ml-pipeline",

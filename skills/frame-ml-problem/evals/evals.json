@@ -118,17 +118,53 @@
     {
       "id": 9,
       "title": "Revise blanks only the named metric",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Status is `locked`.\n- Metric is `MAE`. Metric role is `point_error`. Prediction goal\n  is `point_predictions`. Validation is `cv` with 5 folds.\n- `python -m skore_skills frame show --revise` returns `ask` /\n  `revise` with choices `modify`, `keep`, `stop`.\n- The user chooses `modify`.]\n\nChange the comparison metric. Keep the rest of the framing.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Status is `locked`.\n- Metric is `MAE`. Metric role is `point_error`. Prediction goal\n  is `point_predictions`. Validation is `cv` with 5 folds.\n- `experiments/01_baseline.py` exists.\n- `python -m skore_skills frame show --revise` returns `ask` /\n  `revise` with choices `modify`, `keep`, `stop`.\n- The user chooses `modify`.]\n\nChange the comparison metric. Keep the rest of the framing.",
       "expected_output": "Behavioural response satisfying: - Name `frame show --revise`. - On modify, blank only the metric. Leave metric role, prediction goal, validation, and folds filled. - Set Status to `draft` and Revised on to today's date, then stop for the next `frame show`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Blank metric role, prediction goal, or folds. - Write the replacement metric in this turn.",
       "files": [],
       "expectations": [
         "Name `frame show --revise`.",
         "On modify, blank only the metric. Leave metric role, prediction goal, validation, and folds filled.",
         "Set Status to `draft` and Revised on to today's date, then stop for the next `frame show`.",
+        "Say `experiments/01_baseline.py` still uses the previous metric and is not run. The next build or evaluate rewrites it after the table is locked again.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Blank metric role, prediction goal, or folds.",
         "The response does NOT: Write the replacement metric in this turn.",
-        "The response does NOT: Rewrite an experiment file or a report."
+        "The response does NOT: Rewrite an experiment file or a report.",
+        "The response does NOT: Run `experiments/01_baseline.py`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 10,
+      "title": "Draft table blanks the named metric",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Status is `draft`.\n- Metric is `MAE`. Metric role is `point_error`. The other\n  required cells are valid.\n- `frame show` returns `ask` / `confirm_lock`, not `revise`.]\n\nChange the comparison metric. The table is not locked yet.",
+      "expected_output": "Behavioural response satisfying: - Blank only the metric. Leave Status `draft` and set Revised on to today's date. - Stop for the next `frame show`. Do not write the replacement metric. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Set Status to `locked`. - Blank metric role.",
+      "files": [],
+      "expectations": [
+        "Blank only the metric. Leave Status `draft` and set Revised on to today's date.",
+        "Stop for the next `frame show`. Do not write the replacement metric.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Set Status to `locked`.",
+        "The response does NOT: Blank metric role.",
+        "The response does NOT: Treat `confirm_lock` as the way to make this change."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 11,
+      "title": "Unnamed change asks which decision",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Status is `locked`.\n- Metric is `MAE` and validation is `cv`. The user did not name\n  a cell.]\n\nA problem constraint changed.",
+      "expected_output": "Behavioural response satisfying: - Ask which filled decision to change. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Set Status to `draft` or blank a cell on this turn. - Leave every cell filled and ask to lock again as if the change were done.",
+      "files": [],
+      "expectations": [
+        "Ask which filled decision to change.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Set Status to `draft` or blank a cell on this turn.",
+        "The response does NOT: Leave every cell filled and ask to lock again as if the change were done."
       ],
       "tools": false,
       "sandbox": [],
