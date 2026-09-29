@@ -167,15 +167,21 @@ and `frame show` already returned `proceed` with a non-null
 
 **Assumed workspace state:**
 - Scaffolded workspace.
+- Modeling decisions Status is `locked`. Baseline is
+  `seasonal_naive`. Baseline note is `last observed week`.
 - No experiment scripts or completed/running History rows.
 - `status.data_analysis` is `missing`.
 - Backlog is empty.
+- `python -m skore_skills model choices` returns `choices` whose
+  ids are `baseline` then `discuss`. The baseline reason quotes
+  `seasonal_naive` and `last observed week`.
 
 **Must do:**
 - Run `python -m skore_skills status` and
   `python -m skore_skills model choices`.
-- Ask one question with, in order: Build a dummy predictor;
-  Build a standard baseline; Discuss the next step.
+- Ask one question with, in order: Build the locked baseline;
+  Discuss the next step. The baseline description quotes
+  `seasonal_naive` and `last observed week`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -191,9 +197,12 @@ and `frame show` already returned `proceed` with a non-null
 > Start the next modeling iteration.
 
 **Assumed workspace state:**
+- Modeling decisions Status is `locked`.
 - `experiments/01_baseline.py` exists.
 - `status.data_analysis` is `present`.
 - Backlog contains B1 and B2.
+- `python -m skore_skills model choices` returns `choices` whose
+  ids are `eda_proposal`, `backlog`, `discuss`.
 
 **Must do:**
 - Run `python -m skore_skills model choices`.
@@ -201,8 +210,9 @@ and `frame show` already returned `proceed` with a non-null
   EDA; Pick from the Backlog; Discuss the next step.
 
 **Must NOT do:**
+- Offer the locked baseline.
+- Offer a dummy predictor or a standard baseline.
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Offer a dummy predictor or standard baseline.
 - Silently pick B1.
 
 ---
@@ -213,9 +223,12 @@ and `frame show` already returned `proceed` with a non-null
 > What model should we build next?
 
 **Assumed workspace state:**
+- Modeling decisions Status is `locked`.
 - A prior experiment exists.
 - `status.data_analysis` is `skipped`.
 - Backlog is empty.
+- `python -m skore_skills model choices` returns one choice,
+  `discuss`.
 
 **Must do:**
 - Offer only Discuss the next step.
@@ -223,7 +236,7 @@ and `frame show` already returned `proceed` with a non-null
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Treat skipped EDA as recorded findings.
-- Offer dummy, standard baseline, EDA proposal, or Backlog.
+- Offer an EDA proposal or Backlog.
 
 ---
 

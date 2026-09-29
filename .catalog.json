@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "ad169eea0a0fad8d85d4c9b7e219f2bd67d46a36c3b85d99ed76da9999d77d18",
+  "catalog_hash": "13bbd0bc2d8b6675ea6babb69186bdc387c88157d4f0fac71be7685d2d622506",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,16 +12,16 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "5e52d22d2f53dce0a252d30a2789a29ee2d5c49bea3c1473f0920bd740d5e8c1"
+      "hash": "5ad5351ef6118f5b2d023d05841190a7a717b64859883236a72be219400a2ca0"
     },
     {
       "id": "frame-ml-problem",
       "path": "skills/frame-ml-problem",
       "title": "Frame ML Problem",
-      "summary": "Lock the problem, deployment setting, metric, baseline, and validation scheme before any model code.",
+      "summary": "Lock the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "8a908649aaf496a39e235ce284bafac4ea40e23f7e486fad0d1041bf9cdf2bc1"
+      "hash": "1740bece2be46a7b4caad15dd84eac89f61dc52a2bd67380ea2565ae3ad27968"
     },
     {
       "id": "build-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "d18fad66a94e7e8f1ff466063d0d11529278b57062911110d0a08bab85362bed"
+      "hash": "a6cb503d58f43cc90523e195f3b3cd46ea1ee572c797126abeb9cdaa2a6b05eb"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "d19b195dbbfb0abcd72535d483b0f3b1bf9a178785e259d4f2f209a6b2bbc1f1"
+      "hash": "4711918bcca7146d82c237a155b285d5b847a03a565ebdbaa97c7ff531ed4c2c"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -102,7 +102,7 @@
       "summary": "Show stored project choices and re-enter the skill that can change one.",
       "category": "meta",
       "subcategory": null,
-      "hash": "0e962538b52d37065edd947c5be61f237b2b7e8a0676c8a644b9dc6a945bc13e"
+      "hash": "52297fd9c01b6f80fc139e8cf5c00105c86dd3a1c130b2695352e12d215818c1"
     },
     {
       "id": "review-ml-experiment",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "da06feebf0bc3a1838e41dbba1897ac6861d7652e23865b00110e9ebc66b311c"
+      "hash": "8506228b0f3663f910417ff279161bff97d68bd015d5b22c2949bee81efe8506"
     },
     {
       "id": "choose-python-library",

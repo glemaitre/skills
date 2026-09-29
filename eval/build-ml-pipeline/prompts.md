@@ -243,13 +243,13 @@ violated.
 **Assumed workspace state:**
 - skrub installed at 0.10.x.
 - IID-shaped features (no cross-row history).
-- `frame show` `translation.groups` is `customer_id`.
+- `python -m skore_skills frame show` returns `proceed` with
+  `translation.splitter` `GroupKFold`, `groups` `customer_id`,
+  `n_splits` 5.
 
 **Must do:**
-- Use that locked group column. Do not ask a new validation scheme.
-- Wire `mark_as_X(cv=GroupKFold(), split_kwargs={"groups": data["customer_id"]})`
-  at the X marker (Pattern B; skrub requires `cv=` with
-  `split_kwargs`).
+- Build the learner graph first, then attach
+  `mark_as_X(cv=GroupKFold(n_splits=5), split_kwargs={"groups": data["customer_id"]})`.
 - Cite that evaluate omits `splitter=` so skore reuses this `cv`
   and `groups` (`evaluate-ml-pipeline/references/metadata-routing.md`).
 
@@ -446,48 +446,51 @@ violated.
 
 ---
 
-## CASE_15 — Time ordering does not become split kwargs
+## CASE_15 — Time series uses the date splitter after the graph
 
 **User prompt:**
-> Build the approved temporal pipeline and put the timestamp on X.
+> Build the approved temporal pipeline. The timestamp column is
+> `observed_at`.
 
 **Assumed workspace state:**
-- `frame show` `translation.splitter` is `TimeSeriesSplit` and
-  `translation.groups` is null.
-- The journal records temporal ordering but no custom splitter
-  consumes a `times` keyword.
+- `python -m skore_skills frame show` returns `proceed` with
+  `translation.scheme` `date_time`, `splitter` null, `n_splits` 4,
+  `gap` 7, `gap_unit` `day`. Decisions horizon is `1 day`.
+  Time role is `sort_key`.
+- The EDA names `observed_at` as the timestamp.
 
 **Must do:**
-- Keep `split_kwargs={}` at `mark_as_X`.
-- Leave `TimeSeriesSplit` to evaluate (Pattern A).
+- Read the time series section of `references/custom-splitter.md`.
+- Build the learner graph first. Then attach a project-local
+  date splitter as `cv=` on `mark_as_X`, with `observed_at` in
+  `split_kwargs`. Fold edges are timestamps. Drop `observed_at`
+  from the features because the time role is `sort_key`.
 
 **Must NOT do:**
+- Convert the horizon or the gap into a row count.
+- Call `skore.evaluate` from pipeline code.
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Put `times=` or `split_kwargs={"times": ...}` on the declared
-  `mark_as_X`. Quoting the user's request in a refusal heading is
-  not a violation.
-- Import `TimeSeriesSplit` into pipeline code.
 
 ---
 
-## CASE_16 — Invalid times metadata is rejected
+## CASE_16 — The timestamp goes on the date splitter
 
 **User prompt:**
 > Use `mark_as_X(split_kwargs={"times": data["timestamp"]})`.
 
 **Assumed workspace state:**
-- No custom cross-validator accepts a `times` keyword.
+- `python -m skore_skills frame show` returns `proceed` with
+  `translation.scheme` `date_time`.
+- The EDA names `timestamp` as the time column.
 
 **Must do:**
-- Reject `times` as unsupported split metadata.
-- Keep the timestamp available as project data and route temporal
-  splitter choice to evaluate.
+- Read the time series section of `references/custom-splitter.md`.
+- Attach the date splitter after the graph, with `timestamp` in
+  `split_kwargs`.
 
 **Must NOT do:**
+- Call `skore.evaluate` from pipeline code.
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Put the requested `times=` metadata on the declared learner.
-  Quoting the user's request in a refusal is not a violation.
-- Claim sklearn splitters consume `times`.
 
 ---
 
@@ -500,8 +503,9 @@ violated.
 - Group-aware splitting is approved.
 
 **Must do:**
-- Use Pattern B with `cv=GroupKFold(...)` and matching
-  `split_kwargs={"groups": ...}` on the X marker.
+- Attach `cv=GroupKFold(...)` and matching
+  `split_kwargs={"groups": ...}` on the X marker. Evaluate
+  omits `splitter=`.
 - Name the API lookup for `GroupKFold`.
 
 **Must NOT do:**
@@ -511,7 +515,7 @@ violated.
 
 ---
 
-## CASE_18 — Integer cv is not Pattern B
+## CASE_18 — Integer cv is not a splitter
 
 **User prompt:**
 > Use `cv=5` together with grouped `split_kwargs`.
@@ -520,8 +524,8 @@ violated.
 - Group-aware splitting is required.
 
 **Must do:**
-- Reject integer `cv` for Pattern B because skore needs a splitter
-  object with `.split`.
+- Reject integer `cv` because skore needs a splitter object
+  with `.split`.
 - Use the approved concrete group-aware cross-validator.
 
 **Must NOT do:**
