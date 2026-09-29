@@ -65,8 +65,8 @@
     {
       "id": 4,
       "title": "Resolve hidden paths",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `python -m skore_skills git ignore-merge` returns\n  `action: resolve-dotfiles` with `.cursor/` listed.\n- `policy.git.autocommit` is already `on`.\n- No HEAD yet.]\n\nSet up git and keep the `.cursor` folder tracked.",
-      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills git ignore-merge`. - Ask which hidden paths to keep, then re-run `python -m skore_skills git ignore-merge --decide --keep .cursor`. - After autocommit `on` and no HEAD, `git add` and `git commit`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - `--keep` `.env` or `.skore`. - Use `python -m skore_skills git end-turn` to create the first commit.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `python -m skore_skills git ignore-merge` returns\n  `action: resolve-dotfiles` with `.cursor/` listed.\n- `python -m skore_skills git review` returns `review_paths` empty.\n- `policy.git.autocommit` is already `on`.\n- No HEAD yet.]\n\nSet up git and keep the `.cursor` folder tracked.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills git ignore-merge`. - Ask which hidden paths to keep, then re-run `python -m skore_skills git ignore-merge --decide --keep .cursor`. - After autocommit `on` and no HEAD, `git add` and `git commit`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - `--keep` `.env` or `.skore`. - Ask a second question for review paths when `review_paths` is empty.",
       "files": [],
       "expectations": [
         "Run `python -m skore_skills git ignore-merge`.",
@@ -74,6 +74,7 @@
         "After autocommit `on` and no HEAD, `git add` and `git commit`.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: `--keep` `.env` or `.skore`.",
+        "The response does NOT: Ask a second question for review paths when `review_paths` is empty.",
         "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
       ],
       "tools": false,
@@ -94,6 +95,7 @@
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: `--keep` `checkpoints/`.",
         "The response does NOT: Stage `checkpoints/`.",
+        "The response does NOT: Ask a separate hidden-file question when `ambiguous_dotfiles` is empty.",
         "The response does NOT: Choose the ignore path by size or extension instead of the JSON.",
         "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
       ],
@@ -113,6 +115,28 @@
         "The response does NOT: Run `git init`.",
         "The response does NOT: Run `python -m skore_skills git ignore-merge`.",
         "The response does NOT: Invent another `git commit` on this turn."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 7,
+      "title": "One question for hidden files and review paths",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace, not yet a git repository.\n- `policy.git.autocommit` is already `on`.\n- No HEAD yet.\n- `python -m skore_skills git ignore-merge` returns\n  `action: resolve-dotfiles` with `.python-version` listed.\n- `python -m skore_skills git review` returns\n  `action: resolve-review` with `checkpoints/` kind `artifact`.\n- `src/pkg/data.py` is also dirty.]\n\nSet up git and make the first commit. Keep `.python-version` tracked and do not track `checkpoints/`.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills git ignore-merge` and `python -m skore_skills git review` before asking. - Ask **once**, listing `.python-version` and `checkpoints/` with kind `artifact`, and saying paths that are not kept are ignored. - Run `python -m skore_skills git ignore-merge --decide --keep .python-version`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Ask two questions, one for hidden files and another for review paths. - `--keep` `checkpoints/`, `.env`, or `.skore`.",
+      "files": [],
+      "expectations": [
+        "Run `python -m skore_skills git ignore-merge` and `python -m skore_skills git review` before asking.",
+        "Ask **once**, listing `.python-version` and `checkpoints/` with kind `artifact`, and saying paths that are not kept are ignored.",
+        "Run `python -m skore_skills git ignore-merge --decide --keep .python-version`.",
+        "Run `python -m skore_skills git review-decide --ignore checkpoints/`.",
+        "`git add` and `git commit` the source file.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Ask two questions, one for hidden files and another for review paths.",
+        "The response does NOT: `--keep` `checkpoints/`, `.env`, or `.skore`.",
+        "The response does NOT: Stage `checkpoints/`.",
+        "The response does NOT: Use `python -m skore_skills git end-turn` to create the first commit."
       ],
       "tools": false,
       "sandbox": [],

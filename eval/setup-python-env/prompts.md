@@ -185,3 +185,61 @@ violated.
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `env add-skore --mode local`.
 - Ask where to store reports (Hub / local / MLflow).
+
+---
+
+## CASE_08 — Dispatched setup already answered both gates
+
+**User prompt:**
+> Continue the Python environment setup.
+
+**Assumed workspace state:**
+- Empty folder; no manifests, no `src/`.
+- `setup-ml-project` dispatched this turn.
+- `policy.env_manager` is `pixi`.
+- `policy.env.managed` is true.
+- `env detect` reports `env_manager: none` because nothing is on
+  disk yet.
+- pixi is on PATH.
+
+**Must do:**
+- Do not ask which environment manager to use.
+- Do not ask whether we manage the environment.
+- Run `python -m skore_skills env init --manager pixi`, then
+  `env sync --execute`, then `env add-skore --execute` with no
+  `--mode`, then `env verify --execute`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Ask the manager or managed-environment question on this
+  dispatched turn.
+- Treat the empty folder as a reason to ask again after both
+  answers are already recorded.
+
+---
+
+## CASE_09 — Dispatched setup recorded only env.managed
+
+**User prompt:**
+> Continue the Python environment setup.
+
+**Assumed workspace state:**
+- `setup-ml-project` dispatched this turn.
+- `pixi.toml` exists. `env detect` reports `env_manager: pixi`,
+  `ambiguous: false`, `mismatch: false`.
+- `policy.env_manager` is unset.
+- `policy.env.managed` is true.
+
+**Must do:**
+- Do not ask which environment manager to use.
+- Do not ask whether we manage the environment.
+- Persist `python -m skore_skills policy set env_manager pixi`.
+- Skip `env init` because `pixi.toml` exists, then
+  `env sync --execute`, `env add-skore --execute` with no
+  `--mode`, and `env verify --execute`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Ask the managed-environment question because `policy.env_manager`
+  is unset.
+- Run `env init` over the existing `pixi.toml`.

@@ -69,7 +69,9 @@ after listing the boxes.
    resolve it. Do not confirm in prose instead of the tool. A
    matching `[project] name` + `src/<pkg>/` already resolves it —
    do not re-ask. A recorded `policy.package` also resolves it.
-   Do not re-ask. When `src/<pkg>/` is absent, scaffold that
+   Do not re-ask. When `setup-ml-project` dispatched this turn
+   and `policy.package` is set, do not ask again. When
+   `src/<pkg>/` is absent, scaffold that
    name. A `status` package of null does not reopen the ask.
    Persist the resolved import name with
    `python -m skore_skills policy set package <pkg>`.

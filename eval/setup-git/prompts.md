@@ -90,6 +90,7 @@
 - Scaffolded workspace, not yet a git repository.
 - `python -m skore_skills git ignore-merge` returns
   `action: resolve-dotfiles` with `.cursor/` listed.
+- `python -m skore_skills git review` returns `review_paths` empty.
 - `policy.git.autocommit` is already `on`.
 - No HEAD yet.
 
@@ -102,6 +103,8 @@
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - `--keep` `.env` or `.skore`.
+- Ask a second question for review paths when `review_paths` is
+  empty.
 - Use `python -m skore_skills git end-turn` to create the first
   commit.
 
@@ -132,6 +135,8 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - `--keep` `checkpoints/`.
 - Stage `checkpoints/`.
+- Ask a separate hidden-file question when `ambiguous_dotfiles`
+  is empty.
 - Choose the ignore path by size or extension instead of the JSON.
 - Use `python -m skore_skills git end-turn` to create the first
   commit.
@@ -157,3 +162,39 @@
 - Run `git init`.
 - Run `python -m skore_skills git ignore-merge`.
 - Invent another `git commit` on this turn.
+
+---
+
+## CASE_07 — One question for hidden files and review paths
+
+**User prompt:**
+> Set up git and make the first commit. Keep `.python-version` tracked and do not track `checkpoints/`.
+
+**Assumed workspace state:**
+- Scaffolded workspace, not yet a git repository.
+- `policy.git.autocommit` is already `on`.
+- No HEAD yet.
+- `python -m skore_skills git ignore-merge` returns
+  `action: resolve-dotfiles` with `.python-version` listed.
+- `python -m skore_skills git review` returns
+  `action: resolve-review` with `checkpoints/` kind `artifact`.
+- `src/pkg/data.py` is also dirty.
+
+**Must do:**
+- Run `python -m skore_skills git ignore-merge` and
+  `python -m skore_skills git review` before asking.
+- Ask **once**, listing `.python-version` and `checkpoints/`
+  with kind `artifact`, and saying paths that are not kept are
+  ignored.
+- Run `python -m skore_skills git ignore-merge --decide --keep .python-version`.
+- Run `python -m skore_skills git review-decide --ignore checkpoints/`.
+- `git add` and `git commit` the source file.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Ask two questions, one for hidden files and another for review
+  paths.
+- `--keep` `checkpoints/`, `.env`, or `.skore`.
+- Stage `checkpoints/`.
+- Use `python -m skore_skills git end-turn` to create the first
+  commit.
