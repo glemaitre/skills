@@ -14,6 +14,9 @@ description: >
   env route. Classify this turn first (editable | add-skore |
   named package). If managed, env add --execute (or --editable).
   If unmanaged, ask; default is the user handles it — do not wait.
+  When setup-ml-project already chose user-managed this turn,
+  name the package and the manager, then return. Do not ask and
+  do not wait.
   Never --execute while managed is false.
 ---
 
@@ -40,7 +43,7 @@ after listing the boxes.
 
 ```
 - [ ] status + env detect
-- [ ] env.managed: null → stop | false → ask, no --execute | true → continue
+- [ ] env.managed: null → stop | false and setup already chose unmanaged → name package and manager, return | false → ask, no --execute | true → continue
 - [ ] classify: editable | add-skore | env route then env add
 - [ ] skrub → env graphviz (execute conda/`dot -c` when allowed)
 ```
@@ -60,11 +63,20 @@ after listing the boxes.
    - **Named package** otherwise (`skrub`, pandas, …). Never
      `--editable` for a named dependency.
 
-4. If `managed` is false: **do not** `--execute`. Run print-only
-   `env add` (or `env add --editable`, or `env add-skore --mode
-   <mode>`) to obtain the manager line. Every ask in this skill
-   carries its context inline: name the package(s), the manager
-   and env the command would touch, and what each option does.
+4. If `managed` is false and `setup-ml-project` dispatched this
+   turn: the opening question already chose user-managed. Name
+   the package and the manager in words, then return. Do not run
+   `env add` — print-only refuses while managed is false. Do not
+   invent `pixi add` / `uv add` / `pip install`. Do not ask. Do
+   not wait. Do not say the turn continues after the user
+   confirms. Stop this sequence. Do not continue at step 5 or
+   step 6.
+5. If `managed` is false on a standalone turn: **do not**
+   `--execute`. Run print-only `env add` (or `env add --editable`,
+   or `env add-skore --mode <mode>`) to obtain the manager line.
+   Every ask in this skill carries its context inline: name the
+   package(s), the manager and env the command would touch, and
+   what each option does.
    Do not name the calling skill. A file link is an addition,
    never the context. Ask with two options:
 
@@ -80,7 +92,7 @@ after listing the boxes.
    name the package and the manager in words. Do not invent a
    wrapper command.
 
-5. If this turn is editable and `has_src` is true:
+6. If this turn is editable and `has_src` is true:
 
    ```bash
    python -m skore_skills env add --editable --execute
@@ -88,7 +100,7 @@ after listing the boxes.
 
    Never `pip install -e .` in a pixi project. If `has_src` is
    false, stop. Name `setup-workspace` only if it is installed.
-6. If the package is Skore, read the persisted `policy.skore_mode`
+7. If the package is Skore, read the persisted `policy.skore_mode`
    and run:
 
    ```bash
@@ -98,7 +110,7 @@ after listing the boxes.
    If the mode is unset, return to `evaluate-ml-pipeline`. Do not
    spell `skore[...]` or pick conda vs PyPI yourself. See
    `add-python-package/references/skore_variant.md`.
-7. Else `python -m skore_skills env route <pkg>`. Use **only** the
+8. Else `python -m skore_skills env route <pkg>`. Use **only** the
    `scope` returned **this turn**. Do not list other branches. Do
    not guess `default`.
 
@@ -115,7 +127,7 @@ after listing the boxes.
    `--execute` on that one command. Never paste `pixi add` /
    `uv add` / `pip install` from memory.
 
-8. If this turn is `skrub`, Graphviz is required for DataOp HTML
+9. If this turn is `skrub`, Graphviz is required for DataOp HTML
    graphs. After the add, run `python -m skore_skills env
    graphviz`. Then:
 
@@ -139,7 +151,9 @@ after listing the boxes.
    as a command fence.
 
 Return when the import is available, when the user confirmed they
-installed it, or when they chose to handle it themselves.
+installed it, when they chose to handle it themselves, or when
+this setup turn already chose user-managed and the package was
+named. That last return does not wait.
 
 ## References
 

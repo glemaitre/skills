@@ -19,7 +19,9 @@ description: >
   HOW TO USE: detect, ask managed vs user-managed, ask the
   manager when needed, then env init, env sync, add Skore for
   the recorded hub or mlflow destination (plain Skore when that
-  is unset or local), and env verify.
+  is unset or local), and env verify. When setup-ml-project
+  dispatched this turn, skip each ask whose answer is already
+  recorded. One recorded answer does not make the other ask.
 ---
 
 # Set Up Python Environment
@@ -43,6 +45,7 @@ after listing the boxes.
 
 ```
 - [ ] env detect + status
+- [ ] dispatched → skip each ask that is already recorded
 - [ ] G-ENV-MGR: ask if none / ambiguous / mismatch; else keep recorded
 - [ ] env.managed: ask (default true) and persist
 - [ ] unmanaged → stop | managed → env init, env sync, add-skore (no --mode), env verify
@@ -59,15 +62,27 @@ Do not write the catalog id.
 ## Sequence
 
 1. `python -m skore_skills env detect` and `status`.
-2. **G-ENV-MGR.** Read the JSON fields, not sentinel strings:
-   ask when `env_manager` is `"none"`, `ambiguous` is true, or
-   `mismatch` is true. Use `recommended` as the ask order. PATH is
-   not permission. Do not `curl | sh`.
-3. Ask whether **we** manage the env (default yes). Persist
+2. When `setup-ml-project` dispatched this turn, skip each
+   question on its own. `policy.env_manager` set → do not ask
+   which manager. `policy.env.managed` `true` or `false` → do
+   not ask whether we manage the env. A recorded manager with
+   `env.managed` still null still asks that one question. A
+   recorded `env.managed` with no `policy.env_manager` does not
+   reopen the managed question. A standalone request still asks,
+   including when a manager is only recorded and nothing is on
+   disk yet (`env_manager` is `"none"`).
+3. **G-ENV-MGR.** Skip when step 2 skipped it. Otherwise read the
+   JSON fields, not sentinel strings: ask when `env_manager` is
+   `"none"`, `ambiguous` is true, or `mismatch` is true. Use
+   `recommended` as the ask order. PATH is not permission. Do not
+   `curl | sh`.
+4. Skip when step 2 skipped it. Otherwise ask whether **we** manage
+   the env (default yes). Persist
    `python -m skore_skills policy set env.managed true` or `false`.
-4. Unmanaged: stop. Name ruff / ipython / ipykernel / skore; do
+5. Unmanaged: stop. Name ruff / ipython / ipykernel / skore; do
    not init. Do not mention `skore-skills` to the user.
-5. Managed: `policy set env_manager <manager>`, then
+6. Managed: `policy set env_manager <manager>` when it is not
+   already recorded, then
 
    ```bash
    python -m skore_skills env init --manager <manager>

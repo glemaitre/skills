@@ -162,6 +162,27 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 10,
+      "title": "Setup already chose user-managed",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `setup-ml-project` dispatched this turn.\n- The opening question already set `policy.env.managed` to false.\n- Manager is pixi (manifest present).\n- This is not a standalone unmanaged request.]\n\nAdd pandas.",
+      "expected_output": "Behavioural response satisfying: - Name pandas and the pixi manager in words, then return. - Do not run `env add`. Print-only refuses while managed is false. - Do not ask **I will handle it** or **Please install this now**. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Ask the two-option unmanaged question. - Run `env add` or pass `--execute`.",
+      "files": [],
+      "expectations": [
+        "Name pandas and the pixi manager in words, then return.",
+        "Do not run `env add`. Print-only refuses while managed is false.",
+        "Do not ask **I will handle it** or **Please install this now**.",
+        "Do not wait for confirmation, and do not say the turn continues once pandas is installed.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Ask the two-option unmanaged question.",
+        "The response does NOT: Run `env add` or pass `--execute`.",
+        "The response does NOT: Invent `pixi add pandas` as a command for the user to run.",
+        "The response does NOT: Wait for the user to install pandas."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

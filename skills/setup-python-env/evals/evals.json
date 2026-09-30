@@ -132,6 +132,43 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 8,
+      "title": "Dispatched setup already answered both gates",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Empty folder; no manifests, no `src/`.\n- `setup-ml-project` dispatched this turn.\n- `policy.env_manager` is `pixi`.\n- `policy.env.managed` is true.\n- `env detect` reports `env_manager: none` because nothing is on\n  disk yet.\n- pixi is on PATH.]\n\nContinue the Python environment setup.",
+      "expected_output": "Behavioural response satisfying: - Do not ask which environment manager to use. - Do not ask whether we manage the environment. - Run `python -m skore_skills env init --manager pixi`, then `env sync --execute`, then `env add-skore --execute` with no `--mode`, then `env verify --execute`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Ask the manager or managed-environment question on this dispatched turn. - Treat the empty folder as a reason to ask again after both answers are already recorded.",
+      "files": [],
+      "expectations": [
+        "Do not ask which environment manager to use.",
+        "Do not ask whether we manage the environment.",
+        "Run `python -m skore_skills env init --manager pixi`, then `env sync --execute`, then `env add-skore --execute` with no `--mode`, then `env verify --execute`.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Ask the manager or managed-environment question on this dispatched turn.",
+        "The response does NOT: Treat the empty folder as a reason to ask again after both answers are already recorded."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 9,
+      "title": "Dispatched setup recorded only env.managed",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `setup-ml-project` dispatched this turn.\n- `pixi.toml` exists. `env detect` reports `env_manager: pixi`,\n  `ambiguous: false`, `mismatch: false`.\n- `policy.env_manager` is unset.\n- `policy.env.managed` is true.]\n\nContinue the Python environment setup.",
+      "expected_output": "Behavioural response satisfying: - Do not ask which environment manager to use. - Do not ask whether we manage the environment. - Persist `python -m skore_skills policy set env_manager pixi`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Ask the managed-environment question because `policy.env_manager` is unset. - Run `env init` over the existing `pixi.toml`.",
+      "files": [],
+      "expectations": [
+        "Do not ask which environment manager to use.",
+        "Do not ask whether we manage the environment.",
+        "Persist `python -m skore_skills policy set env_manager pixi`.",
+        "Skip `env init` because `pixi.toml` exists, then `env sync --execute`, `env add-skore --execute` with no `--mode`, and `env verify --execute`.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Ask the managed-environment question because `policy.env_manager` is unset.",
+        "The response does NOT: Run `env init` over the existing `pixi.toml`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

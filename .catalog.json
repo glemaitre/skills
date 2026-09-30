@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "5ae2c708b012bf96c7a6ecb09af5824f0536a9e147299b49f11badd4aac9e23b",
+  "catalog_hash": "37ef8948577522dee37beeeb08e2653b0ddbfb8a1236063048f3fbd05dc7d887",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -135,10 +135,10 @@
       "id": "setup-ml-project",
       "path": "skills/setup-ml-project",
       "title": "Set Up ML Project",
-      "summary": "Coordinate workspace, environment, and git setup.",
+      "summary": "Ask setup choices up front, then coordinate workspace, environment, and git.",
       "category": "meta",
       "subcategory": null,
-      "hash": "c0a51da660ad02120c769c7e0c8815bfd1390ad0af0f436a2ab77201a0b4175a"
+      "hash": "7609c4771cdf4c51afd80028a692305ed07d140e01ca1d6836712b12081b370e"
     },
     {
       "id": "setup-git",
@@ -147,7 +147,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "0366c5afe3a9684eaed26b1e96f159ef87b902a52a37a216e2eae307db75d892"
+      "hash": "8fbc9735a787e214cd05242c8d380f34bdcf1850440fd769ed0fcf9d280261dd"
     },
     {
       "id": "persist-ml-git",
@@ -201,7 +201,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
-      "hash": "f0fa89049726d192b24a424622103199f6605f4291565a2b50212a634458d632"
+      "hash": "4c2fa4736e478b3a7d80a8df63d4d85d51da0f0ec1eec5dc13ed2cd77dfd01f7"
     },
     {
       "id": "setup-workspace",
@@ -210,7 +210,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "d2a43ca8f19719dbd6fd0c571a5e9bd044632f56e38d376a61cfa75c484a1dda"
+      "hash": "89ccd88145091d67ef2b3313e65a782bcb2d81e1c251cce7d93f26f663f260f5"
     },
     {
       "id": "setup-python-env",
@@ -219,7 +219,7 @@
       "summary": "Detect the env manager and bootstrap the runtime, agent-tools, and composed development environments.",
       "category": "action",
       "subcategory": null,
-      "hash": "9470d9baaa0518ab2616c1da298a4bc3de5b95b84da8ed772ff67da9971d9ae2"
+      "hash": "9d2d9e47baf31f9dad5a0580f22c09de53748330b6d04245b40436ecab37a5ca"
     },
     {
       "id": "export-ml-notebook",
