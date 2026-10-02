@@ -23,8 +23,11 @@
 - After Review, confirm the report with `project.summarize()` and
   load it with `project.get(id)`.
 - Render checks and metrics into the audit digest.
-- Write `scratch/results/<stem>/{report,checks,metrics}.html`; leave
-  the bare Display last on checks and metrics, with no text snapshot.
+- Write `scratch/results/<stem>/{report,checks,metrics}.html`. Leave
+  the bare Display last on checks. Metrics last is
+  `summarize().frame(verbose_name=True, flat_index=False)`, and
+  `metrics.html` is that frame's `_repr_html_()`. No second text
+  snapshot of the table.
 - Print a `help()` tree per namespace for the Additional report view
   menu.
 - Derive G-AUDIT-FINDING by running
@@ -69,6 +72,9 @@
 - Run audit, then call `manage-ml-backlog` record-outcome with the
   digest and locator.
 - Build the site only after record-outcome when enabled.
+- When notebooks are on, convert `audit/<stem>.py` on this direct
+  close (`--html` when the site is on). Do not add
+  `<!-- results-embed: audit -->`.
 - Close with `git end-turn --stage evaluate`.
 
 **Must NOT do:**
@@ -98,7 +104,8 @@
 - Return the digest, G-AUDIT-FINDING from `audit finding`, locator
   from `loop locator`, and optional headline to
   `model-ml-pipeline`.
-- State that the dispatcher owns record-outcome, site, and git close.
+- State that the dispatcher owns record-outcome, notebook convert
+  (including `audit/<stem>.py`), site, and git close.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -108,6 +115,8 @@
   them as the **dispatcher's** close is allowed).
 - Load `triage-ml-task` from this skill.
 - Dispatch `manage-ml-backlog` from this skill.
+- Run `notebook convert` on `audit/<stem>.py` here.
+- Add `<!-- results-embed: audit -->`.
 
 ---
 

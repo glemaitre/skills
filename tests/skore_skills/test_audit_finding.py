@@ -34,6 +34,19 @@ mae                  1.200000e+00            0.000000
 """
 
 
+VERBOSE = """\
+## Metrics summary
+
+Estimator        DummyRegressor
+Aggregate                  mean           std
+Metric
+Score             -1.322314e-01  1.570092e-16
+R²                -1.322314e-01  1.570092e-16
+RMSE               1.170470e+00  0.000000e+00
+MAE                1.040000e+00  0.000000e+00
+"""
+
+
 def test_parses_issues_tips_and_metric(tmp_path: Path) -> None:
     path = tmp_path / "audit.md"
     path.write_text(DIGEST, encoding="utf-8")
@@ -45,6 +58,23 @@ def test_parses_issues_tips_and_metric(tmp_path: Path) -> None:
         "1 issue(s), 2 tip(s) — SKD002 (issue), SKD006 (tip), SKD012 (tip)"
     )
     assert "RMSE 1.414214e+00" in payload["finding"]
+
+
+def test_verbose_frame_headline_is_the_first_recognized_row(tmp_path: Path) -> None:
+    """Verbose names still yield a headline; the first recognized row wins."""
+    path = tmp_path / "audit.md"
+    path.write_text(VERBOSE, encoding="utf-8")
+    payload = audit_finding(path)
+    assert payload["finding"].endswith("R² -1.322314e-01")
+
+    path.write_text(
+        "## Metrics summary\n\n"
+        "Accuracy                      0.466667  0.000000e+00\n"
+        "ROC AUC                       0.500000  0.000000e+00\n"
+        "Log loss                      0.699825  0.000000e+00\n",
+        encoding="utf-8",
+    )
+    assert audit_finding(path)["finding"].endswith("accuracy 0.466667")
 
 
 def test_clean_digest(tmp_path: Path) -> None:

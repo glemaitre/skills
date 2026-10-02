@@ -21,11 +21,13 @@ Tell the user the written `.ipynb` (and HTML viewer) paths. Do
 not quote `notebook convert`, `--html`, or `site build` as
 something they should run.
 
-While `policy.notebooks` is true, `explore-ml-data`,
-`model-ml-pipeline`, and `audit-ml-pipeline` already convert the
-percent file they wrote that turn. This skill owns on-demand
-conversions, other sources, and turning the flag on when it is
-`null` or false.
+While `policy.notebooks` is true, `explore-ml-data` converts the
+analysis file it wrote. `model-ml-pipeline` and
+`evaluate-ml-pipeline` convert the experiment script and, when
+it exists, `audit/<stem>.py`. `audit-ml-pipeline` converts
+`audit/<stem>.py` only on a direct close. This skill owns
+on-demand conversions, other sources, and turning the flag on
+when it is `null` or false.
 
 ## Sequence
 

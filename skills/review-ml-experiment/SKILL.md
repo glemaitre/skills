@@ -2,16 +2,18 @@
 name: review-ml-experiment
 description: >
   Post-evaluate review. Gate the expensive skore-check audit, then
-  write one markdown idea file per candidate. Trigger after a
-  successful evaluate, on "review this stem", or when review consent
-  is Review or proceed. Do not write JOURNAL.md or a design note.
-  Do not run cells run until the user accepts the audit cost.
+  write one markdown idea file and one Ideas row per candidate.
+  Trigger after a successful evaluate, on "review this stem", or
+  when review consent is Review or proceed. Do not write History,
+  Backlog, or a design note. Do not run cells run until the user
+  accepts the audit cost.
 ---
 
 # Review ML Experiment
 
 Optional loop step after evaluate. Record-outcome stays with the
-caller. This skill writes idea files only.
+caller. This skill writes idea files and their Ideas rows. The
+stem is whichever experiment was reviewed.
 
 ## Human-facing prose
 
@@ -51,7 +53,7 @@ reading this report and writing follow-up ideas — not skill ids,
    not test is another candidate. A user idea or a literature
    query is not a candidate here: after this skill returns,
    `shape-user-idea` or `search-ml-literature` writes that file
-   when the user asks. Load `research-ml-practice` only if
+   and its Ideas row when the user asks. Load `research-ml-practice` only if
    `status.skills.research-ml-practice` is true and an audit or
    design candidate needs sources; otherwise one-line skip. Do
    not invent papers, metrics, or a winner.
@@ -60,8 +62,16 @@ reading this report and writing follow-up ideas — not skill ids,
    (`audit:<stem>:checks.<code>` or `design:<stem>`), Triage
    `open`, Question, Why now, What changes, Open gaps. No
    acceptance criteria. On a refresh, keep an existing file's
-   `Triage` value. A new candidate is `open`.
-7. Return the digest, JSON `finding` from
+   `Triage` value and the matching Ideas status. A new candidate
+   is `open`.
+7. Upsert one `## Ideas` row per file in `journal/JOURNAL.md`.
+   If that table is missing, insert it between History and
+   Backlog. Columns: Question, Status, Experiment, Source.
+   Question is the file's Question as plain text, not a link.
+   Status is `open`, `discarded`, or `aside`, matching `Triage`.
+   A `promoted` file has no Ideas row. Experiment is this run's
+   stem. Source is copied verbatim. Edit only that table.
+8. Return the digest, JSON `finding` from
    `python -m skore_skills audit finding --stem <stem>`, the
    locator from `python -m skore_skills loop locator --stem <stem>`,
    and the idea paths.
@@ -81,7 +91,8 @@ report. Name the stem and those paths. Do not invent minutes.
 
 - Do not run `cells run` before **Review** or an explicit re-audit
   confirmation.
-- Do not write `JOURNAL.md` or a design note.
+- Do not write History, Backlog, Status, or a design note.
+  The Ideas table is the only `JOURNAL.md` edit.
 - Do not call `skore.evaluate` or `project.put`.
 - Do not pick a winning idea.
 - Do not invent a missing child's procedure.

@@ -228,10 +228,14 @@ Record-outcome runs before convert and site build.
 
 If `policy.notebooks` is true and `export-ml-notebook` is
 installed, run `python -m skore_skills notebook convert
-experiments/<stem>.py`, with `--html` when `policy.site` is
-also true. Convert re-executes the script. If convert fails
-because `ipywidgets` is missing, load `add-python-package` for
-it (agent) and convert again. Missing jupytext / nbclient /
+experiments/<stem>.py`, and the same command on
+`audit/<stem>.py` when that file exists, with `--html` when
+`policy.site` is also true. `audit-ml-pipeline` does not convert
+on this path. Site build embeds `audit/<stem>.nb.html` under
+`## Notebooks`; do not add `<!-- results-embed: audit -->`.
+Convert re-executes the script. If convert fails because
+`ipywidgets` is missing, load `add-python-package` for it
+(agent) and convert again. Missing jupytext / nbclient /
 nbconvert → one line naming `add-python-package`. Then, if
 `policy.site` is true and `export-ml-site` is installed, run
 `python -m skore_skills site build`. A build error does not

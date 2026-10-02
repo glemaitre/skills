@@ -127,6 +127,8 @@ and `frame show` already returned `proceed` with a non-null
 - Run `python -m skore_skills notebook convert
   experiments/01_baseline.py --html` after the implement loop,
   before site build.
+- Also convert `audit/01_baseline.py --html` when that file exists.
+  Do not add `<!-- results-embed: audit -->`.
 - Run `python -m skore_skills site build` before git end-turn.
 - Run `python -m skore_skills git end-turn --stage implement`.
 
@@ -305,6 +307,7 @@ and `frame show` already returned `proceed` with a non-null
 - `evaluate-ml-pipeline` and `review-ml-experiment` are installed.
 - `review consent` returns `ask`.
 - `policy.notebooks` and `policy.site` are both true.
+- `audit/01_baseline.py` exists after Review.
 
 **Must do:**
 - Run evaluate, then `review consent`.
@@ -314,6 +317,9 @@ and `frame show` already returned `proceed` with a non-null
 - After Review, load `manage-ml-backlog` in record-outcome mode
   with the returned digest, locator, and G-AUDIT-FINDING.
 - Record before `notebook convert` and `site build`.
+- Convert `audit/01_baseline.py --html` here, after
+  record-outcome and before site build, together with the
+  experiment script.
 - Write 2–6 sentences from the digest, name `report.html` and
   `html/01_baseline.html` instead of the design-note markdown,
   and include locator plus G-AUDIT-FINDING in the user-facing
@@ -325,7 +331,9 @@ and `frame show` already returned `proceed` with a non-null
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `cells run` from this dispatcher before Review.
 - Leave History `planned` in any journal excerpt you author.
-- Convert `audit/01_baseline.py` here — the audit skill did it.
+- Skip `audit/01_baseline.py` because the audit skill was supposed
+  to convert it.
+- Add `<!-- results-embed: audit -->`.
 - Open idea triage inside record-outcome mode.
 - Write the journal files directly instead of dispatching.
 

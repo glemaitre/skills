@@ -319,9 +319,12 @@ Brief outline; full anatomy with concrete examples →
    severity; every `issue` / `tip` line ends with the documentation
    URL holding the actionable mitigation (custom `CSTM*` checks may
    have none).
-8. **Metrics summary** — same snapshot pattern for
-   `report.metrics.summarize()` into
+8. **Metrics summary** —
+   `metrics = report.metrics.summarize().frame(verbose_name=True, flat_index=False)`,
+   write `metrics._repr_html_()` to
    `scratch/results/<stem>/metrics.html`, then `metrics` last.
+   That frame is the only metrics table. Do not also paste its
+   values into the design note.
 9. **Available report accessors** — call `help()` on
    `report.metrics`, `report.checks`, and any other namespace that
    exists (`inspection`, `data`, …). `help()` prints its tree and
@@ -329,22 +332,24 @@ Brief outline; full anatomy with concrete examples →
    written to disk. Skip a namespace that is absent. Do not call
    plot accessors here.
 
-That's the core template. Leave a bare Display as the last
-expression: editors render `_repr_html_`, the runner records the
-`repr`, and both are informative — no `.frame()` and no text
-snapshot. Extra Display cells are appended only after the user
-picks Additional report view. Details: →
-`references/cell_anatomy.md`.
+That's the core template. Leave checks as a bare Display: editors
+render `_repr_html_`, the runner records the `repr`, and
+`.frame()` drops the severity grouping. Metrics are the frame
+above, not that Display and not a second markdown table. Extra
+Display cells are appended only after the user picks Additional
+report view. Details: → `references/cell_anatomy.md`.
 
 ### The digest is the review's canonical source
 
 The rendered digest at `scratch/audit/<stem>/audit.md` is the
 **single source of truth** that `review-ml-experiment` reads to
-write `journal/ideas/<stem>-<slug>.md`. That skill reads the digest
-as text, walks `Issues:` then `Tips:` in `## Checks summary`, and
-does not re-open the Project, call `report.*`, or write
+write `journal/ideas/<stem>-<slug>.md` and one Ideas row in
+`journal/JOURNAL.md`. That skill reads the digest as text, walks
+`Issues:` then `Tips:` in `## Checks summary`, and does not
+re-open the Project, call `report.*`, or write
 `scratch/<ts>_*.py` probes for metric extraction.
-`manage-ml-backlog` later triages those files into Backlog rows.
+`manage-ml-backlog` later triages those files. A promoted idea
+leaves the Ideas table and becomes a Backlog row.
 
 The contract stays narrow: persisted-report locator + checks +
 metrics summary. The review must not walk extra Display headings.
@@ -450,16 +455,23 @@ Paste JSON `finding` verbatim. The CLI streams the digest to stdout when the des
 
 ### Executed notebook
 
-If `policy.notebooks` is true and `export-ml-notebook` is
-installed, run `python -m skore_skills notebook convert
-audit/<stem>.py` after **Close audit**, with `--html` when
-`policy.site` is also true. The audit has no page of its own: the
-site places its viewer under the matching design note's
-`## Notebooks` section, after the evaluation notebook. If convert
-fails because `ipywidgets` is missing, load `add-python-package`
-for it (agent) and convert again. Missing jupytext / nbclient →
-one-line skip naming `add-python-package`; do not fail the audit,
-do not `pixi add`.
+Direct close only. When `model-ml-pipeline` or
+`evaluate-ml-pipeline` owns this turn, do not convert here. That
+caller converts `audit/<stem>.py` with the experiment script.
+
+On a direct close, if `policy.notebooks` is true and
+`export-ml-notebook` is installed, run
+`python -m skore_skills notebook convert audit/<stem>.py` after
+**Close audit**, with `--html` when `policy.site` is also true.
+The audit has no page of its own. Site build embeds
+`audit/<stem>.nb.html` under the design note's `## Notebooks`
+section, after the evaluation notebook, whenever that file
+exists. Do not add `<!-- results-embed: audit -->`. A marker does
+not create the viewer, and a missing `.nb.html` omits it. If
+convert fails because `ipywidgets` is missing, load
+`add-python-package` for it (agent) and convert again. Missing
+jupytext / nbclient → one-line skip naming `add-python-package`;
+do not fail the audit, do not `pixi add`.
 
 ### Re-execution semantics
 
@@ -510,8 +522,8 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 
 ## End of turn
 
-**Dispatched** (`model-ml-pipeline` or `manage-ml-backlog` this
-turn), after **Close audit**: run
+**Dispatched** (`model-ml-pipeline`, `evaluate-ml-pipeline`, or
+`manage-ml-backlog` this turn), after **Close audit**: run
 `python -m skore_skills audit finding --stem <stem>` and
 `python -m skore_skills loop locator --stem <stem>`. Return the
 digest, JSON `finding`, JSON `locator`, and an optional
@@ -593,7 +605,8 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 
 - Open or write the skore Project's reports (`evaluate-ml-pipeline`).
 - Install `ipython` (`add-python-package` owns).
-- Write `journal/ideas/` files (`review-ml-experiment` owns that).
+- Write `journal/ideas/` files or Ideas rows
+  (`review-ml-experiment` owns both).
 - Write or edit `journal/NN_*.md` or `journal/JOURNAL.md` directly. At end
   of turn, dispatch `manage-ml-backlog` record-outcome mode
   instead — that skill owns every journal write.
@@ -607,7 +620,7 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | Skill | Relationship |
 |---|---|
 | `manage-ml-backlog` | Downstream record-outcome consumer; never dispatches audit from record-outcome mode |
-| `review-ml-experiment` | Loop caller. Parses the digest as text and writes one idea file per candidate. Never opens the Project |
+| `review-ml-experiment` | Loop caller. Parses the digest as text and writes one idea file and one Ideas row per candidate. Never opens the Project |
 | `evaluate-ml-pipeline` | Producer side. `skore.evaluate` + `project.put` live only in `experiments/NN_*.py` |
 | `setup-workspace` | Workspace layout; four-way stem pairing |
 | `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |
@@ -632,8 +645,9 @@ If the skill is not installed, name the package and stop.
 ## References (load on demand)
 
 - `references/cell_anatomy.md` — concrete cell examples (right /
-  wrong shapes), core sequence, why the bare Display serves both
-  audiences, extra Display snapshot contract, bare-expression rules.
+  wrong shapes), core sequence, why checks stay a bare Display
+  and metrics use `frame(verbose_name=True, flat_index=False)`,
+  extra Display snapshot contract, bare-expression rules.
 - `references/runner_internals.md` — leftover runner internals
   (IPython, Agg). Prefer `--help` / the package docstring.
 - `references/failure_modes.md` — detailed recovery for every

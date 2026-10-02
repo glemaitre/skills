@@ -18,7 +18,7 @@
 - Copy the headline result, locator, and G-AUDIT-FINDING into
   History / the design-note Status block.
 - Do not open idea triage in this record. An empty `journal/ideas/`
-  is a one-line skip.
+  is a one-line skip. Do not edit the Ideas table.
 - Run `python -m skore_skills git end-turn --stage backlog`.
 - If that command returns `invoke`, load `persist-ml-git`.
 
@@ -38,13 +38,15 @@
 **Assumed workspace state:**
 - `journal/ideas/01_baseline-calibration.md` exists.
 - Its Source is `audit:01_baseline:checks.SKD003`.
-- That Source is not already a Backlog row.
+- That Question and Source are not already a Backlog row.
+- The Ideas table has that Question with Status `open`.
 - The highest Backlog index is `B2`.
 - The user answers promote.
 
 **Must do:**
 - Append a stable `B3` row. Item comes from the file's Question.
   Source is copied verbatim.
+- Remove that Ideas row.
 - Set `Triage: promoted` on
   `journal/ideas/01_baseline-calibration.md` and keep the file.
 
@@ -70,7 +72,7 @@
 - Run `python -m skore_skills scaffold --journal` as the
   initialization command.
 - State that the packaged index provides Status, Data understanding,
-  History, and Backlog.
+  Modeling decisions, History, Ideas, and Backlog.
 - Return to triage after initialization.
 
 **Must NOT do:**
@@ -160,7 +162,9 @@
 - Copy G-AUDIT-FINDING byte-for-byte into the design-note
   `Audit findings` Status line, separately from Headline result.
 - Insert `## Results` with Report overview, then Checks, then
-  Metrics, summarizing from the digest — not from HTML.
+  Metrics. Summarize Report overview and Checks from the digest,
+  not from HTML. `### Metrics` is a heading only: do not transcribe
+  the metric table or its values.
 - After Metrics, add a `###` subsection for `roc` with
   `<!-- results-embed: roc -->`, summarizing from that digest cell.
 - Update the rest of the design-note Status block for
@@ -171,7 +175,9 @@
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Paste the metrics table or its values under `### Metrics`.
 - Rescan the Backlog or add/resolve `B1` / `B2` rows.
+- Edit the Ideas table.
 - Ask the idea-triage question.
 - Dispatch `audit-ml-pipeline`. Naming the caller when returning
   is not dispatching it.
@@ -212,6 +218,7 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Invent or estimate a metric.
 - Mark the row `done` without a result.
+- Edit the Ideas table.
 - Ask the idea-triage question.
 - Parse report HTML to fill Results.
 
@@ -259,6 +266,7 @@
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Fabricate a `B1` row.
+- Invent an Ideas row.
 - Write a design note.
 - Start a literature search or a shaping questionnaire. Offering
   to shape an idea or search the literature, without loading
@@ -275,18 +283,21 @@
 - `journal/ideas/01_baseline-calibration.md` exists.
 - Its `Triage` line is missing, so it is open.
 - Its Source is `audit:01_baseline:checks.SKD003`.
-- That Source is not already a Backlog row.
+- That Question and Source are not already a Backlog row.
+- The Ideas table has that Question with Status `open`.
 - The highest Backlog index is `B2`.
 - The user answers discard.
 
 **Must do:**
 - Set `Triage: discarded` on
   `journal/ideas/01_baseline-calibration.md`.
+- Set that Ideas row's Status to `discarded` and keep the row.
 - Keep that file.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Append a Backlog row.
+- Remove that Ideas row.
 - Delete the idea file.
 - Write a design note.
 
@@ -301,18 +312,21 @@
 - `journal/ideas/01_baseline-calibration.md` exists.
 - Its `Triage` line is `open`.
 - Its Source is `audit:01_baseline:checks.SKD003`.
-- That Source is not already a Backlog row.
+- That Question and Source are not already a Backlog row.
+- The Ideas table has that Question with Status `open`.
 - The highest Backlog index is `B2`.
 - The user answers set aside.
 
 **Must do:**
 - Set `Triage: aside` on
   `journal/ideas/01_baseline-calibration.md`.
+- Set that Ideas row's Status to `aside` and keep the row.
 - Keep that file.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Append a Backlog row.
+- Remove that Ideas row.
 - Delete the idea file.
 - Write a design note.
 
@@ -326,12 +340,15 @@
 **Assumed workspace state:**
 - `journal/ideas/01_baseline-calibration.md` exists.
 - Its `Triage` line is missing, so it is open.
+- Its Question is the Item of Backlog row `B2`.
 - Its Source is `audit:01_baseline:checks.SKD003`.
-- That Source is already Backlog row `B2`.
+- That Question and Source are already Backlog row `B2`.
+- The Ideas table has that Question with Status `open`.
 
 **Must do:**
 - Set `Triage: promoted` on
   `journal/ideas/01_baseline-calibration.md`.
+- Remove that Ideas row.
 - Keep that file.
 
 **Must NOT do:**
@@ -374,12 +391,14 @@
 - `journal/ideas/01_baseline-calibration.md` has `Triage: discarded`.
 - No idea file is `open`.
 - Its Source is `audit:01_baseline:checks.SKD003`.
-- That Source is not already a Backlog row.
+- That Question and Source are not already a Backlog row.
+- The Ideas table has that Question with Status `discarded`.
 - The highest Backlog index is `B2`.
 
 **Must do:**
 - Set `Triage: promoted` on
   `journal/ideas/01_baseline-calibration.md`.
+- Remove that Ideas row.
 - Keep that file.
 - Append a stable `B3` row. Item comes from the file's Question.
   Source is copied verbatim.
@@ -399,8 +418,10 @@
 
 **Assumed workspace state:**
 - `journal/ideas/01_baseline-calibration.md` has `Triage: promoted`.
+- That promoted idea has no Ideas row.
 - `journal/ideas/monotonic.md` has `Triage: discarded`.
 - `journal/ideas/split.md` has `Triage: aside`.
+- Those discarded and aside rows remain in Ideas.
 - No idea file is `open`.
 - The user has not picked a file to revisit.
 
@@ -408,6 +429,7 @@
 - Say in one line how many ideas are promoted, discarded, and
   set aside.
 - Offer to revisit. Do not retag until the user picks a file.
+- Leave the discarded and aside Ideas rows in place.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).

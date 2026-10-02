@@ -65,7 +65,7 @@ checks
 # cross-validation reports include mean ± std across folds).
 
 # %%
-metrics = report.metrics.summarize()
+metrics = report.metrics.summarize().frame(verbose_name=True, flat_index=False)
 _results = PROJECT_ROOT / "scratch" / "results" / "<NN>_<short_name>"
 _results.mkdir(parents=True, exist_ok=True)
 (_results / "metrics.html").write_text(metrics._repr_html_(), encoding="utf-8")
