@@ -44,8 +44,16 @@ skill ids, `G-*` names, or the wrapper CLI.
 
 ## Procedure
 
-1. `python -m skore_skills status`. Unscaffolded workspace →
-   setup. Then `python -m skore_skills frame show` without
+1. `python -m skore_skills status`. If `status.setup.pending`
+   is non-empty and `status.skills.setup-ml-project` is true,
+   load `setup-ml-project` and stop. Do not start this skill.
+   When it returns, continue. Do not load it again on this turn.
+   If that skill is not installed, name the pending pieces in
+   one line and stop. Do not invent `git init`, scaffold, or
+   `env init`. If `status.setup.env` or `status.setup.workspace`
+   is `declined`, stop in one line. A declined `git` or
+   `editable` is not asked again; continue. Then
+   `python -m skore_skills frame show` without
    `--revise`. Anything other than `proceed` loads
    `frame-ml-problem` and stops. `translation` null → stop.
    Do not write an evaluation call.
@@ -153,11 +161,19 @@ the marker.
 No `Stratified*` for class imbalance. It compresses across-fold
 variance.
 
-The headline is `translation.metric`. If build attached
-`.skb.with_scoring(...)`, inspect `report.metrics.score()`.
-`skore.evaluate` has no `scoring=` argument. A metric or a
-`sample_weight` that belongs on the DataOp goes back to build
-(`references/custom-metrics.md`).
+The headline is `translation.metric`. A name on the skore
+default list in `build-ml-pipeline` needs no scorer. Any other
+name must already be `.skb.with_scoring(...)` on the prediction
+DataOp. If it is not, return to `build-ml-pipeline` before
+`skore.evaluate`. Do not call `report.metrics.add`. When the
+scorer is attached, that name is a row in
+`report.metrics.summarize().frame()`. `skore.evaluate` has no
+`scoring=` argument (`references/custom-metrics.md`). If the
+name is attached and still missing from that frame, the
+predictor class is wrong: it must be the mixin, then
+`BaseEstimator` (`RegressorMixin` or `ClassifierMixin` first).
+Return to `build-ml-pipeline`. `BaseEstimator` alone, and
+`BaseEstimator` before the mixin, both fail.
 
 An extra check the user asks for after the lock:
 `references/custom-checks.md`. Subclass `skore.Check` at module
@@ -168,9 +184,9 @@ checks. Do not invent a check. Do not register one from
 
 Escalate past `evaluate` only when the dispatcher is too coarse
 (`references/reports.md`): `EstimatorReport` for one held-out
-fit, `CrossValidationReport` for per-fold artifacts,
-`ComparisonReport` for two or more learners. Holdout uses
-`EstimatorReport`.
+fit, `CrossValidationReport` for per-fold artifacts. Holdout uses
+`EstimatorReport`. This loop scores that one learner with one
+`skore.evaluate` and one `project.put`.
 
 CV is necessary but not sufficient for any pipeline with
 history-dependent features. `skore.evaluate` materializes the
@@ -249,9 +265,15 @@ Record-outcome runs before convert and site build.
 
 If `policy.notebooks` is true and `export-ml-notebook` is
 installed, run `python -m skore_skills notebook convert
-experiments/<stem>.py`, with `--html` when `policy.site` is
-also true. Convert re-executes the script. Missing converters
-→ one line naming `add-python-package`. Then, if
+experiments/<stem>.py`, and the same command on
+`audit/<stem>.py` when that file exists, with `--html` when
+`policy.site` is also true. `audit-ml-pipeline` does not convert
+on this path. Site build embeds `audit/<stem>.nb.html` under
+`## Notebooks`; do not add `<!-- results-embed: audit -->`.
+Convert re-executes the script. If convert fails because
+`ipywidgets` is missing, load `add-python-package` for it
+(agent) and convert again. Missing jupytext / nbclient /
+nbconvert → one line naming `add-python-package`. Then, if
 `policy.site` is true and `export-ml-site` is installed, run
 `python -m skore_skills site build`. A build error does not
 fail the turn.
@@ -278,8 +300,9 @@ G-AUDIT-FINDING (`n/a — audit not run` when skipped).
 
 ## Stops
 
-- No scaffold (`has_src` and `has_journal` both false) → setup.
-  Do not require `git`.
+- Pending setup (`status.setup.pending` non-empty) → load
+  `setup-ml-project`. A declined `git` is not asked again. A
+  declined env or workspace stops.
 - Smoke missing or red on a history-dependent pipeline → build.
 - Empty `split_kwargs` plus a possible group column → return
   to `build-ml-pipeline`. Do not default to `KFold`.
@@ -312,6 +335,6 @@ Pre-flight (evaluate-ml-pipeline):
 - `references/skrub_interop.md` — env-dict versus `(X, y)`.
 - `references/g_skore_mode.md` — Project constructors.
 - `references/reports.md` — when `evaluate` is too coarse.
-- `references/custom-metrics.md` — metric kwargs and
+- `references/custom-metrics.md` — a non-default metric via
   `with_scoring`.
 - `references/custom-checks.md` — a check the user asked for.

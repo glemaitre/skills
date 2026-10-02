@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "Approved model implementation",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Matching approved design note and experiment shell exist.\n- Workspace is scaffolded (`has_src` and `has_journal` true).]\n\nThe baseline design is approved. Implement and test the model.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Matching approved design note and experiment shell exist.\n- Workspace is scaffolded (`has_src` and `has_journal` true).]\n\nThe baseline design is approved. Implement and test the model.",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - Resume the approved stem directly; do not show the starting choices menu. - Preview the broad sequence as local pipeline preparation, small real-data smoke fit/predict, optional full-dataset evaluation, then read-only audit; leave each detailed compute preview to its child skill and do not invent minute estimates. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Duplicate detailed build / smoke / evaluate / audit previews from the dispatcher. - Load `smoke-test-ml-pipeline` as a sibling dispatcher step.",
       "files": [],
       "expectations": [
@@ -34,7 +34,7 @@
     {
       "id": 2,
       "title": "Missing design note stops before code",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The Backlog choice is confirmed with stem `02_target_transform`.\n- `journal/02_target_transform.md` does not exist.]\n\nImplement experiment 02 for the selected target transform.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- The Backlog choice is confirmed with stem `02_target_transform`.\n- `journal/02_target_transform.md` does not exist.]\n\nImplement experiment 02 for the selected target transform.",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills scaffold --journal --stem 02_target_transform` to create the packaged design-note shell. - State that Question, Motivation, Method, and Risks are filled only after that command creates the shell, then stop for user approval. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Write model or experiment code before the design note is approved. - Recreate or fill the design-note shape from memory when the CLI command did not run this turn.",
       "files": [],
       "expectations": [
@@ -52,7 +52,7 @@
     {
       "id": 3,
       "title": "Site on rebuilds after implement",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Matching approved design note and experiment shell exist.\n- `policy.site` is true. `policy.notebooks` is false.\n- `export-ml-site` is installed.]\n\nThe baseline design is approved. Implement and test the model.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Matching approved design note and experiment shell exist.\n- `policy.site` is true. `policy.notebooks` is false.\n- `export-ml-site` is installed.]\n\nThe baseline design is approved. Implement and test the model.",
       "expected_output": "Behavioural response satisfying: - Dispatch `build-ml-pipeline` (`smoke run` inside build). - Name the post-smoke Evaluate / Modify / Stop question before evaluate. - Run `python -m skore_skills site build` after the unfitted `pipeline.html` snapshot (before Evaluate is fine) so Method shows the diagram, and again after the implement loop before git end-turn. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Fail the model turn if site build errors; name the error. - Run `notebook convert` while the notebooks gate is off.",
       "files": [],
       "expectations": [
@@ -73,12 +73,13 @@
     {
       "id": 4,
       "title": "Notebooks on converts the experiment script",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved design note and experiment shell exist with stem\n  `01_baseline`.\n- `policy.notebooks` is true. `policy.site` is true.\n- `export-ml-notebook` and `export-ml-site` are installed.\n- `jupytext`, `nbclient`, and `nbconvert` are installed.]\n\nThe baseline design is approved. Implement and test the model.",
-      "expected_output": "Behavioural response satisfying: - Dispatch `build-ml-pipeline` (`smoke run` inside build). - Run `python -m skore_skills notebook convert experiments/01_baseline.py --html` after the implement loop, before site build. - Run `python -m skore_skills site build` before git end-turn. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Fail the model turn if convert errors; name the error. - Run `cells run` as a substitute for convert.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Approved design note and experiment shell exist with stem\n  `01_baseline`.\n- `policy.notebooks` is true. `policy.site` is true.\n- `export-ml-notebook` and `export-ml-site` are installed.\n- `jupytext`, `nbclient`, `ipywidgets`, and `nbconvert` are installed.]\n\nThe baseline design is approved. Implement and test the model.",
+      "expected_output": "Behavioural response satisfying: - Dispatch `build-ml-pipeline` (`smoke run` inside build). - Run `python -m skore_skills notebook convert experiments/01_baseline.py --html` after the implement loop, before site build. - Also convert `audit/01_baseline.py --html` when that file exists. Do not add `<!-- results-embed: audit -->`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Fail the model turn if convert errors; name the error. - Run `cells run` as a substitute for convert.",
       "files": [],
       "expectations": [
         "Dispatch `build-ml-pipeline` (`smoke run` inside build).",
         "Run `python -m skore_skills notebook convert experiments/01_baseline.py --html` after the implement loop, before site build.",
+        "Also convert `audit/01_baseline.py --html` when that file exists. Do not add `<!-- results-embed: audit -->`.",
         "Run `python -m skore_skills site build` before git end-turn.",
         "Run `python -m skore_skills git end-turn --stage implement`.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
@@ -94,7 +95,7 @@
     {
       "id": 5,
       "title": "Smoke red or Stop does not start evaluate",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Approved design and experiment script exist.\n- `tests/smoke/test_01_baseline.py` fails pytest (row count).]\n\nThe baseline design is approved. Implement the model. Pytest\nsmoke is red on row count.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Approved design and experiment script exist.\n- `tests/smoke/test_01_baseline.py` fails pytest (row count).]\n\nThe baseline design is approved. Implement the model. Pytest\nsmoke is red on row count.",
       "expected_output": "Behavioural response satisfying: - Stay with `build-ml-pipeline` / `smoke run` to fix topology. - Name that JSON `stop` keeps the loop in build. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Load `evaluate-ml-pipeline` or write `skore.evaluate`. Describing the post-green sequence, and saying it is unreachable while smoke is red, is not starting it. Writing the call this turn is. - Load `audit-ml-pipeline`.",
       "files": [],
       "expectations": [
@@ -112,7 +113,7 @@
     {
       "id": 6,
       "title": "First-model menu without EDA or Backlog",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- Modeling decisions Status is `locked`. Baseline is\n  `seasonal_naive`. Baseline note is `last observed week`.\n- No experiment scripts or completed/running History rows.\n- `status.data_analysis` is `missing`.\n- Backlog is empty.\n- `python -m skore_skills model choices` returns `choices` whose\n  ids are `baseline` then `discuss`. The baseline reason quotes\n  `seasonal_naive` and `last observed week`.]\n\nLet us start modeling. What can we do?",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Scaffolded workspace.\n- Modeling decisions Status is `locked`. Baseline is\n  `seasonal_naive`. Baseline note is `last observed week`.\n- No experiment scripts or completed/running History rows.\n- `status.data_analysis` is `missing`.\n- Backlog is empty.\n- `python -m skore_skills model choices` returns `choices` whose\n  ids are `baseline` then `discuss`. The baseline reason quotes\n  `seasonal_naive` and `last observed week`.]\n\nLet us start modeling. What can we do?",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status` and `python -m skore_skills model choices`. - Ask one question with, in order: Build the locked baseline; Discuss the next step. The baseline description quotes `seasonal_naive` and `last observed week`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Offer an EDA-derived proposal. - Offer Pick from the Backlog.",
       "files": [],
       "expectations": [
@@ -130,7 +131,7 @@
     {
       "id": 7,
       "title": "Existing model with EDA and Backlog",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Modeling decisions Status is `locked`.\n- `experiments/01_baseline.py` exists.\n- `status.data_analysis` is `present`.\n- Backlog contains B1 and B2.\n- `python -m skore_skills model choices` returns `choices` whose\n  ids are `eda_proposal`, `backlog`, `discuss`.]\n\nStart the next modeling iteration.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Modeling decisions Status is `locked`.\n- `experiments/01_baseline.py` exists.\n- `status.data_analysis` is `present`.\n- Backlog contains B1 and B2.\n- `python -m skore_skills model choices` returns `choices` whose\n  ids are `eda_proposal`, `backlog`, `discuss`.]\n\nStart the next modeling iteration.",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills model choices`. - Ask one question with, in order: Propose a pipeline from the EDA; Pick from the Backlog; Discuss the next step. It must NOT: - Offer the locked baseline. - Offer a dummy predictor or a standard baseline. - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
       "files": [],
       "expectations": [
@@ -148,7 +149,7 @@
     {
       "id": 8,
       "title": "Skipped EDA is not an EDA proposal",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Modeling decisions Status is `locked`.\n- A prior experiment exists.\n- `status.data_analysis` is `skipped`.\n- Backlog is empty.\n- `python -m skore_skills model choices` returns one choice,\n  `discuss`.]\n\nWhat model should we build next?",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Modeling decisions Status is `locked`.\n- A prior experiment exists.\n- `status.data_analysis` is `skipped`.\n- Backlog is empty.\n- `python -m skore_skills model choices` returns one choice,\n  `discuss`.]\n\nWhat model should we build next?",
       "expected_output": "Behavioural response satisfying: - Offer only Discuss the next step. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Treat skipped EDA as recorded findings. - Offer an EDA proposal or Backlog.",
       "files": [],
       "expectations": [
@@ -164,7 +165,7 @@
     {
       "id": 9,
       "title": "Discussion becomes a confirmed proposal",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- The user selected Discuss the next step.]\n\nI want to talk through what to model next.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- The user selected Discuss the next step.]\n\nI want to talk through what to model next.",
       "expected_output": "Behavioural response satisfying: - Preview this route as LLM discussion over recorded project facts, with no model fit, smoke test, or CV before confirmation. - Discuss what to learn, why now, and what changes. - Once an idea is agreed, restate it and wait for an explicit yes before creating a design note. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Claim local model computation is running during the discussion. - Force a free-text / artifact entry menu.",
       "files": [],
       "expectations": [
@@ -184,7 +185,7 @@
     {
       "id": 10,
       "title": "Backlog selection consumes one real row",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- CLI returned B1 and B3; B2 was previously consumed.]\n\nPick from the backlog.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- CLI returned B1 and B3; B2 was previously consumed.]\n\nPick from the backlog.",
       "expected_output": "Behavioural response satisfying: - Load `manage-ml-backlog` and present B1 and B3 in that order. - Ask for one selection and preserve the unselected row. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Renumber B3 to B2. - Invent a new Backlog item.",
       "files": [],
       "expectations": [
@@ -201,7 +202,7 @@
     {
       "id": 11,
       "title": "Implement loop gates review before record-outcome",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `01_baseline` design note approved; smoke green.\n- The user chose Evaluate at the post-smoke gate.\n- `evaluate-ml-pipeline` and `review-ml-experiment` are installed.\n- `review consent` returns `ask`.\n- `policy.notebooks` and `policy.site` are both true.]\n\nEvaluate it.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `01_baseline` design note approved; smoke green.\n- The user chose Evaluate at the post-smoke gate.\n- `evaluate-ml-pipeline` and `review-ml-experiment` are installed.\n- `review consent` returns `ask`.\n- `policy.notebooks` and `policy.site` are both true.\n- `audit/01_baseline.py` exists after Review.]\n\nEvaluate it.",
       "expected_output": "Behavioural response satisfying: - Run evaluate, then `review consent`. - On `ask`, let `review-ml-experiment` preview the audit cost and ask Review / Skip / Stop. Do not load `audit-ml-pipeline` from this dispatcher. - After Review, load `manage-ml-backlog` in record-outcome mode with the returned digest, locator, and G-AUDIT-FINDING. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `cells run` from this dispatcher before Review. - Leave History `planned` in any journal excerpt you author.",
       "files": [],
       "expectations": [
@@ -209,12 +210,14 @@
         "On `ask`, let `review-ml-experiment` preview the audit cost and ask Review / Skip / Stop. Do not load `audit-ml-pipeline` from this dispatcher.",
         "After Review, load `manage-ml-backlog` in record-outcome mode with the returned digest, locator, and G-AUDIT-FINDING.",
         "Record before `notebook convert` and `site build`.",
+        "Convert `audit/01_baseline.py --html` here, after record-outcome and before site build, together with the experiment script.",
         "Write 2\u20136 sentences from the digest, name `report.html` and `html/01_baseline.html` instead of the design-note markdown, and include locator plus G-AUDIT-FINDING in the user-facing close.",
         "Run `python -m skore_skills git end-turn --stage implement` last.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Run `cells run` from this dispatcher before Review.",
         "The response does NOT: Leave History `planned` in any journal excerpt you author.",
-        "The response does NOT: Convert `audit/01_baseline.py` here \u2014 the audit skill did it.",
+        "The response does NOT: Skip `audit/01_baseline.py` because the audit skill was supposed to convert it.",
+        "The response does NOT: Add `<!-- results-embed: audit -->`.",
         "The response does NOT: Open idea triage inside record-outcome mode.",
         "The response does NOT: Write the journal files directly instead of dispatching."
       ],
@@ -225,7 +228,7 @@
     {
       "id": 12,
       "title": "Skip review still records the locator",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Smoke is green and evaluate returned\n  `[Open report](https://example.invalid/report/42) \u00b7 hub \u00b7 id: 42`.\n- The user answered Skip at the review gate.]\n\nFinish the successful baseline evaluation.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Smoke is green and evaluate returned\n  `[Open report](https://example.invalid/report/42) \u00b7 hub \u00b7 id: 42`.\n- The user answered Skip at the review gate.]\n\nFinish the successful baseline evaluation.",
       "expected_output": "Behavioural response satisfying: - Pass the exact locator to `manage-ml-backlog` record-outcome. - Pass G-AUDIT-FINDING `n/a \u2014 audit not run`. - Write 2\u20136 sentences of the result and link `journal/<stem>.md`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run the skore-check audit after Skip. - Write `journal/ideas/` files.",
       "files": [],
       "expectations": [
@@ -248,7 +251,7 @@
     {
       "id": 13,
       "title": "Planned design note uses one approval gate",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_target_transform.md` exists with State `planned`.\n- Question, Motivation, Method, and Risks are filled.\n- `design consent` returns `ask` with choices approve, modify, stop.]\n\nThe design note is written. Approve it and implement.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `journal/02_target_transform.md` exists with State `planned`.\n- Question, Motivation, Method, and Risks are filled.\n- `design consent` returns `ask` with choices approve, modify, stop.]\n\nThe design note is written. Approve it and implement.",
       "expected_output": "Behavioural response satisfying: - Ask one AskUserQuestion, in order: Approve / Modify / Stop. - On Approve, set State to `approved` and Approved by user on to a `YYYY-MM-DD` date, then require `design consent` `proceed` before code. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Also ask in chat whether the note looks right. - Treat \"Approve it and implement\" as approval before the gate.",
       "files": [],
       "expectations": [
@@ -266,7 +269,7 @@
     {
       "id": 14,
       "title": "Skipped EDA still site-builds before Evaluate",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Matching approved design note and experiment shell exist.\n- `status.data_analysis` is `skipped`. No\n  `data_analysis/data_analysis.md`.\n- `policy.site` is true. `export-ml-site` is installed.\n- `build-ml-pipeline` is installed.]\n\nThe baseline design is approved. Implement and test the model.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Matching approved design note and experiment shell exist.\n- `status.data_analysis` is `skipped`. No\n  `data_analysis/data_analysis.md`.\n- `policy.site` is true. `export-ml-site` is installed.\n- `build-ml-pipeline` is installed.]\n\nThe baseline design is approved. Implement and test the model.",
       "expected_output": "Behavioural response satisfying: - Dispatch `build-ml-pipeline`. - Require `python -m skore_skills site build` after the unfitted `pipeline.html` snapshot and before the Evaluate question, inside that build. - Keep the post-loop `site build` for the fitted diagram. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Defer the first `site build` until after `skore.evaluate`. - Skip the pre-Evaluate site build because EDA was skipped.",
       "files": [],
       "expectations": [
@@ -286,7 +289,7 @@
     {
       "id": 15,
       "title": "Design approval states the note's facts inline",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace; no prior experiment.\n- `journal/01_dummy.md` exists with State `planned`, question\n  \"Does the loading and fit/predict path work end to end?\",\n  Files touched `src/pkg/pipeline.py`, change \"first pipeline; a\n  DummyClassifier inside the skrub DataOps declaration\", and the\n  risk \"the dummy adds no predictive value; it only proves the\n  path\".\n- `python -m skore_skills design consent --stem 01_dummy` returns\n  `action` `ask` with those facts in its JSON `context`.]\n\nBuild a dummy predictor to check the pipeline runs.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Scaffolded workspace; no prior experiment.\n- `journal/01_dummy.md` exists with State `planned`, question\n  \"Does the loading and fit/predict path work end to end?\",\n  Files touched `src/pkg/pipeline.py`, change \"first pipeline; a\n  DummyClassifier inside the skrub DataOps declaration\", and the\n  risk \"the dummy adds no predictive value; it only proves the\n  path\".\n- `python -m skore_skills design consent --stem 01_dummy` returns\n  `action` `ask` with those facts in its JSON `context`.]\n\nBuild a dummy predictor to check the pipeline runs.",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills design consent --stem 01_dummy`. - State the design question, the planned change and files touched, and the recorded risk in the approval message itself. - Ask Approve / Modify / Stop and stop there. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Ask for approval by only pointing at `journal/01_dummy.md` without stating what the note says. - Write model, experiment, or pytest code before approval.",
       "files": [],
       "expectations": [
@@ -305,7 +308,7 @@
     {
       "id": 16,
       "title": "Unpopulated design note is not ready for approval",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `journal/02_target_transform.md` is the scaffolded shell: State\n  `planned`, every content section still a template comment.\n- `design consent --stem 02_target_transform` returns `ask` with\n  every `context` field empty.]\n\nThe note for 02_target_transform is created. Approve and build it.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `journal/02_target_transform.md` is the scaffolded shell: State\n  `planned`, every content section still a template comment.\n- `design consent --stem 02_target_transform` returns `ask` with\n  every `context` field empty.]\n\nThe note for 02_target_transform is created. Approve and build it.",
       "expected_output": "Behavioural response satisfying: - Say the note states no question, method change, or risk yet, so it is not ready for approval. - Offer to populate Question / Motivation / Method / Risks first. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Treat \"approve and build it\" as design approval. - Fill the note's sections from memory as if they were recorded.",
       "files": [],
       "expectations": [
@@ -324,7 +327,7 @@
     {
       "id": 17,
       "title": "Site on rebuilds before design approval",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace; no prior experiment.\n- `journal/01_dummy.md` was just populated (State `planned`) with\n  question, files touched, planned change, and a recorded risk.\n- `python -m skore_skills design consent --stem 01_dummy` returns\n  `action` `ask` with those facts in its JSON `context`.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nBuild a dummy predictor to check the pipeline runs.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Scaffolded workspace; no prior experiment.\n- `journal/01_dummy.md` was just populated (State `planned`) with\n  question, files touched, planned change, and a recorded risk.\n- `python -m skore_skills design consent --stem 01_dummy` returns\n  `action` `ask` with those facts in its JSON `context`.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nBuild a dummy predictor to check the pipeline runs.",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills site build` after the note is populated and before Approve / Modify / Stop. - Name `report.html` and `html/01_dummy.html`. - State the design question, planned change, and recorded risk inline, then ask Approve / Modify / Stop and stop there. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Write model, experiment, or pytest code before approval. - Run `notebook convert` or `git end-turn` on this preview rebuild.",
       "files": [],
       "expectations": [
@@ -343,7 +346,7 @@
     {
       "id": 18,
       "title": "Unlocked framing stops before modeling",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.modeling_decisions` is `draft`.\n- `frame-ml-problem` is installed.]\n\nLet us start modeling. What can we do?",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Scaffolded workspace.\n- `status.modeling_decisions` is `draft`.\n- `frame-ml-problem` is installed.]\n\nLet us start modeling. What can we do?",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills status`. - Load `frame-ml-problem` and stop. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `python -m skore_skills model choices`. - Write a design note or model code.",
       "files": [],
       "expectations": [
@@ -360,7 +363,7 @@
     {
       "id": 19,
       "title": "A null translation does not start model code",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Scaffolded workspace.\n- `status.modeling_decisions` is `locked`.\n- `python -m skore_skills frame show` returns `proceed` with\n  `translation` null.]\n\nThe modeling decisions are locked. Build the first model.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Scaffolded workspace.\n- `status.modeling_decisions` is `locked`.\n- `python -m skore_skills frame show` returns `proceed` with\n  `translation` null.]\n\nThe modeling decisions are locked. Build the first model.",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills frame show`. - Say the lock has no splitter translation and stop. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Offer model choices or dispatch `build-ml-pipeline`.",
       "files": [],
       "expectations": [
@@ -368,6 +371,23 @@
         "Say the lock has no splitter translation and stop.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Offer model choices or dispatch `build-ml-pipeline`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 20,
+      "title": "Pending setup loads project setup",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- No `src/` and no `journal/`.\n- `status.setup.pending` is `env`, `workspace`, `git`.\n- `status.setup.env` and `status.setup.workspace` are `missing`,\n  not `declined`.\n- `status.skills.setup-ml-project` is true.]\n\nBuild the first baseline model.",
+      "expected_output": "Behavioural response satisfying: - Load `setup-ml-project` and stop. - Do not write a design note or dispatch `build-ml-pipeline`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `python -m skore_skills model choices`. - Start model code.",
+      "files": [],
+      "expectations": [
+        "Load `setup-ml-project` and stop.",
+        "Do not write a design note or dispatch `build-ml-pipeline`.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Run `python -m skore_skills model choices`.",
+        "The response does NOT: Start model code."
       ],
       "tools": false,
       "sandbox": [],

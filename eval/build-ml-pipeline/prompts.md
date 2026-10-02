@@ -30,6 +30,7 @@ violated.
 > with a `build_pipeline()` function.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Tabular regression task, mixed-type DataFrame, no cross-row
   features (IID).
 - `skrub`, `scikit-learn`, `skore` are installed and importable.
@@ -66,6 +67,7 @@ violated.
 > DataOps pipeline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.9.0.
 - Cache exists at `scratch/api/skrub/0.9.0/tabular_pipeline.md`
   (you may treat its content as known).
@@ -96,6 +98,7 @@ violated.
 > we'll do `mark_as_X` on the result.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.9.0.
 - The user is in early baseline construction.
 - The skill's `references/` tree is on disk at the project root
@@ -145,6 +148,7 @@ violated.
 > Continue from here — add the encoder and the predictor.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.9.0.
 - `data` is already a loaded DataFrame.
 
@@ -177,6 +181,7 @@ violated.
 > category and replaces the column. Attach it with `.skb.apply_func`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.9.0.
 - An existing skrub DataOps graph with `mark_as_X` / `mark_as_y`
   in place.
@@ -187,9 +192,9 @@ violated.
   **leakage rule** (uses statistics learned from data → must be
   stateful) — target encoding learns category → mean from training
   y.
-- Propose a sklearn-compatible estimator (`BaseEstimator` +
-  `TransformerMixin` or an existing `TargetEncoder`) attached via
-  `.skb.apply`.
+- Propose a sklearn-compatible estimator (`TransformerMixin`,
+  then `BaseEstimator`, or an existing `TargetEncoder`) attached
+  via `.skb.apply`. The mixin is the first base.
 - Run `python -m skore_skills api get
   sklearn.preprocessing.TargetEncoder` (or equivalent) before
   writing its call.
@@ -199,6 +204,7 @@ violated.
 - Accept `apply_func(target_encode)` as written.
 - Propose the function with a "compute mean on training only via
   manual filtering" workaround.
+- Inherit `BaseEstimator` before `TransformerMixin`.
 
 ---
 
@@ -210,6 +216,7 @@ violated.
 > should I extend `pipeline.py` so that 01 still runs the same?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `src/<pkg>/pipeline.py` has `build_learner(data_dir_preview=None)`.
 - `experiments/01_baseline.py` uses `build_learner()` (no kwargs).
 - Calendar features = a stateless step appending a few columns.
@@ -241,6 +248,7 @@ violated.
 > rows per customer. Build the pipeline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.10.x.
 - IID-shaped features (no cross-row history).
 - `python -m skore_skills frame show` returns `proceed` with
@@ -269,6 +277,7 @@ violated.
 > Declare the baseline learner.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Design note approved.
 - `import skrub` raises `ModuleNotFoundError`.
 
@@ -291,6 +300,7 @@ violated.
 > the pipeline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Design note approved.
 - `research-ml-practice` is installed.
 - Scratch research lists a `measure` row (plot id uniqueness)
@@ -317,6 +327,7 @@ violated.
 > full-dataset CV.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved `journal/01_baseline.md`.
 - Experiment shell `experiments/01_baseline.py` exists after
   the declaration.
@@ -359,12 +370,14 @@ violated.
 > classification task.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The approved Method names a dummy predictor.
 - No prior model exists.
 
 **Must do:**
-- Use `DummyClassifier` as the predictor in the skrub DataOps
-  graph and name `api get` for its installed signature.
+- Declare that one `DummyClassifier` as the predictor in the
+  skrub DataOps graph and name `api get` for its installed
+  signature.
 - Continue to `smoke run` and the normal Evaluate
   (Recommended) / Modify / Stop gate.
 - State that this validates the operational path, not predictive
@@ -385,6 +398,7 @@ violated.
 > tabular regression problem.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The approved Method requests a quick traditional-ML baseline.
 
 **Must do:**
@@ -406,6 +420,7 @@ violated.
 > Implement the approved EDA-backed design.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The Method cites high cardinality and a temporal grouping
   finding from `data_analysis/data_analysis.md`.
 
@@ -431,6 +446,7 @@ violated.
 > install Pydot and Graphviz" instead of a figure.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Design note approved; `import skrub` succeeds.
 - Smoke is green.
 
@@ -453,6 +469,7 @@ violated.
 > `observed_at`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `python -m skore_skills frame show` returns `proceed` with
   `translation.scheme` `date_time`, `splitter` null, `n_splits` 4,
   `gap` 7, `gap_unit` `day`. Decisions horizon is `1 day`.
@@ -479,6 +496,7 @@ violated.
 > Use `mark_as_X(split_kwargs={"times": data["timestamp"]})`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `python -m skore_skills frame show` returns `proceed` with
   `translation.scheme` `date_time`.
 - The EDA names `timestamp` as the time column.
@@ -500,6 +518,7 @@ violated.
 > Put `groups` in `split_kwargs` but leave `cv` unset.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Group-aware splitting is approved.
 
 **Must do:**
@@ -521,6 +540,7 @@ violated.
 > Use `cv=5` together with grouped `split_kwargs`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Group-aware splitting is required.
 
 **Must do:**
@@ -542,6 +562,7 @@ violated.
 > Smoke is green on 01_baseline. What now?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `experiments/01_baseline.py` and `tests/smoke/test_01_baseline.py`
   exist; `smoke run --stem 01_baseline` returned `proceed`.
 - `evaluate consent --stem 01_baseline` returns `ask` with
@@ -569,6 +590,7 @@ violated.
 > The design is approved. Declare the learner. EDA was skipped.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved `journal/01_baseline.md`.
 - `status.data_analysis` is `skipped`. No
   `data_analysis/data_analysis.md`.
@@ -595,6 +617,7 @@ violated.
 > Declare the baseline learner.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved design note.
 - `status.modeling_decisions` is `missing`.
 - `frame-ml-problem` is installed.
@@ -609,13 +632,88 @@ violated.
 
 ---
 
-## CASE_22 — A shipped split is not joined into one table
+## CASE_22 — Locked F2 attaches with_scoring
+
+**User prompt:**
+> Write the baseline learner. The comparison metric is F2.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- `frame show` returned `proceed`. `translation.metric` is `F2`.
+  Binary classification, IID, `translation.splitter` `KFold`,
+  `n_splits` 5. No row-aligned metric kwargs.
+- No existing `src/<pkg>/pipeline.py`.
+
+**Must do:**
+- Attach `.skb.with_scoring(...)` on the prediction DataOp after
+  prediction and before `.skb.make_learner()`.
+- Tick the pre-flight box for the non-default score.
+- Keep `cv=KFold(n_splits=5)` on `mark_as_X`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Defer the F2 scorer to evaluate.
+- Call `report.metrics.add`.
+- Pass `scoring=` to `skore.evaluate`.
+- Skip `with_scoring` because F2 has no `sample_weight`.
+
+---
+
+## CASE_23 — Default MAE attaches no scorer
+
+**User prompt:**
+> Write the baseline learner. Compare on MAE.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- `frame show` returned `proceed`. `translation.metric` is `MAE`.
+  Tabular regression, IID, `KFold`, `n_splits` 5.
+- No existing `src/<pkg>/pipeline.py`.
+
+**Must do:**
+- Declare the graph and `cv=KFold(n_splits=5)` on `mark_as_X`.
+- Mark the non-default-score pre-flight box n/a.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Call `.skb.with_scoring`.
+- Register a scorer for MAE.
+
+---
+
+## CASE_24 — Custom predictor is mixin, then BaseEstimator
+
+**User prompt:**
+> The baseline predictor is a commune mean. Write
+> `CommuneMeanRegressor` with `fit` and `predict`.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- `frame show` returned `proceed`. Tabular regression.
+- No existing estimator class.
+
+**Must do:**
+- Declare `class CommuneMeanRegressor(RegressorMixin, BaseEstimator)`.
+- The mixin is the first base.
+- Implement `fit` and `predict`.
+- Attach with `.skb.apply(..., y=y)`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Declare `class CommuneMeanRegressor(BaseEstimator, RegressorMixin)`.
+- Subclass `BaseEstimator` alone.
+- Omit the mixin.
+
+---
+
+## CASE_25 — A shipped split is not joined into one table
 
 **User prompt:**
 > Declare the learner. Train and test already exist as separate
 > files.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved design note. `frame show` returns `proceed`.
 - `translation.splitter` is `prefit`, `translation.report` is
   `EstimatorReport`, and `n_splits` is null.

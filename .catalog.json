@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "348c3f1f1d3c22643cbab277228bd5cc4c3c64ed4d7cb050af8366c46ebaf495",
+  "catalog_hash": "011dbf5a530cbf2be6ba1d7f57e64f98af6e68347341032013aab6dbf945439e",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "6ef622f6027859eacb4a63f727dc9cf675cd24a16c8e638a4eb94342b3cf1851"
+      "hash": "e9a157d362f90d26cf14978b36c45bce28035af2c5f297828c79d3c86d53d656"
     },
     {
       "id": "frame-ml-problem",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "81562d1bd6255c4b4ad443ff2de302fb57057edff47658b9400f32731b5161c1"
+      "hash": "a9400b58eb26b18df0fbfb85077c31a0ee45be511d6b82113a950c4e58e97745"
     },
     {
       "id": "build-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "520d2fd80688e946bf5b7c05f5f8fd383dbeb6f7a54461798652420ae85a672a"
+      "hash": "306bce6428c7b222066673faee9d78479c136077b1285b29343f6dcd26064208"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "3a65382530d823bee25c5587654eead0d3c3b59028abc6dd6072e24d14f7a853"
+      "hash": "87952b1e8c1e89bdbaf36fbd6a4374a313aed2566ea748dee39ce882bd0c6301"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Structural pytest: prediction count must match the predict-grid row count.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "23053f711aebf2b2044433e5b7c237eaf63b2fda491d6256b84f9da9ce6297a8"
+      "hash": "b47255179cc863910859790e02cd795b3b67495fd31caee100c47dfe0d7ff58a"
     },
     {
       "id": "audit-ml-pipeline",
@@ -57,16 +57,16 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "284ebb7392ee5d425961d69e725a553d16c7a45d7971e2e9ca11e893192a4eed"
+      "hash": "29222f2372db98585bdedbbffdc46c791ef8c052bbd8d9f13c667f47eaf98abf"
     },
     {
       "id": "manage-ml-backlog",
       "path": "skills/manage-ml-backlog",
       "title": "Manage ML Backlog",
-      "summary": "Record experiment outcomes and triage idea files into backlog rows, keeping each file with a triage flag.",
+      "summary": "Record experiment outcomes and triage idea files. A promoted idea moves from the Ideas table into a Backlog row.",
       "category": "action",
       "subcategory": null,
-      "hash": "7af8f788b6c747779a18eb871a3d5494c3b97e60bbd05a41a59146461051a30f"
+      "hash": "45fd640d14a7f18aaac928092014228e7274a127ca6360d89eed7b01cc6ab899"
     },
     {
       "id": "organize-ml-workspace",
@@ -93,7 +93,7 @@
       "summary": "Session owner: list installed entry skills and ask which to run.",
       "category": "meta",
       "subcategory": null,
-      "hash": "2c61c5476668886e90b059585029b49d5c6c3f4930a9a527c9e6148b8518f338"
+      "hash": "29d768455f74f74bb5d98934e073528b720503fff9e5c9e585e8568b328e634e"
     },
     {
       "id": "review-ml-choices",
@@ -108,28 +108,28 @@
       "id": "review-ml-experiment",
       "path": "skills/review-ml-experiment",
       "title": "Review ML Experiment",
-      "summary": "Gate the skore-check audit, then write one idea file per candidate.",
+      "summary": "Gate the skore-check audit, then write one idea file and one Ideas row per candidate.",
       "category": "meta",
       "subcategory": null,
-      "hash": "521e69eee58bec20a96f8888b7b9ba711d5250429adb01639647720e6e88990e"
+      "hash": "cab1560b6d30c42407e5f6a8d4a8154a9759433d33727245b70e3e208f2a8adc"
     },
     {
       "id": "shape-user-idea",
       "path": "skills/shape-user-idea",
       "title": "Shape User Idea",
-      "summary": "Shape a user idea or a named artifact into one idea file after they confirm.",
+      "summary": "Shape a user idea or a named artifact into one idea file and one Ideas row after they confirm.",
       "category": "meta",
       "subcategory": null,
-      "hash": "53a4189adebaae8d4a070d20152adcb92bb24c8d3d5cdd88699161138cbd6114"
+      "hash": "15be4222f9b061865632b721a3a15a55862b215092196cf5d1f1416c46aebc2c"
     },
     {
       "id": "search-ml-literature",
       "path": "skills/search-ml-literature",
       "title": "Search ML Literature",
-      "summary": "Search scientific and technical sources and write one idea file for the direction the user confirms.",
+      "summary": "Search scientific and technical sources and write one idea file and one Ideas row for the direction the user confirms.",
       "category": "meta",
       "subcategory": null,
-      "hash": "f13c281f07d91f50d98d3a6ee29e40926b31651b4953089e117573252ccba14c"
+      "hash": "a863710efe79d1a6fefe2f5c18fce43207fb09d88e9de5b8e803536d4776c89e"
     },
     {
       "id": "setup-ml-project",
@@ -138,7 +138,7 @@
       "summary": "Ask setup choices up front, then coordinate workspace, environment, and git.",
       "category": "meta",
       "subcategory": null,
-      "hash": "7609c4771cdf4c51afd80028a692305ed07d140e01ca1d6836712b12081b370e"
+      "hash": "5a4dc59d33409aff717fac9d032904ee007e6d4ba13b3597eca1d76acdad147e"
     },
     {
       "id": "setup-git",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "8506228b0f3663f910417ff279161bff97d68bd015d5b22c2949bee81efe8506"
+      "hash": "30a527792af5376820ef4d3906939baa604ea99c4bac523cb9d836f87b7213e0"
     },
     {
       "id": "choose-python-library",
@@ -201,7 +201,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
-      "hash": "4c2fa4736e478b3a7d80a8df63d4d85d51da0f0ec1eec5dc13ed2cd77dfd01f7"
+      "hash": "d232cba2d5e533841a87d3891af927e7cad69cdfd4a851c2f58538cb7847cba1"
     },
     {
       "id": "setup-workspace",
@@ -210,7 +210,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "89ccd88145091d67ef2b3313e65a782bcb2d81e1c251cce7d93f26f663f260f5"
+      "hash": "ab1de1a8aa73abc9cb30473054814f018712bfb1e37bfccc9922f29cd7c80fa0"
     },
     {
       "id": "setup-python-env",
@@ -228,7 +228,7 @@
       "summary": "Convert a jupytext percent file into an executed notebook.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "3fefd56f1f4955be48b119bdd23e9c7d23d08a189b2b8043f883f3fb78d6d5d1"
+      "hash": "9ca08d9c2910750e04ea245cd738bdfa629e86470b65c365153c0779445d558a"
     },
     {
       "id": "export-ml-site",
@@ -237,7 +237,7 @@
       "summary": "Package workspace markdown and existing notebook HTML into an offline MkDocs site.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "6917ce0dfe5903ec3a5e3cb11dee86eed73f06d8aab6bc20a91e15dba1c63e95"
+      "hash": "151a4371d90ef0a976d52adfbf009889dc7d2318b1f7d286df3b958a2ce3cf22"
     },
     {
       "id": "export-ml-project",

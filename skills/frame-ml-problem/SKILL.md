@@ -35,8 +35,15 @@ wrapper CLI.
 
 ## Procedure
 
-1. Run `python -m skore_skills status`. If `has_journal` is false,
-   send the user to setup and stop. If `data_analysis` is
+1. Run `python -m skore_skills status`. If `status.setup.pending`
+   is non-empty and `status.skills.setup-ml-project` is true,
+   load `setup-ml-project` and stop. Do not start this skill.
+   When it returns, continue. Do not load it again on this turn.
+   If that skill is not installed, name the pending pieces in
+   one line and stop. Do not invent `git init`, scaffold, or
+   `env init`. If `status.setup.env` or `status.setup.workspace`
+   is `declined`, stop in one line. A declined `git` or
+   `editable` is not asked again; continue. If `data_analysis` is
    `missing` and `explore-ml-data` is installed, **AskUserQuestion**:
    explore first (default) or continue from facts the user stated.
    Explore loads `explore-ml-data` and stops. Do not invent dataset

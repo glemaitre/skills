@@ -42,9 +42,15 @@ criteria" section. Keep `## Notebooks` with Evaluation then Audit.
 
 ## Entry routing — deterministic
 
-1. Run `python -m skore_skills status`. If `has_src` and
-   `has_journal` are both false, STOP: explain and send the user
-   to `setup-ml-project` / triage. Do not require `git`.
+1. Run `python -m skore_skills status`. If `status.setup.pending`
+   is non-empty and `status.skills.setup-ml-project` is true,
+   load `setup-ml-project` and stop. Do not start this skill.
+   When it returns, continue. Do not load it again on this turn.
+   If that skill is not installed, name the pending pieces in
+   one line and stop. Do not invent `git init`, scaffold, or
+   `env init`. If `status.setup.env` or `status.setup.workspace`
+   is `declined`, stop in one line. A declined `git` or
+   `editable` is not asked again and does not block modeling.
 2. **Framing is mandatory.** If `status.modeling_decisions` is not
    `locked`, load `frame-ml-problem` only if
    `status.skills.frame-ml-problem` is true and stop. Do not invent
@@ -52,7 +58,8 @@ criteria" section. Keep `## Notebooks` with Evaluation then Audit.
    a pipeline. Missing skill → stop in one line. This includes an
    approved-stem resume: do not build until the table is locked.
    When the table is `locked`, run
-   `python -m skore_skills frame show`. A `proceed` whose
+   `python -m skore_skills frame show`. Anything other than
+   `proceed` loads `frame-ml-problem` and stops. A `proceed` whose
    `translation` is null has no splitter translation: say so and
    stop. Do not write model code. Do not present a choice list:
    no dummy predictor, standard baseline, EDA-driven proposal,
@@ -117,14 +124,14 @@ is approved only by Design approval below. No branch writes model
 code before that gate is `proceed`. Use the next available numeric
 stem; never overwrite an existing note.
 
-- **Locked baseline (`baseline`).** The comparison model is the
-  one the journal already locked. A `dummy` token is a
+- **Locked baseline (`baseline`).** The note names the one
+  comparison model the journal already locked. A `dummy` token is a
   `DummyClassifier` or `DummyRegressor` inside the normal skrub
   DataOps declaration: it proves loading, fit/predict, and pytest
   smoke, and it is not expected to add predictive value. Any
   other token (`logistic`, `seasonal_naive`, `group_mean`,
-  `production`) is that comparison model, named in the note. Do
-  not upgrade it to another estimator. Confirm the proposal,
+  `production`) is that one comparison model. Do not upgrade it
+  to another estimator. Confirm the proposal,
   write the note, then Design approval, before build. Keep the
   normal post-smoke Evaluate (Recommended) / Modify / Stop gate.
 - **EDA proposal (`eda_proposal`).** Read
@@ -266,8 +273,9 @@ symbols are written, children use
 
 ## Stop conditions
 
-- Unscaffolded workspace (`has_src` and `has_journal` both
-  false): setup/triage; do not start build.
+- Pending setup (`status.setup.pending` non-empty): load
+  `setup-ml-project` and do not start build. A declined `git`
+  is not asked again. A declined env or workspace stops.
 - Generic model landing: do not hand-author the menu; run
   `python -m skore_skills model choices`.
 - If `journal/NN_<short>.md` is missing, this turn only names
@@ -308,9 +316,15 @@ to triage.
 If `policy.notebooks` is true and `export-ml-notebook` is
 installed, run
 `python -m skore_skills notebook convert experiments/<stem>.py`
-only when the experiment script already exists, with `--html`
-when `policy.site` is also true. Convert re-executes the
-script; say so when it is slow. Missing jupytext / nbclient /
+only when the experiment script already exists, and the same
+command on `audit/<stem>.py` when that file exists, with
+`--html` when `policy.site` is also true. `audit-ml-pipeline`
+does not convert on this path. Site build embeds
+`audit/<stem>.nb.html` under `## Notebooks`; do not add
+`<!-- results-embed: audit -->`. Convert re-executes the
+script; say so when it is slow. If convert fails because
+`ipywidgets` is missing, load `add-python-package` for it
+(agent) and convert again. Missing jupytext / nbclient /
 nbconvert → one-line skip naming `add-python-package`; do not
 fail the turn.
 
@@ -340,10 +354,10 @@ locator/finding alone.
    among tokens, then G-AUDIT-FINDING (`n/a — audit not run`
    when skipped). Index strings, not the narrative.
 
-Then the same convert/site rules apply. `audit-ml-pipeline`
-converts `audit/<stem>.py` itself; do not convert it again here.
-The site appends that viewer to the experiment design note's
-`## Notebooks` section after evaluation.
+Then the same convert/site rules apply. Convert
+`audit/<stem>.py` here when the file exists; the audit skill
+did not. The site appends that viewer to the experiment design
+note's `## Notebooks` section after evaluation.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` so the fitted Method pipeline

@@ -12,6 +12,7 @@ and `frame show` already returned `proceed` with a non-null
 > The baseline design is approved. Implement and test the model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Matching approved design note and experiment shell exist.
 - Workspace is scaffolded (`has_src` and `has_journal` true).
 
@@ -59,6 +60,7 @@ and `frame show` already returned `proceed` with a non-null
 > Implement experiment 02 for the selected target transform.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The Backlog choice is confirmed with stem `02_target_transform`.
 - `journal/02_target_transform.md` does not exist.
 
@@ -83,6 +85,7 @@ and `frame show` already returned `proceed` with a non-null
 > The baseline design is approved. Implement and test the model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Matching approved design note and experiment shell exist.
 - `policy.site` is true. `policy.notebooks` is false.
 - `export-ml-site` is installed.
@@ -112,17 +115,20 @@ and `frame show` already returned `proceed` with a non-null
 > The baseline design is approved. Implement and test the model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved design note and experiment shell exist with stem
   `01_baseline`.
 - `policy.notebooks` is true. `policy.site` is true.
 - `export-ml-notebook` and `export-ml-site` are installed.
-- `jupytext`, `nbclient`, and `nbconvert` are installed.
+- `jupytext`, `nbclient`, `ipywidgets`, and `nbconvert` are installed.
 
 **Must do:**
 - Dispatch `build-ml-pipeline` (`smoke run` inside build).
 - Run `python -m skore_skills notebook convert
   experiments/01_baseline.py --html` after the implement loop,
   before site build.
+- Also convert `audit/01_baseline.py --html` when that file exists.
+  Do not add `<!-- results-embed: audit -->`.
 - Run `python -m skore_skills site build` before git end-turn.
 - Run `python -m skore_skills git end-turn --stage implement`.
 
@@ -142,6 +148,7 @@ and `frame show` already returned `proceed` with a non-null
 > smoke is red on row count.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved design and experiment script exist.
 - `tests/smoke/test_01_baseline.py` fails pytest (row count).
 
@@ -166,6 +173,7 @@ and `frame show` already returned `proceed` with a non-null
 > Let us start modeling. What can we do?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - Modeling decisions Status is `locked`. Baseline is
   `seasonal_naive`. Baseline note is `last observed week`.
@@ -197,6 +205,7 @@ and `frame show` already returned `proceed` with a non-null
 > Start the next modeling iteration.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Modeling decisions Status is `locked`.
 - `experiments/01_baseline.py` exists.
 - `status.data_analysis` is `present`.
@@ -223,6 +232,7 @@ and `frame show` already returned `proceed` with a non-null
 > What model should we build next?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Modeling decisions Status is `locked`.
 - A prior experiment exists.
 - `status.data_analysis` is `skipped`.
@@ -246,6 +256,7 @@ and `frame show` already returned `proceed` with a non-null
 > I want to talk through what to model next.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The user selected Discuss the next step.
 
 **Must do:**
@@ -270,6 +281,7 @@ and `frame show` already returned `proceed` with a non-null
 > Pick from the backlog.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - CLI returned B1 and B3; B2 was previously consumed.
 
 **Must do:**
@@ -289,11 +301,13 @@ and `frame show` already returned `proceed` with a non-null
 > Evaluate it.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `01_baseline` design note approved; smoke green.
 - The user chose Evaluate at the post-smoke gate.
 - `evaluate-ml-pipeline` and `review-ml-experiment` are installed.
 - `review consent` returns `ask`.
 - `policy.notebooks` and `policy.site` are both true.
+- `audit/01_baseline.py` exists after Review.
 
 **Must do:**
 - Run evaluate, then `review consent`.
@@ -303,6 +317,9 @@ and `frame show` already returned `proceed` with a non-null
 - After Review, load `manage-ml-backlog` in record-outcome mode
   with the returned digest, locator, and G-AUDIT-FINDING.
 - Record before `notebook convert` and `site build`.
+- Convert `audit/01_baseline.py --html` here, after
+  record-outcome and before site build, together with the
+  experiment script.
 - Write 2–6 sentences from the digest, name `report.html` and
   `html/01_baseline.html` instead of the design-note markdown,
   and include locator plus G-AUDIT-FINDING in the user-facing
@@ -314,7 +331,9 @@ and `frame show` already returned `proceed` with a non-null
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `cells run` from this dispatcher before Review.
 - Leave History `planned` in any journal excerpt you author.
-- Convert `audit/01_baseline.py` here — the audit skill did it.
+- Skip `audit/01_baseline.py` because the audit skill was supposed
+  to convert it.
+- Add `<!-- results-embed: audit -->`.
 - Open idea triage inside record-outcome mode.
 - Write the journal files directly instead of dispatching.
 
@@ -326,6 +345,7 @@ and `frame show` already returned `proceed` with a non-null
 > Finish the successful baseline evaluation.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Smoke is green and evaluate returned
   `[Open report](https://example.invalid/report/42) · hub · id: 42`.
 - The user answered Skip at the review gate.
@@ -354,6 +374,7 @@ and `frame show` already returned `proceed` with a non-null
 > The design note is written. Approve it and implement.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/02_target_transform.md` exists with State `planned`.
 - Question, Motivation, Method, and Risks are filled.
 - `design consent` returns `ask` with choices approve, modify, stop.
@@ -378,6 +399,7 @@ and `frame show` already returned `proceed` with a non-null
 > The baseline design is approved. Implement and test the model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Matching approved design note and experiment shell exist.
 - `status.data_analysis` is `skipped`. No
   `data_analysis/data_analysis.md`.
@@ -407,6 +429,7 @@ and `frame show` already returned `proceed` with a non-null
 > Build a dummy predictor to check the pipeline runs.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace; no prior experiment.
 - `journal/01_dummy.md` exists with State `planned`, question
   "Does the loading and fit/predict path work end to end?",
@@ -438,6 +461,7 @@ and `frame show` already returned `proceed` with a non-null
 > The note for 02_target_transform is created. Approve and build it.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/02_target_transform.md` is the scaffolded shell: State
   `planned`, every content section still a template comment.
 - `design consent --stem 02_target_transform` returns `ask` with
@@ -463,6 +487,7 @@ and `frame show` already returned `proceed` with a non-null
 > Build a dummy predictor to check the pipeline runs.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace; no prior experiment.
 - `journal/01_dummy.md` was just populated (State `planned`) with
   question, files touched, planned change, and a recorded risk.
@@ -492,6 +517,7 @@ and `frame show` already returned `proceed` with a non-null
 > Let us start modeling. What can we do?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.modeling_decisions` is `draft`.
 - `frame-ml-problem` is installed.
@@ -513,6 +539,7 @@ and `frame show` already returned `proceed` with a non-null
 > The modeling decisions are locked. Build the first model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.modeling_decisions` is `locked`.
 - `python -m skore_skills frame show` returns `proceed` with
@@ -525,3 +552,26 @@ and `frame show` already returned `proceed` with a non-null
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Offer model choices or dispatch `build-ml-pipeline`.
+
+---
+
+## CASE_20 — Pending setup loads project setup
+
+**User prompt:**
+> Build the first baseline model.
+
+**Assumed workspace state:**
+- No `src/` and no `journal/`.
+- `status.setup.pending` is `env`, `workspace`, `git`.
+- `status.setup.env` and `status.setup.workspace` are `missing`,
+  not `declined`.
+- `status.skills.setup-ml-project` is true.
+
+**Must do:**
+- Load `setup-ml-project` and stop.
+- Do not write a design note or dispatch `build-ml-pipeline`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Run `python -m skore_skills model choices`.
+- Start model code.

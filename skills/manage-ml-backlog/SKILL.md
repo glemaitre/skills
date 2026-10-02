@@ -2,12 +2,13 @@
 name: manage-ml-backlog
 description: >
   Canonical backlog loop step. Record an experiment outcome in
-  History and triage idea files into Backlog rows. Keep each
-  idea file and mark it promoted, discarded, or aside. Also
-  supports the model-entry selection mode: show real B<N> rows
-  supplied by the deterministic CLI and consume one into a
-  proposal. Trigger after audit, when a run finishes, when the
-  user asks what to try next or to triage idea files, or when model-ml-pipeline routes its
+  History and triage idea files. Summarize open, discarded, and
+  aside ideas in the JOURNAL Ideas table. Move a row into Backlog
+  when it is promoted, and keep the idea file. Also supports the
+  model-entry selection mode: show real B<N> rows supplied by the
+  deterministic CLI and consume one into a proposal. Trigger after
+  audit, when a run finishes, when the user asks what to try next
+  or to triage idea files, or when model-ml-pipeline routes its
   Backlog choice here. This is cadence, not a methodology owner.
 ---
 
@@ -27,11 +28,13 @@ replies use the same data-science language — not skill ids, `G-*`
 names, or the wrapper CLI. `<!-- results-embed: … -->` is a site
 marker. Authoring hints stay in this skill. `style` is ruff only.
 
-The CLI writes JOURNAL with four sections in order: Status, Data
-understanding, History, Backlog. History and Backlog start as
-header-only tables. Column contracts stay here (Stem, Intent,
-Status, Headline result, Report, Design note; `#`, Item, Source).
-Do not put those contracts back into HTML comments in the file.
+The CLI writes JOURNAL with sections in order: Status, Data
+understanding, Modeling decisions, History, Ideas, Backlog.
+History, Ideas, and Backlog start as header-only tables. Column
+contracts stay here (Stem, Intent, Status, Headline result,
+Report, Design note; Question, Status, Experiment, Source; `#`,
+Item, Source). Do not put those contracts back into HTML comments
+in the file.
 
 ## Model-entry selection mode
 
@@ -83,10 +86,11 @@ Run Procedure steps 1-3 and nothing else:
    separate Status lines. Also refresh the `journal/JOURNAL.md`
    Status rows `Last experiment` and `Last result`. Insert or replace `## Results`
    between Status and Notebooks from digest text, not HTML.
+   `### Metrics` is a heading only.
 
-Then return to the caller. Do not read `journal/ideas/` and do
-not open the idea-triage menu — the caller did not ask what to
-try next.
+Then return to the caller. Do not read `journal/ideas/`, do not
+edit the Ideas table, and do not open the idea-triage menu — the
+caller did not ask what to try next.
 
 Do not dispatch `audit-ml-pipeline` in this mode; the digest is
 already in hand and dispatching would bounce back here. Do not run
@@ -113,13 +117,16 @@ locator.
    `n/a — audit digest unavailable`.
 2. Read `journal/JOURNAL.md` History and Backlog. If the index is
    missing, run `python -m skore_skills scaffold --journal`. Do
-   not write or paste the file. The CLI writes four sections:
-   Status, Data understanding, History, and Backlog. If that
-   command cannot run this turn, name it and stop. After the file
-   exists, edit the existing History and Backlog tables (columns:
-   Stem, Intent, Status, Headline result, Report, Design note; and
-   #, Item, Source). A planned History row uses `n/a` in Report.
-   Stable `B<N>` indices. Do not renumber on removal.
+   not write or paste the file. The CLI writes sections in order:
+   Status, Data understanding, Modeling decisions, History, Ideas,
+   and Backlog. If that command cannot run this turn, name it and
+   stop. After the file exists, edit the existing History and
+   Backlog tables (columns: Stem, Intent, Status, Headline result,
+   Report, Design note; and #, Item, Source). Ideas columns are
+   Question, Status, Experiment, Source; triage owns that table.
+   A planned History row uses `n/a` in Report. Stable `B<N>`
+   indices. Do not renumber on removal. Record-outcome does not
+   edit Ideas.
 3. If recording a run: copy the headline metric from the audit
    digest or the user's value. Do not invent numbers. With no
    digest and no user headline, skip the headline in one line and
@@ -146,39 +153,56 @@ locator.
    `## Metrics summary` as text. With no audit this turn, fall back
    to `scratch/results/<stem>/report.txt`, which evaluate writes.
    Write `### Report overview` from the report text, then
-   `### Checks` then `### Metrics` when those sections exist.
+   `### Checks` when that section exists. `### Metrics` is a heading
+   only when `## Metrics summary` exists: do not transcribe the
+   metric table or its values. The site embeds
+   `scratch/results/<stem>/metrics.html` under that heading. History
+   and Last result still get the single headline metric.
    Evaluation-only (audit skipped): Report overview only — do not
    invent Checks or Metrics subsections. After Metrics, add one
    `###` subsection per extra Display cell the audit appended, using
    a human title and a `<!-- results-embed: <slug> -->` comment with
    the accessor name as `<slug>` so site build can inject the
-   viewer. Each subsection is 2–4 sentences of context from that
-   cell's output; do not copy G-AUDIT-FINDING, do not parse
-   `*.html`, and do not paste iframes (site build injects those). If
-   no subsection has a source, skip the Results section.
+   viewer. Report overview, Checks, and each extra subsection are
+   2–4 sentences from that cell's output. Do not copy
+   G-AUDIT-FINDING, do not parse `*.html`, and do not paste iframes
+   (site build injects those). Do not add
+   `<!-- results-embed: audit -->`. The audit notebook viewer is
+   `audit/<stem>.nb.html`, which site build places under
+   `## Notebooks`. If no subsection has a source, skip the Results
+   section.
 4. Idea triage, separate from record-outcome. Read
-   `journal/ideas/*.md`. A file's `Triage` line is `open`,
-   `promoted`, `discarded`, or `aside`. A missing line is
-   `open`. An `open` file whose Source is already a Backlog
-   row is set to `promoted` without asking, and no duplicate
-   row is appended. Ask the other `open` files: promote /
-   discard / set aside. Write that value on the `Triage`
-   line and keep the file. Promote appends a stable `B<N>`
-   row (Item from Question, Source copied verbatim) and sets
-   `promoted`. Discard sets `discarded` and adds no row. Set
-   aside sets `aside` and adds no row.
-   `promoted`, `discarded`, and `aside` leave the default
-   queue; a later pass does not ask about them. Do not
-   create a design note here. Do not delete an idea file.
-   Changing `Triage` does not remove or renumber a Backlog
-   row. An empty folder is a one-line skip: there are no
-   idea files to triage, and it does not fabricate `B1`.
-   When no file is `open` and tagged files remain, say in
-   one line how many are promoted, discarded, and set aside,
-   and offer to revisit. Do not retag until the user picks a
-   file. On revisit, the same three choices apply. Promoting
-   then appends `B<N>` only when its Source is not already a
-   row. The only other follow-up is offering to shape an
+   `journal/ideas/*.md` and the Ideas table. If `## Ideas` is
+   missing, insert that header-only table between History and
+   Backlog. Do not rewrite the other sections. A file's
+   `Triage` line is `open`, `promoted`, `discarded`, or
+   `aside`. A missing line is `open`. An `open` file whose
+   Question and Source already match one Backlog row is set to
+   `promoted` without asking, its Ideas row is removed, and no
+   duplicate row is appended. Match both fields so two `user`
+   ideas do not collapse. An `open` file with no Ideas row gets
+   one: Question as plain text, Status `open`, Experiment from
+   the file, Source copied verbatim. Ask the other `open`
+   files: promote / discard / set aside. Write that value on
+   the `Triage` line and keep the file. Promote removes that
+   Ideas row and appends a stable `B<N>` row (Item from
+   Question, Source copied verbatim) and sets `promoted`.
+   Discard sets `discarded` on the file and the Ideas row and
+   adds no Backlog row. Set aside sets `aside` on the file and
+   the Ideas row and adds no Backlog row. A promoted idea is
+   absent from Ideas. `promoted`, `discarded`, and `aside`
+   leave the default queue; a later pass does not ask about
+   them. Do not create a design note here. Do not delete an
+   idea file. Changing `Triage` does not remove or renumber a
+   Backlog row. An empty folder is a one-line skip: there are
+   no idea files to triage, and it does not fabricate `B1`.
+   When no file is `open` and tagged files remain, say in one
+   line how many are promoted, discarded, and set aside, and
+   offer to revisit. Do not retag until the user picks a file.
+   On revisit, the same three choices apply. Promoting then
+   appends `B<N>` only when that Question and Source are not
+   already a row, and removes the Ideas row. The only other
+   follow-up is offering to shape an
    idea or search the literature when those skills are
    installed. Do not load either skill, and do not start
    a search or a shaping menu, until the user picks one. Missing
@@ -203,12 +227,14 @@ locator.
 - Do not derive, shorten, or merge G-AUDIT-FINDING with the
   headline metric. Copy each into its owned field.
 - Do not parse `scratch/results/<stem>/*.html` when writing
-  `## Results`. Summarize from the digest, or from `report.txt` on
-  the evaluation-only path.
+  `## Results`. Summarize Report overview and Checks from the
+  digest, or from `report.txt` on the evaluation-only path.
+  `### Metrics` is a heading only.
 - Do not paste a `JOURNAL.md` body or recreate the index from
   memory.
 - Do not mark `done` while smoke is red.
-- Do not delete an idea file. Triage writes its `Triage` line.
+- Do not delete an idea file. Triage writes its `Triage` line
+  and moves or updates its Ideas row.
 - Design approval is owned by `model-ml-pipeline`; this skill only
   returns a confirmed proposal or selected Backlog row.
 

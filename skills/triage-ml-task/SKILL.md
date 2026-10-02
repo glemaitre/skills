@@ -28,14 +28,31 @@ context.
 ## Procedure
 
 1. Run `python -m skore_skills status`. Read `skills`, `data_analysis`,
-   `loop_stage`, and the filesystem snapshot. If `.skore` is
+   `loop_stage`, `setup.pending`, and the filesystem snapshot. If `.skore` is
    missing, that is expected. Do not treat a missing file as an
    empty project when `src/` or `journal/` exist.
-2. **Certain request** — load that skill. Tell the user the work
+2. **Certain request** — load that skill, after the setup gate
+   below. Tell the user the work
    you are starting, not the catalog id. Do not list the catalog.
    `status.skills` is a per-id dict. Load the mapped skill only if
    `status.skills.<id>` is true; else one-line skip and do not
    invent that skill's steps:
+
+   **Setup gate for a lifecycle skill.** Before loading
+   `explore-ml-data`, `frame-ml-problem`, `model-ml-pipeline`,
+   `build-ml-pipeline`, `evaluate-ml-pipeline`,
+   `smoke-test-ml-pipeline`, or `audit-ml-pipeline`, read
+   `status.setup.pending`. If it is non-empty and
+   `status.skills.setup-ml-project` is true, load
+   `setup-ml-project` and stop. Tell the user the requested work
+   waits on those pieces. Do not show the entry menu. After setup
+   returns, load the certain lifecycle skill. Do not load setup
+   again on this turn. If `setup.env` or `setup.workspace` is
+   `declined`, stop in one line. A declined `git` or `editable`
+   does not block. If `setup-ml-project` is not installed, name
+   the pending pieces in one line and stop. Do not invent
+   `git init`, scaffold, or `env init`. Uncertain sessions skip
+   this gate.
 
    | User intent | Skill |
    |---|---|
@@ -76,8 +93,10 @@ context.
    `manage-ml-backlog` is installed loads that skill and stops.
    Do not ask the user to choose explore, build, review, or export.
 
-   Certain EDA: run `python -m skore_skills status`, load
-   `explore-ml-data`, stop. Do not inventory `data/`, list
+   Certain EDA: run `python -m skore_skills status`. If
+   `status.setup.pending` is non-empty, load `setup-ml-project`
+   (setup gate above) and stop. Otherwise load
+   `explore-ml-data` and stop. Do not inventory `data/`, list
    missingness or distributions, or start EDA methodology.
 
    Certain generic export: run `python -m skore_skills status`,
@@ -134,8 +153,9 @@ context.
 ## Stop conditions
 
 - Do not design experiments, write pipelines, or run exploratory
-  data analysis yourself. Certain EDA is load `explore-ml-data`
-  only — no data inventory and no EDA checklist.
+  data analysis yourself. Certain EDA with `setup.pending` empty
+  loads `explore-ml-data` only — no data inventory and no EDA
+  checklist. Pending setup loads `setup-ml-project` first.
 - Do not load every skill.
 - Do not invent workspace facts when status is unavailable.
 - Do not treat a missing `.skore` as an empty project when `src/`

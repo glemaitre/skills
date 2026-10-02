@@ -7,12 +7,14 @@ description: >
   picks a library, or for editable install of src/<pkg>/.
 
   SKIP choosing between competing libraries (choose-python-library
-  owns that). SKIP bootstrapping a missing manager
-  (setup-python-env).
+  owns that). SKIP bootstrapping a missing manager directly
+  (setup-python-env). When env.managed is null, load
+  setup-ml-project if it is installed.
 
   HOW TO USE: read status.policy.env.managed, env detect, and
   env route. Classify this turn first (editable | add-skore |
-  named package). If managed, env add --execute (or --editable).
+  named package). If managed is null, load setup-ml-project and
+  stop. If managed, env add --execute (or --editable).
   If unmanaged, ask; default is the user handles it — do not wait.
   When setup-ml-project already chose user-managed this turn,
   name the package and the manager, then return. Do not ask and
@@ -43,7 +45,7 @@ after listing the boxes.
 
 ```
 - [ ] status + env detect
-- [ ] env.managed: null → stop | false and setup already chose unmanaged → name package and manager, return | false → ask, no --execute | true → continue
+- [ ] env.managed: null and setup-ml-project installed → load it and stop | null → say unresolved and stop | false and setup already chose unmanaged → name package and manager, return | false → ask, no --execute | true → continue
 - [ ] classify: editable | add-skore | env route then env add
 - [ ] skrub → env graphviz (execute conda/`dot -c` when allowed)
 ```
@@ -51,9 +53,12 @@ after listing the boxes.
 ## Sequence
 
 1. `python -m skore_skills status` and `env detect`.
-2. If `policy.env.managed` is null: env is unresolved. Say so and
-   stop. Do not bootstrap here. Do not load `setup-python-env` by
-   catalog id unless the user asked for env setup.
+2. If `policy.env.managed` is null: env is unresolved. If
+   `status.skills.setup-ml-project` is true, load
+   `setup-ml-project` and stop. Do not ask whether to set up an
+   environment. Do not load `setup-python-env`. If that skill is
+   not installed, say the environment is unresolved and stop.
+   Do not bootstrap here.
 3. Classify this turn **before** adding anything:
 
    - **Editable** only if the user asked to install the workspace

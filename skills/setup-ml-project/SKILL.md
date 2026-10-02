@@ -1,14 +1,17 @@
 ---
 name: setup-ml-project
 description: >
-  Coordinate first-time ML project setup. Trigger when the user asks
-  to set up or bootstrap a complete ML workspace. Ask the installed
-  pieces (all preselected), then in that same opening phase ask the
-  environment manager, whether we manage the env, the import name,
-  and git autocommit — only for boxes that stay checked and answers
-  that are not already recorded. Persist those answers, then run
-  only what stays checked. Git may ask once, just before the first
-  commit, which unknown files to keep.
+  Coordinate ML project setup. Trigger when the user asks to set up
+  or bootstrap a workspace, or when a pipeline stage finds
+  status.setup.pending non-empty. Ask only those pending pieces
+  (all preselected). Do not offer a piece that is already done or
+  declined. Then, in that same opening phase, ask the environment
+  manager, whether we manage the env, the import name, and git
+  autocommit — only for boxes that stay checked and answers that
+  are not already recorded. Persist those answers, then run only
+  what stays checked. Git may ask once, just before the first
+  commit, which unknown files to keep. Return to the skill that
+  dispatched this turn.
 ---
 
 # Set Up ML Project
@@ -31,47 +34,66 @@ after listing the boxes.
 
 ```
 - [ ] status + env detect (read-only)
-- [ ] ask which pieces (all installed boxes preselected)
+- [ ] pending empty → return to caller
+- [ ] ask pending pieces only (those boxes preselected)
+- [ ] persist declined for unchecked pieces
 - [ ] editable without workspace and no src → stop
 - [ ] ask remaining choices; persist
-- [ ] load selected | skip
-- [ ] status again; load triage-ml-task only if
-      status.skills.triage-ml-task is true
+- [ ] load selected | skip; persist done
+- [ ] return to the dispatching skill, else triage
 ```
 
 ## Sequence
 
 1. Run `python -m skore_skills status` and
    `python -m skore_skills env detect`. `status.skills` is a
-   per-id dict, never a boolean. Do not `env init`, `scaffold`,
-   install a package, or `git init` in this opening phase.
-2. **AskUserQuestion** with `allow_multiple`. Say first, in 2–4
-   lines, what the answer authorizes (which pieces run, in which
-   order) and the `status` facts each box rests on — detected
-   manager, `has_src`, git presence. A file link is an addition,
-   never the context. Include a box only when **that** id is true.
-   Option labels (user-visible, no ids):
+   per-id dict, never a boolean. Read `status.setup`. Each piece
+   is `done`, `declined`, or `missing`. `setup.pending` is the
+   ordered list of `missing` pieces. Do not `env init`,
+   `scaffold`, install a package, or `git init` in this opening
+   phase.
+2. If `setup.pending` is empty, ask nothing. Go to step 8.
+   `done` and `declined` pieces are already answered. Do not
+   offer them. Do not ask their environment manager, whether we
+   manage the env, import name, or automatic commits again.
+3. **AskUserQuestion** with `allow_multiple` for `setup.pending`
+   only. Say first, in 2–4 lines, what the answer authorizes
+   (which pieces run, in which order) and the `status` facts
+   each box rests on — detected manager, `has_src`, git
+   presence, and which pieces are already recorded. A file link
+   is an addition, never the context. Include a box only when
+   **that** id is true **and** the piece is `missing`. Option
+   labels (user-visible, no ids):
 
-   - Python environment
-   - Workspace layout
-   - Editable install — show when
-     `status.skills.add-python-package` is true and (`has_src`
-     is true **or** workspace is on this board)
-   - Git
+   - Python environment — `setup.pending` contains `env` and
+     `status.skills.setup-python-env` is true
+   - Workspace layout — `setup.pending` contains `workspace`
+     and `status.skills.setup-workspace` is true
+   - Editable install — `status.skills.add-python-package` is
+     true, `status.setup.editable` is `missing`, and
+     (`has_src` is true **or** workspace is on this board)
+   - Git — `setup.pending` contains `git` and
+     `status.skills.setup-git` is true
 
    Map checked labels to `setup-python-env`, `setup-workspace`,
    `add-python-package`, `setup-git` when loading.
 
-   **Preselect every installed piece** (all boxes on). Do not
-   leave a box off because the layout already looks done. The
-   user may uncheck.
-3. Editable checked, `has_src` false, and workspace not selected
+   **Preselect every box on this board** (those boxes on). Do
+   not add a `done` or `declined` piece because the layout
+   already looks unfinished. The user may uncheck. If every
+   pending piece's skill id is false, skip the ask, name the
+   missing skills in one line, and go to step 8.
+4. Before any write, persist each unchecked box:
+   `python -m skore_skills policy set setup.<piece> declined`
+   (`env`, `workspace`, `editable`, or `git`). Do not persist
+   `declined` for a box that was not on the board.
+5. Editable checked, `has_src` false, and workspace not selected
    → one-line stop. Do not ask the remaining choices. Do not
    scaffold from this meta.
-4. Ask the remaining choices **now**, before any write. Skip a
-   question when its piece was unchecked or the value is already
-   recorded. Each ask states in 2–4 lines what the answer
-   authorizes. Order:
+6. Ask the remaining choices **now**, before any write. Skip a
+   question when its piece was unchecked, was not on the board,
+   or the value is already recorded. Each ask states in 2–4
+   lines what the answer authorizes. Order:
 
    - **Environment manager** — Python environment stayed
      checked. If `env_manager` is not `"none"`, `ambiguous` is
@@ -101,21 +123,28 @@ after listing the boxes.
 
    Do not ask notebooks, the documentation site, tabular
    library, or where reports go.
-5. Load **still-checked** skills only, in this order: env →
+7. Load **still-checked** skills only, in this order: env →
    workspace → editable (`has_src`) → git. Load `<id>` only if
    `status.skills.<id>` is true; else one-line skip. Do not
    invent that skill's steps. The loaded skills must not ask
-   again for a choice persisted in step 4.
-6. Unchecked or that id is false → one-line skip.
-7. `status` again. Load `triage-ml-task` only if
-   `status.skills.triage-ml-task` is true; else stop. Do not
-   start exploratory data analysis or a pipeline. That handoff
-   may ask what to do next; it is not a setup question.
+   again for a choice persisted in step 6. After each loaded
+   skill returns, persist
+   `python -m skore_skills policy set setup.<piece> done`.
+   Do not mark a skipped or unchecked piece `done`.
+8. Return to the skill that dispatched this turn (a lifecycle
+   stage, or triage waiting on a lifecycle request). Do not
+   open the entry board and do not start exploratory data
+   analysis or a pipeline from here. When the user asked only
+   to set up or bootstrap, `status` again and load
+   `triage-ml-task` only if `status.skills.triage-ml-task` is
+   true; else stop. That handoff may ask what to do next; it
+   is not a setup question.
 
 ## Stop conditions
 
 - Do not `env init`, `scaffold`, install a package, or `git init`
-  until step 4 has finished.
+  until step 6 has finished.
+- Do not offer a `done` or `declined` piece again.
 - Do not ask tabular library, skore mode, notebooks, or site.
 - Do not ask which hidden files or review paths to keep; `setup-git`
   asks that once, before the first commit.

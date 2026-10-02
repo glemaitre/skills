@@ -6,9 +6,8 @@ the `SkrubLearner` fit shape, see the workspace's
 `scratch/api/<lib>/<version>/` cache populated by `python -m skore_skills api get`
 Shape 0/1/2/3.*
 
-`skore.evaluate(...)` is a dispatcher: depending on the
-`estimator`/`splitter` combination it returns an `EstimatorReport`,
-a `CrossValidationReport`, or a `ComparisonReport`. Feeding it a
+`skore.evaluate(...)` is a dispatcher: for this one learner it
+returns an `EstimatorReport` or a `CrossValidationReport`. Feeding it a
 `SkrubLearner` (the learner returned by `make_learner()` on a skrub
 DataOps graph) requires the **env-dict-style** fit shape, not the
 sklearn-style `(X, y)`.
@@ -96,7 +95,6 @@ The return type depends on `splitter`:
 | omitted, DataOp has `mark_as_X(cv=...)` | `CrossValidationReport` — reuses the DataOp `cv` and `split_kwargs` |
 | omitted, no DataOp `cv` | `EstimatorReport` — single 80/20 holdout |
 | `"prefit"` on a fitted learner; `data` is the test binding only | `EstimatorReport` — the shipped test table |
-| Multi-key comparison | `ComparisonReport` |
 
 An explicit `splitter=` always overrides a DataOp `cv` and drops
 `split_kwargs`. Omit `splitter=` when the locked `cv` is on the
@@ -121,17 +119,15 @@ installed skore version — the dispatch table can evolve.
 
 ## Custom metrics on a SkrubLearner
 
-When a custom metric needs DataOp-derived metadata such as
-per-row sample weights, attach it to the prediction node with
-`.skb.with_scoring(...)` before `.skb.make_learner()`. The metric
-kwargs must be DataOps aligned with the marked X rows. They are
-not CV `split_kwargs`.
+A comparison metric that is not a skore default attaches with
+`.skb.with_scoring(...)` before `.skb.make_learner()`, whether
+or not it needs row metadata. Row-aligned kwargs such as
+per-row sample weights are DataOps aligned with the marked X
+rows. They are not CV `split_kwargs`. See
+`references/custom-metrics.md`.
 
-After `skore.evaluate`, inspect these scorers through
-`report.metrics.score()`. They do not become custom rows in
-`report.metrics.summarize()`. For sklearn-style report registry
-metrics, including the required ordering before `Project.put`,
-see `references/custom-metrics.md`.
+After `skore.evaluate`, the attached name is a row in
+`report.metrics.summarize().frame()`.
 
 ## Persisting to the Project store
 
@@ -284,8 +280,8 @@ report = skore.evaluate(
 )
 report
 
-# Custom metrics or checks register here, before the report is stored.
-# DataOp `with_scoring` was attached in build_learner.
+# Custom checks register here, before the report is stored.
+# A non-default metric was attached with `with_scoring` in build.
 
 # %%
 _results = PROJECT_ROOT / "scratch" / "results" / "01_baseline"
@@ -326,8 +322,8 @@ Note the clean separation:
 ## When `evaluate` is too coarse — escalate
 
 If the default `evaluate(...)` dispatch doesn't fit (you need
-explicit `train_data=` / `test_data=` on `EstimatorReport`, or a
-multi-key `ComparisonReport`), construct the report class directly.
+explicit `train_data=` / `test_data=` on `EstimatorReport` for
+this one learner), construct that report class directly.
 Look up the signatures via `python -m skore_skills api get` against the installed skore
 version — the kwargs differ between `EstimatorReport` (uses
 `train_data` / `test_data`) and `CrossValidationReport` (uses

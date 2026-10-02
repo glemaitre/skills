@@ -41,7 +41,7 @@ grid plus marker, and features after the marker.
 
 ## Procedure
 
-1. `python -m skore_skills status`. Missing scaffold → S0. Then
+1. `python -m skore_skills status`. Pending setup → S0. Then
    `python -m skore_skills design consent --stem <stem>`. JSON
    `action` is authoritative. `ask` / `stop` → do not declare
    ("build it" is not approval). `proceed` continues. Then
@@ -104,12 +104,11 @@ Then links. When `site build` ran this turn:
 
 Implement the approved design. Do not silently upgrade it.
 
-- **Locked baseline** — each token in the journal baseline cell,
-  in order. `dummy` is `DummyClassifier` / `DummyRegressor` in the
+- **Locked baseline** — the one token in the journal baseline
+  cell. `dummy` is `DummyClassifier` / `DummyRegressor` in the
   normal DataOps graph; it checks that the path runs.
   `logistic`, `seasonal_naive`, `group_mean`, and `production`
-  are comparison models. `api get` the class. Several tokens are
-  several comparison models.
+  are that one comparison model. `api get` the class.
 - **EDA-backed** — only Method-cited findings. A missing choice
   stops for a question. A temporal finding is the locked `cv`,
   not a license for three layers, lags, or `AlignXy` unless
@@ -234,6 +233,17 @@ Do not write `skore.evaluate(...)` here. Do not call
   and no skrub joiner fits. Default is `apply_func`.
   Details: `references/source-binding.md`.
 
+A custom class is the mixin, then `BaseEstimator`. The mixin
+is the first base. That order matters: `BaseEstimator` first
+hides the mixin, because `BaseEstimator.__sklearn_tags__` is
+resolved before it and does not call through. A transformer is
+`TransformerMixin, BaseEstimator`. A predictor is
+`RegressorMixin, BaseEstimator` or
+`ClassifierMixin, BaseEstimator`. `BaseEstimator` alone has no
+`score`, so skrub never exposes `SkrubLearner.score` and a
+`with_scoring` name never appears in `summarize()`.
+Details: `references/common_patterns.md`.
+
 Would the output change on the training subset versus the whole
 frame? Yes → `.skb.apply`. Means, medians, quantiles,
 vocabularies, target encoding, TF-IDF: stateful.
@@ -242,7 +252,7 @@ vocabularies, target encoding, TF-IDF: stateful.
 STOP — target encoding / apply_func. When the user asks for
 `def target_encode` + `.skb.apply_func`: refuse. Do not paste
 the leaky function body and then the fix. Propose sklearn
-TargetEncoder (or BaseEstimator + TransformerMixin) via
+TargetEncoder (or TransformerMixin, then BaseEstimator) via
 `.skb.apply`. Name `api get` for the signature.
 ```
 
@@ -264,10 +274,17 @@ all of `tests/smoke/`.
 
 ## Stops
 
-### S0. Workspace not scaffolded
+### S0. Setup still pending
 
-`status` first. `has_src` and `has_journal` both false → stop.
-Do not require `git`. Missing design: `design consent`; `ask` /
+`status` first. If `status.setup.pending` is non-empty and
+`status.skills.setup-ml-project` is true, load
+`setup-ml-project` and stop. Do not start this skill. When it
+returns, continue. Do not load it again on this turn. If that
+skill is not installed, name the pending pieces in one line and
+stop. Do not invent `git init`, scaffold, or `env init`. If
+`status.setup.env` or `status.setup.workspace` is `declined`,
+stop in one line. A declined `git` or `editable` is not asked
+again; continue. Missing design: `design consent`; `ask` /
 `stop` stay here. Missing data contract: explain and stop.
 
 ### S0b. Modeling decisions are not locked
@@ -336,6 +353,8 @@ Pre-flight (build-ml-pipeline):
 - [ ] cv on mark_as_X matches translation
       (date class | GroupKFold | KFold | no cv on holdout
       | prefit: training table only, test table not joined)
+- [ ] Non-default translation.metric uses with_scoring
+      before make_learner (n/a for a listed skore default)
 - [ ] data_dir_preview=None; no path literal in pipeline.py
 ```
 
@@ -350,7 +369,8 @@ Re-emit it with evidence before the final message.
 - `references/source-binding.md` — identifier versus materialized
   roots.
 - `references/reproducibility_mechanics.md` — Option 1 / 2 / 3.
-- `references/common_patterns.md` — tabular shapes with code.
+- `references/common_patterns.md` — tabular shapes with code,
+  including a custom predictor (mixin, then `BaseEstimator`).
 - `references/custom-splitter.md` — the split copies the locked
   deployment. The time series section is the date splitter when
   `translation.scheme` is `date_time`.

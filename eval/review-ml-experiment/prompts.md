@@ -48,13 +48,16 @@
 - Source the check file as `audit:01_baseline:checks.SKD003` and
   the gap as `design:01_baseline`.
 - Write `Triage: open` on each new idea file.
+- Upsert one `## Ideas` row per file: Question as plain text,
+  Status `open`, Experiment `01_baseline`, Source copied from
+  the file.
 - Return the digest, `audit finding` JSON, `loop locator` JSON,
   and the idea paths.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Open the Project or call `report.*` from this skill.
-- Write `JOURNAL.md` or a design note.
+- Write History, Backlog, Status, or a design note.
 - Invent a metric or a winning idea.
 - Put acceptance criteria in the idea files.
 
@@ -76,7 +79,7 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `cells run`.
 - Write any `journal/ideas/` file.
-- Write `JOURNAL.md`.
+- Write an Ideas row or any other `JOURNAL.md` edit.
 
 ---
 
@@ -91,19 +94,23 @@
 - `scratch/audit/01_baseline/audit.md` already exists.
 - `journal/ideas/01_baseline-calibration.md` exists with
   `Triage: discarded`.
+- The Ideas table has that question with Status `discarded`.
 - The user did not ask to re-audit.
 
 **Must do:**
 - Refresh `journal/ideas/` from the existing digest.
 - Keep that file's `Triage: discarded`.
+- Keep that Ideas row and its Status `discarded`.
 - Skip `cells run`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Reset that file's `Triage` to `open`.
+- Reset that Ideas Status to `open`.
 - Delete that idea file.
+- Remove that Ideas row.
 - Re-run the skore checks.
-- Write `JOURNAL.md`.
+- Write History, Backlog, Status, or a design note.
 
 ---
 

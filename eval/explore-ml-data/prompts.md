@@ -8,6 +8,7 @@
 > EDA is done. Close the turn.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` was just written.
 
 **Must do:**
@@ -31,6 +32,7 @@
 > Explore the dataset before we design a model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists (`has_src`, `journal/JOURNAL.md`).
 - Raw data path is known.
 - `policy.tabular` is unset.
@@ -60,6 +62,7 @@
 > Skip the EDA. I already know the data.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists (`has_src`, `journal/JOURNAL.md`).
 - `status.data_analysis` is `missing`.
 - No `data_analysis/data_analysis.md`.
@@ -84,6 +87,7 @@
 > Explore the dataset.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` exists.
 - JOURNAL § Data understanding records `Status: done`.
 - The user did not ask to re-run or refresh EDA.
@@ -114,6 +118,7 @@
 > script.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. G-TABULAR is `pandas`. Skrub, IPython,
   matplotlib, and seaborn are installed.
 - JOURNAL names target `MedHouseVal` (regression).
@@ -156,6 +161,7 @@
 > Run the EDA now.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. User chose **run**.
 - `ipython` is not importable in the project env.
 - `add-python-package` is installed.
@@ -177,10 +183,11 @@
 > EDA is done. Close the turn.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` was just written.
 - `policy.notebooks` is true. `policy.site` is true.
 - `export-ml-notebook` and `export-ml-site` are installed.
-- `jupytext`, `nbclient`, and `nbconvert` are installed.
+- `jupytext`, `nbclient`, `ipywidgets`, and `nbconvert` are installed.
 
 **Must do:**
 - Write 2–6 sentences of EDA findings.
@@ -207,6 +214,7 @@
 > EDA is done. Close the turn.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` was just written.
 - `policy.site` is false.
 
@@ -230,10 +238,11 @@
 > EDA is done. Close the turn.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` was just written.
 - `policy.notebooks` is true. `policy.site` is false.
 - `export-ml-notebook` is installed.
-- `jupytext` and `nbclient` are installed.
+- `jupytext`, `nbclient`, and `ipywidgets` are installed.
 
 **Must do:**
 - Run `python -m skore_skills notebook convert
@@ -253,6 +262,7 @@
 > EDA is done. Close the turn.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` was just written.
 - `policy.notebooks` is true. `policy.site` is false.
 - `export-ml-notebook` is installed.
@@ -277,6 +287,7 @@
 > Explore the California housing CSV. Target is MedHouseVal.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. G-TABULAR is `pandas`.
 - `add-python-package` is installed.
 - User chose **run** for G-DATA-ANALYSIS.
@@ -326,6 +337,7 @@
 > Explore the dataset.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. User chose **run**.
 - JOURNAL Goal does not name a column.
 - Column names are `A`, `B`, `C`.
@@ -349,6 +361,7 @@
 > Explore the data and add a PCA plot of the numeric columns.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. User chose **run**. Target is known.
 - `add-python-package` is installed.
 
@@ -370,6 +383,7 @@
 > Explore the dataset. Target is MedHouseVal.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Default notebook, extras.json, and `data_analysis.md` are on
   disk.
 - User picks **Close** on keep-exploring vs close.
@@ -395,6 +409,7 @@
 > Explore the dataset. Target is MedHouseVal.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` was just written.
 - `policy.site` is true.
 - `export-ml-site` is installed.
@@ -428,6 +443,7 @@
 > Is 0.97 correlation with the target leakage?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - EDA markdown exists. User picked Keep exploring, then
   Automatic exploration related to the data and problem. The
   prompt already names a leakage concern.
@@ -459,6 +475,7 @@
 > Is 0.97 correlation with the target leakage?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - EDA markdown exists. User picked Keep exploring, then Research
   this concern.
 - `status.skills.research-ml-practice` is false or absent.
@@ -482,6 +499,7 @@
 > Is 0.97 correlation with the target leakage?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` exists.
 - JOURNAL § Data understanding records `Status: done`.
 - `status.data_analysis` is present.
@@ -509,6 +527,7 @@
 > Explore the dataset.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. User chose **run**.
 - User picked **no target yet** on the target AskUserQuestion.
 - `plot-ml-figure` is installed.
@@ -532,6 +551,7 @@
 > Keep exploring. Research extra analyses for this table.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` exists with Open questions.
 - JOURNAL names California housing / MedHouseVal.
 - User picked **Keep exploring**, then **Automatic exploration
@@ -565,6 +585,7 @@
 > Explore the data. Target is y.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. G-TABULAR is `pandas`.
 - User chose **run** for G-DATA-ANALYSIS.
 - IPython is available. `add-python-package` is installed.
@@ -594,6 +615,7 @@
 > Explore the data. Target is y.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. G-TABULAR is `pandas`.
 - User chose **run** for G-DATA-ANALYSIS.
 - IPython is available. `plot-ml-figure` is installed.
@@ -629,6 +651,7 @@
 > Keep exploring. Add join keys / coverage.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Two families are already in `data_analysis/data_analysis.py`
   (`family_a` with `id`, `y`; `family_b` with `id`, `z`).
 - `data_analysis/data_analysis.md` exists.
@@ -655,6 +678,7 @@
 > Explore the data. Target is y.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. G-TABULAR is `pandas`.
 - User chose **run** for G-DATA-ANALYSIS.
 - IPython is available.
@@ -678,6 +702,7 @@
 > Explore the California housing CSV. Target is MedHouseVal.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. G-TABULAR is `pandas`.
 - User chose **run** for G-DATA-ANALYSIS.
 - IPython is available.
@@ -706,6 +731,7 @@
 > Skip the data analysis. We already wrote it.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` exists.
 - `status.data_analysis` is `present`.
 
@@ -722,12 +748,38 @@
 
 ---
 
-## CASE_27 — A shipped train and test pair is not joined
+## CASE_27 — Pending setup loads project setup
+
+**User prompt:**
+> Explore the dataset.
+
+**Assumed workspace state:**
+- No `src/` and no `journal/`. `data/` has one CSV.
+- `status.setup.pending` is `env`, `workspace`, `git`.
+- `status.setup.env` and `status.setup.workspace` are `missing`,
+  not `declined`.
+- `status.skills.setup-ml-project` is true.
+- `status.data_analysis` is `missing`.
+
+**Must do:**
+- Load `setup-ml-project` and stop.
+- Do not place `data_analysis/data_analysis.py`.
+- Do not invent `PROJECT_ROOT` or write a root `JOURNAL.md`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Run `python -m skore_skills cells run`.
+- Ask the tabular-library question before setup returns.
+
+---
+
+## CASE_28 — A shipped train and test pair is not joined
 
 **User prompt:**
 > Explore the files in `data/`. Target is y.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffold exists. G-TABULAR is `pandas`.
 - User chose **run** for G-DATA-ANALYSIS.
 - IPython is available.

@@ -43,10 +43,13 @@
 - Write `journal/ideas/<slug>.md` with Source
   `literature: https://example.invalid/censored-models`,
   Experiment `01_baseline`, and `Triage: open`.
+- Upsert one `## Ideas` row: Question as plain text, Status
+  `open`, Experiment `01_baseline`, Source
+  `literature: https://example.invalid/censored-models`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Write `JOURNAL.md` or a design note.
+- Write History, Backlog, Status, or a design note.
 - Append a `B<N>` row.
 - Add a package.
 

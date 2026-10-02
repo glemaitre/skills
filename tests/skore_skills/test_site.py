@@ -261,18 +261,22 @@ def test_site_theme_uses_hub_sizing_scale() -> None:
 
 
 def test_site_theme_flattens_and_numbers_contents() -> None:
-    """Contents rows sit flush and collapse into numbered tiles."""
+    """Contents rows sit flush and use hierarchical numbered tiles."""
     css = (site_mod.SITE_ASSETS / "skore.css").read_text(encoding="utf-8")
     javascript = (site_mod.SITE_ASSETS / "skore.js").read_text(encoding="utf-8")
     assert "[dir] .md-sidebar--secondary .md-nav__list" in css
     assert "[dir] .md-sidebar--secondary .md-nav__item > .md-nav__link" in css
     assert "counter-reset: skore-toc" in css
     assert "counter-increment: skore-toc" in css
+    # Panel padding belongs to the root nav; applying it to nested navs adds
+    # extra vertical space around subsection rows.
+    assert ".md-sidebar--secondary .md-sidebar__inner > .md-nav {" in css
+    assert "\n  .md-sidebar--secondary .md-nav {\n" not in css
     # Numbers share the collapse icon's box and gap so the two columns line up.
     assert (
         ".md-sidebar--secondary .md-nav__link::before {\n"
         "    flex: 0 0 var(--numbers-20);\n"
-        "    content: counter(skore-toc);"
+        '    content: counters(skore-toc, ".");'
     ) in css
     assert "flex: 0 0 var(--numbers-20);\n  opacity: 0.8;" in css
     assert "body.skore-toc-collapsed .skore-toc-label {\n    display: none;" in css

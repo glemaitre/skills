@@ -21,11 +21,13 @@ Tell the user the written `.ipynb` (and HTML viewer) paths. Do
 not quote `notebook convert`, `--html`, or `site build` as
 something they should run.
 
-While `policy.notebooks` is true, `explore-ml-data`,
-`model-ml-pipeline`, and `audit-ml-pipeline` already convert the
-percent file they wrote that turn. This skill owns on-demand
-conversions, other sources, and turning the flag on when it is
-`null` or false.
+While `policy.notebooks` is true, `explore-ml-data` converts the
+analysis file it wrote. `model-ml-pipeline` and
+`evaluate-ml-pipeline` convert the experiment script and, when
+it exists, `audit/<stem>.py`. `audit-ml-pipeline` converts
+`audit/<stem>.py` only on a direct close. This skill owns
+on-demand conversions, other sources, and turning the flag on
+when it is `null` or false.
 
 ## Sequence
 
@@ -33,8 +35,8 @@ conversions, other sources, and turning the flag on when it is
    `skills`.
 2. If `policy.notebooks` is `null`: persist
    `python -m skore_skills policy set notebooks true`. Do not
-   AskUserQuestion. Then load `add-python-package` for `jupytext`
-   and `nbclient` (agent) and continue.
+   AskUserQuestion. Then load `add-python-package` for `jupytext`,
+   `nbclient`, and `ipywidgets` (agent) and continue.
 3. If `policy.notebooks` is false: say executed notebooks are
    off; offer to turn them on. Do not convert until the policy
    is true.
@@ -50,6 +52,10 @@ conversions, other sources, and turning the flag on when it is
    strips that setup cell from the written notebook. Do not put
    `%matplotlib inline` in the `.py` (`style` / ruff would reject
    it).
+
+   If convert fails because `ipywidgets` is missing, load
+   `add-python-package` for it (agent) and convert again. Missing
+   `jupytext` / `nbclient` / `nbconvert` stays a one-line skip.
 
    If the user wants the executed notebook on the site, load
    `add-python-package` for `nbconvert` (agent) and pass `--html`

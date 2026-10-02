@@ -118,6 +118,19 @@ def test_status_organized_fixture(
             "env": {"managed": None},
             "git": {"autocommit": None},
             "loop": {"stage": None, "stem": None},
+            "setup": {
+                "env": None,
+                "workspace": None,
+                "editable": None,
+                "git": None,
+            },
+        },
+        "setup": {
+            "env": "missing",
+            "workspace": "done",
+            "editable": "missing",
+            "git": "missing",
+            "pending": ["env", "editable", "git"],
         },
         "loop_stage": "implement",
     }
@@ -341,6 +354,90 @@ def test_first_manager_follows_table_order() -> None:
     assert first_manager({"uv": ["uv.lock"], "pixi": ["pixi.toml"]}) == "pixi"
     assert first_manager({"conda": ["environment.yml"]}) == "conda"
     assert first_manager({}) == "none"
+
+
+def test_status_setup_empty_tree_is_pending(tmp_path: Path) -> None:
+    """A fresh tree has every setup piece missing except editable."""
+    setup = snapshot(tmp_path)["setup"]
+    assert setup == {
+        "env": "missing",
+        "workspace": "missing",
+        "editable": "missing",
+        "git": "missing",
+        "pending": ["env", "workspace", "git"],
+    }
+
+
+def test_status_setup_infers_done_pieces(tmp_path: Path) -> None:
+    """A recorded env, scaffold, and git are done; editable stays missing."""
+    from skore_skills.policy import set_policy_value
+
+    _write(tmp_path / "pixi.toml", '[workspace]\nname = "demo"\n')
+    (tmp_path / "src" / "demo").mkdir(parents=True)
+    (tmp_path / ".git").mkdir()
+    set_policy_value(tmp_path, "env_manager", "pixi")
+    set_policy_value(tmp_path, "env.managed", "true")
+    set_policy_value(tmp_path, "git.autocommit", "on")
+    setup = snapshot(tmp_path)["setup"]
+    assert setup["env"] == "done"
+    assert setup["workspace"] == "done"
+    assert setup["git"] == "done"
+    assert setup["editable"] == "missing"
+    assert setup["pending"] == ["editable"]
+
+
+def test_status_setup_declined_wins_over_inference(tmp_path: Path) -> None:
+    """A stored decline stays declined even when the files exist."""
+    from skore_skills.policy import set_policy_value
+
+    (tmp_path / "journal").mkdir()
+    (tmp_path / ".git").mkdir()
+    set_policy_value(tmp_path, "git.autocommit", "off")
+    set_policy_value(tmp_path, "setup.workspace", "declined")
+    set_policy_value(tmp_path, "setup.git", "declined")
+    setup = snapshot(tmp_path)["setup"]
+    assert setup["workspace"] == "declined"
+    assert setup["git"] == "declined"
+    assert "workspace" not in setup["pending"]
+    assert "git" not in setup["pending"]
+
+
+def test_status_setup_unmanaged_env_is_done(tmp_path: Path) -> None:
+    """``env.managed`` false with a recorded manager needs no manifest."""
+    from skore_skills.policy import set_policy_value
+
+    set_policy_value(tmp_path, "env_manager", "uv")
+    set_policy_value(tmp_path, "env.managed", "false")
+    assert snapshot(tmp_path)["setup"]["env"] == "done"
+
+
+def test_status_setup_managed_without_manifest_stays_missing(tmp_path: Path) -> None:
+    """A managed manager is done only after its manifest matches."""
+    from skore_skills.policy import set_policy_value
+
+    set_policy_value(tmp_path, "env_manager", "pixi")
+    set_policy_value(tmp_path, "env.managed", "true")
+    assert snapshot(tmp_path)["setup"]["env"] == "missing"
+
+
+def test_status_setup_ignores_non_object_record() -> None:
+    """A non-object ``setup`` value falls back to inference."""
+    from skore_skills.policy import empty_policy
+    from skore_skills.workspace import setup_status
+
+    policy = empty_policy()
+    policy["setup"] = "nope"
+    setup = setup_status(
+        policy,
+        env_manager=None,
+        ambiguous=False,
+        has_src=False,
+        has_journal=True,
+        git=False,
+    )
+    assert setup["workspace"] == "done"
+    assert setup["env"] == "missing"
+    assert setup["pending"] == ["env", "editable", "git"]
 
 
 def test_status_skills_ignores_out_of_bound_depth(tmp_path: Path) -> None:

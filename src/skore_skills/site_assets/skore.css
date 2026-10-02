@@ -466,7 +466,7 @@ body.skore-motion-ready .skore-topnav__caret {
     border-radius: var(--numbers-12);
   }
 
-  .md-sidebar--secondary .md-nav {
+  .md-sidebar--secondary .md-sidebar__inner > .md-nav {
     min-height: 0;
     flex: 0 1 auto;
     overflow-y: auto;
@@ -506,7 +506,7 @@ body.skore-motion-ready .skore-topnav__caret {
   /* Same box and gap as the collapse control's icon, so the two line up. */
   .md-sidebar--secondary .md-nav__link::before {
     flex: 0 0 var(--numbers-20);
-    content: counter(skore-toc);
+    content: counters(skore-toc, ".");
     text-align: center;
   }
 
@@ -540,7 +540,10 @@ body.skore-motion-ready .skore-topnav__caret {
     width: var(--skore-toc-rail-width);
   }
 
-  body.skore-toc-collapsed .md-sidebar--secondary .md-nav {
+  body.skore-toc-collapsed
+    .md-sidebar--secondary
+    .md-sidebar__inner
+    > .md-nav {
     padding: var(--numbers-6) 0;
     scrollbar-gutter: auto;
     scrollbar-width: none;

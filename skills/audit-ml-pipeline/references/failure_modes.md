@@ -40,7 +40,7 @@ this skore predates that, and the runner has nothing to capture.
 Chain `.frame()` on the affected cell only:
 
 ```python
-report.metrics.summarize().frame()
+report.metrics.summarize().frame(verbose_name=True, flat_index=False)
 report.checks.summarize().frame()
 ```
 

@@ -172,19 +172,20 @@ the user picks a name from the `help()` trees.
    review cites in an idea file.
    Verified on `CrossValidationReport` and `EstimatorReport`.
 
-8. **Metrics summary (code cell, bare Display last).**
+8. **Metrics summary (code cell, verbose frame last).**
    ```python
-   metrics = report.metrics.summarize()
+   metrics = report.metrics.summarize().frame(
+       verbose_name=True, flat_index=False
+   )
    _results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
    _results.mkdir(parents=True, exist_ok=True)
    (_results / "metrics.html").write_text(metrics._repr_html_(), encoding="utf-8")
    metrics
    ```
-   Repr is the metric table with task-appropriate defaults:
-   - **regression**: RMSE / MAE / R² + fit/predict timings.
-   - **binary classification**: accuracy / precision / recall / F1
-     / ROC-AUC / log-loss + timings.
-   - **multiclass**: macro/micro averages.
+   The frame is the metric table, with verbose names and the
+   estimator/aggregate columns left unflattened. That same HTML is
+   the only metrics table the site shows under `### Metrics`.
+   Do not also paste the values into the design note.
 
 9. **Available report accessors (code cell, printed trees).**
    `help()` prints its tree and returns `None`, so the runner
@@ -244,9 +245,13 @@ Every skore Display — `ChecksSummaryDisplay`,
 
 That makes one line serve both audiences. A human opening the
 audit `.py` as a notebook gets the rich HTML; the runner captures
-`repr(result.result)` and the digest gets the text. `.frame()` is
-not needed for either, and on checks it is a downgrade: the frame
-drops the severity grouping and buries the messages in a column.
+`repr(result.result)` and the digest gets the text. On checks,
+`.frame()` is a downgrade: it drops the severity grouping and
+buries the messages in a column. Metrics are the exception. The
+Display `repr` is a flat index (`rmse`, `dummyregressor_mean`).
+The last expression is
+`summarize().frame(verbose_name=True, flat_index=False)`, and
+`metrics.html` is that frame's `_repr_html_()`.
 
 The only thing neither path produces is a *standalone* per-item
 HTML file, because the converted notebook is one document. That is

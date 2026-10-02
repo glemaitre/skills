@@ -8,6 +8,7 @@
 > Which comparison metric should we lock before building?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/JOURNAL.md` exists. Modeling decisions Status is still
   the empty placeholder.
 - `scratch/data_analysis/extras.json` has `"task": "classification"`.
@@ -31,6 +32,7 @@
   `uncovered`. Say horizon and gap are n/a unless the deployment
   is time, and generalize-to is n/a unless the deployment is
   groups.
+- Ask for one baseline token for the Baseline cell.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -46,6 +48,7 @@
 > New rows arrive later than the fit. Lock that.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Prediction goal is `point_predictions` and Deployment is `time`.
   Status is `draft`.
 - `frame show` returns `missing` with horizon, gap, time_role,
@@ -75,6 +78,7 @@
 > We are clustering customers. What should we lock?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `scratch/data_analysis/extras.json` has `"task": "clustering"`.
 - `frame show` returns `ask` / `uncovered`, `reference`
   `references/fallback.md`, and `context.task` `clustering`.
@@ -100,6 +104,7 @@
 > Lock the comparison metric and the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `python -m skore_skills frame show` exits with `No such command
   'frame'`. There is no JSON.
 
@@ -123,6 +128,7 @@
 > The table is filled. Lock it.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Every required cell is valid and Status is `draft`.
 - `frame show` returns `ask` / `confirm_lock` with choices
   `lock`, `modify`, `stop`, and `context.metric` `MAE`.
@@ -146,6 +152,7 @@
 > The constraint changed: we now need intervals, not point predictions.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Status is `locked`.
 - Prediction goal is `point_predictions`, metric role is
   `point_error`, metric is `MAE`, deployment is `iid`, and
@@ -177,6 +184,7 @@
 > Change the comparison metric. Keep the rest of the framing.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Status is `locked`.
 - Metric is `MAE`. Metric role is `point_error`. Prediction goal
   is `point_predictions`. Folds is `5`.
@@ -210,6 +218,7 @@
 > Change the comparison metric. The table is not locked yet.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Status is `draft`.
 - Metric is `MAE`. Metric role is `point_error`. The other
   required cells are valid.
@@ -233,6 +242,7 @@
 > A problem constraint changed.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Status is `locked`.
 - Metric is `MAE` and folds is `5`. The user did not name
   a cell.
@@ -254,6 +264,7 @@
 > Lock the table.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `model-ml-pipeline` dispatched this turn.
 - `frame show` returns `proceed` with a non-null `translation`.
 
@@ -273,6 +284,7 @@
 > Lock the table.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - This turn was not dispatched by `model-ml-pipeline`.
 - `frame show` returns `proceed` with a non-null `translation`.
 
@@ -286,12 +298,37 @@
 
 ---
 
-## CASE_12 — A shipped train and test table is a folds choice
+## CASE_12 — Pending setup loads project setup
+
+**User prompt:**
+> Which comparison metric should we lock before building?
+
+**Assumed workspace state:**
+- No `src/` and no `journal/`.
+- `status.setup.pending` is `env`, `workspace`, `git`.
+- `status.setup.env` and `status.setup.workspace` are `missing`,
+  not `declined`.
+- `status.skills.setup-ml-project` is true.
+
+**Must do:**
+- Load `setup-ml-project` and stop.
+- Do not write `journal/JOURNAL.md` or ask the modeling
+  decisions.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Run `python -m skore_skills frame show`.
+- Invent a metric, baseline, or fold count.
+
+---
+
+## CASE_13 — A shipped train and test table is a folds choice
 
 **User prompt:**
 > How should we split rows for evaluation?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Status is `draft`. Every modeling-decisions cell except Folds
   is already filled for an iid point-prediction problem.
 - `frame show` returns `ask` / `missing_keys`. `missing` is

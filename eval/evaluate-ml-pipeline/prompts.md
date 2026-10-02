@@ -16,6 +16,7 @@ violated.
 > regression, no groups, no temporal ordering.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/01_baseline.md` approved.
 - `src/<pkg>/pipeline.py` exists with `build_learner` returning a
   `SkrubLearner`. The X-marker has `cv=KFold(n_splits=5)` and
@@ -40,6 +41,8 @@ violated.
 - Pick **`skore.evaluate(learner, data={...})`** as the entry
   point, with no `splitter=` (not `cross_val_score`, not
   `cross_validate`). The `KFold` already on the marker is reused.
+- Score that one learner with one `skore.evaluate` and one
+  `project.put`.
 - Name `python -m skore_skills frame show` and
   `python -m skore_skills api get` for `skore.evaluate` (or Read
   the matching caches already listed).
@@ -79,6 +82,7 @@ violated.
 > forecast experiment. Pick the splitter.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/02_load_forecast.md` approved.
 - `pipeline.py` X-marker has no `cv=`.
 - `python -m skore_skills frame show` returns `proceed` with
@@ -104,6 +108,7 @@ violated.
 > are grouped by customer.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `status.modeling_decisions` is `locked`.
 - `frame show` `translation.groups` is `customer_id` and
   `translation.splitter` is `GroupKFold`.
@@ -143,6 +148,7 @@ violated.
 > sure if we should treat it as a group.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `pipeline.py` X-marker has empty `split_kwargs`.
 - `status.modeling_decisions` is `locked`.
 - `frame show` `translation.groups` is `region`.
@@ -172,6 +178,7 @@ violated.
 > Quick and simple.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `pipeline.py` returns a `SkrubLearner`.
 - skore is installed.
 
@@ -200,6 +207,7 @@ violated.
 > fine. Mark it `done` in `JOURNAL.md`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `02_load_forecast` ran; CV report is clean.
 - `tests/smoke/test_02_load_forecast.py` exists but has NOT been
   run this turn / is currently red on row-count.
@@ -231,6 +239,7 @@ violated.
 > report)` to refresh the cache.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `experiments/02_text_encoder.py` already produced a report.
 - The user wants a "refreshed" version.
 
@@ -258,6 +267,7 @@ violated.
 > Wire `experiments/01_baseline.py` for the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/01_baseline.md` approved.
 - `src/<pkg>/pipeline.py` has `build_learner`.
 - `policy.skore_mode` is unset. `import skore` may fail.
@@ -290,6 +300,7 @@ violated.
 > Wire `experiments/01_baseline.py` for the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Same as CASE_01.
 - `policy.skore_mode` is `local`.
 - `skore` imports.
@@ -310,6 +321,7 @@ violated.
 > Wire evaluate for the 24h-ahead load forecast. Run CV now.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/02_load_forecast.md` approved.
 - `experiments/02_load_forecast.py` exists.
 - Pipeline has lag features (history-dependent).
@@ -335,6 +347,7 @@ violated.
 > Evaluate the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Same as CASE_01; smoke is green.
 - `model-ml-pipeline` did NOT dispatch this turn.
 - `policy.notebooks` and `policy.site` are both true.
@@ -367,6 +380,7 @@ violated.
 - Run `site build` before the journal is recorded.
 - Write `journal/JOURNAL.md` or the design note directly.
 - Run `git commit` in this skill.
+- Convert `audit/01_baseline.py`: no audit file exists this turn.
 
 ---
 
@@ -376,6 +390,7 @@ violated.
 > Evaluate the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Same as CASE_01; smoke is green.
 - `model-ml-pipeline` dispatched this turn and owns the close.
 - `policy.notebooks` and `policy.site` are both true.
@@ -405,6 +420,7 @@ violated.
 > Evaluate and save 01_baseline locally.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Smoke is green and `policy.skore_mode` is `local`.
 - `project.put("01_baseline", report)` succeeds.
 - The newest matching summary row has id `local-report-id`.
@@ -437,6 +453,7 @@ violated.
 > Evaluate and upload 02_encoder to Skore Hub.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Smoke is green and `policy.skore_mode` is `hub`.
 - Successful `put` stdout contains
   `Consult your report at https://hub.example/direct-report`.
@@ -464,6 +481,7 @@ violated.
 > Evaluate 03_features into our file-backed MLflow project.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Smoke is green and `policy.skore_mode` is `mlflow`.
 - `tracking_uri` is `file:./mlruns`; put emits no run URL.
 - Summary identifies experiment `7` and run `abc123`.
@@ -488,6 +506,7 @@ violated.
 > `splitter=GroupKFold()` so the gate is visible.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - X marker has `cv=GroupKFold()` and
   `split_kwargs={"groups": data["customer_id"]}`.
 - Smoke is green.
@@ -510,6 +529,7 @@ violated.
 > Evaluate the approved, smoke-green experiment and finish the turn.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - This is a standalone evaluate invocation.
 - Notebooks and site are enabled.
 
@@ -521,7 +541,9 @@ violated.
 - Run audit when available, then record-outcome with locator and
   optional digest/headline.
 - Order the remaining close as notebook convert, site build, then
-  `git end-turn --stage evaluate`.
+  `git end-turn --stage evaluate`. Convert `experiments/<stem>.py`
+  and, when `audit/<stem>.py` exists, that file too (`--html` when
+  the site is on). Do not add `<!-- results-embed: audit -->`.
 - If git returns `invoke`, stop after loading `persist-ml-git`
   because it returns to triage.
 
@@ -539,6 +561,7 @@ violated.
 > Run evaluation for 05_new_model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The design is approved and smoke is green.
 - This experiment has never been evaluated.
 - The user has not yet chosen Evaluate at the post-smoke gate.
@@ -558,32 +581,34 @@ violated.
 
 ---
 
-## CASE_19 — Register report custom metric before persistence
+## CASE_19 — F2 with beta goes through with_scoring
 
 **User prompt:**
 > Evaluate 06_classifier with an F2 score using beta=2, show it,
 > and save the report.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The post-smoke answer was Evaluate in this turn.
-- This is a sklearn-style classifier, not a SkrubLearner.
+- The learner is a SkrubLearner. `pipeline.py` has no
+  `with_scoring`.
 - `python -m skore_skills api get` confirmed the installed
-  `skore.evaluate`, `make_scorer`, and metric-registry signatures.
+  `with_scoring`, `make_scorer`, and `skore.evaluate` signatures.
 
 **Must do:**
-- Load `references/custom-metrics.md` and use the report-registry
-  route.
-- Define a named scorer with `make_scorer(..., beta=2)`.
-- Order the implementation as `skore.evaluate(...)`, then
-  `report.metrics.add(...)`, then
-  `report.metrics.summarize(...)`, then `project.put(...)`.
+- Load `references/custom-metrics.md`.
+- Route back through build and attach
+  `.skb.with_scoring(...)` before `.skb.make_learner()`, with a
+  named scorer from `make_scorer(..., beta=2)`.
+- After that attachment, call `skore.evaluate(learner, data={...})`
+  and read the F2 row from `report.metrics.summarize().frame()`
+  before `project.put(...)`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Call `report.metrics.add`.
 - Pass `scoring=` to `skore.evaluate`.
-- Call `project.put` before registering and computing the F2
-  metric.
-- Use a lambda for the persisted metric.
+- Use a lambda for the persisted scorer.
 
 ---
 
@@ -594,6 +619,7 @@ violated.
 > disjoint and `sample_weight` is a column in the input table.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The post-smoke answer was Evaluate in this turn.
 - The learner is a SkrubLearner whose X marker already has
   `cv=GroupKFold()` and
@@ -608,15 +634,15 @@ violated.
   prediction and before `.skb.make_learner()`.
 - Call `skore.evaluate(learner, data={...})` without
   `splitter=`.
-- Inspect the custom scorer with `report.metrics.score()`, then
-  call `project.put(...)`.
+- Read the attached name from `report.metrics.summarize().frame()`,
+  then call `project.put(...)`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Call `report.metrics.add`.
 - Pass `scoring=` to `skore.evaluate`.
 - Put `sample_weight` in `mark_as_X(..., split_kwargs=...)`.
 - Derive scoring weights from the unsplit raw frame.
-- Claim the DataOp scorer appears in `metrics.summarize()`.
 
 ---
 
@@ -627,6 +653,7 @@ violated.
 > the test set has more than 50 features, then save the report.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The post-smoke answer was Evaluate in this turn.
 - This is a sklearn-style estimator, not a SkrubLearner.
 - `python -m skore_skills api get` confirmed the installed
@@ -657,6 +684,7 @@ violated.
 > regression, no groups, no temporal ordering.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/01_baseline.md` approved.
 - `src/<pkg>/pipeline.py` exists with `build_learner` returning a
   `SkrubLearner`. The X-marker has empty `split_kwargs`.
@@ -673,7 +701,7 @@ violated.
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Define a `Check` subclass or call `report.checks.add`.
 - Pass `scoring=` to `skore.evaluate`.
-- Call `report.metrics.add` without an explicit metric request.
+- Call `report.metrics.add`.
 
 ---
 
@@ -683,6 +711,7 @@ violated.
 > Evaluate the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved design, green smoke, declared learner.
 - `status.modeling_decisions` is `draft`.
 - `model-ml-pipeline` is installed.
@@ -699,12 +728,95 @@ violated.
 
 ---
 
-## CASE_24 — A shipped test table uses a prefitted learner
+## CASE_24 — Missing locked F2 returns to build
+
+**User prompt:**
+> Evaluate 09_classifier. The locked comparison metric is F2.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- The post-smoke answer was Evaluate in this turn.
+- The learner is a SkrubLearner. `pipeline.py` has no
+  `with_scoring`.
+- `frame show` returned `proceed` with `translation.metric` `F2`.
+- Binary classification. The X marker has `cv=KFold(n_splits=5)`.
+
+**Must do:**
+- Return to build before `skore.evaluate` so F2 is attached with
+  `.skb.with_scoring(...)` before `.skb.make_learner()`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Call `skore.evaluate` while the locked scorer is missing.
+- Cover the locked F2 with `report.metrics.add`.
+- Pass `scoring=` to `skore.evaluate`.
+
+---
+
+## CASE_25 — Attached F2 is a summarize row
+
+**User prompt:**
+> Evaluate 09_classifier. The locked comparison metric is F2.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- The post-smoke answer was Evaluate in this turn.
+- The learner is a SkrubLearner. The prediction DataOp already
+  has `.skb.with_scoring(...)` for F2, before `make_learner`.
+- `frame show` returned `proceed` with `translation.metric` `F2`.
+- Binary classification. The X marker has `cv=KFold(n_splits=5)`.
+- `policy.skore_mode` is `local`.
+
+**Must do:**
+- Call `skore.evaluate(learner, data={...})` without `splitter=`.
+- Read the F2 row from `report.metrics.summarize().frame()`, then
+  `project.put(...)`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Send the learner back to build.
+- Call `report.metrics.add`.
+- Pass `scoring=` to `skore.evaluate`.
+
+---
+
+## CASE_26 — Attached metric missing because the mixin is absent
+
+**User prompt:**
+> `within_10pct` is on the learner with `with_scoring`, but
+> `summarize()` has no such row. The predictor is
+> `class CommuneMeanRegressor(BaseEstimator)`.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- The prediction DataOp already has
+  `.skb.with_scoring(...)` for `within_10pct`, before
+  `make_learner`.
+- `CommuneMeanRegressor` subclasses `BaseEstimator` only.
+  It implements `fit` and `predict`.
+- `frame show` returned `proceed`. Tabular regression.
+
+**Must do:**
+- Return to build before treating the report as complete.
+- Change the bases to `RegressorMixin, BaseEstimator`.
+- The mixin is the first base.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Leave the class as `BaseEstimator` only.
+- Write `class CommuneMeanRegressor(BaseEstimator, RegressorMixin)`.
+- Call `report.metrics.add`.
+- Drop `with_scoring` as if the scorer were missing.
+
+---
+
+## CASE_27 — A shipped test table uses a prefitted learner
 
 **User prompt:**
 > Score the baseline on the test table that shipped with the data.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved design, green smoke, declared `build_learner`. The
   marker has no `cv`. The graph loads one table.
 - `frame show` returns `proceed` with `translation.splitter`

@@ -14,9 +14,12 @@ description: >
   recorded EDA; or a methodology concern (leakage, research)
   arises on a recorded EDA.
 
-  STOP when status shows no scaffold or no data (send to setup
-  or triage), the request is not raw-data exploration, or EDA
-  is recorded with no refresh and no methodology concern.
+  STOP when `status.setup.pending` is non-empty (load
+  `setup-ml-project`), when there is no data (send to triage),
+  the request is not raw-data exploration, or EDA is recorded
+  with no refresh and no methodology concern. Do not invent a
+  package root or write a root `JOURNAL.md` while workspace
+  setup is still pending.
 
   HOW TO USE: G-TABULAR, add the tabular stack via
   `add-python-package`, infer or ask the target, load
@@ -75,6 +78,18 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 
 ## Stop conditions
 
+- **Setup first.** Run `python -m skore_skills status`. If
+  `status.setup.pending` is non-empty and
+  `status.skills.setup-ml-project` is true, load
+  `setup-ml-project` and stop. Do not start this skill. When it
+  returns, continue. Do not load it again on this turn. If that
+  skill is not installed, name the pending pieces in one line
+  and stop. Do not invent `git init`, scaffold, or `env init`.
+  If `status.setup.env` or `status.setup.workspace` is
+  `declined`, stop in one line. A declined `git` or `editable`
+  is not asked again; continue. Do not define `PROJECT_ROOT` by
+  hand or write a root `JOURNAL.md` while workspace setup is
+  pending.
 - **Read-only raw data.** Never clean, rewrite, or re-save the
   user's files. Never tell the user to drop a column or file
   (“drop it”). Leakage stays Open questions / a `measure`
@@ -159,6 +174,7 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 ## Pre-flight
 
 ```
+- [ ] Setup: pending empty | load setup-ml-project and stop
 - [ ] Detect: status.data_analysis present|skipped|missing
 - [ ] G-DATA-ANALYSIS: run | skip when the analysis file is absent (skip → JOURNAL only, STOP). present → keep or re-run; never write skipped
 - [ ] G-TABULAR + add frame lib + skrub + matplotlib + seaborn
@@ -408,8 +424,10 @@ summary (optional md / site link); it never reaches convert /
 If `policy.notebooks` is true, `export-ml-notebook` is installed,
 run `python -m skore_skills notebook convert
 data_analysis/data_analysis.py`, with `--html` when `policy.site`
-is also true. Skip in one line otherwise. Missing jupytext /
-nbclient / nbconvert → one-line skip naming `add-python-package`;
+is also true. Skip in one line otherwise. If convert fails
+because `ipywidgets` is missing, load `add-python-package` for
+it (agent) and convert again. Missing jupytext / nbclient /
+nbconvert → one-line skip naming `add-python-package`;
 do not fail the turn, do not `pixi add`.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run

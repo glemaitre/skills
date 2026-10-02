@@ -21,12 +21,16 @@ converted notebooks (`<stem>.nb.html`, written only by
 `export-ml-notebook` with `notebook convert --html`) are embedded
 inline. HTML viewers have open-separately and fullscreen controls.
 Each experiment design note has one `## Notebooks` section:
-evaluation first, then audit; a missing viewer is omitted.
+evaluation first, then audit. The audit viewer is
+`audit/<stem>.nb.html` from `notebook convert --html`. A missing
+file is omitted. Do not use `<!-- results-embed: audit -->`.
 Derived HTML and PNG viewers under `scratch/results/<stem>/`
 (report, checks, metrics, plus extra Display slugs) may be copied
 into the staged docs. Core Results headings are Report overview /
-Checks / Metrics. Extra slugs use `<!-- results-embed: <slug> -->`
-under `## Results` **or** `## Method` (`pipeline` is the Method
+Checks / Metrics. `### Metrics` is a heading; the scores are the
+embedded `metrics.html` viewer, not a second markdown table.
+Extra slugs use `<!-- results-embed: <slug> -->` under
+`## Results` **or** `## Method` (`pipeline` is the Method
 diagram: unfitted after construct, fitted after evaluate).
 Only Markdown and already-generated notebook/HTML viewers are
 exported. The gitignored serialized Skore `reports/` directory is

@@ -45,41 +45,45 @@
 
 ---
 
-## CASE_02 — Continue setup, all boxes still on
+## CASE_02 — Recorded env stays off the board
 
 **User prompt:**
 > Continue the setup.
 
 **Assumed workspace state:**
+- `status.setup.env` is `done`. `status.setup.pending` is
+  `workspace`, `git`. `status.setup.editable` is `missing`.
 - `python -m skore_skills status` reports `env_manager: pixi`,
-  `policy.env_manager: pixi`, `has_src: false`, `git: false`.
-- `policy.env.managed`, `policy.package`, and
-  `policy.git.autocommit` are unset.
+  `policy.env_manager: pixi`, `policy.env.managed: true`,
+  `has_src: false`, `git: false`.
+- `policy.package` and `policy.git.autocommit` are unset.
 - `pixi.toml` and a `pixi init` `pyproject.toml` exist; no `src/`.
 - Every `skills` entry is `true`.
 
 **Must do:**
-- Read `status` first and treat the manager as already resolved.
-- Ask the multi-select with **all installed pieces preselected**
-  (not only remaining work).
-- Before any setup command, ask the choices that are still
-  unset for the boxes the user keeps: whether we manage the
-  environment when env stays checked, the Python import name
-  when workspace stays checked, and automatic commits when git
-  stays checked. Persist those answers.
+- Read `status` first and do not offer Python environment.
+- Ask the multi-select with workspace layout, editable install,
+  and Git **preselected**. Editable is on the board because
+  workspace is pending and editable is still missing.
+- Before any setup command, persist
+  `python -m skore_skills policy set setup.<piece> declined` for
+  each unchecked box.
+- Ask the Python import name and automatic commits for the boxes
+  the user keeps. Do not ask which manager to use or whether we
+  manage the environment.
 - If the user keeps workspace + git: load `setup-workspace` then
-  `setup-git`; schedule editable only after `has_src`. Do not
-  install sklearn or skrub. If env remains selected,
-  `setup-python-env` may install its required plain Skore; this
-  coordinator must not install or configure it directly.
-- Do not re-ask which environment manager to use in this meta.
+  `setup-git`; schedule editable only after `has_src`. After each
+  loaded skill returns, persist `setup.<piece> done`. Do not
+  install sklearn or skrub.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
-- Re-ask which environment manager to use.
+- Offer the Python environment box.
+- Re-ask which environment manager to use or whether we manage
+  the environment.
 - Pass `--force` to `scaffold`.
 - Wire the editable install before the layout exists.
-- Uncheck env/workspace/git because env already exists.
+- Preselect a piece whose `status.setup` value is `done`.
 
 ---
 
@@ -131,6 +135,8 @@
 **Must do:**
 - Ask the multi-select with every installed box preselected.
 - Skip `setup-python-env` in one line because the user unchecked it.
+- Persist `python -m skore_skills policy set setup.env declined`
+  before any write.
 - Do not ask the environment manager or whether we manage the
   environment.
 - Before `scaffold` or `git init`, ask the Python import name and
@@ -198,3 +204,27 @@
   names pixi.
 - Run `env init` or `scaffold` before the remaining opening
   questions are answered.
+
+---
+
+## CASE_07 — Recorded setup asks nothing
+
+**User prompt:**
+> Set up this project.
+
+**Assumed workspace state:**
+- `status.setup.env`, `workspace`, `editable`, and `git` are
+  `done`. `status.setup.pending` is empty.
+- Every `skills` entry is `true`.
+- The user asked only to set up. No lifecycle skill is waiting.
+
+**Must do:**
+- Run `python -m skore_skills status`.
+- Ask nothing about the Python environment, workspace layout,
+  editable install, or Git.
+- Load `triage-ml-task`. Do not start exploratory data analysis.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- AskUserQuestion for a piece that is already `done`.
+- Run `env init`, `scaffold`, or `git init`.

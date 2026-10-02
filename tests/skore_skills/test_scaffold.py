@@ -52,7 +52,14 @@ def test_scaffold_tree_and_no_placeholders(
     assert (tmp_path / "journal" / "JOURNAL.md").is_file()
     journal = (tmp_path / "journal" / "JOURNAL.md").read_text(encoding="utf-8")
     assert "## History" in journal
+    assert "## Ideas" in journal
     assert "## Backlog" in journal
+    assert (
+        journal.index("## History")
+        < journal.index("## Ideas")
+        < journal.index("## Backlog")
+    )
+    assert "| Question | Status | Experiment | Source |" in journal
     assert "[data_analysis/data_analysis.md]" in journal
     assert "Workspace decisions" not in journal
     assert "| Project / dataset |" in journal
@@ -204,6 +211,12 @@ def test_scaffold_journal_index_and_design(
     journal_text = journal.read_text(encoding="utf-8")
     design_text = design.read_text(encoding="utf-8")
     assert "## History" in journal_text
+    assert "## Ideas" in journal_text
+    assert (
+        journal_text.index("## History")
+        < journal_text.index("## Ideas")
+        < journal_text.index("## Backlog")
+    )
     assert "| Headline result | Report | Design note |" in journal_text
     assert design_text.startswith("# 02_target_transform\n")
     assert "- **Persisted report:**" in design_text
