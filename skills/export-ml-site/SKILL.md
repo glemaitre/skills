@@ -53,8 +53,13 @@ left rail beside a 1200px report column. Mobile uses a drawer.
 4. If this is the first site turn, run `site init` (gitignore
    only). Later turns only `site build`.
 5. `python -m skore_skills site build`. Do not run
-   `notebook convert`. Name a build error; the markdown sources
-   remain the record. Tell the user to open `report.html` at
+   `notebook convert`. If `site build` errors with
+   `mkdocs-material is required`, load `add-python-package`
+   for `mkdocs-material` (agent) and build once more. Do not
+   `pixi add` / `uv add`. If that skill is missing, or the
+   retry still fails, name the error in one line. Name a build
+   error; the markdown sources remain the record. Tell the user
+   to open `report.html` at
    the workspace root (double-click; no server). Do not send
    them to the markdown instead. Stage owners that just ran
    `site build` must name that launcher (and the stage page:
@@ -69,7 +74,11 @@ that AskUserQuestion / consent stop — not only at End of turn.
 
 1. If `policy.site` is true and this skill is installed, run
    `python -m skore_skills site build`. Skip in one line
-   otherwise. Name a build error; do not fail the gate.
+   otherwise. If `site build` errors with `mkdocs-material is
+   required`, load `add-python-package` for `mkdocs-material`
+   (agent) and build once more. Do not `pixi add` / `uv add`.
+   If that skill is missing, or the retry still fails, name the
+   error in one line. Name a build error; do not fail the gate.
 2. In the same message as the gate, **Open these**: the `.md`
    path, plus `report.html` and the stage page
    (`html/<stem>.html`, `html/data_analysis.html`, or the home

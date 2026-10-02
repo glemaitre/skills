@@ -275,7 +275,11 @@ Convert re-executes the script. If convert fails because
 (agent) and convert again. Missing jupytext / nbclient /
 nbconvert → one line naming `add-python-package`. Then, if
 `policy.site` is true and `export-ml-site` is installed, run
-`python -m skore_skills site build`. A build error does not
+`python -m skore_skills site build`. If `site build` errors
+with `mkdocs-material is required`, load `add-python-package`
+for `mkdocs-material` (agent) and build once more. Do not
+`pixi add` / `uv add`. If that skill is missing, or the retry
+still fails, name the error in one line. A build error does not
 fail the turn.
 
 Run `python -m skore_skills git end-turn --stage evaluate`.

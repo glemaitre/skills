@@ -25,4 +25,9 @@ stub is `add-python-package` for `skrub`, not a pipeline rewrite.
 If `policy.site` is true and `export-ml-site` is installed, run
 `python -m skore_skills site build` after this snapshot and
 before `smoke run` and the Evaluate question. Skipped or missing
-EDA does not defer it. Skip in one line otherwise.
+EDA does not defer it. Skip in one line otherwise. If `site
+build` errors with `mkdocs-material is required`, load
+`add-python-package` for `mkdocs-material` (agent) and build
+once more. Do not `pixi add` / `uv add`. If that skill is
+missing, or the retry still fails, name the error in one line.
+Name a build error; do not skip Evaluate.

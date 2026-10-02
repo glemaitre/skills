@@ -274,8 +274,13 @@ not write or execute the notebook.
 6. **Keep exploring vs close** — unless the user already closed
    the turn (“EDA is done”, “close the turn”): if `policy.site`
    is true and `export-ml-site` is installed, run
-   `python -m skore_skills site build` first (skip in one line
-   otherwise; name a build error; do not fail the gate). Link
+   `python -m skore_skills site build` first. Skip in one line
+   otherwise. If `site build` errors with `mkdocs-material is
+   required`, load `add-python-package` for `mkdocs-material`
+   (agent) and build once more. Do not `pixi add` / `uv add`.
+   If that skill is missing, or the retry still fails, name the
+   error in one line. Name a build error; do not fail the gate.
+   Link
    `data_analysis/data_analysis.md` plus `report.html` and
    `html/data_analysis.html` when the build ran. Do not
    `notebook convert` or `git end-turn` on this preview. Then
@@ -432,8 +437,12 @@ do not fail the turn, do not `pixi add`.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` after durable files are on
-disk. Skip in one line otherwise. Name a build error; do not fail
-the data-analysis turn. Name `report.html` and
+disk. Skip in one line otherwise. If `site build` errors with
+`mkdocs-material is required`, load `add-python-package` for
+`mkdocs-material` (agent) and build once more. Do not
+`pixi add` / `uv add`. If that skill is missing, or the retry
+still fails, name the error in one line. Name a build error;
+do not fail the data-analysis turn. Name `report.html` and
 `html/data_analysis.html` in the User-facing close when the
 build ran. Do not also send the user to the markdown.
 

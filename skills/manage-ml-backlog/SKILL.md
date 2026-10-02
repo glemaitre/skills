@@ -243,8 +243,12 @@ locator.
 If `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build`. Do not run
 `notebook convert`. Skip
-in one line otherwise. Name a build error; do not fail the
-backlog turn.
+in one line otherwise. If `site build` errors with
+`mkdocs-material is required`, load `add-python-package` for
+`mkdocs-material` (agent) and build once more. Do not
+`pixi add` / `uv add`. If that skill is missing, or the retry
+still fails, name the error in one line. Name a build error;
+do not fail the backlog turn.
 
 Run `python -m skore_skills git end-turn --stage backlog`. If JSON
 `action` is `invoke`, load `persist-ml-git` only if

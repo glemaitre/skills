@@ -571,8 +571,12 @@ is staged and `git end-turn` stages the turn.
 The `notebook convert` for `audit/<stem>.py` already ran above.
 If `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` so the audit viewer reaches
-the experiment page. Skip in one line otherwise. Name a build
-error; do not fail the audit turn. Name `report.html` (and
+the experiment page. Skip in one line otherwise. If `site build`
+errors with `mkdocs-material is required`, load
+`add-python-package` for `mkdocs-material` (agent) and build
+once more. Do not `pixi add` / `uv add`. If that skill is
+missing, or the retry still fails, name the error in one line.
+Name a build error; do not fail the audit turn. Name `report.html` (and
 `html/<stem>.html`) in the User-facing close when the build ran.
 Do not also send the user to the markdown.
 
