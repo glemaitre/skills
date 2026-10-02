@@ -2,29 +2,24 @@
 name: explore-ml-data
 description: >
   Owns data understanding before any model is designed. Place
-  `data_analysis/data_analysis.py`, run
-  `python -m skore_skills cells run`, dump facts under
-  `scratch/data_analysis/`, then write `data_analysis.md` and
-  JOURNAL § Data understanding. Never design the model, edit
-  `src/<pkg>/`, or modify raw data files.
+  `data_analysis/data_analysis.py`, run `cells run`, write
+  `data_analysis.md` and JOURNAL § Data understanding. Never
+  design the model, edit `src/<pkg>/`, or modify raw data files.
 
   TRIGGER when the user asks to explore, profile, or understand
   the data; triage sent them here (`status.data_analysis`
   missing); a data source changed; they want to refresh a
-  recorded EDA; or a methodology concern (leakage, research)
-  arises on a recorded EDA.
+  recorded EDA; or leakage or research arises on a recorded EDA.
 
   STOP when `status.setup.pending` is non-empty (load
   `setup-ml-project`), when there is no data (send to triage),
   the request is not raw-data exploration, or EDA is recorded
   with no refresh and no methodology concern. Do not invent a
-  package root or write a root `JOURNAL.md` while workspace
-  setup is still pending.
+  package root or a root `JOURNAL.md` while setup is pending.
 
-  HOW TO USE: G-TABULAR, add the tabular stack via
-  `add-python-package`, infer or ask the target, load
-  `plot-ml-figure` if installed, copy the template, `cells run`,
-  write facts and the markdown, then ask keep-exploring vs close.
+  HOW TO USE: G-TABULAR via `add-python-package`, infer or ask
+  the target, load `plot-ml-figure` if installed, then ask
+  keep-exploring vs close.
 ---
 
 # Explore ML Data
