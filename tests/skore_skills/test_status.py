@@ -420,6 +420,26 @@ def test_status_setup_managed_without_manifest_stays_missing(tmp_path: Path) -> 
     assert snapshot(tmp_path)["setup"]["env"] == "missing"
 
 
+def test_status_setup_ignores_non_object_record() -> None:
+    """A non-object ``setup`` value falls back to inference."""
+    from skore_skills.policy import empty_policy
+    from skore_skills.workspace import setup_status
+
+    policy = empty_policy()
+    policy["setup"] = "nope"
+    setup = setup_status(
+        policy,
+        env_manager=None,
+        ambiguous=False,
+        has_src=False,
+        has_journal=True,
+        git=False,
+    )
+    assert setup["workspace"] == "done"
+    assert setup["env"] == "missing"
+    assert setup["pending"] == ["env", "editable", "git"]
+
+
 def test_status_skills_ignores_out_of_bound_depth(tmp_path: Path) -> None:
     """Sidecars deeper than ``<dot-dir>/<sub>/skills`` are not scanned."""
     deep = tmp_path / ".cache" / "a" / "b" / "skills"
