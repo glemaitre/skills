@@ -539,6 +539,24 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 29,
+      "title": "Missing mkdocs-material retries before keep vs close",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Scaffold exists. G-TABULAR is `pandas`.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available.\n- `policy.site` is true.\n- `export-ml-site` is installed.\n- `add-python-package` is installed.\n- `python -m skore_skills site build` printed\n  `mkdocs-material is required; add it with add-python-package`.]\n\nExplore the California housing CSV. Target is MedHouseVal.",
+      "expected_output": "Behavioural response satisfying: - After `data_analysis.md` and JOURNAL, load `add-python-package` for `mkdocs-material` and run `python -m skore_skills site build` again. - Then AskUserQuestion keep exploring vs close (neither option recommended or preselected). It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `pixi add` or `uv add`. - Skip the keep-vs-close gate.",
+      "files": [],
+      "expectations": [
+        "After `data_analysis.md` and JOURNAL, load `add-python-package` for `mkdocs-material` and run `python -m skore_skills site build` again.",
+        "Then AskUserQuestion keep exploring vs close (neither option recommended or preselected).",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Run `pixi add` or `uv add`.",
+        "The response does NOT: Skip the keep-vs-close gate.",
+        "The response does NOT: Run `notebook convert` or `git end-turn` before the user picks Close."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

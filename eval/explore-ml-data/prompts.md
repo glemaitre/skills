@@ -797,3 +797,35 @@
 - Persist a joined modeling table.
 - Split rows again during exploration.
 - Lock a fold count or write `predefined` into the journal.
+
+---
+
+## CASE_29 — Missing mkdocs-material retries before keep vs close
+
+**User prompt:**
+> Explore the California housing CSV. Target is MedHouseVal.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- Scaffold exists. G-TABULAR is `pandas`.
+- User chose **run** for G-DATA-ANALYSIS.
+- IPython is available.
+- `policy.site` is true.
+- `export-ml-site` is installed.
+- `add-python-package` is installed.
+- `python -m skore_skills site build` printed
+  `mkdocs-material is required; add it with add-python-package`.
+
+**Must do:**
+- After `data_analysis.md` and JOURNAL, load `add-python-package`
+  for `mkdocs-material` and run `python -m skore_skills site build`
+  again.
+- Then AskUserQuestion keep exploring vs close (neither option
+  recommended or preselected).
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Run `pixi add` or `uv add`.
+- Skip the keep-vs-close gate.
+- Run `notebook convert` or `git end-turn` before the user picks
+  Close.

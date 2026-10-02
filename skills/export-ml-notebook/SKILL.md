@@ -77,8 +77,13 @@ when it is `null` or false.
    viewer is packaged. Run `--html` and `site build` **only**
    when the user asked for HTML or a site viewer. Convert
    without `--html` does not rebuild the site. Skip in one line
-   otherwise. Name a build error; do not fail the convert. Point
-   the user at the HTML viewer / `report.html`, not the CLI.
+   otherwise. If `site build` errors with `mkdocs-material is
+   required`, load `add-python-package` for `mkdocs-material`
+   (agent) and build once more. Do not `pixi add` / `uv add`.
+   If that skill is missing, or the retry still fails, name the
+   error in one line. Name a build error; do not fail the
+   convert. Point the user at the HTML viewer / `report.html`,
+   not the CLI.
 
 ## Stop conditions
 

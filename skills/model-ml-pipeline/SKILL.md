@@ -362,8 +362,11 @@ note's `## Notebooks` section after evaluation.
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` so the fitted Method pipeline
 diagram (and Results) replace the construct-time snapshot. Skip in
-one line otherwise.
-Name a build error; do not fail the model turn. Name
+one line otherwise. If `site build` errors with `mkdocs-material
+is required`, load `add-python-package` for `mkdocs-material`
+(agent) and build once more. Do not `pixi add` / `uv add`. If
+that skill is missing, or the retry still fails, name the error
+in one line. Name a build error; do not fail the model turn. Name
 `report.html` (and `html/<stem>.html`) in the User-facing
 close when the build ran. Do not also send the user to the
 markdown.
