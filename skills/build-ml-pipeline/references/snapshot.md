@@ -17,10 +17,13 @@ markdown plus a code cell that builds the unfitted
 file already contains `skore.evaluate`.
 
 Optional: `DataOp.skb.draw_graph()` to `pipeline.svg` only if
-`python -m skore_skills env graphviz` is healthy. Otherwise skip
-Graphviz in one line. Do not `pip install graphviz` and do not
-`env graphviz` from this skill. A "install Pydot and Graphviz"
-stub is `add-python-package` for `skrub`, not a pipeline rewrite.
+`python -m skore_skills env graphviz` has `dot` set. If `dot` is
+null, or output contains `install Pydot and Graphviz` or
+`Format: "svg" not recognized`, load `add-python-package` for
+`skrub` once, then redraw once. Do not `pip install graphviz`.
+Do not call `env graphviz` from this skill. If that skill is
+missing, or the retry still fails, skip Graphviz in one line.
+Do not rewrite the pipeline.
 
 If `policy.site` is true and `export-ml-site` is installed, run
 `python -m skore_skills site build` after this snapshot and

@@ -133,8 +133,9 @@ after listing the boxes.
    `uv add` / `pip install` from memory.
 
 9. If this turn is `skrub`, Graphviz is required for DataOp HTML
-   graphs. After the add, run `python -m skore_skills env
-   graphviz`. Then:
+   graphs. An already-importable skrub still runs this step. Do
+   not return before it because `import skrub` succeeds. After
+   the add, run `python -m skore_skills env graphviz`. Then:
 
    - `dot` is set, or `action` is `conda` and managed →
      `python -m skore_skills env graphviz --execute` (installs

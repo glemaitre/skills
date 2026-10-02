@@ -241,3 +241,29 @@
 - Run `env add` or pass `--execute`.
 - Invent `pixi add pandas` as a command for the user to run.
 - Wait for the user to install pandas.
+
+---
+
+## CASE_11 — Already-importable skrub still registers Graphviz
+
+**User prompt:**
+> Add skrub to the project.
+
+**Assumed workspace state:**
+- Pixi project (`pixi.toml` or `[tool.pixi]`).
+- `status.policy.env.managed` is true.
+- `env_manager` is pixi.
+- `import skrub` already succeeds.
+- `python -m skore_skills env route skrub` returns
+  `scope: default`.
+- `env graphviz` returns `action: conda` and `managed: true`.
+
+**Must do:**
+- Run `python -m skore_skills env graphviz` and
+  `env graphviz --execute`.
+- Do not return only because `import skrub` already succeeds.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Return before Graphviz setup because the import works.
+- Run `pip install graphviz`.

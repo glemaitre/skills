@@ -732,3 +732,26 @@ violated.
   as a second source that gets joined.
 - Attach `KFold` or call `train_test_split`.
 - Call `skore.evaluate`.
+
+---
+
+## CASE_26 — SVG format error is not a pipeline rewrite
+
+**User prompt:**
+> The learner cell printed Format: "svg" not recognized instead of
+> a figure.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- Design note approved; `import skrub` succeeds.
+- Smoke is green.
+
+**Must do:**
+- Load `add-python-package` for `skrub`, then redraw once.
+- Keep the skrub DataOps graph.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Substitute `sklearn.Pipeline` / `make_pipeline`.
+- Run `pip install graphviz`.
+- Call `env add` or `env graphviz` from this skill.
