@@ -42,9 +42,15 @@ criteria" section. Keep `## Notebooks` with Evaluation then Audit.
 
 ## Entry routing — deterministic
 
-1. Run `python -m skore_skills status`. If `has_src` and
-   `has_journal` are both false, STOP: explain and send the user
-   to `setup-ml-project` / triage. Do not require `git`.
+1. Run `python -m skore_skills status`. If `status.setup.pending`
+   is non-empty and `status.skills.setup-ml-project` is true,
+   load `setup-ml-project` and stop. Do not start this skill.
+   When it returns, continue. Do not load it again on this turn.
+   If that skill is not installed, name the pending pieces in
+   one line and stop. Do not invent `git init`, scaffold, or
+   `env init`. If `status.setup.env` or `status.setup.workspace`
+   is `declined`, stop in one line. A declined `git` or
+   `editable` is not asked again and does not block modeling.
 2. **Framing is mandatory.** If `status.modeling_decisions` is not
    `locked`, load `frame-ml-problem` only if
    `status.skills.frame-ml-problem` is true and stop. Do not invent
@@ -267,8 +273,9 @@ symbols are written, children use
 
 ## Stop conditions
 
-- Unscaffolded workspace (`has_src` and `has_journal` both
-  false): setup/triage; do not start build.
+- Pending setup (`status.setup.pending` non-empty): load
+  `setup-ml-project` and do not start build. A declined `git`
+  is not asked again. A declined env or workspace stops.
 - Generic model landing: do not hand-author the menu; run
   `python -m skore_skills model choices`.
 - If `journal/NN_<short>.md` is missing, this turn only names

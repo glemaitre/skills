@@ -25,6 +25,9 @@ LOOP_STAGES = (
     "backlog",
 )
 
+SETUP_PIECES = ("env", "workspace", "editable", "git")
+SETUP_VALUES = ("done", "declined")
+
 POLICY_SET_KEYS = (
     "env_manager",
     "env.managed",
@@ -36,6 +39,10 @@ POLICY_SET_KEYS = (
     "git.autocommit",
     "loop.stage",
     "loop.stem",
+    "setup.env",
+    "setup.workspace",
+    "setup.editable",
+    "setup.git",
 )
 
 _POLICY_FLAT_KEYS = frozenset(
@@ -49,6 +56,7 @@ _POLICY_FLAT_KEYS = frozenset(
         "site",
         "git",
         "loop",
+        "setup",
     }
 )
 MANAGED_TRUE = ("true", "on", "yes")
@@ -68,6 +76,7 @@ def empty_policy() -> dict[str, Any]:
         "env": {"managed": None},
         "git": {"autocommit": None},
         "loop": {"stage": None, "stem": None},
+        "setup": dict.fromkeys(SETUP_PIECES),
     }
 
 
@@ -114,6 +123,14 @@ def _merge_loaded(raw: Any) -> dict[str, Any]:
         if "stem" in loop:
             merged["stem"] = loop["stem"]
         data["loop"] = merged
+    setup = raw.get("setup")
+    if isinstance(setup, dict):
+        merged_setup = dict(data["setup"])
+        for piece in SETUP_PIECES:
+            value = setup.get(piece)
+            if value in SETUP_VALUES:
+                merged_setup[piece] = value
+        data["setup"] = merged_setup
     return data
 
 
@@ -206,6 +223,8 @@ def set_policy_value(root: Path, key: str, value: str) -> dict[str, Any]:
         raise ValueError("git.autocommit must be off or on")
     if key == "loop.stage" and parsed is not None and parsed not in LOOP_STAGES:
         raise ValueError(f"loop.stage must be one of {', '.join(LOOP_STAGES)}")
+    if key.startswith("setup.") and parsed is not None and parsed not in SETUP_VALUES:
+        raise ValueError("setup piece must be done or declined")
     if key == "env.managed" and parsed is not None:
         lowered = str(parsed).lower()
         if lowered in MANAGED_TRUE:
@@ -223,7 +242,9 @@ def set_policy_value(root: Path, key: str, value: str) -> dict[str, Any]:
         else:
             raise ValueError(f"{key} must be true or false")
     policy = load_policy(root)
-    if key.startswith("git."):
+    if key.startswith("setup."):
+        policy["setup"][key.split(".", 1)[1]] = parsed
+    elif key.startswith("git."):
         policy["git"][key.split(".", 1)[1]] = parsed
     elif key.startswith("loop."):
         policy["loop"][key.split(".", 1)[1]] = parsed

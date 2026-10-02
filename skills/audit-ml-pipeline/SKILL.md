@@ -11,11 +11,12 @@ description: >
   same `put()` key, or they want a narrative of a past experiment
   without `journal/ideas/` files.
 
-  STOP when status shows no scaffold, no approved design, no
+  STOP when `status.setup.pending` is non-empty (load
+  `setup-ml-project`), or when there is no approved design, no
   report, or no agent feature: explain and send the user to
-  setup/triage, `evaluate-ml-pipeline`, or `model-ml-pipeline`.
-  Do not require git or another action skill. Also stop for
-  raw-data exploration or sourcing a future experiment.
+  setup, `evaluate-ml-pipeline`, or `model-ml-pipeline`. A
+  declined git is not asked again. Also stop for raw-data
+  exploration or sourcing a future experiment.
 
   HOW TO USE: confirm journal, experiment, smoke, and report;
   place the file from `templates/audit.py`; `cells run`; derive
@@ -105,10 +106,16 @@ reads the digest as text and does not open the Project. See
 
 ## Stop conditions — read before anything else
 
-- **Workspace not scaffolded.** Run `python -m skore_skills status`
-  first. If `has_src` and `has_journal` are both false, STOP and
-  send the user to `setup-ml-project` / triage. Do not require
-  `git`.
+- **Setup still pending.** Run `python -m skore_skills status`
+  first. If `status.setup.pending` is non-empty and
+  `status.skills.setup-ml-project` is true, load
+  `setup-ml-project` and stop. Do not start this skill. When it
+  returns, continue. Do not load it again on this turn. If that
+  skill is not installed, name the pending pieces in one line
+  and stop. Do not invent `git init`, scaffold, or `env init`.
+  If `status.setup.env` or `status.setup.workspace` is
+  `declined`, stop in one line. A declined `git` or `editable`
+  is not asked again; continue.
 - **No report → STOP.** Four-way pairing is hard: run
   `python -m skore_skills design consent --stem <stem>` (`ask` /
   `stop` → do not audit) + `experiments/NN_*.py` + smoke pytest

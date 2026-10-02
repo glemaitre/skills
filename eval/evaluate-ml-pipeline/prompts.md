@@ -16,6 +16,7 @@ violated.
 > regression, no groups, no temporal ordering.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/01_baseline.md` approved.
 - `src/<pkg>/pipeline.py` exists with `build_learner` returning a
   `SkrubLearner`. The X-marker has `cv=KFold(n_splits=5)` and
@@ -81,6 +82,7 @@ violated.
 > forecast experiment. Pick the splitter.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/02_load_forecast.md` approved.
 - `pipeline.py` X-marker has no `cv=`.
 - `python -m skore_skills frame show` returns `proceed` with
@@ -106,6 +108,7 @@ violated.
 > are grouped by customer.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `status.modeling_decisions` is `locked`.
 - `frame show` `translation.groups` is `customer_id` and
   `translation.splitter` is `GroupKFold`.
@@ -145,6 +148,7 @@ violated.
 > sure if we should treat it as a group.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `pipeline.py` X-marker has empty `split_kwargs`.
 - `status.modeling_decisions` is `locked`.
 - `frame show` `translation.groups` is `region`.
@@ -174,6 +178,7 @@ violated.
 > Quick and simple.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `pipeline.py` returns a `SkrubLearner`.
 - skore is installed.
 
@@ -202,6 +207,7 @@ violated.
 > fine. Mark it `done` in `JOURNAL.md`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `02_load_forecast` ran; CV report is clean.
 - `tests/smoke/test_02_load_forecast.py` exists but has NOT been
   run this turn / is currently red on row-count.
@@ -233,6 +239,7 @@ violated.
 > report)` to refresh the cache.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `experiments/02_text_encoder.py` already produced a report.
 - The user wants a "refreshed" version.
 
@@ -260,6 +267,7 @@ violated.
 > Wire `experiments/01_baseline.py` for the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/01_baseline.md` approved.
 - `src/<pkg>/pipeline.py` has `build_learner`.
 - `policy.skore_mode` is unset. `import skore` may fail.
@@ -292,6 +300,7 @@ violated.
 > Wire `experiments/01_baseline.py` for the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Same as CASE_01.
 - `policy.skore_mode` is `local`.
 - `skore` imports.
@@ -312,6 +321,7 @@ violated.
 > Wire evaluate for the 24h-ahead load forecast. Run CV now.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/02_load_forecast.md` approved.
 - `experiments/02_load_forecast.py` exists.
 - Pipeline has lag features (history-dependent).
@@ -337,6 +347,7 @@ violated.
 > Evaluate the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Same as CASE_01; smoke is green.
 - `model-ml-pipeline` did NOT dispatch this turn.
 - `policy.notebooks` and `policy.site` are both true.
@@ -378,6 +389,7 @@ violated.
 > Evaluate the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Same as CASE_01; smoke is green.
 - `model-ml-pipeline` dispatched this turn and owns the close.
 - `policy.notebooks` and `policy.site` are both true.
@@ -407,6 +419,7 @@ violated.
 > Evaluate and save 01_baseline locally.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Smoke is green and `policy.skore_mode` is `local`.
 - `project.put("01_baseline", report)` succeeds.
 - The newest matching summary row has id `local-report-id`.
@@ -439,6 +452,7 @@ violated.
 > Evaluate and upload 02_encoder to Skore Hub.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Smoke is green and `policy.skore_mode` is `hub`.
 - Successful `put` stdout contains
   `Consult your report at https://hub.example/direct-report`.
@@ -466,6 +480,7 @@ violated.
 > Evaluate 03_features into our file-backed MLflow project.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Smoke is green and `policy.skore_mode` is `mlflow`.
 - `tracking_uri` is `file:./mlruns`; put emits no run URL.
 - Summary identifies experiment `7` and run `abc123`.
@@ -490,6 +505,7 @@ violated.
 > `splitter=GroupKFold()` so the gate is visible.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - X marker has `cv=GroupKFold()` and
   `split_kwargs={"groups": data["customer_id"]}`.
 - Smoke is green.
@@ -512,6 +528,7 @@ violated.
 > Evaluate the approved, smoke-green experiment and finish the turn.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - This is a standalone evaluate invocation.
 - Notebooks and site are enabled.
 
@@ -541,6 +558,7 @@ violated.
 > Run evaluation for 05_new_model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The design is approved and smoke is green.
 - This experiment has never been evaluated.
 - The user has not yet chosen Evaluate at the post-smoke gate.
@@ -567,6 +585,7 @@ violated.
 > and save the report.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The post-smoke answer was Evaluate in this turn.
 - The learner is a SkrubLearner. `pipeline.py` has no
   `with_scoring`.
@@ -597,6 +616,7 @@ violated.
 > disjoint and `sample_weight` is a column in the input table.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The post-smoke answer was Evaluate in this turn.
 - The learner is a SkrubLearner whose X marker already has
   `cv=GroupKFold()` and
@@ -630,6 +650,7 @@ violated.
 > the test set has more than 50 features, then save the report.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The post-smoke answer was Evaluate in this turn.
 - This is a sklearn-style estimator, not a SkrubLearner.
 - `python -m skore_skills api get` confirmed the installed
@@ -660,6 +681,7 @@ violated.
 > regression, no groups, no temporal ordering.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/01_baseline.md` approved.
 - `src/<pkg>/pipeline.py` exists with `build_learner` returning a
   `SkrubLearner`. The X-marker has empty `split_kwargs`.
@@ -686,6 +708,7 @@ violated.
 > Evaluate the baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved design, green smoke, declared learner.
 - `status.modeling_decisions` is `draft`.
 - `model-ml-pipeline` is installed.
@@ -708,6 +731,7 @@ violated.
 > Evaluate 09_classifier. The locked comparison metric is F2.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The post-smoke answer was Evaluate in this turn.
 - The learner is a SkrubLearner. `pipeline.py` has no
   `with_scoring`.
@@ -732,6 +756,7 @@ violated.
 > Evaluate 09_classifier. The locked comparison metric is F2.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The post-smoke answer was Evaluate in this turn.
 - The learner is a SkrubLearner. The prediction DataOp already
   has `.skb.with_scoring(...)` for F2, before `make_learner`.
@@ -760,6 +785,7 @@ violated.
 > `class CommuneMeanRegressor(BaseEstimator)`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The prediction DataOp already has
   `.skb.with_scoring(...)` for `within_10pct`, before
   `make_learner`.
