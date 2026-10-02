@@ -319,3 +319,33 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `python -m skore_skills frame show`.
 - Invent a metric, baseline, or fold count.
+
+---
+
+## CASE_13 — A shipped train and test table is a folds choice
+
+**User prompt:**
+> How should we split rows for evaluation?
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- Status is `draft`. Every modeling-decisions cell except Folds
+  is already filled for an iid point-prediction problem.
+- `frame show` returns `ask` / `missing_keys`. `missing` is
+  `folds`. The question cites `references/validation.md` and has
+  no candidates.
+- The EDA summary names `data/train.csv` as the training table
+  and `data/test.csv` as the test table.
+
+**Must do:**
+- Read `references/validation.md`.
+- In the folds question, offer using the training table and test
+  table the EDA already names, and quote those two files.
+- Say that `1` is one split drawn from a single table, and that
+  choosing the shipped tables is recorded as `predefined`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Write `prefit` or a splitter class in the journal.
+- Record `1` as the way to use the shipped tables.
+- Tell the user to concatenate the two tables.

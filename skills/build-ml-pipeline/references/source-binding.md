@@ -60,6 +60,12 @@ Common identifier types:
 For multi-source pipelines, declare one `skrub.var(...)` per source and
 join inside the graph (see SKILL pattern 3).
 
+A shipped training table and test table are not two sources to join.
+When `translation.splitter` is `prefit`, bind one source — the training
+table. Do not concatenate the test file into that frame. Evaluation
+rebinds the same variable to the test table. Both tables share the
+schema the loader expects, including the target.
+
 ## Discourage — bind a materialized DataFrame produced outside the graph
 
 The loader runs in module-level / driver code, the graph receives an
@@ -138,7 +144,9 @@ auto-rewrite.
    parameter** on `build_pipeline` (e.g. `path_preview: str | Path | None
    = None`); the experiment script passes an absolute path resolved from
    `<pkg>.PROJECT_ROOT`. Do not bake a relative-path literal into the
-   `value=` of `skrub.var`.
+   `value=` of `skrub.var`. When the identifier is a shipped training
+   file and a separate test file is the held-out table (`prefit`),
+   bind the training file only. Do not concatenate the test file.
 2. No — the data is generated in-process? Bind the generated object
    directly via `skrub.var`. The synthetic case is the only case where
    binding a materialized object is the intended form.

@@ -34,7 +34,7 @@
 | Metric | <comparison name> |
 | Baseline | <one of seasonal_naive, group_mean, logistic, production, dummy> |
 | Baseline note | <one short phrase> |
-| Folds | <integer, at least 1> |
+| Folds | <integer at least 1, or predefined> |
 
 ## History
 

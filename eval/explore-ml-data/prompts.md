@@ -770,3 +770,30 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `python -m skore_skills cells run`.
 - Ask the tabular-library question before setup returns.
+
+---
+
+## CASE_28 — A shipped train and test pair is not joined
+
+**User prompt:**
+> Explore the files in `data/`. Target is y.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- Scaffold exists. G-TABULAR is `pandas`.
+- User chose **run** for G-DATA-ANALYSIS.
+- IPython is available.
+- Raw files: `data/train.csv` and `data/test.csv`, same columns,
+  including `y`.
+
+**Must do:**
+- Name both files in the summary as a training table and a test
+  table.
+- Leave the evaluation choice for later. Do not concatenate the
+  two files.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Persist a joined modeling table.
+- Split rows again during exploration.
+- Lock a fold count or write `predefined` into the journal.

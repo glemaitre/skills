@@ -201,8 +201,15 @@ structure, open `references/custom-splitter.md` and write
   and `split_kwargs={"groups": data["<translation.groups>"]}`.
 - `splitter` `KFold` — `cv=KFold(n_splits=<folds>)` and empty
   `split_kwargs`.
-- Holdout (`report` `EstimatorReport`) or `translation` null —
-  no `cv`.
+- `splitter` `prefit` — the data already has a training table
+  and a test table. No `cv`. The graph loads the training table
+  only. Do not add the test table as a second source, and do not
+  concatenate the two files. Both tables share the schema the
+  loader expects, including the target. The experiment binds the
+  test table later. Do not call `train_test_split`.
+- Holdout (`report` `EstimatorReport` and `splitter` null) or
+  `translation` null — no `cv`. This holdout is one split drawn
+  from a single table. It is not the shipped train/test pair.
 
 Scoring uses `translation.metric`. If that name is one skore
 already reports for the task (regression: MSE, RMSE, MAE, R²;
@@ -344,7 +351,8 @@ Pre-flight (build-ml-pipeline):
 - [ ] mark_as_X placement (loaded frame, or predict grid if cross-row)
 - [ ] Layer 1 has no horizon, lag, or task filter
 - [ ] cv on mark_as_X matches translation
-      (date class | GroupKFold | KFold | no cv on holdout)
+      (date class | GroupKFold | KFold | no cv on holdout
+      | prefit: training table only, test table not joined)
 - [ ] Non-default translation.metric uses with_scoring
       before make_learner (n/a for a listed skore default)
 - [ ] data_dir_preview=None; no path literal in pipeline.py

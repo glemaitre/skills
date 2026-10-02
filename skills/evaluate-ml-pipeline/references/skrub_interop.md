@@ -94,10 +94,24 @@ The return type depends on `splitter`:
 | A scikit-learn or project cross-validator (`KFold`, `GroupKFold`, custom) | `CrossValidationReport` — multi-fold |
 | omitted, DataOp has `mark_as_X(cv=...)` | `CrossValidationReport` — reuses the DataOp `cv` and `split_kwargs` |
 | omitted, no DataOp `cv` | `EstimatorReport` — single 80/20 holdout |
+| `"prefit"` on a fitted learner; `data` is the test binding only | `EstimatorReport` — the shipped test table |
 
 An explicit `splitter=` always overrides a DataOp `cv` and drops
 `split_kwargs`. Omit `splitter=` when the locked `cv` is on the
-marker. See `references/metadata-routing.md`.
+marker. `splitter="prefit"` is the exception: the learner is
+already fitted on the training table, and `data` binds only the
+test table. Do not concatenate the two tables, and do not pass
+the training table into that call. See
+`references/metadata-routing.md`.
+
+```python
+fitted = learner.fit({"table": train_df})
+report = skore.evaluate(
+    fitted,
+    data={"table": test_df},
+    splitter="prefit",
+)
+```
 
 Confirm the exact dispatch rules via `python -m skore_skills api get`
 (`inspect.signature(skore.evaluate)` + the docstring) against the

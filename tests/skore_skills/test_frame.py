@@ -237,6 +237,52 @@ def test_one_fold_translates_to_estimator_report(tmp_path: Path) -> None:
     assert payload["translation"]["n_splits"] is None
 
 
+def test_predefined_folds_translate_to_prefit(tmp_path: Path) -> None:
+    _journal(tmp_path, **_locked_iid(Folds="predefined"))
+
+    payload = frame_show(tmp_path)
+
+    assert payload["action"] == "proceed"
+    translation = payload["translation"]
+    assert translation["splitter"] == "prefit"
+    assert translation["report"] == "EstimatorReport"
+    assert translation["n_splits"] is None
+    assert translation["pattern"] is None
+    assert translation["scheme"] is None
+
+
+def test_predefined_time_does_not_become_a_date_splitter(tmp_path: Path) -> None:
+    _journal(
+        tmp_path,
+        **_locked_iid(
+            Deployment="time",
+            Horizon="7 day",
+            Gap="7 day",
+            **{"Time role": "sort_key"},
+            **{"Generalize to": "n/a"},
+            Baseline="seasonal_naive",
+            **{"Baseline note": "last observed week"},
+            Folds="predefined",
+        ),
+    )
+
+    payload = frame_show(tmp_path)
+
+    assert payload["translation"]["splitter"] == "prefit"
+    assert payload["translation"]["scheme"] is None
+    assert payload["translation"]["pattern"] is None
+    assert payload["translation"]["report"] == "EstimatorReport"
+
+
+def test_prefit_is_not_a_folds_cell(tmp_path: Path) -> None:
+    _journal(tmp_path, **_locked_iid(Folds="prefit"))
+
+    payload = frame_show(tmp_path)
+
+    assert payload["reason"] == "missing_keys"
+    assert "folds" in payload["missing"]
+
+
 def test_horizon_list_locks_with_one_baseline(tmp_path: Path) -> None:
     _journal(
         tmp_path,

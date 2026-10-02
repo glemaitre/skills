@@ -220,6 +220,25 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 13,
+      "title": "A shipped train and test table is a folds choice",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Status is `draft`. Every modeling-decisions cell except Folds\n  is already filled for an iid point-prediction problem.\n- `frame show` returns `ask` / `missing_keys`. `missing` is\n  `folds`. The question cites `references/validation.md` and has\n  no candidates.\n- The EDA summary names `data/train.csv` as the training table\n  and `data/test.csv` as the test table.]\n\nHow should we split rows for evaluation?",
+      "expected_output": "Behavioural response satisfying: - Read `references/validation.md`. - In the folds question, offer using the training table and test table the EDA already names, and quote those two files. - Say that `1` is one split drawn from a single table, and that choosing the shipped tables is recorded as `predefined`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Write `prefit` or a splitter class in the journal. - Record `1` as the way to use the shipped tables.",
+      "files": [],
+      "expectations": [
+        "Read `references/validation.md`.",
+        "In the folds question, offer using the training table and test table the EDA already names, and quote those two files.",
+        "Say that `1` is one split drawn from a single table, and that choosing the shipped tables is recorded as `predefined`.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Write `prefit` or a splitter class in the journal.",
+        "The response does NOT: Record `1` as the way to use the shipped tables.",
+        "The response does NOT: Tell the user to concatenate the two tables."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

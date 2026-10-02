@@ -14,6 +14,7 @@ _SECTION = re.compile(
 )
 _QUANTITY = re.compile(r"^(?P<value>\d+(?:\.\d+)?)\s+(?P<unit>[A-Za-z]+)$")
 _FOLDS = re.compile(r"^[1-9]\d*$")
+_PREDEFINED = "predefined"
 
 _LABELS = (
     ("Status", "status"),
@@ -233,7 +234,7 @@ def _valid(root: Path, key: str, rows: dict[str, str]) -> bool:
     if key == "gap":
         return _quantity(value) is not None
     if key == "folds":
-        return _FOLDS.fullmatch(value) is not None
+        return value == _PREDEFINED or _FOLDS.fullmatch(value) is not None
     if key == "generalize_to":
         return value != "n/a"
     if key == "baseline":
@@ -339,24 +340,26 @@ def _translation(rows: dict[str, str]) -> dict[str, Any] | None:
     time = effective["deployment"] == "time"
     horizons = _quantities(effective["horizon"]) if time else None
     gap = _quantity(effective["gap"]) if time else None
+    predefined = effective["folds"] == _PREDEFINED
     holdout = effective["folds"] == "1"
-    splitter = None
+    splitter = "prefit" if predefined else None
     pattern = None
     scheme = None
     groups = None
-    if not holdout and time:
+    if not predefined and not holdout and time:
         pattern, scheme = "B", "date_time"
-    elif not holdout and effective["deployment"] == "groups":
+    elif not predefined and not holdout and effective["deployment"] == "groups":
         splitter, pattern = "GroupKFold", "B"
         groups = effective["generalize_to"]
-    elif not holdout:
+    elif not predefined and not holdout:
         splitter, pattern = "KFold", "A"
     folds = effective["folds"]
+    scored_once = holdout or predefined
     return {
         "splitter": splitter,
         "pattern": pattern,
         "scheme": scheme,
-        "n_splits": None if holdout or not folds.isdigit() else int(folds),
+        "n_splits": None if scored_once or not folds.isdigit() else int(folds),
         "horizons": None
         if horizons is None
         else [_number(value) for value, _ in horizons],
@@ -364,7 +367,7 @@ def _translation(rows: dict[str, str]) -> dict[str, Any] | None:
         "gap": None if gap is None else _number(gap[0]),
         "gap_unit": None if gap is None else gap[1],
         "groups": groups,
-        "report": "EstimatorReport" if holdout else None,
+        "report": "EstimatorReport" if scored_once else None,
         "metric": effective["metric"],
     }
 

@@ -809,3 +809,31 @@ violated.
 - Drop `with_scoring` as if the scorer were missing.
 
 ---
+
+## CASE_27 — A shipped test table uses a prefitted learner
+
+**User prompt:**
+> Score the baseline on the test table that shipped with the data.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- Approved design, green smoke, declared `build_learner`. The
+  marker has no `cv`. The graph loads one table.
+- `frame show` returns `proceed` with `translation.splitter`
+  `prefit`, `translation.report` `EstimatorReport`, and
+  `n_splits` null.
+- `policy.skore_mode` is `local`. Evaluate consent is `proceed`.
+- `data/train.parquet` and `data/test.parquet` share a schema,
+  including the target.
+
+**Must do:**
+- Fit the learner on the training table only.
+- Write `skore.evaluate` in `experiments/NN_*.py` with
+  `splitter="prefit"` and `data` bound only to the test table.
+- Say that omitting `splitter=` would draw a new 80/20 split.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Omit `splitter=` or pass the training table into `evaluate`.
+- Concatenate the two tables before the call.
+- Pass positional `X, y` for a `SkrubLearner`.

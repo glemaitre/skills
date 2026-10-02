@@ -703,3 +703,32 @@ violated.
 - Declare `class CommuneMeanRegressor(BaseEstimator, RegressorMixin)`.
 - Subclass `BaseEstimator` alone.
 - Omit the mixin.
+
+---
+
+## CASE_25 — A shipped split is not joined into one table
+
+**User prompt:**
+> Declare the learner. Train and test already exist as separate
+> files.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- Approved design note. `frame show` returns `proceed`.
+- `translation.splitter` is `prefit`, `translation.report` is
+  `EstimatorReport`, and `n_splits` is null.
+- `data/train.parquet` and `data/test.parquet` share a schema,
+  including the target column.
+
+**Must do:**
+- Declare `build_learner` with one source: the training file.
+- Leave `cv` off `mark_as_X`.
+- Say the test file is bound later, at evaluation, and is not
+  part of this graph.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Concatenate the test file into the training frame, or add it
+  as a second source that gets joined.
+- Attach `KFold` or call `train_test_split`.
+- Call `skore.evaluate`.

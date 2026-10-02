@@ -521,6 +521,24 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 28,
+      "title": "A shipped train and test pair is not joined",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Scaffold exists. G-TABULAR is `pandas`.\n- User chose **run** for G-DATA-ANALYSIS.\n- IPython is available.\n- Raw files: `data/train.csv` and `data/test.csv`, same columns,\n  including `y`.]\n\nExplore the files in `data/`. Target is y.",
+      "expected_output": "Behavioural response satisfying: - Name both files in the summary as a training table and a test table. - Leave the evaluation choice for later. Do not concatenate the two files. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Persist a joined modeling table. - Split rows again during exploration.",
+      "files": [],
+      "expectations": [
+        "Name both files in the summary as a training table and a test table.",
+        "Leave the evaluation choice for later. Do not concatenate the two files.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Persist a joined modeling table.",
+        "The response does NOT: Split rows again during exploration.",
+        "The response does NOT: Lock a fold count or write `predefined` into the journal."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }
