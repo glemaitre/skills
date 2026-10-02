@@ -5,6 +5,9 @@ description: >
   any non-default score are already on the DataOp from
   `build-ml-pipeline`. This skill writes the call without
   `splitter=`, persists the report, and records the locator.
+  When the locked split is the training table and test table
+  that shipped with the data, fit on the training table, then
+  pass `splitter="prefit"` with only the test table.
   When `model-ml-pipeline` dispatched this turn, return the
   locator. A standalone turn also owns the evaluate-stage close.
 
@@ -29,7 +32,7 @@ or metric prints.
 
 A `SkrubLearner` does not implement sklearn's `fit(X, y)`.
 `cross_val_score` raises. Call `skore.evaluate(learner, data={...})`
-and omit `splitter=`.
+and omit `splitter=`, unless `translation.splitter` is `prefit`.
 
 ## Human-facing prose
 
@@ -73,8 +76,10 @@ skill ids, `G-*` names, or the wrapper CLI.
    installed.
 5. Emit Pre-flight, then 1–3 sentences: this is local
    full-dataset evaluation with the locked scheme, report
-   metrics, and `project.put`. Name the stem, the fold count
-   when known, and `experiments/<stem>.py` plus
+   metrics, and `project.put`. When `translation.splitter` is
+   `prefit`, say the model is fitted on the training table and
+   scored on the shipped test table. Name the stem, the fold
+   count when known, and `experiments/<stem>.py` plus
    `scratch/results/<stem>/`. Timing depends on rows, folds,
    and the learner. Do not invent minutes. If consent is still
    pending, preview and stop.
@@ -93,25 +98,57 @@ this turn (<why>).` A cache hit is a satisfied lookup.
 ## The call
 
 `skore.evaluate` in `experiments/NN_*.py`. Omit `splitter=` so
-skore reuses the DataOp `cv` and `split_kwargs`. Passing
+skore reuses the DataOp `cv` and `split_kwargs`, unless
+`translation.splitter` is `prefit`. Passing any other
 `splitter=` drops `split_kwargs`. Omitted `splitter=` with no
 DataOp `cv` is an 80/20 holdout, correct only when
-`translation.report` is `EstimatorReport`. Wiring:
+`translation.report` is `EstimatorReport` and
+`translation.splitter` is null. Wiring:
 `references/metadata-routing.md`.
+
+When `translation.splitter` is `prefit`, fit on the training
+table only, then score the test table. Confirm `fit` and
+`evaluate` with `api get`. Do not pass the training table into
+`evaluate`. Omitting `splitter=` here draws a new 80/20 split
+of the test table. Do not concatenate the two tables.
+
+```python
+learner = build_learner()
+fitted = learner.fit({"table": train_df})
+report = skore.evaluate(
+    fitted,
+    data={"table": test_df},
+    splitter="prefit",
+)
+```
+
+An estimator whose `fit` is `(X, y)` uses the same rule:
+
+```python
+fitted_model = LogisticRegression().fit(X_train, y_train)
+report = skore.evaluate(
+    fitted_model, X_test, y_test, splitter="prefit"
+)
+```
+
+`X` / `y` and `data` stay mutually exclusive.
 
 - `SkrubLearner` — `skore.evaluate(learner, data={...})`. Keys
   are the `skrub.var` names. Interop:
   `references/skrub_interop.md`.
 - An estimator whose `fit` is `(X, y)` —
   `skore.evaluate(estimator, X, y)`. Still omit `splitter=`
-  when the locked `cv` is already the evaluation scheme.
+  when the locked `cv` is already the evaluation scheme. The
+  prefit call above is the exception: the estimator is already
+  fitted, and `X` and `y` are the test table.
 
 The `cv` on `mark_as_X` is `KFold`, `GroupKFold`, or the
 date-based class from build. If `translation` names a `cv` and
 the marker has none, return to `build-ml-pipeline`. Do not
 wire `split_kwargs` here. Empty `split_kwargs` plus a possible
 group column → return to `build-ml-pipeline`. Do not default
-to `KFold`.
+to `KFold`. `translation.splitter` `prefit` is not a `cv` on
+the marker.
 
 No `Stratified*` for class imbalance. It compresses across-fold
 variance.
@@ -259,11 +296,12 @@ G-AUDIT-FINDING (`n/a — audit not run` when skipped).
 Pre-flight (evaluate-ml-pipeline):
 - [ ] sklearn, skrub, skore import
 - [ ] frame show is proceed; DataOp cv matches translation
-      (or holdout, and the marker has no cv)
+      (or holdout / prefit, and the marker has no cv)
 - [ ] skore_mode is set (local | hub | mlflow)
 - [ ] evaluate consent is proceed, or the user answered Evaluate
 - [ ] Call site is experiments/NN_*.py
 - [ ] skore.evaluate omits splitter=
+      (or splitter="prefit" and only the test table is passed)
 - [ ] Smoke: passing | n/a (no history-dependent step) | STOP
 ```
 

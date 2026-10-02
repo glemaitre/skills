@@ -72,8 +72,13 @@ wrapper CLI.
    cells to `n/a` in the same edit. Horizon, gap, and time role
    are `n/a` unless deployment is time. Generalize-to is `n/a`
    unless deployment is groups. A fold count of `1` is one
-   train/test split. Once any decision cell is filled and Status
-   is not `locked`, set Status to `draft`. Stop this turn.
+   train/test split drawn from a single table. When the EDA
+   report, the text shipped with the data, or the user already
+   names a separate training table and test table, offer using
+   that split in the folds question and write `predefined` if
+   they choose it. Do not offer it otherwise. Do not write
+   `prefit` in the table. Once any decision cell is filled and
+   Status is not `locked`, set Status to `draft`. Stop this turn.
 6. When the user named one cell and Status is `draft`, do not
    use the lock menu as the change. Run
    `python -m skore_skills frame clear --cell <key>` for that

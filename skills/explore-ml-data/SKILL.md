@@ -116,7 +116,10 @@ Details: `references/cell_anatomy.md`. Extra recipes:
   “no target yet” or Decline → `<TARGET>=None`, `<TASK>=none`;
   TableReport + duplicates only. Do not persist a policy key.
 - **No train/test split.** The modeling-decisions lock owns that
-  choice later. Do not split during EDA.
+  choice later. Do not split during EDA. If the files already
+  are a training table and a test table, name both in the
+  summary and do not concatenate them. Exploration does not
+  choose the evaluation.
   Leakage cells are qualitative flags on the raw family that
   holds the target. Further families use `templates/family.py`
   only (TableReport + duplicates) — no leakage / target /

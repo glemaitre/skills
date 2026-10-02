@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "62fc43c0b7932d60924f9842b245a1a72079a2969f154dfa300e2d9d4d76b1cf",
+  "catalog_hash": "348c3f1f1d3c22643cbab277228bd5cc4c3c64ed4d7cb050af8366c46ebaf495",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "d77e76f71781797efd503f58f0f5c4ddebf89002a05ebd552a559367d1131774"
+      "hash": "6ef622f6027859eacb4a63f727dc9cf675cd24a16c8e638a4eb94342b3cf1851"
     },
     {
       "id": "frame-ml-problem",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "1740bece2be46a7b4caad15dd84eac89f61dc52a2bd67380ea2565ae3ad27968"
+      "hash": "81562d1bd6255c4b4ad443ff2de302fb57057edff47658b9400f32731b5161c1"
     },
     {
       "id": "build-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "a6cb503d58f43cc90523e195f3b3cd46ea1ee572c797126abeb9cdaa2a6b05eb"
+      "hash": "520d2fd80688e946bf5b7c05f5f8fd383dbeb6f7a54461798652420ae85a672a"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "4711918bcca7146d82c237a155b285d5b847a03a565ebdbaa97c7ff531ed4c2c"
+      "hash": "3a65382530d823bee25c5587654eead0d3c3b59028abc6dd6072e24d14f7a853"
     },
     {
       "id": "smoke-test-ml-pipeline",
