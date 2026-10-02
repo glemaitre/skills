@@ -116,11 +116,14 @@ to `KFold`.
 No `Stratified*` for class imbalance. It compresses across-fold
 variance.
 
-The headline is `translation.metric`. If build attached
-`.skb.with_scoring(...)`, inspect `report.metrics.score()`.
-`skore.evaluate` has no `scoring=` argument. A metric or a
-`sample_weight` that belongs on the DataOp goes back to build
-(`references/custom-metrics.md`).
+The headline is `translation.metric`. A name on the skore
+default list in `build-ml-pipeline` needs no scorer. Any other
+name must already be `.skb.with_scoring(...)` on the prediction
+DataOp. If it is not, return to `build-ml-pipeline` before
+`skore.evaluate`. Do not call `report.metrics.add`. When the
+scorer is attached, that name is a row in
+`report.metrics.summarize().frame()`. `skore.evaluate` has no
+`scoring=` argument (`references/custom-metrics.md`).
 
 An extra check the user asks for after the lock:
 `references/custom-checks.md`. Subclass `skore.Check` at module
@@ -274,6 +277,6 @@ Pre-flight (evaluate-ml-pipeline):
 - `references/skrub_interop.md` — env-dict versus `(X, y)`.
 - `references/g_skore_mode.md` — Project constructors.
 - `references/reports.md` — when `evaluate` is too coarse.
-- `references/custom-metrics.md` — metric kwargs and
+- `references/custom-metrics.md` — a non-default metric via
   `with_scoring`.
 - `references/custom-checks.md` — a check the user asked for.
