@@ -8,6 +8,7 @@
 > Audit experiment 02 after evaluation.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The design is approved, smoke is green, and the persisted report exists.
 - `review consent` returns `ask`. The user has not answered yet.
 
@@ -52,6 +53,7 @@
 > Re-audit experiment 03.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - This is a direct free-text invocation.
 - The report exists and smoke is green.
 
@@ -84,6 +86,7 @@
 > Continue the model loop and audit the evaluated baseline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `model-ml-pipeline` dispatched `review-ml-experiment`, which
   loaded this audit.
 - `cells run` already produced the digest.
@@ -114,6 +117,7 @@
 > Audit experiment 04.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The design is approved and smoke is green.
 - `project.summarize()` has no row for experiment 04.
 
@@ -135,6 +139,7 @@
 > Add another audit view before we close.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The initial audit digest exists, including a `help()` tree per
   namespace.
 - A tree's `Displays` group lists one extra view; `api get` confirms

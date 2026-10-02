@@ -30,6 +30,7 @@ violated.
 > with a `build_pipeline()` function.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Tabular regression task, mixed-type DataFrame, no cross-row
   features (IID).
 - `skrub`, `scikit-learn`, `skore` are installed and importable.
@@ -66,6 +67,7 @@ violated.
 > DataOps pipeline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.9.0.
 - Cache exists at `scratch/api/skrub/0.9.0/tabular_pipeline.md`
   (you may treat its content as known).
@@ -96,6 +98,7 @@ violated.
 > we'll do `mark_as_X` on the result.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.9.0.
 - The user is in early baseline construction.
 - The skill's `references/` tree is on disk at the project root
@@ -145,6 +148,7 @@ violated.
 > Continue from here — add the encoder and the predictor.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.9.0.
 - `data` is already a loaded DataFrame.
 
@@ -177,6 +181,7 @@ violated.
 > category and replaces the column. Attach it with `.skb.apply_func`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.9.0.
 - An existing skrub DataOps graph with `mark_as_X` / `mark_as_y`
   in place.
@@ -211,6 +216,7 @@ violated.
 > should I extend `pipeline.py` so that 01 still runs the same?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `src/<pkg>/pipeline.py` has `build_learner(data_dir_preview=None)`.
 - `experiments/01_baseline.py` uses `build_learner()` (no kwargs).
 - Calendar features = a stateless step appending a few columns.
@@ -242,6 +248,7 @@ violated.
 > rows per customer. Build the pipeline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - skrub installed at 0.10.x.
 - IID-shaped features (no cross-row history).
 - `python -m skore_skills frame show` returns `proceed` with
@@ -270,6 +277,7 @@ violated.
 > Declare the baseline learner.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Design note approved.
 - `import skrub` raises `ModuleNotFoundError`.
 
@@ -292,6 +300,7 @@ violated.
 > the pipeline.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Design note approved.
 - `research-ml-practice` is installed.
 - Scratch research lists a `measure` row (plot id uniqueness)
@@ -318,6 +327,7 @@ violated.
 > full-dataset CV.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved `journal/01_baseline.md`.
 - Experiment shell `experiments/01_baseline.py` exists after
   the declaration.
@@ -360,6 +370,7 @@ violated.
 > classification task.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The approved Method names a dummy predictor.
 - No prior model exists.
 
@@ -387,6 +398,7 @@ violated.
 > tabular regression problem.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The approved Method requests a quick traditional-ML baseline.
 
 **Must do:**
@@ -408,6 +420,7 @@ violated.
 > Implement the approved EDA-backed design.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The Method cites high cardinality and a temporal grouping
   finding from `data_analysis/data_analysis.md`.
 
@@ -433,6 +446,7 @@ violated.
 > install Pydot and Graphviz" instead of a figure.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Design note approved; `import skrub` succeeds.
 - Smoke is green.
 
@@ -455,6 +469,7 @@ violated.
 > `observed_at`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `python -m skore_skills frame show` returns `proceed` with
   `translation.scheme` `date_time`, `splitter` null, `n_splits` 4,
   `gap` 7, `gap_unit` `day`. Decisions horizon is `1 day`.
@@ -481,6 +496,7 @@ violated.
 > Use `mark_as_X(split_kwargs={"times": data["timestamp"]})`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `python -m skore_skills frame show` returns `proceed` with
   `translation.scheme` `date_time`.
 - The EDA names `timestamp` as the time column.
@@ -502,6 +518,7 @@ violated.
 > Put `groups` in `split_kwargs` but leave `cv` unset.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Group-aware splitting is approved.
 
 **Must do:**
@@ -523,6 +540,7 @@ violated.
 > Use `cv=5` together with grouped `split_kwargs`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Group-aware splitting is required.
 
 **Must do:**
@@ -544,6 +562,7 @@ violated.
 > Smoke is green on 01_baseline. What now?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `experiments/01_baseline.py` and `tests/smoke/test_01_baseline.py`
   exist; `smoke run --stem 01_baseline` returned `proceed`.
 - `evaluate consent --stem 01_baseline` returns `ask` with
@@ -571,6 +590,7 @@ violated.
 > The design is approved. Declare the learner. EDA was skipped.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved `journal/01_baseline.md`.
 - `status.data_analysis` is `skipped`. No
   `data_analysis/data_analysis.md`.
@@ -597,6 +617,7 @@ violated.
 > Declare the baseline learner.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Approved design note.
 - `status.modeling_decisions` is `missing`.
 - `frame-ml-problem` is installed.
@@ -617,6 +638,7 @@ violated.
 > Write the baseline learner. The comparison metric is F2.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `frame show` returned `proceed`. `translation.metric` is `F2`.
   Binary classification, IID, `translation.splitter` `KFold`,
   `n_splits` 5. No row-aligned metric kwargs.
@@ -643,6 +665,7 @@ violated.
 > Write the baseline learner. Compare on MAE.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `frame show` returned `proceed`. `translation.metric` is `MAE`.
   Tabular regression, IID, `KFold`, `n_splits` 5.
 - No existing `src/<pkg>/pipeline.py`.
@@ -665,6 +688,7 @@ violated.
 > `CommuneMeanRegressor` with `fit` and `predict`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `frame show` returned `proceed`. Tabular regression.
 - No existing estimator class.
 

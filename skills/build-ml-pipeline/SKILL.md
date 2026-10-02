@@ -41,7 +41,7 @@ grid plus marker, and features after the marker.
 
 ## Procedure
 
-1. `python -m skore_skills status`. Missing scaffold → S0. Then
+1. `python -m skore_skills status`. Pending setup → S0. Then
    `python -m skore_skills design consent --stem <stem>`. JSON
    `action` is authoritative. `ask` / `stop` → do not declare
    ("build it" is not approval). `proceed` continues. Then
@@ -267,10 +267,17 @@ all of `tests/smoke/`.
 
 ## Stops
 
-### S0. Workspace not scaffolded
+### S0. Setup still pending
 
-`status` first. `has_src` and `has_journal` both false → stop.
-Do not require `git`. Missing design: `design consent`; `ask` /
+`status` first. If `status.setup.pending` is non-empty and
+`status.skills.setup-ml-project` is true, load
+`setup-ml-project` and stop. Do not start this skill. When it
+returns, continue. Do not load it again on this turn. If that
+skill is not installed, name the pending pieces in one line and
+stop. Do not invent `git init`, scaffold, or `env init`. If
+`status.setup.env` or `status.setup.workspace` is `declined`,
+stop in one line. A declined `git` or `editable` is not asked
+again; continue. Missing design: `design consent`; `ask` /
 `stop` stay here. Missing data contract: explain and stop.
 
 ### S0b. Modeling decisions are not locked

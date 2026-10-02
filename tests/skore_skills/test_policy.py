@@ -82,6 +82,16 @@ def test_policy_set_rejects_invalid_autocommit(tmp_path: Path) -> None:
         set_policy_value(tmp_path, "git.autocommit", "maybe")
 
 
+def test_policy_set_setup_piece(tmp_path: Path) -> None:
+    """Setup pieces persist ``done`` or ``declined``."""
+    policy = set_policy_value(tmp_path, "setup.env", "done")
+    assert policy["setup"]["env"] == "done"
+    policy = set_policy_value(tmp_path, "setup.git", "declined")
+    assert policy["setup"]["git"] == "declined"
+    with pytest.raises(ValueError, match="done or declined"):
+        set_policy_value(tmp_path, "setup.workspace", "maybe")
+
+
 def test_policy_set_rejects_unknown_key(tmp_path: Path) -> None:
     """Unknown keys fail before writing."""
     with pytest.raises(ValueError, match="unknown policy key"):

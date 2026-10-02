@@ -11,12 +11,13 @@ description: >
   the smoke test is failing, a pipeline edit needs proof, or
   the experiment script changes pipeline shape.
 
-  STOP when status shows no scaffold, no approved design, or no
-  matching experiment script: explain and send the user to
-  setup/triage or stay in `build-ml-pipeline`. Do not require
-  git. "Why is smoke failing?" stays here. This action does not
-  cover regression tests or CV interpretation. Do not write
-  `skore.evaluate`.
+  STOP when `status.setup.pending` is non-empty (load
+  `setup-ml-project`), or when there is no approved design or
+  no matching experiment script: explain and send the user to
+  setup or stay in `build-ml-pipeline`. A declined git is not
+  asked again. "Why is smoke failing?" stays here. This action
+  does not cover regression tests or CV interpretation. Do not
+  write `skore.evaluate`.
 
   HOW TO USE: `status`, read the journal and experiment, write
   `tests/smoke/test_NN_*.py`, then
@@ -52,9 +53,16 @@ links); this skill does not narrate the pipeline.
 
 ## Stop conditions — read before anything else
 
-- **Workspace not scaffolded.** Run `python -m skore_skills status`
-  first. If `has_src` and `has_journal` are both false, STOP and
-  send the user to setup/triage. Do not require `git`.
+- **Setup still pending.** Run `python -m skore_skills status`
+  first. If `status.setup.pending` is non-empty and
+  `status.skills.setup-ml-project` is true, load
+  `setup-ml-project` and stop. Do not start this skill. When it
+  returns, continue. Do not load it again on this turn. If that
+  skill is not installed, name the pending pieces in one line
+  and stop. Do not invent `git init`, scaffold, or `env init`.
+  If `status.setup.env` or `status.setup.workspace` is
+  `declined`, stop in one line. A declined `git` or `editable`
+  is not asked again; continue.
 - **No smoke test without an approved design note + script.** The pairing
   rule is hard: run
   `python -m skore_skills design consent --stem <stem>`.

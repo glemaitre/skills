@@ -111,16 +111,17 @@
 **Assumed workspace state:**
 - `env.managed` is null / unanswered.
 - `env detect` reports none or unmanaged-unasked.
+- `status.skills.setup-ml-project` is true.
 
 **Must do:**
-- Say the env is unresolved and stop (or triage). Do not
-  bootstrap `setup-python-env` by catalog id if D20 still applies;
-  status is enough.
+- Load `setup-ml-project` and stop. Do not ask a separate
+  environment question. Do not load `setup-python-env`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `env init`.
 - Run `env add` while managed is unanswered.
+- Load `setup-python-env`.
 
 ---
 

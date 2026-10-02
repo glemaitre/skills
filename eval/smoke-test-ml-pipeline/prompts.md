@@ -12,6 +12,7 @@ violated.
 > features going back 168 hours and a 24h-ahead target.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/02_load_forecast.md` approved with Status.headline
   `RMSE 0.083 ± 0.004 (5-fold CV)`.
 - `experiments/02_load_forecast.py` exists.
@@ -56,6 +57,7 @@ violated.
 > written the design note yet but the script's ready.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `experiments/03_target_transform.py` exists (written directly).
 - `journal/03_target_transform.md` does NOT exist.
 
@@ -82,6 +84,7 @@ violated.
 > `>= 0.95 * n_predict_grid_rows` so it passes.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - The pipeline has lag features (cross-row).
 - The 24-row gap is exactly the lag window (168h or similar).
 
@@ -111,6 +114,7 @@ violated.
 > write a fixture with 100 fake rows.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `data/` contains real data.
 - The smoke test currently uses it but is slow.
 
@@ -138,6 +142,7 @@ violated.
 > the CV mean from `project.summarize()` instead of hardcoding it.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Smoke test currently has a hardcoded `CV_MEAN_MAE = 0.083` from
   the design note.
 - skore is in the env.
@@ -168,6 +173,7 @@ violated.
 > features. Just wrap it.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `tests/smoke/test_02_load_forecast.py` failing on
   `len(predictions) < n_predict_grid_rows`.
 - The pipeline has lag features.
@@ -198,6 +204,7 @@ violated.
 > Write the smoke test for `01_baseline`.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Design note approved; experiment script exists.
 - `pytest` is not installed in the project env.
 
@@ -219,6 +226,7 @@ violated.
 > Write the smoke test for `01_baseline` and prove it.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `journal/01_baseline.md` approved (`design consent` `proceed`)
   with Status.headline `MAE 0.42 (5-fold CV)`.
 - `experiments/01_baseline.py` exists; `build_learner` consumes

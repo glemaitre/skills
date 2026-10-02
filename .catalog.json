@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "e28b43fa2cad2954a541284710822f73a3034c0982f489858f9aa926927833c9",
+  "catalog_hash": "4bd3a83533badcd2d7ddc258c307fe975fa4d90e75a9a2b8f498736503e0654f",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "1f14dd17dbe6486366370b263ac3610f1075df0b67827c920ffebc68930780c0"
+      "hash": "75c6a1cae3ac960c664f384e3c93d2a096d81500297a47358d807e36250dfb22"
     },
     {
       "id": "frame-ml-problem",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "1fa5d6bc87ee8dbb6a3119ff74a00990609c519162f75e77f4b5f07737886764"
+      "hash": "a0d93e6b0ac606db62b8fcb5492c62f8ea4af5b7a31faed73464929b0dc50883"
     },
     {
       "id": "build-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "1e3d6e2c8e12f19670db3b8cb6ac21418c6462ecf68a54cf89a192492f453857"
+      "hash": "8912a2b0ecef01b58da9bea8a309cd57a1a34cf8469e1722da5035d635fc0363"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "9a64115550254c9fe40420fbd260e391554352446864a6928d5bb566b7d79fbe"
+      "hash": "e5eb0a3d19fcf5b1f9b8a9832f9b89d5c655cb6a400a1e049a7f95fa9b2c08cd"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Structural pytest: prediction count must match the predict-grid row count.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "23053f711aebf2b2044433e5b7c237eaf63b2fda491d6256b84f9da9ce6297a8"
+      "hash": "b47255179cc863910859790e02cd795b3b67495fd31caee100c47dfe0d7ff58a"
     },
     {
       "id": "audit-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "7d6a68e831759bbab18cf7776a9e86e54618954d59ccdcad9bc6405714b64001"
+      "hash": "4015e2599c68fd8e2d6f44d6030d736be19ea19001be1360238daa46de43842f"
     },
     {
       "id": "manage-ml-backlog",
@@ -93,7 +93,7 @@
       "summary": "Session owner: list installed entry skills and ask which to run.",
       "category": "meta",
       "subcategory": null,
-      "hash": "2c61c5476668886e90b059585029b49d5c6c3f4930a9a527c9e6148b8518f338"
+      "hash": "29d768455f74f74bb5d98934e073528b720503fff9e5c9e585e8568b328e634e"
     },
     {
       "id": "review-ml-choices",
@@ -138,7 +138,7 @@
       "summary": "Ask setup choices up front, then coordinate workspace, environment, and git.",
       "category": "meta",
       "subcategory": null,
-      "hash": "7609c4771cdf4c51afd80028a692305ed07d140e01ca1d6836712b12081b370e"
+      "hash": "5a4dc59d33409aff717fac9d032904ee007e6d4ba13b3597eca1d76acdad147e"
     },
     {
       "id": "setup-git",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "a29e2d8c80d571d28668cc05f490b120916a6e32964afc1f2ab01803a6132854"
+      "hash": "7fa6bc87708bf5307c2cf646e45d4bf3b3b6e41c33eb33ff1364ed94f8532020"
     },
     {
       "id": "choose-python-library",
@@ -201,7 +201,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
-      "hash": "4c2fa4736e478b3a7d80a8df63d4d85d51da0f0ec1eec5dc13ed2cd77dfd01f7"
+      "hash": "d232cba2d5e533841a87d3891af927e7cad69cdfd4a851c2f58538cb7847cba1"
     },
     {
       "id": "setup-workspace",

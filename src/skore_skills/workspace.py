@@ -12,7 +12,12 @@ from typing import Any
 
 from skore_skills.frame import modeling_decisions_state
 from skore_skills.installed_skills import installed_skills
-from skore_skills.policy import infer_loop_stage, load_policy
+from skore_skills.policy import (
+    AUTOCOMMIT_VALUES,
+    SETUP_PIECES,
+    infer_loop_stage,
+    load_policy,
+)
 
 MANAGER_ORDER = ("pixi", "uv", "poetry", "hatch", "conda", "pip-venv")
 
@@ -33,6 +38,7 @@ STATUS_KEYS = (
     "git",
     "last_history_stem",
     "policy",
+    "setup",
     "loop_stage",
     "skills",
 )
@@ -206,6 +212,81 @@ def ruff_is_configured(root: Path) -> bool:
     return isinstance(tool, dict) and "ruff" in tool
 
 
+def setup_status(
+    policy: dict[str, Any],
+    *,
+    env_manager: str | None,
+    ambiguous: bool,
+    has_src: bool,
+    has_journal: bool,
+    git: bool,
+) -> dict[str, Any]:
+    """Return each setup piece as ``done``, ``declined``, or ``missing``.
+
+    ``pending`` lists ``missing`` pieces in pipeline order. Editable is
+    pending only after the workspace piece is ``done``. A stored
+    ``declined`` wins over filesystem inference.
+    """
+    recorded = policy.get("setup")
+    if not isinstance(recorded, dict):
+        recorded = {}
+    states: dict[str, str] = {}
+    for piece in SETUP_PIECES:
+        stored = recorded.get(piece)
+        if stored == "declined":
+            states[piece] = "declined"
+            continue
+        inferred = _setup_inferred(
+            piece,
+            policy,
+            env_manager=env_manager,
+            ambiguous=ambiguous,
+            has_src=has_src,
+            has_journal=has_journal,
+            git=git,
+        )
+        if stored == "done" or inferred:
+            states[piece] = "done"
+            continue
+        states[piece] = "missing"
+    pending = [
+        piece
+        for piece in SETUP_PIECES
+        if states[piece] == "missing"
+        and not (piece == "editable" and states["workspace"] != "done")
+    ]
+    return {**states, "pending": pending}
+
+
+def _setup_inferred(
+    piece: str,
+    policy: dict[str, Any],
+    *,
+    env_manager: str | None,
+    ambiguous: bool,
+    has_src: bool,
+    has_journal: bool,
+    git: bool,
+) -> bool:
+    """Return True when the workspace already proves this piece is done."""
+    if piece == "env":
+        recorded = policy.get("env_manager")
+        managed = policy.get("env", {}).get("managed")
+        if recorded not in MANAGER_ORDER:
+            return False
+        if managed is not True and managed is not False:
+            return False
+        if managed is False:
+            return True
+        return not ambiguous and env_manager == recorded
+    if piece == "workspace":
+        return has_src or has_journal
+    if piece == "git":
+        autocommit = policy.get("git", {}).get("autocommit")
+        return git and autocommit in AUTOCOMMIT_VALUES
+    return False
+
+
 def is_scaffolded(root: Path) -> bool:
     """Return True if ``src/`` or ``journal/`` exists.
 
@@ -232,6 +313,14 @@ def snapshot(root: Path) -> dict[str, Any]:
     }
     policy = load_policy(root)
     payload["policy"] = policy
+    payload["setup"] = setup_status(
+        policy,
+        env_manager=payload["env_manager"],
+        ambiguous=payload["ambiguous"],
+        has_src=payload["has_src"],
+        has_journal=payload["has_journal"],
+        git=payload["git"],
+    )
     payload["loop_stage"] = infer_loop_stage(root, policy, payload)
     payload["skills"] = installed_skills(root)
     return payload

@@ -79,14 +79,15 @@
     {
       "id": 5,
       "title": "Unresolved manager",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `env.managed` is null / unanswered.\n- `env detect` reports none or unmanaged-unasked.]\n\nAdd ruff.",
-      "expected_output": "Behavioural response satisfying: - Say the env is unresolved and stop (or triage). Do not bootstrap `setup-python-env` by catalog id if D20 still applies; status is enough. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `env init`. - Run `env add` while managed is unanswered.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `env.managed` is null / unanswered.\n- `env detect` reports none or unmanaged-unasked.\n- `status.skills.setup-ml-project` is true.]\n\nAdd ruff.",
+      "expected_output": "Behavioural response satisfying: - Load `setup-ml-project` and stop. Do not ask a separate environment question. Do not load `setup-python-env`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Run `env init`. - Run `env add` while managed is unanswered.",
       "files": [],
       "expectations": [
-        "Say the env is unresolved and stop (or triage). Do not bootstrap `setup-python-env` by catalog id if D20 still applies; status is enough.",
+        "Load `setup-ml-project` and stop. Do not ask a separate environment question. Do not load `setup-python-env`.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Run `env init`.",
-        "The response does NOT: Run `env add` while managed is unanswered."
+        "The response does NOT: Run `env add` while managed is unanswered.",
+        "The response does NOT: Load `setup-python-env`."
       ],
       "tools": false,
       "sandbox": [],

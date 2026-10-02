@@ -8,6 +8,7 @@
 > What can you help me with on this machine learning project?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Existing scaffold with no specific task requested.
 - No `.skore` file.
 - `status.data_analysis` is `missing`.
@@ -47,6 +48,7 @@
 > Initialize git here.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace, no `.git`.
 - `status.skills.setup-git` is `true`.
 
@@ -68,6 +70,7 @@
 > Initialize git here.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.skills.setup-git` is `false`.
 
@@ -87,6 +90,7 @@
 > Bootstrap this project for me.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Empty folder.
 - `status.skills.setup-ml-project` is `true`.
 - `status.skills.setup-python-env` is `true`.
@@ -108,6 +112,7 @@
 > Get pixi going for this folder.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Empty folder.
 - `status.skills.setup-python-env` is `true`.
 
@@ -128,6 +133,7 @@
 > Explore the data in data/.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace with `data/` present.
 - `status.skills.explore-ml-data` is `true`.
 
@@ -151,6 +157,7 @@
 > Build the first baseline model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.data_analysis` is `missing`.
 - `status.skills.explore-ml-data` is `true`.
@@ -175,6 +182,7 @@
 > Build the first baseline model.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.data_analysis` is `present`.
 - `status.skills.model-ml-pipeline` is `true`.
@@ -196,6 +204,7 @@
 > Give me an executed ipynb of the EDA.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.skills.export-ml-notebook` is `true`.
 
@@ -216,6 +225,7 @@
 > Build the MkDocs documentation site.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.skills.export-ml-site` is `true`.
 
@@ -236,6 +246,7 @@
 > Export the project.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.skills.export-ml-project` is `true`.
 
@@ -256,6 +267,7 @@
 > Give me an HTML notebook of the EDA.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.skills.export-ml-notebook` is `true`.
 
@@ -277,6 +289,7 @@
 > Research whether 0.97 correlation with the target is leakage.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - The question is about the table (`data_analysis` may be
   `present` or `missing`).
@@ -301,6 +314,7 @@
 > this high-cardinality column.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - An approved design note exists; modeling is in progress.
 - `status.skills.model-ml-pipeline` is `true`.
@@ -323,6 +337,7 @@
 > Audit experiment 02.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.skills.audit-ml-pipeline` is `true`.
 - `status.skills.model-ml-pipeline` is `true`.
@@ -344,6 +359,7 @@
 > Push our skore reports to Hub.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.skills.sync-ml-reports` is `true`.
 
@@ -365,6 +381,7 @@
 > What should we try next?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `status.data_analysis` is `present`.
 - `loop_stage` is `backlog`.
 - `status.skills.manage-ml-backlog` is `true`.
@@ -390,6 +407,7 @@
 > What can you help me with on this machine learning project?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `status.data_analysis` is `present`.
 - `loop_stage` is `backlog`.
 - `status.skills.manage-ml-backlog` is `true`.
@@ -417,6 +435,7 @@
 > What should we try next?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `loop_stage` is `backlog`.
 - `status.skills.manage-ml-backlog` is `false`.
 - The other usual entry skills are `true`.
@@ -441,6 +460,7 @@
 > Review experiment 02.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `status.skills.review-ml-experiment` is `true`.
 
 **Must do:**
@@ -461,6 +481,7 @@
 > I want to try a monotonic constraint on the target.
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - `status.skills.shape-user-idea` is `true`.
 
 **Must do:**
@@ -481,6 +502,7 @@
 > What do people do for censored regression?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - No design note is in progress.
 - `status.skills.search-ml-literature` is `true`.
 
@@ -502,6 +524,7 @@
 > What did we decide for this project?
 
 **Assumed workspace state:**
+- `status.setup.pending` is empty.
 - Scaffolded workspace.
 - `status.skills.review-ml-choices` is `true`.
 - `policy.skore_mode` is `local`.
@@ -513,4 +536,32 @@
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `sync-ml-reports` as the certain skill.
+- Ask which entry skill to run.
+
+---
+
+## CASE_24 — Certain EDA on a fresh folder
+
+**User prompt:**
+> Explore the data in data/.
+
+**Assumed workspace state:**
+- The folder contains only `data/` (one CSV). No `src/`, no
+  `journal/`, no `.git`, and no env manifest.
+- `status.setup.pending` is `env`, `workspace`, `git`.
+- `status.setup.env` and `status.setup.workspace` are `missing`,
+  not `declined`.
+- `status.skills.explore-ml-data` is true.
+- `status.skills.setup-ml-project` is true.
+
+**Must do:**
+- Run `python -m skore_skills status`.
+- Load `setup-ml-project` and stop. Tell the user exploration
+  waits on those pieces.
+- Do not show the entry menu.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Load `explore-ml-data` before setup returns.
+- Start exploratory data analysis methodology.
 - Ask which entry skill to run.

@@ -41,8 +41,16 @@ skill ids, `G-*` names, or the wrapper CLI.
 
 ## Procedure
 
-1. `python -m skore_skills status`. Unscaffolded workspace →
-   setup. Then `python -m skore_skills frame show` without
+1. `python -m skore_skills status`. If `status.setup.pending`
+   is non-empty and `status.skills.setup-ml-project` is true,
+   load `setup-ml-project` and stop. Do not start this skill.
+   When it returns, continue. Do not load it again on this turn.
+   If that skill is not installed, name the pending pieces in
+   one line and stop. Do not invent `git init`, scaffold, or
+   `env init`. If `status.setup.env` or `status.setup.workspace`
+   is `declined`, stop in one line. A declined `git` or
+   `editable` is not asked again; continue. Then
+   `python -m skore_skills frame show` without
    `--revise`. Anything other than `proceed` loads
    `frame-ml-problem` and stops. `translation` null → stop.
    Do not write an evaluation call.
@@ -251,8 +259,9 @@ G-AUDIT-FINDING (`n/a — audit not run` when skipped).
 
 ## Stops
 
-- No scaffold (`has_src` and `has_journal` both false) → setup.
-  Do not require `git`.
+- Pending setup (`status.setup.pending` non-empty) → load
+  `setup-ml-project`. A declined `git` is not asked again. A
+  declined env or workspace stops.
 - Smoke missing or red on a history-dependent pipeline → build.
 - Empty `split_kwargs` plus a possible group column → return
   to `build-ml-pipeline`. Do not default to `KFold`.
