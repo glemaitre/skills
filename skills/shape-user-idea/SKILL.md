@@ -2,17 +2,18 @@
 name: shape-user-idea
 description: >
   Shape an idea the user already has, or answer a project question,
-  and write one idea file after they confirm. A topic with no
-  artifact belongs to search-ml-literature. Do not write JOURNAL.md
-  or a design note. Do not pick a backlog row.
+  and write one idea file and its Ideas row after they confirm. A
+  topic with no artifact belongs to search-ml-literature. Do not
+  write History, Backlog, or a design note. Do not pick a backlog
+  row.
 ---
 
 # Shape User Idea
 
 Comes after review, beside the backlog. The user already has an
 idea, a question, or an artifact. This skill writes
-`journal/ideas/<slug>.md` only after they confirm. The backlog
-triages that file later.
+`journal/ideas/<slug>.md` and one Ideas row only after they
+confirm. The backlog triages that file later.
 
 ## Human-facing prose
 
@@ -52,10 +53,9 @@ data-science terms — not skill ids or the wrapper CLI.
    claim this dataset does not establish stays in Open gaps.
 8. Restate the idea in one short paragraph and wait for an
    explicit yes. "Maybe" is not yes. No or stop writes nothing.
-9. On yes, the only file this skill writes is
-   `journal/ideas/<slug>.md`. Do not create or edit
-   `journal/JOURNAL.md` or a design note. Write
-   `journal/ideas/<slug>.md`:
+9. On yes, write `journal/ideas/<slug>.md` and upsert its Ideas
+   row. Do not create a design note. Do not edit History,
+   Backlog, or Status. Write `journal/ideas/<slug>.md`:
 
 ```
 # <slug>
@@ -69,12 +69,17 @@ data-science terms — not skill ids or the wrapper CLI.
 ```
 
    Why now carries the quote, URL, or path. No acceptance
-   criteria. Return the path to the caller (`manage-ml-backlog`
-   or `triage-ml-task`).
+   criteria. Then upsert one `## Ideas` row: Question as plain
+   text, Status `open`, Experiment `<last History stem, or n/a>`,
+   Source `user`. If that table is missing, insert it between
+   History and Backlog. Do not rewrite the other sections.
+   Return the path to the caller (`manage-ml-backlog` or
+   `triage-ml-task`).
 
 ## Stop conditions
 
-- Do not write `JOURNAL.md` or a design note.
+- Do not write History, Backlog, Status, or a design note.
+  The Ideas table is the only `JOURNAL.md` edit.
 - Do not append a `B<N>` row. The backlog triages the file.
 - Do not invent source content from a title.
 - Do not `WebSearch` for a topic with no artifact.

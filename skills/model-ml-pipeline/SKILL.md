@@ -316,8 +316,12 @@ to triage.
 If `policy.notebooks` is true and `export-ml-notebook` is
 installed, run
 `python -m skore_skills notebook convert experiments/<stem>.py`
-only when the experiment script already exists, with `--html`
-when `policy.site` is also true. Convert re-executes the
+only when the experiment script already exists, and the same
+command on `audit/<stem>.py` when that file exists, with
+`--html` when `policy.site` is also true. `audit-ml-pipeline`
+does not convert on this path. Site build embeds
+`audit/<stem>.nb.html` under `## Notebooks`; do not add
+`<!-- results-embed: audit -->`. Convert re-executes the
 script; say so when it is slow. If convert fails because
 `ipywidgets` is missing, load `add-python-package` for it
 (agent) and convert again. Missing jupytext / nbclient /
@@ -350,10 +354,10 @@ locator/finding alone.
    among tokens, then G-AUDIT-FINDING (`n/a — audit not run`
    when skipped). Index strings, not the narrative.
 
-Then the same convert/site rules apply. `audit-ml-pipeline`
-converts `audit/<stem>.py` itself; do not convert it again here.
-The site appends that viewer to the experiment design note's
-`## Notebooks` section after evaluation.
+Then the same convert/site rules apply. Convert
+`audit/<stem>.py` here when the file exists; the audit skill
+did not. The site appends that viewer to the experiment design
+note's `## Notebooks` section after evaluation.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` so the fitted Method pipeline

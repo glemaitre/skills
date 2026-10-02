@@ -380,6 +380,7 @@ violated.
 - Run `site build` before the journal is recorded.
 - Write `journal/JOURNAL.md` or the design note directly.
 - Run `git commit` in this skill.
+- Convert `audit/01_baseline.py`: no audit file exists this turn.
 
 ---
 
@@ -540,7 +541,9 @@ violated.
 - Run audit when available, then record-outcome with locator and
   optional digest/headline.
 - Order the remaining close as notebook convert, site build, then
-  `git end-turn --stage evaluate`.
+  `git end-turn --stage evaluate`. Convert `experiments/<stem>.py`
+  and, when `audit/<stem>.py` exists, that file too (`--html` when
+  the site is on). Do not add `<!-- results-embed: audit -->`.
 - If git returns `invoke`, stop after loading `persist-ml-git`
   because it returns to triage.
 

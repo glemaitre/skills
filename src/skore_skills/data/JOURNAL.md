@@ -41,6 +41,11 @@
 | Stem | Intent (one line) | Status | Headline result | Report | Design note |
 |---|---|---|---|---|---|
 
+## Ideas
+
+| Question | Status | Experiment | Source |
+|---|---|---|---|
+
 ## Backlog
 
 | # | Item | Source |

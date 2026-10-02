@@ -114,7 +114,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | --- | --- |
 | [triage-ml-task](skills/triage-ml-task/SKILL.md) | Session owner: list installed entry skills and ask which to run. |
 | [review-ml-choices](skills/review-ml-choices/SKILL.md) | Show stored project choices and re-enter the skill that can change one. |
-| [review-ml-experiment](skills/review-ml-experiment/SKILL.md) | Gate the skore-check audit, then write one idea file per candidate. |
+| [review-ml-experiment](skills/review-ml-experiment/SKILL.md) | Gate the skore-check audit, then write one idea file and one Ideas row per candidate. |
 | [setup-ml-project](skills/setup-ml-project/SKILL.md) | Ask only the setup pieces that are not already recorded, then coordinate workspace, environment, and git. |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
 | [setup-python-env](skills/setup-python-env/SKILL.md) | Detect the env manager and bootstrap the runtime, agent-tools, and composed development environments. |
@@ -140,9 +140,9 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 | Skill | Description |
 | --- | --- |
-| [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md) | Record experiment outcomes and triage idea files into backlog rows, keeping each file with a triage flag. |
-| [shape-user-idea](skills/shape-user-idea/SKILL.md) | Shape a user idea or a named artifact into one idea file after they confirm. |
-| [search-ml-literature](skills/search-ml-literature/SKILL.md) | Search scientific and technical sources and write one idea file for the direction the user confirms. |
+| [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md) | Record experiment outcomes and triage idea files. A promoted idea moves from the Ideas table into a Backlog row. |
+| [shape-user-idea](skills/shape-user-idea/SKILL.md) | Shape a user idea or a named artifact into one idea file and one Ideas row after they confirm. |
+| [search-ml-literature](skills/search-ml-literature/SKILL.md) | Search scientific and technical sources and write one idea file and one Ideas row for the direction the user confirms. |
 
 ### Workspace and tooling
 

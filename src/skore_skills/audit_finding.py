@@ -11,7 +11,8 @@ UNAVAILABLE = "n/a — audit digest unavailable"
 CLEAN = "0 issues, 0 tips — automated checks surfaced no actionable finding"
 _CODE = re.compile(r"^\s*-\s*\[([A-Za-z0-9]+)\]")
 _METRIC_LINE = re.compile(
-    r"^\s*(mae|rmse|r2|roc_auc|roc-auc|accuracy|log_loss|log-loss)\s+"
+    r"^\s*(mae|rmse|r2|r²|roc_auc|roc-auc|roc auc|accuracy|"
+    r"log_loss|log-loss|log loss)\s+"
     r"([+-]?(?:\d+\.\d+|\d+)(?:[eE][+-]?\d+)?)",
     re.IGNORECASE,
 )
@@ -55,7 +56,8 @@ def _headline_metric(text: str) -> str | None:
         match = _METRIC_LINE.match(line)
         if match is None:
             continue
-        name = match.group(1).lower().replace("-", "_")
+        name = match.group(1).lower().replace("²", "2")
+        name = name.replace("-", "_").replace(" ", "_")
         value = match.group(2)
         labels = {
             "mae": "MAE",

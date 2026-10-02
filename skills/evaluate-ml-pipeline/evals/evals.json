@@ -224,7 +224,8 @@
         "The response does NOT: End the turn without convert or site build while both gates are true. This turn has no tools, so naming `notebook convert` and then `site build` in that order is the close, including inside a later-turn list. Omitting those two names is the violation.",
         "The response does NOT: Run `site build` before the journal is recorded.",
         "The response does NOT: Write `journal/JOURNAL.md` or the design note directly.",
-        "The response does NOT: Run `git commit` in this skill."
+        "The response does NOT: Run `git commit` in this skill.",
+        "The response does NOT: Convert `audit/01_baseline.py`: no audit file exists this turn."
       ],
       "tools": false,
       "sandbox": [],
@@ -328,12 +329,12 @@
       "id": 17,
       "title": "Standalone evaluate close is ordered",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- This is a standalone evaluate invocation.\n- Notebooks and site are enabled.]\n\nEvaluate the approved, smoke-green experiment and finish the turn.",
-      "expected_output": "Behavioural response satisfying: - After `put`, write a 2\u20136 sentence narrative, then surface G-REPORT-LOCATOR first among tokens. Name `report.html` and `html/<stem>.html` when site build ran. Do not send the user to the design-note markdown instead. - Run audit when available, then record-outcome with locator and optional digest/headline. - Order the remaining close as notebook convert, site build, then `git end-turn --stage evaluate`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Record before the locator exists. - Build the site before record-outcome.",
+      "expected_output": "Behavioural response satisfying: - After `put`, write a 2\u20136 sentence narrative, then surface G-REPORT-LOCATOR first among tokens. Name `report.html` and `html/<stem>.html` when site build ran. Do not send the user to the design-note markdown instead. - Run audit when available, then record-outcome with locator and optional digest/headline. - Order the remaining close as notebook convert, site build, then `git end-turn --stage evaluate`. Convert `experiments/<stem>.py` and, when `audit/<stem>.py` exists, that file too (`--html` when the site is on). Do not add `<!-- results-embed: audit -->`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Record before the locator exists. - Build the site before record-outcome.",
       "files": [],
       "expectations": [
         "After `put`, write a 2\u20136 sentence narrative, then surface G-REPORT-LOCATOR first among tokens. Name `report.html` and `html/<stem>.html` when site build ran. Do not send the user to the design-note markdown instead.",
         "Run audit when available, then record-outcome with locator and optional digest/headline.",
-        "Order the remaining close as notebook convert, site build, then `git end-turn --stage evaluate`.",
+        "Order the remaining close as notebook convert, site build, then `git end-turn --stage evaluate`. Convert `experiments/<stem>.py` and, when `audit/<stem>.py` exists, that file too (`--html` when the site is on). Do not add `<!-- results-embed: audit -->`.",
         "If git returns `invoke`, stop after loading `persist-ml-git` because it returns to triage.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Record before the locator exists.",

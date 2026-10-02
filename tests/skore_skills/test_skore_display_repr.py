@@ -1,6 +1,7 @@
 """Representations skore displays expose to notebooks and to the cell runner.
 
-Audit cells leave a bare Display as the last expression. Editors render
+Checks stay a bare Display. Metrics snapshot
+``frame(verbose_name=True, flat_index=False)``. Editors render
 ``_repr_html_``; ``skore_skills cells run`` records ``__repr__``. These
 tests pin both paths so ``audit-ml-pipeline`` does not have to snapshot
 text by hand, and so a skore release that regresses either one fails
@@ -85,11 +86,21 @@ def test_checks_repr_carries_codes_and_doc_urls(
     assert "docs.skore.probabl.ai" in text
 
 
-def test_metrics_repr_carries_metric_values(displays: dict[str, object]) -> None:
-    """Metric names and values reach the digest without ``.frame()``."""
+def test_metrics_repr_is_the_flat_index(displays: dict[str, object]) -> None:
+    """The Display repr is the flat index the metrics cell does not snapshot."""
     text = repr(displays["metrics"])
     assert "rmse" in text
     assert "mae" in text
+
+
+def test_metrics_frame_keeps_verbose_names(displays: dict[str, object]) -> None:
+    """The audit snapshot uses verbose names and an unflattened column index."""
+    table = displays["metrics"].frame(verbose_name=True, flat_index=False)
+    labels = [str(label) for label in table.index]
+    assert "RMSE" in labels
+    assert "MAE" in labels
+    assert "rmse" not in labels
+    assert getattr(table.columns, "nlevels", 1) > 1
 
 
 def test_help_prints_the_display_tree(report: object, capsys) -> None:

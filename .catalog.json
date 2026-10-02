@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "4bd3a83533badcd2d7ddc258c307fe975fa4d90e75a9a2b8f498736503e0654f",
+  "catalog_hash": "4284a6c1f87ef060932d0976e49bc26877b2d259780493e8f8a4b76567c9de70",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "e5eb0a3d19fcf5b1f9b8a9832f9b89d5c655cb6a400a1e049a7f95fa9b2c08cd"
+      "hash": "4301e61db3c62a6d1c41234f4c68f46223cbce7afb05dc44954fd90460b15741"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,16 +57,16 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "4015e2599c68fd8e2d6f44d6030d736be19ea19001be1360238daa46de43842f"
+      "hash": "29222f2372db98585bdedbbffdc46c791ef8c052bbd8d9f13c667f47eaf98abf"
     },
     {
       "id": "manage-ml-backlog",
       "path": "skills/manage-ml-backlog",
       "title": "Manage ML Backlog",
-      "summary": "Record experiment outcomes and triage idea files into backlog rows, keeping each file with a triage flag.",
+      "summary": "Record experiment outcomes and triage idea files. A promoted idea moves from the Ideas table into a Backlog row.",
       "category": "action",
       "subcategory": null,
-      "hash": "7af8f788b6c747779a18eb871a3d5494c3b97e60bbd05a41a59146461051a30f"
+      "hash": "45fd640d14a7f18aaac928092014228e7274a127ca6360d89eed7b01cc6ab899"
     },
     {
       "id": "organize-ml-workspace",
@@ -108,28 +108,28 @@
       "id": "review-ml-experiment",
       "path": "skills/review-ml-experiment",
       "title": "Review ML Experiment",
-      "summary": "Gate the skore-check audit, then write one idea file per candidate.",
+      "summary": "Gate the skore-check audit, then write one idea file and one Ideas row per candidate.",
       "category": "meta",
       "subcategory": null,
-      "hash": "521e69eee58bec20a96f8888b7b9ba711d5250429adb01639647720e6e88990e"
+      "hash": "cab1560b6d30c42407e5f6a8d4a8154a9759433d33727245b70e3e208f2a8adc"
     },
     {
       "id": "shape-user-idea",
       "path": "skills/shape-user-idea",
       "title": "Shape User Idea",
-      "summary": "Shape a user idea or a named artifact into one idea file after they confirm.",
+      "summary": "Shape a user idea or a named artifact into one idea file and one Ideas row after they confirm.",
       "category": "meta",
       "subcategory": null,
-      "hash": "53a4189adebaae8d4a070d20152adcb92bb24c8d3d5cdd88699161138cbd6114"
+      "hash": "15be4222f9b061865632b721a3a15a55862b215092196cf5d1f1416c46aebc2c"
     },
     {
       "id": "search-ml-literature",
       "path": "skills/search-ml-literature",
       "title": "Search ML Literature",
-      "summary": "Search scientific and technical sources and write one idea file for the direction the user confirms.",
+      "summary": "Search scientific and technical sources and write one idea file and one Ideas row for the direction the user confirms.",
       "category": "meta",
       "subcategory": null,
-      "hash": "f13c281f07d91f50d98d3a6ee29e40926b31651b4953089e117573252ccba14c"
+      "hash": "a863710efe79d1a6fefe2f5c18fce43207fb09d88e9de5b8e803536d4776c89e"
     },
     {
       "id": "setup-ml-project",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "7fa6bc87708bf5307c2cf646e45d4bf3b3b6e41c33eb33ff1364ed94f8532020"
+      "hash": "30a527792af5376820ef4d3906939baa604ea99c4bac523cb9d836f87b7213e0"
     },
     {
       "id": "choose-python-library",
@@ -228,7 +228,7 @@
       "summary": "Convert a jupytext percent file into an executed notebook.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "1c180bdf2bd83e4907cb74d9fa91e483a1e60dac7fcaabbec7249b5371748fbb"
+      "hash": "9ca08d9c2910750e04ea245cd738bdfa629e86470b65c365153c0779445d558a"
     },
     {
       "id": "export-ml-site",
@@ -237,7 +237,7 @@
       "summary": "Package workspace markdown and existing notebook HTML into an offline MkDocs site.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "6917ce0dfe5903ec3a5e3cb11dee86eed73f06d8aab6bc20a91e15dba1c63e95"
+      "hash": "151a4371d90ef0a976d52adfbf009889dc7d2318b1f7d286df3b958a2ce3cf22"
     },
     {
       "id": "export-ml-project",
