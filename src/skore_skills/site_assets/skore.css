@@ -492,6 +492,11 @@ body.skore-motion-ready .skore-topnav__caret {
     padding-left: 0;
   }
 
+  /* Material's negative bottom margin on nested navs shrinks the gap after them. */
+  .md-sidebar--secondary .md-nav__item > .md-nav {
+    margin: 0;
+  }
+
   .md-sidebar--secondary .md-nav__link {
     display: flex;
     align-items: center;
@@ -503,11 +508,11 @@ body.skore-motion-ready .skore-topnav__caret {
     counter-increment: skore-toc;
   }
 
-  /* Same box and gap as the collapse control's icon, so the two line up. */
   .md-sidebar--secondary .md-nav__link::before {
-    flex: 0 0 var(--numbers-20);
+    flex: 0 0 var(--numbers-24);
     content: counters(skore-toc, ".");
-    text-align: center;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
   }
 
   .md-sidebar--secondary .md-nav__link--active {
@@ -549,10 +554,10 @@ body.skore-motion-ready .skore-topnav__caret {
     scrollbar-width: none;
   }
 
-  /* Flex centering, so the flush rule's zeroed link margins still apply. */
   body.skore-toc-collapsed .md-sidebar--secondary .md-nav__item {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 
   body.skore-toc-collapsed .md-sidebar--secondary .md-nav__link {
@@ -561,6 +566,11 @@ body.skore-motion-ready .skore-topnav__caret {
     justify-content: center;
     padding: 0;
     font-weight: 600;
+  }
+
+  body.skore-toc-collapsed .md-sidebar--secondary .md-nav__link::before {
+    flex: 0 0 auto;
+    text-align: center;
   }
 
   body.skore-toc-collapsed .skore-toc-label {

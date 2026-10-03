@@ -272,11 +272,14 @@ def test_site_theme_flattens_and_numbers_contents() -> None:
     # extra vertical space around subsection rows.
     assert ".md-sidebar--secondary .md-sidebar__inner > .md-nav {" in css
     assert "\n  .md-sidebar--secondary .md-nav {\n" not in css
-    # Numbers share the collapse icon's box and gap so the two columns line up.
+    assert ".md-nav__item > .md-nav {\n    margin: 0;" in css
+    # A fixed-width, left-aligned column lines up single- and multi-level numbers.
     assert (
         ".md-sidebar--secondary .md-nav__link::before {\n"
-        "    flex: 0 0 var(--numbers-20);\n"
-        '    content: counters(skore-toc, ".");'
+        "    flex: 0 0 var(--numbers-24);\n"
+        '    content: counters(skore-toc, ".");\n'
+        "    text-align: left;\n"
+        "    font-variant-numeric: tabular-nums;"
     ) in css
     assert "flex: 0 0 var(--numbers-20);\n  opacity: 0.8;" in css
     assert "body.skore-toc-collapsed .skore-toc-label {\n    display: none;" in css
@@ -290,7 +293,13 @@ def test_site_theme_flattens_and_numbers_contents() -> None:
     assert (
         "body.skore-toc-collapsed .md-sidebar--secondary .md-nav__item {\n"
         "    display: flex;\n"
-        "    justify-content: center;"
+        "    flex-direction: column;\n"
+        "    align-items: center;"
+    ) in css
+    assert (
+        "body.skore-toc-collapsed .md-sidebar--secondary .md-nav__link::before {\n"
+        "    flex: 0 0 auto;\n"
+        "    text-align: center;"
     ) in css
     assert (
         "body.skore-toc-collapsed .skore-toc-footer {\n    padding: var(--numbers-6) 0;"
