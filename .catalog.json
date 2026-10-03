@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "c60e75c606253343262867c721ec5e4f4f503cae8b02b0e88a30d48df94bb602",
+  "catalog_hash": "3e1ed042038f2ba66bb6168520b7b439e0b21ef8b6a09e41de9c9d476aa78277",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "a9400b58eb26b18df0fbfb85077c31a0ee45be511d6b82113a950c4e58e97745"
+      "hash": "51cde0074c94466454fb7b55439eb4767796bbcfebed4113ef67578f71da2197"
     },
     {
       "id": "build-ml-pipeline",
@@ -120,7 +120,7 @@
       "summary": "Shape a user idea or a named artifact into one idea file and one Ideas row after they confirm.",
       "category": "meta",
       "subcategory": null,
-      "hash": "15be4222f9b061865632b721a3a15a55862b215092196cf5d1f1416c46aebc2c"
+      "hash": "ad05f9b0a6e64c4229b77190f5ec16b23aae0749f5e6c0d6f3cd268e256d1bd0"
     },
     {
       "id": "search-ml-literature",
@@ -129,7 +129,7 @@
       "summary": "Search scientific and technical sources and write one idea file and one Ideas row for the direction the user confirms.",
       "category": "meta",
       "subcategory": null,
-      "hash": "a863710efe79d1a6fefe2f5c18fce43207fb09d88e9de5b8e803536d4776c89e"
+      "hash": "30d6b1dc1ee6c807b02d6666c0b90b331faa2ac0fb0c2b485488ddfcd5891fec"
     },
     {
       "id": "setup-ml-project",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "e4bceb61e00dfaf7d5c3aae5d250fc7aaa6e74704c78a10914e9d66b11cec00b"
+      "hash": "fdb55648239a8497ca0463786b9d92476b6b3eac5f1980c7de31c255a98ddb17"
     },
     {
       "id": "choose-python-library",

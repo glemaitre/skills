@@ -15,7 +15,8 @@
 
 **Must do:**
 - Walk what to learn, why now, and what changes.
-- Restate the idea and wait for an explicit yes before writing.
+- Restate the idea, then AskUserQuestion Yes / No, before the
+  file. On Yes, write.
 - On yes, write `journal/ideas/<slug>.md` with Source `user`,
   Experiment `01_baseline`, `Triage: open`, Question, Why now,
   What changes, and Open gaps.

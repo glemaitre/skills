@@ -51,9 +51,14 @@ data-science terms — not skill ids or the wrapper CLI.
    Status, ask before writing the file. A library the source names and
    the user has not agreed to add stays in Open gaps. A domain
    claim this dataset does not establish stays in Open gaps.
-8. Restate the idea in one short paragraph and wait for an
-   explicit yes. "Maybe" is not yes. No or stop writes nothing.
-9. On yes, write `journal/ideas/<slug>.md` and upsert its Ideas
+8. Restate the idea in one short paragraph, then one
+   single-choice **AskUserQuestion**: **Yes** / **No**. Do not
+   also ask for a typed yes. Put that question in the message
+   before any idea file. "Maybe" is not Yes. No or Stop writes
+   nothing. A Yes from the tool, or an explicit yes the user
+   already gave, authorizes the write only after that question
+   is in the message.
+9. On Yes, write `journal/ideas/<slug>.md` and upsert its Ideas
    row. Do not create a design note. Do not edit History,
    Backlog, or Status. Write `journal/ideas/<slug>.md`:
 
@@ -83,7 +88,7 @@ data-science terms — not skill ids or the wrapper CLI.
 - Do not append a `B<N>` row. The backlog triages the file.
 - Do not invent source content from a title.
 - Do not `WebSearch` for a topic with no artifact.
-- The entry question and the confirmation paragraph are
+- The entry question and the Yes / No confirmation are
   required gates.
 - If the user already asked to add a named library, put it in
   What changes and load `add-python-package` when that skill

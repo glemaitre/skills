@@ -38,8 +38,9 @@
 - The last History stem is `01_baseline`.
 
 **Must do:**
-- Restate the direction and wait for yes. The user already said
-  yes in this prompt, so write the file.
+- The user already said yes in this prompt, so write the file.
+  AskUserQuestion Yes / No only when that yes is not already
+  given.
 - Write `journal/ideas/<slug>.md` with Source
   `literature: https://example.invalid/censored-models`,
   Experiment `01_baseline`, and `Triage: open`.
