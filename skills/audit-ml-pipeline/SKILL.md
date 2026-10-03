@@ -19,7 +19,8 @@ description: >
   exploration or sourcing a future experiment.
 
   HOW TO USE: confirm journal, experiment, smoke, and report;
-  place the file from `templates/audit.py`; `cells run`; derive
+  place the file from `templates/audit.py`; copy
+  `templates/viewers.py` to scratch; `cells run`; derive
   G-AUDIT-FINDING; then the continue-or-close gate. Resolve
   skore symbols with `api get`.
 ---
@@ -62,13 +63,17 @@ and never dispatches audit back.
 |---|---|---|---|
 | `audit/<NN>_<short_name>.py` | **Durable** (in git) | This skill, once per experiment | The bare-expression cells. Source of truth. Can be opened as a notebook in JupyterLab / VS Code for the rich HTML view |
 | `scratch/audit/<stem>/audit.md` | Ephemeral (gitignored), optional | `cells run` when given a 2nd arg | Per-cell markdown digest: source + stdout + last-expression `repr`. Same content as stdout |
-| `scratch/results/<stem>/report.html` `report.txt` `locator.txt` `pipeline.html` | Ephemeral (gitignored) | Evaluate (`experiments/<stem>.py`) | Full-report viewer, text fallback, locator, fitted Method diagram |
-| `scratch/results/<stem>/checks.html` `metrics.html` and extra `<slug>.html` / `.png` | Ephemeral (gitignored) | Audit cells | Per-item viewers the site embeds under `## Results`. The digest already carries the text, so no extra `.txt` is written here |
+| `scratch/results/<stem>/snapshot.py` | Ephemeral (gitignored) | Evaluate, from `templates/snapshot.py` | Re-opens the stored report and writes `report.html`, `report.txt`, `locator.txt`, fitted `pipeline.html` |
+| `scratch/results/<stem>/report.html` `report.txt` `locator.txt` `pipeline.html` | Ephemeral (gitignored) | `snapshot.py` | Full-report viewer, text fallback, locator, fitted Method diagram |
+| `scratch/audit/<stem>/viewers.py` | Ephemeral (gitignored) | This skill, from `templates/viewers.py` | Re-opens the report. Writes checks, metrics, and extra viewers, plus `accessors.txt` |
+| `scratch/audit/<stem>/accessors.txt` | Ephemeral (gitignored) | `viewers.py` | `help()` trees. Additional report view labels come from the `Displays` groups here, not from the notebook |
+| `scratch/results/<stem>/checks.html` `metrics.html` and extra `<slug>.html` / `.png` | Ephemeral (gitignored) | `viewers.py` | Per-item viewers the site embeds under `## Results`. The digest already carries the text, so no extra `.txt` is written here |
 | Stdout from `cells run` | Captured by the bash tool | CLI (always) | Streamed digest — the agent reads this directly from the tool output |
 
 **Mnemonic:** `audit/` is *source* (in git); `scratch/audit/` and
-stdout are *output*. Never put the source `.py` under
-`scratch/audit/`. Never commit anything under `scratch/audit/`.
+stdout are *output*. Never copy `audit/<stem>.py` under
+`scratch/audit/`. `viewers.py` is the gitignored agent script.
+Never commit anything under `scratch/audit/`.
 
 ## Read-only contract
 
@@ -87,10 +92,12 @@ The central rule. Surfaced as the first Stop condition below.
 - `skore.evaluate(...)` — duplicates the report under the same key
   and pollutes `summarize()`.
 - `project.put(...)` — same.
-- Writes outside `scratch/audit/<stem>/` and
-  `scratch/results/<stem>/` — no `data/` writes, no `reports/`
-  writes, no edits to `src/<pkg>/`. The audit is a viewer. Snapshot
-  HTML under `scratch/results/<stem>/` is allowed.
+- Snapshot writes (`write_text` of HTML, `locator.txt`,
+  `report.txt`) and `help()` loops in `audit/<stem>.py`. Those
+  live in `scratch/audit/<stem>/viewers.py`, which may write
+  `scratch/results/<stem>/` and `accessors.txt`.
+- Writes to `data/`, `reports/`, or `src/<pkg>/`. The audit
+  notebook is a viewer.
 - Mutation of the loaded `report` that survives the cell (e.g.
   monkey-patching skore symbols).
 
@@ -158,8 +165,9 @@ reads the digest as text and does not open the Project. See
 - **Executed artifacts go to `scratch/audit/<stem>/`, NOT into
   `audit/`.** Durable artifact is `audit/<stem>.py`; the rendered
   digest is ephemeral.
-- **`audit/` is read-only against workspace data.** No writes to
-  `data/`, `reports/`, or outside `scratch/audit/<stem>/`.
+- **`audit/<stem>.py` does not write snapshot files.** HTML,
+  `locator.txt`, and `help()` trees are `viewers.py`. No writes
+  to `data/` or `reports/`.
 - **Don't filter warnings in audit cells.** No
   `warnings.filterwarnings(...)` unless the user explicitly asks
   — the runner streams cell stderr into the digest and that's
@@ -182,12 +190,13 @@ reads the digest as text and does not open the Project. See
 | `checks.frame()` instead of the bare `checks` Display | The Display `__repr__` already groups issues and tips with their codes and documentation URLs. `.frame()` flattens that into a table the agent then has to re-read, and drops the severity grouping the review mines |
 | `project.get(KEY)` raised `KeyError` → re-run `evaluate` + `put` "to refresh" | Lookup shape is wrong (get is by id, not key). Hub: read the id from the URL printed by `put()`. Local: read `summary["id"]` for the matching key row. Never re-run `evaluate` + `put` to recover |
 | Write `pixi add --feature agent ipython` directly from this skill | Install commands owned by `add-python-package`. This skill **requests**; it does not install |
-| Dump the audit `.py` into `scratch/audit/<stem>/` | `.py` is durable in git; `scratch/` is gitignored. Source in `audit/`; digest in `scratch/audit/<stem>/` |
+| Dump the audit `.py` into `scratch/audit/<stem>/` | The notebook stays in `audit/`. `viewers.py` is the only `.py` that belongs under `scratch/audit/<stem>/`, and it is gitignored |
 | Register a Jupyter kernel "to be safe" | Current runner is in-process; no kernel. Registering creates an orphan kernelspec |
 | Add a fix-up cell that mutates `data/` or `reports/` | Audit files are read-only. State mutations belong in a `scratch/<ts>_*.py` probe or the experiment script |
 | Substitute `<SKORE_PROJECT_INIT>` in `audit/<stem>.py` without reading `experiments/<stem>.py` first | Audit must open the same Project. Always Read experiments/<stem>.py this turn and copy the literal Project init block byte-identical (modulo formatting) |
 | Hub mode: put `skore.login(mode="hub")` after `skore.Project(...)` | `Project(...)` constructor authenticates at init time; without prior `login`, fails. Order is fixed: login first, Project second |
 | Implement-loop audit → write scratch probe first to "double-check metrics" | The audit IS the metric-extraction step. Scratch probes for metrics are the anti-pattern this dispatch replaces |
+| `write_text` or a `help()` loop inside `audit/<stem>.py` | The notebook is the human view. Copy `templates/viewers.py` to `scratch/audit/<stem>/viewers.py` for HTML, the locator file, and `accessors.txt` |
 
 ## Pre-flight — emit before any audit-file write or execution
 
@@ -300,11 +309,9 @@ Brief outline; full anatomy with concrete examples →
    path segment is plural, id uses singular, e.g. `cross-validations`
    → `cross-validation`, `estimators` → `estimator`; local **and
    mlflow**: read `summary["id"]` for the matching key row), then
-   `report = project.get(REPORT_ID)`. Write `report._repr_html_()`
-   to `scratch/results/<stem>/report.html` and the normalized
-   locator to `scratch/results/<stem>/locator.txt` (confirm
-   `_repr_html_` with `api get`), then `report` as the last
-   expression.
+   `report = project.get(REPORT_ID)`, then `report` as the last
+   expression. Do not write HTML or `locator.txt` in this cell.
+   `viewers.py` does that (confirm `_repr_html_` with `api get`).
 6. **Persisted report** — substitute the exact normalized locator
    from evaluate. For a direct audit, use the selected `REPORT_ID`
    and `policy.skore_mode`: local links `../reports/`; Hub uses the
@@ -313,24 +320,24 @@ Brief outline; full anatomy with concrete examples →
    experiment id + run id. If no authoritative locator exists,
    write `n/a — backend did not expose a locator`. Do not call
    `put`, inspect private storage, or invent a frontend URL.
-7. **Checks summary** — `checks = report.checks.summarize()`, write
-   `checks._repr_html_()` to `scratch/results/<stem>/checks.html`,
-   then `checks` as the last expression. Its repr groups the walk by
-   severity; every `issue` / `tip` line ends with the documentation
-   URL holding the actionable mitigation (custom `CSTM*` checks may
-   have none).
+7. **Checks summary** — `checks = report.checks.summarize()`, then
+   `checks` as the last expression. `viewers.py` writes
+   `checks.html`. Its repr groups the walk by severity; every
+   `issue` / `tip` line ends with the documentation URL holding
+   the actionable mitigation (custom `CSTM*` checks may have none).
 8. **Metrics summary** —
    `metrics = report.metrics.summarize().frame(verbose_name=True, flat_index=False)`,
-   write `metrics._repr_html_()` to
-   `scratch/results/<stem>/metrics.html`, then `metrics` last.
-   That frame is the only metrics table. Do not also paste its
-   values into the design note.
-9. **Available report accessors** — call `help()` on
-   `report.metrics`, `report.checks`, and any other namespace that
-   exists (`inspection`, `data`, …). `help()` prints its tree and
-   returns `None`, so the runner captures it as stdout; nothing is
-   written to disk. Skip a namespace that is absent. Do not call
-   plot accessors here.
+   then `metrics` last. `viewers.py` writes `metrics.html` from
+   that frame. That frame is the only metrics table. Do not also
+   paste its values into the design note.
+9. **Available report accessors** — not a notebook cell. Copy
+   `templates/viewers.py` to `scratch/audit/<stem>/viewers.py`
+   and run it. It calls `help()` on `report.metrics`,
+   `report.checks`, and any other namespace that exists
+   (`inspection`, `data`, …) and writes the trees to
+   `accessors.txt`. `help()` prints its tree and returns `None`.
+   Skip a namespace that is absent. Do not call plot accessors
+   here. Do not put the loop in `audit/<stem>.py`.
 
 That's the core template. Leave checks as a bare Display: editors
 render `_repr_html_`, the runner records the `repr`, and
@@ -357,7 +364,7 @@ Do not
 put ROC / confusion-matrix / importance cells in the core
 template. After Close-audit extras, those cells use their own
 `## <title>` headings. If the user explicitly asks for a custom
-figure that `help()` did **not** list, load
+figure that `accessors.txt` did **not** list, load
 `plot-ml-figure` if installed **before writing the cell**; never
 replace a skore Display. Save PNG (or HTML) and leave the figure
 visible; never `plt.close` in the audit notebook.
@@ -388,12 +395,12 @@ this exact order. None is recommended or preselected.
 **Gate context.** Ahead of the question, state in 2–4 lines what
 the answer authorizes and the facts it rests on — echoed inline
 from this turn's digest (the checks and metrics just read, the
-Display names the trees actually list) — plus what each option
+Display names in `accessors.txt`) — plus what each option
 does. A file link is an addition, never the context.
 
 | Label | Contract |
 |---|---|
-| Additional report view | Menu labels are **exactly** the names under the `Displays` group of this turn's `help()` trees in the digest. Confirm the picked name with `python -m skore_skills api get`. The list is task-dependent — a regression report has no `roc`. Omit anything the trees do not list; never show remembered Display names. Ask one pick before editing. |
+| Additional report view | Menu labels are **exactly** the names under the `Displays` group of this turn's `help()` trees in `scratch/audit/<stem>/accessors.txt`. Confirm the picked name with `python -m skore_skills api get`. The list is task-dependent — a regression report has no `roc`. Omit anything the trees do not list; never show remembered Display names. Ask one pick before editing. |
 | Custom query | Wait for one concrete read-only question about the loaded report. Append only the minimal accessor cells needed to answer it. Prefer a name from the trees when it answers the question. |
 | Custom plot | Only when the trees have no Display for this chart. Load `plot-ml-figure` only if `status.skills.plot-ml-figure` is true; else one-line skip and return to this gate. Append read-only plot cells and keep the figure as notebook output. |
 | Close audit | Continue to the existing dispatched or direct close. |
@@ -401,7 +408,8 @@ does. A file link is an addition, never the context.
 Additional report view / Custom query / Custom plot all edit the
 same durable `audit/<stem>.py`, **below** `## Core audit complete`.
 After an edit: run `style`, then `cells run` to overwrite
-`scratch/audit/<stem>/audit.md`, derive G-AUDIT-FINDING again
+`scratch/audit/<stem>/audit.md`, re-run `viewers.py`, derive
+G-AUDIT-FINDING again
 with `python -m skore_skills audit finding --stem <stem>`
 (from checks + metrics only), and re-present this same gate. Do
 not convert notebooks, build the site, run `git end-turn`,
@@ -411,18 +419,20 @@ step is active. The audit remains read-only: no `evaluate`, no
 
 ### Extra Display cells
 
-Slug = the accessor name `help()` listed under `Displays`. Do not
-invent slugs from docs memory.
+Slug = the accessor name `accessors.txt` listed under `Displays`.
+Do not invent slugs from docs memory.
 
 1. Markdown cell `## <human title>` — not `## Checks summary` or
    `## Metrics summary`.
 2. Code cell: call the accessor; confirm `_repr_html_` with
-   `api get` on the returned Display.
-3. Write `scratch/results/<stem>/<slug>.html` from `_repr_html_()`
-   when it exists. Only when it does not, save `<slug>.png` so the
-   site can still embed a figure.
-4. Last expression: the bare Display.
-5. Failed or inapplicable accessors stay in `scratch/` probes.
+   `api get` on the returned Display. Last expression: the bare
+   Display.
+3. In `viewers.py` only, append that accessor to `EXTRA`. It
+   writes `scratch/results/<stem>/<slug>.html` from
+   `_repr_html_()` when it exists. Only when it does not, save
+   `<slug>.png` so the site can still embed a figure. Re-run
+   `viewers.py`.
+4. Failed or inapplicable accessors stay in `scratch/` probes.
    Do not add a Results subsection for them.
 
 `manage-ml-backlog` turns each extra `<slug>` viewer (other than
@@ -437,7 +447,8 @@ Before the first `cells run` for a stem, run
 - `stop` — name the missing `report.html` and stop.
 - `ask` — emit the cost preview (local read of the persisted
   report; every skore check; can be slow; name
-  `audit/<stem>.py` and `scratch/audit/<stem>/audit.md`; do not
+  `audit/<stem>.py`, `scratch/audit/<stem>/audit.md`, and
+  `scratch/audit/<stem>/viewers.py`; do not
   invent minutes) and **AskUserQuestion** Review (Recommended) /
   Skip / Stop. Do not `cells run` until **Review**. If this turn
   already answered **Review** (including from
@@ -449,6 +460,12 @@ Before the first `cells run` for a stem, run
 python -m skore_skills cells run audit/<stem>.py scratch/audit/<stem>/audit.md
 python -m skore_skills audit finding --stem <stem>
 ```
+
+Copy `templates/viewers.py` to `scratch/audit/<stem>/viewers.py`,
+substitute the Project init, report id, and locator, and run it
+with the composed-dev Python from `env verify` after `cells run`
+and before the continue-or-close gate. The notebook does not
+contain those writes.
 
 Paste JSON `finding` verbatim. The CLI streams the digest to stdout when the dest arg is omitted; the second arg also writes the file. Details:
 `python -m skore_skills cells run --help`.
@@ -629,14 +646,16 @@ Quick lookup; detailed recovery steps in `references/failure_modes.md`.
 | `setup-workspace` | Workspace layout; four-way stem pairing |
 | `add-python-package` | Agent feature install (agent tools (ruff / ipython / ipykernel)). This skill requests; that skill installs |
 | `python -m skore_skills api get` | skore symbol lookups, including `help` and extra Display methods. Cache hits first |
-| `plot-ml-figure` | Custom plot gate only when the `help()` trees have no Display |
+| `plot-ml-figure` | Custom plot gate only when `accessors.txt` has no Display |
 | `python -m skore_skills style` | ruff after writing/editing `audit/<stem>.py` |
 | `choose-python-library` / `python -m skore_skills env stack` | Agent tools (`ipython`, `ipykernel`) live under the agent feature |
 
 ## Templates and assets
 
 - `templates/audit.py` — per-experiment audit file skeleton. Copy
-  + substitute; don't rewrite from memory.
+  + substitute; don't rewrite from memory. Bare displays only.
+- `templates/viewers.py` — agent-only HTML, locator, and
+  `help()` trees. Copy to `scratch/audit/<stem>/viewers.py`.
 
 
 ## Need a package?

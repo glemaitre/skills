@@ -34,10 +34,6 @@ summary
 REPORT_ID = "skore:report:<type-singular>:<N>"
 
 report = project.get(REPORT_ID)
-_results = PROJECT_ROOT / "scratch" / "results" / "<NN>_<short_name>"
-_results.mkdir(parents=True, exist_ok=True)
-(_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
-(_results / "locator.txt").write_text("<REPORT_LOCATOR>", encoding="utf-8")
 report
 
 # %% [markdown]
@@ -53,9 +49,6 @@ report
 
 # %%
 checks = report.checks.summarize()
-_results = PROJECT_ROOT / "scratch" / "results" / "<NN>_<short_name>"
-_results.mkdir(parents=True, exist_ok=True)
-(_results / "checks.html").write_text(checks._repr_html_(), encoding="utf-8")
 checks
 
 # %% [markdown]
@@ -66,19 +59,7 @@ checks
 
 # %%
 metrics = report.metrics.summarize().frame(verbose_name=True, flat_index=False)
-_results = PROJECT_ROOT / "scratch" / "results" / "<NN>_<short_name>"
-_results.mkdir(parents=True, exist_ok=True)
-(_results / "metrics.html").write_text(metrics._repr_html_(), encoding="utf-8")
 metrics
-
-# %% [markdown]
-# ## Available report accessors
-
-# %%
-for _name in ("metrics", "checks", "inspection", "data"):
-    _namespace = getattr(report, _name, None)
-    if callable(getattr(_namespace, "help", None)):
-        _namespace.help()
 
 # %% [markdown]
 # ## Core audit complete

@@ -93,8 +93,10 @@ skill ids, `G-*` names, or the wrapper CLI.
    pending, preview and stop.
 6. Write the call in `experiments/NN_*.py` only. See the call
    shapes below. `python -m skore_skills style` after the edit.
-7. After `put`, record the locator, write the snapshots, then
-   End of turn.
+   The experiment ends at `project.put` and a bare `report`.
+7. After `put` has stored the report, copy `templates/snapshot.py`
+   to `scratch/results/<stem>/snapshot.py` and run it. Then End
+   of turn. Do not add snapshot writes to the experiment file.
 
 Every Python probe goes to `scratch/<ts>_<short>.py` and runs
 with the composed-dev Python from `env verify`. No inline
@@ -210,8 +212,12 @@ when that skill is installed.
 
 `Project.put` returns `None`. Read
 `project.summarize().frame()`, take the newest row for the key,
-and form one locator. Write that exact string to
-`scratch/results/<stem>/locator.txt`. Run
+and form one locator. Copy `templates/snapshot.py` to
+`scratch/results/<stem>/snapshot.py` (gitignored). Substitute
+the Project init from `experiments/<stem>.py`, the report id,
+and that locator. Run the script with the composed-dev Python
+from `env verify`, before `loop locator` and `loop artifacts`.
+Do not put these writes in `experiments/<stem>.py`. Run
 `python -m skore_skills loop locator --stem <stem>` and paste
 JSON `locator` verbatim. Missing locator is
 `n/a — backend did not expose a locator`.
@@ -228,9 +234,9 @@ JSON `locator` verbatim. Missing locator is
   URL: `mlflow · tracking: <uri> · experiment: <id> · run:
   <run-id>`. Do not invent a browser link.
 
-In the same experiment file, write `report._repr_html_()` to
+The script writes `report._repr_html_()` to
 `scratch/results/<stem>/report.html` and `repr(report)` to
-`report.txt`. Overwrite `pipeline.html` from a fitted
+`report.txt`. It overwrites `pipeline.html` from a fitted
 estimator: `report.estimator_` on `EstimatorReport`,
 `report.reports_[0].estimator_` on `CrossValidationReport`.
 Prefer `_repr_html_` when the fitted object defines it.
@@ -327,6 +333,8 @@ Pre-flight (evaluate-ml-pipeline):
 - [ ] skore_mode is set (local | hub | mlflow)
 - [ ] evaluate consent is proceed, or the user answered Evaluate
 - [ ] Call site is experiments/NN_*.py
+- [ ] Snapshots are scratch/results/<stem>/snapshot.py
+      (not cells in the experiment file)
 - [ ] skore.evaluate omits splitter=
       (or splitter="prefit" and only the test table is passed)
 - [ ] Smoke: passing | n/a (no history-dependent step) | STOP
@@ -342,3 +350,5 @@ Pre-flight (evaluate-ml-pipeline):
 - `references/custom-metrics.md` — a non-default metric via
   `with_scoring`.
 - `references/custom-checks.md` — a check the user asked for.
+- `templates/snapshot.py` — agent-only post-put snapshot. Copy
+  to `scratch/results/<stem>/snapshot.py`.

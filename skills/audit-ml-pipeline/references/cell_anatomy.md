@@ -6,12 +6,15 @@ last expression. Cross-referenced from SKILL.md § "Audit file
 contract — overview".
 
 The template core is task-agnostic: persisted-report locator +
-checks summary + metrics summary + a `help()` tree per namespace.
-The rendered digest at `scratch/audit/<stem>/audit.md`
-is what `review-ml-experiment` reads — only `## Checks summary`
-and `## Metrics summary`. Do not name extra Display headings
-like those two. Per-task accessors are appended after the user
-picks Additional report view from names in the trees.
+checks summary + metrics summary. `help()` trees are not a
+notebook cell. `templates/viewers.py`, copied to
+`scratch/audit/<stem>/viewers.py`, writes them to
+`accessors.txt`. The rendered digest at
+`scratch/audit/<stem>/audit.md` is what `review-ml-experiment`
+reads — only `## Checks summary` and `## Metrics summary`. Do
+not name extra Display headings like those two. Per-task
+accessors are appended after the user picks Additional report
+view from names in `accessors.txt`.
 
 Markdown cells in `templates/audit.py` name the experiment and
 interpret **this** report. Hub vs local id mapping, `put()` URL
@@ -36,9 +39,6 @@ summary
 ```python
 # %% Right — multiple statements, bare expression at the end
 report = project.get(REPORT_ID)
-_results = PROJECT_ROOT / "scratch" / "results" / "01_baseline"
-_results.mkdir(parents=True, exist_ok=True)
-(_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
 report
 ```
 
@@ -85,7 +85,8 @@ project.put("01_baseline", report)           # ← duplicates the row; pollutes 
 
 The template ships with this cell sequence. Core cells are
 task-agnostic. Leave them as-is; append Display cells only after
-the user picks a name from the `help()` trees.
+the user picks a name from `accessors.txt`. Snapshot writes stay
+in `viewers.py`.
 
 1. **Module-level docstring (markdown cell).** What this file is,
    the read-only rule, where the digest lands. Verbatim from the
@@ -138,15 +139,13 @@ the user picks a name from the `help()` trees.
    REPORT_ID = "skore:report:<type-singular>:<N>"  # hub: from put() URL
 
    report = project.get(REPORT_ID)
-   _results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
-   _results.mkdir(parents=True, exist_ok=True)
-   (_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
-   (_results / "locator.txt").write_text("<REPORT_LOCATOR>", encoding="utf-8")
    report
    ```
-   Confirm `_repr_html_` with `api get`. The HTML is for the site
-   Results viewer; the digest's `repr(report)` is what the agent
-   summarizes. The two report classes share the
+   Do not write `report.html` or `locator.txt` in this cell.
+   `viewers.py` writes both (a direct audit has no evaluate
+   snapshot yet). Confirm `_repr_html_` with `api get`. The HTML
+   is for the site Results viewer; the digest's `repr(report)` is
+   what the agent summarizes. The two report classes share the
    `checks` / `metrics` accessor API used by the next two cells,
    so the audit body is identical for both.
 
@@ -161,11 +160,9 @@ the user picks a name from the `help()` trees.
 7. **Checks summary (code cell, bare Display last).**
    ```python
    checks = report.checks.summarize()
-   _results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
-   _results.mkdir(parents=True, exist_ok=True)
-   (_results / "checks.html").write_text(checks._repr_html_(), encoding="utf-8")
    checks
    ```
+   `viewers.py` writes `checks.html`. The notebook cell does not.
    The repr opens with the severity counts, then lists issues,
    tips, passed, and not-applicable checks with codes like
    `SKD003`. Actionable lines carry the documentation URL the
@@ -177,37 +174,32 @@ the user picks a name from the `help()` trees.
    metrics = report.metrics.summarize().frame(
        verbose_name=True, flat_index=False
    )
-   _results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
-   _results.mkdir(parents=True, exist_ok=True)
-   (_results / "metrics.html").write_text(metrics._repr_html_(), encoding="utf-8")
    metrics
    ```
+   `viewers.py` writes `metrics.html` from that same frame. The
+   notebook cell does not.
    The frame is the metric table, with verbose names and the
    estimator/aggregate columns left unflattened. That same HTML is
    the only metrics table the site shows under `### Metrics`.
    Do not also paste the values into the design note.
 
-9. **Available report accessors (code cell, printed trees).**
-   `help()` prints its tree and returns `None`, so the runner
-   captures it as stdout — there is nothing to leave as a last
-   expression and nothing to write to disk.
-   ```python
-   for _name in ("metrics", "checks", "inspection", "data"):
-       _namespace = getattr(report, _name, None)
-       if callable(getattr(_namespace, "help", None)):
-           _namespace.help()
-   ```
-   Each tree ends in a `Displays` group; Additional report view
-   labels are exactly those names. The group is task-dependent — a
-   regression report offers `prediction_error` and no `roc`. Do not
-   remember Display class names from docs. `available()` is a
-   different thing: it lists metric or check *names* and only
-   exists on `metrics` and `checks`.
+9. **Available report accessors (not a notebook cell).**
+   `help()` prints its tree and returns `None`. `viewers.py`
+   captures that stdout in `scratch/audit/<stem>/accessors.txt`.
+   Do not put the loop in `audit/<stem>.py`. Each tree ends in a
+   `Displays` group; Additional report view labels are exactly
+   those names. The group is task-dependent — a regression report
+   offers `prediction_error` and no `roc`. Do not remember Display
+   class names from docs. `available()` is a different thing: it
+   lists metric or check *names* and only exists on `metrics` and
+   `checks`.
 
 That's the core template. Deeper accessors are appended after
 `## Core audit complete` only when the user picks Additional
 report view (or a Custom query that is still a report accessor).
-Confirm the method with `api get`, then snapshot:
+Confirm the method with `api get`. The notebook cell is the
+bare Display. Append the HTML write only in `viewers.py`
+(`EXTRA`), then re-run that script:
 
 ```python
 # %% [markdown]
@@ -216,17 +208,14 @@ Confirm the method with `api get`, then snapshot:
 # Heading must not be Checks summary or Metrics summary.
 
 # %%
-disp = report.<namespace>.<slug>()  # <slug> from this turn's Displays group
-_results = PROJECT_ROOT / "scratch" / "results" / "<stem>"
-_results.mkdir(parents=True, exist_ok=True)
-(_results / "<slug>.html").write_text(disp._repr_html_(), encoding="utf-8")
+disp = report.<namespace>.<slug>()  # <slug> from accessors.txt Displays
 disp
 ```
 
 Plot Displays carry `_repr_html_` too. Only when one does not,
-save `<slug>.png` instead. Failed probes stay under `scratch/` and
-do not become Results subsections. Re-run `style` + `cells run`
-after each append.
+`viewers.py` saves `<slug>.png` from `figure_`. Failed probes stay
+under `scratch/` and do not become Results subsections. Re-run
+`style` + `cells run`, then `viewers.py`, after each append.
 
 ## Digest-to-finding contract
 
@@ -255,9 +244,10 @@ The last expression is
 
 The only thing neither path produces is a *standalone* per-item
 HTML file, because the converted notebook is one document. That is
-the sole reason cells write `scratch/results/<stem>/<slug>.html` —
+why `viewers.py` writes `scratch/results/<stem>/<slug>.html` —
 the site embeds those under `## Results`. Agents never read them;
-they summarize from the digest.
+they summarize from the digest. The notebook does not contain
+those writes.
 
 ## Statement-only cells are fine
 
