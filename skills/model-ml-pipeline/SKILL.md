@@ -131,14 +131,22 @@ stem; never overwrite an existing note.
   smoke, and it is not expected to add predictive value. Any
   other token (`logistic`, `seasonal_naive`, `group_mean`,
   `production`) is that one comparison model. Do not upgrade it
-  to another estimator. Confirm the proposal,
+  to another estimator. Restate the proposal, then one
+  single-choice **AskUserQuestion**: **Yes** / **No**. Do not
+  also ask for a typed yes. "Maybe" is not Yes. No or Stop
+  writes nothing. A later Yes (the tool answer, or an explicit
+  yes on a later turn) is what authorizes the write. On Yes,
   write the note, then Design approval, before build. Keep the
   normal post-smoke Evaluate (Recommended) / Modify / Stop gate.
 - **EDA proposal (`eda_proposal`).** Read
   `data_analysis/data_analysis.md` and the project goal. Cite the
   EDA findings that motivate one pipeline proposal. Do not invent
-  findings or present multiple silent alternatives. Confirm the
-  proposal, write the note, then Design approval, before build.
+  findings or present multiple silent alternatives. Restate the
+  proposal, then one single-choice **AskUserQuestion**: **Yes** /
+  **No**. Do not also ask for a typed yes. "Maybe" is not Yes.
+  No or Stop writes nothing. A later Yes (the tool answer, or an
+  explicit yes on a later turn) is what authorizes the write.
+  On Yes, write the note, then Design approval, before build.
 - **Backlog (`backlog`).** Load `manage-ml-backlog` only if
   `status.skills.manage-ml-backlog` is true. Else one-line skip;
   do not invent a Backlog. Pass the
@@ -146,9 +154,12 @@ stem; never overwrite an existing note.
   `B<N>`, consume only that row into a proposal/design stem, then
   return here. Do not add a new Backlog idea in this branch.
 - **Discussion (`discuss`).** Have an open conversation about what
-  to learn, why now, and what changes. Restate the agreed idea and
-  wait for an explicit yes before any design note. Only after that
-  confirmation create/populate the design note, then Design
+  to learn, why now, and what changes. Restate the agreed idea,
+  then one single-choice **AskUserQuestion**: **Yes** / **No**.
+  Do not also ask for a typed yes. "Maybe" is not Yes. No or Stop
+  writes nothing. A later Yes (the tool answer, or an explicit
+  yes on a later turn) is what authorizes the write. Only after
+  that confirmation create/populate the design note, then Design
   approval. If no idea is agreed, return to the entry choices.
 
 ## Before execution

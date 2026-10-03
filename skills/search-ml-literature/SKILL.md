@@ -42,12 +42,17 @@ project — not skill ids or the wrapper CLI.
    plus the claim. Do not rank a winner.
 6. **AskUserQuestion**: pick one, narrow the query, or stop.
    Narrow restarts at step 2. Stop writes no idea file.
-7. Restate the picked direction and wait for an explicit yes.
-   Until yes, that paragraph is the whole message. No or stop
-   writes nothing.
-8. On yes, write `journal/ideas/<slug>.md` and upsert its Ideas
-   row. Do not create a design note. Do not edit History,
-   Backlog, or Status. Write `journal/ideas/<slug>.md`:
+7. If this turn is not already an explicit yes, restate the
+   picked direction in one short paragraph, then one
+   single-choice **AskUserQuestion**: **Yes** / **No**. Do not
+   also ask for a typed yes. Until Yes, that paragraph and the
+   question are the whole message. "Maybe" is not Yes. No or
+   Stop writes nothing.
+8. On Yes — the tool answer, or an explicit yes already given
+   on this or a later turn — write `journal/ideas/<slug>.md`
+   and upsert its Ideas row. Do not create a design note.
+   Do not edit History, Backlog, or Status. Write
+   `journal/ideas/<slug>.md`:
 
 ```
 # <slug>

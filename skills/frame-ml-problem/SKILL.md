@@ -52,9 +52,10 @@ wrapper CLI.
 2. Run `python -m skore_skills frame show`. When the user is
    changing a locked constraint and named one cell, add
    `--revise`. When they are changing a constraint and did not
-   name a cell, ask which filled decision to change (skip
-   `n/a`) and stop. Do not `--revise`, do not `frame clear`, and
-   do not edit the journal on that turn. JSON `action` is
+   name a cell, **AskUserQuestion** one pick among the filled
+   decisions (skip `n/a`) and stop. Do not also ask for a typed
+   answer. Do not `--revise`, do not `frame clear`, and do not
+   edit the journal on that turn. JSON `action` is
    authoritative. Do not invent a menu. If the command is missing
    or exits without JSON, read `references/fallback.md` and follow
    it. Do not open another reference. Do not guess candidates.
@@ -94,9 +95,13 @@ wrapper CLI.
    the record. Status stays `draft`. The next `frame show` asks
    only keys that are still empty or invalid.
 7. `ask` / `confirm_lock` or `ask` / `revise` — quote JSON
-   `context` inline, then offer JSON `choices` only and stop.
-   The user sentence that opened this screen is not a choice.
-   Do not set Status to `locked` in that same turn.
+   `context` inline in 2–4 lines, then one single-choice
+   **AskUserQuestion** using only JSON `choices`, in that order,
+   and stop. `confirm_lock` labels are **Lock** / **Modify** /
+   **Stop**. `revise` labels are **Modify** / **Keep** / **Stop**.
+   Do not also ask for a typed answer. The user sentence that
+   opened this screen is not a choice. Do not set Status to
+   `locked` in that same turn.
    - `lock` on a later turn sets Status to `locked`.
    - `modify` on a revise, when the user named one cell: run
      `python -m skore_skills frame clear --cell <key>` and stop.
@@ -104,7 +109,9 @@ wrapper CLI.
      hand. The next `frame show` asks only keys that are still
      empty or invalid.
      `modify` with no named cell writes nothing and does not
-     `frame clear`: ask which filled decision to change and stop.
+     `frame clear`: **AskUserQuestion** one pick among the filled
+     decisions (skip `n/a`) and stop. Do not also ask for a typed
+     answer.
    - `keep` leaves the locked table unchanged.
    - `stop` writes nothing further.
 8. `proceed` — the table is locked. If `translation` is null, say

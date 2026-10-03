@@ -135,7 +135,8 @@
 
 **Must do:**
 - Quote the JSON context, including MAE, in the question.
-- Offer only lock, modify, and stop, then stop.
+- AskUserQuestion with only Lock, Modify, and Stop, in that
+  order, then stop.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -248,7 +249,8 @@
   a cell.
 
 **Must do:**
-- Ask which filled decision to change. Do not run `frame clear`.
+- AskUserQuestion one pick among the filled decisions. Do not
+  run `frame clear`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
