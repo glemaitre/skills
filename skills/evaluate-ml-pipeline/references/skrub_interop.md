@@ -265,9 +265,6 @@ project = skore.Project(
 
 # %%
 learner = build_learner(data_dir_preview=DATA_DIR)
-_results = PROJECT_ROOT / "scratch" / "results" / "01_baseline"
-_results.mkdir(parents=True, exist_ok=True)
-(_results / "pipeline.html").write_text(learner._repr_html_(), encoding="utf-8")
 learner
 
 # %% [markdown]
@@ -283,26 +280,45 @@ report
 # Custom checks register here, before the report is stored.
 # A non-default metric was attached with `with_scoring` in build.
 
-# %%
-_results = PROJECT_ROOT / "scratch" / "results" / "01_baseline"
-_results.mkdir(parents=True, exist_ok=True)
-(_results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
-(_results / "report.txt").write_text(repr(report), encoding="utf-8")
-(_results / "locator.txt").write_text(
-    "local workspace: [reports/](../reports/) · id: <id>",
-    encoding="utf-8",
-)
-fitted = report.reports_[0].estimator_
-# Prefer `_repr_html_` when the fitted object defines it (DataOps
-# graph); else `sklearn.utils.estimator_html_repr`. Confirm with
-# `api get`. Do not call `SkrubLearner.report` / `full_report`.
-(_results / "pipeline.html").write_text(fitted._repr_html_(), encoding="utf-8")
-
 # %% [markdown]
 # ## Persist
 
 # %%
 project.put("01_baseline", report)
+```
+
+Agent snapshot, not a notebook cell. Copy
+`templates/snapshot.py` to `scratch/results/01_baseline/snapshot.py`
+and run it after `put` has stored the report:
+
+```python
+import skore
+from sklearn.utils import estimator_html_repr
+
+from load_forecast import PROJECT_ROOT
+
+STEM = "01_baseline"
+REPORT_ID = "<id>"
+LOCATOR = "local workspace: [reports/](../reports/) · id: <id>"
+
+project = skore.Project(
+    name="load-forecast",
+    mode="local",
+    workspace=str(PROJECT_ROOT / "reports"),
+)
+report = project.get(REPORT_ID)
+results = PROJECT_ROOT / "scratch" / "results" / STEM
+results.mkdir(parents=True, exist_ok=True)
+(results / "report.html").write_text(report._repr_html_(), encoding="utf-8")
+(results / "report.txt").write_text(repr(report) + "\n", encoding="utf-8")
+(results / "locator.txt").write_text(LOCATOR + "\n", encoding="utf-8")
+fitted = report.reports_[0].estimator_
+# Prefer `_repr_html_` when the fitted object defines it (DataOps
+# graph); else `sklearn.utils.estimator_html_repr`. Confirm with
+# `api get`. Do not call `SkrubLearner.report` / `full_report`.
+render = getattr(fitted, "_repr_html_", None)
+pipeline_html = render() if callable(render) else estimator_html_repr(fitted)
+(results / "pipeline.html").write_text(pipeline_html, encoding="utf-8")
 ```
 
 Note the clean separation:
@@ -314,10 +330,12 @@ Note the clean separation:
   bind the source var at fit/CV time.
 - **No `splitter=`.** The locked `cv` is already on the learner.
   See `evaluate-ml-pipeline/references/metadata-routing.md`.
-- **No agent-only `print` calls** — inspection is the agent's
-  scratch problem (see `python -m skore_skills api get` § "`scratch/` conventions"),
-  not the script's. The bare `report` line is jupytext display,
-  not a debug print.
+- **No agent-only `print` calls or snapshot writes** — inspection
+  and the HTML / locator files are the agent's scratch problem
+  (`scratch/results/<stem>/snapshot.py`; see
+  `python -m skore_skills api get` § "`scratch/` conventions"),
+  not the experiment script. The bare `report` line is jupytext
+  display, not a debug print.
 
 ## When `evaluate` is too coarse — escalate
 

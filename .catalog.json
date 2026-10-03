@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "dbc59578f56eaa3497642f932c29af3b4cde750c574a8b1d7d33f0a6d5b59bf3",
+  "catalog_hash": "c60e75c606253343262867c721ec5e4f4f503cae8b02b0e88a30d48df94bb602",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "d19d2bd84ee0f5b0bde67931918ab9330941e6db592bef383e434c258ed5464d"
+      "hash": "c5458b1b39bac58075e3462fb79a45a53d52c032123cf7ff96dae212790f750c"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "74a9072c8c3024341a41225cf1077897c6363e0ba2490d00d5a5371419344721"
+      "hash": "0fd714914f86d57ecbd19b9c9c83d82ef2838d2cb9ee29f2972870f262ee75e5"
     },
     {
       "id": "manage-ml-backlog",

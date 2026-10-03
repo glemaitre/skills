@@ -51,13 +51,15 @@ violated.
 - Run `python -m skore_skills git end-turn --stage evaluate` at
   the end of the turn.
 - If that command returns `invoke`, load `persist-ml-git`.
-- Write `scratch/results/01_baseline/report.html` from
-  `report._repr_html_()`, `report.txt` from `repr(report)`, and
-  `locator.txt` with the normalized G-REPORT-LOCATOR in
-  `experiments/01_baseline.py` after the bare `report` display.
+- Copy `templates/snapshot.py` to
+  `scratch/results/01_baseline/snapshot.py` and run it after
+  `put`. It writes `report.html` from `report._repr_html_()`,
+  `report.txt` from `repr(report)`, and `locator.txt` with the
+  normalized G-REPORT-LOCATOR. The experiment file ends at `put`
+  and a bare `report`.
 - Overwrite `scratch/results/01_baseline/pipeline.html` from a
-  fitted `estimator_` (`reports_[0].estimator_` on a CV report),
-  not `SkrubLearner.report`.
+  fitted `estimator_` (`reports_[0].estimator_` on a CV report)
+  inside `snapshot.py`, not `SkrubLearner.report`.
 - Run `python -m skore_skills loop locator --stem 01_baseline` and
   `python -m skore_skills loop artifacts --stem 01_baseline`.
 
@@ -72,6 +74,9 @@ violated.
 - Pre-pin a different metric (e.g. `scoring="neg_mean_squared_error"`).
   The locked comparison is `MAE`.
 - Run `git commit` in this skill or `git push`.
+- Put `write_text` of `report.html`, `report.txt`, `locator.txt`,
+  or `pipeline.html` in `experiments/01_baseline.py`. Those writes
+  belong in `scratch/results/01_baseline/snapshot.py`.
 
 ---
 

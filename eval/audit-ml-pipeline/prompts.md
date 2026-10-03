@@ -16,20 +16,24 @@
 - Run `python -m skore_skills review consent --stem <stem>` before
   the first `cells run`.
 - On `ask`, give a 1–3 sentence preview: local read of the
-  persisted report, every skore check, writes `audit/<stem>.py`
-  and `scratch/audit/<stem>/audit.md`, can be slow. Do not invent
+  persisted report, every skore check, writes `audit/<stem>.py`,
+  `scratch/audit/<stem>/audit.md`, and
+  `scratch/audit/<stem>/viewers.py`, can be slow. Do not invent
   minutes. Ask Review / Skip / Stop. Do not `cells run` until
   Review.
 - After Review, confirm the report with `project.summarize()` and
   load it with `project.get(id)`.
 - Render checks and metrics into the audit digest.
-- Write `scratch/results/<stem>/{report,checks,metrics}.html`. Leave
-  the bare Display last on checks. Metrics last is
-  `summarize().frame(verbose_name=True, flat_index=False)`, and
-  `metrics.html` is that frame's `_repr_html_()`. No second text
-  snapshot of the table.
-- Print a `help()` tree per namespace for the Additional report view
-  menu.
+- Copy `templates/viewers.py` to `scratch/audit/<stem>/viewers.py`
+  and run it. It writes
+  `scratch/results/<stem>/{report,checks,metrics}.html`. Leave
+  the bare Display last on checks in `audit/<stem>.py`. Metrics
+  last is `summarize().frame(verbose_name=True, flat_index=False)`,
+  and `metrics.html` is that frame's `_repr_html_()`. No second
+  text snapshot of the table.
+- Write a `help()` tree per namespace to
+  `scratch/audit/<stem>/accessors.txt` for the Additional report
+  view menu. Do not put that loop in the audit notebook.
 - Derive G-AUDIT-FINDING by running
   `python -m skore_skills audit finding --stem <stem>` and pasting
   JSON `finding` verbatim.
@@ -47,6 +51,9 @@
 - Write skill ids, `skore_skills`, `cells run`, or API-tutorial
   prose (version floors, `summarize(ignore=…)`, hub locator
   recipes) into `audit/<stem>.py` markdown cells or `#` comments.
+- Put snapshot `write_text` calls or the `help()` loop in
+  `audit/<stem>.py`. Those belong in
+  `scratch/audit/<stem>/viewers.py`.
 
 ---
 
@@ -149,8 +156,8 @@
 
 **Assumed workspace state:**
 - `status.setup.pending` is empty.
-- The initial audit digest exists, including a `help()` tree per
-  namespace.
+- The initial audit digest exists. `help()` trees are in
+  `scratch/audit/<stem>/accessors.txt`, not in the notebook.
 - A tree's `Displays` group lists one extra view; `api get` confirms
   that method.
 
@@ -163,9 +170,10 @@
 - Offer only accessor names from this turn's `Displays` groups — not
   a remembered Display catalog.
 - Confirm the selected accessor with `api get`, append it below
-  `## Core audit complete` on the same `audit/<stem>.py`, write
-  `scratch/results/<stem>/<slug>.html`, leave the bare Display last,
-  run style + cells run, and overwrite the digest.
+  `## Core audit complete` on the same `audit/<stem>.py` as a bare
+  Display, write `scratch/results/<stem>/<slug>.html` from
+  `viewers.py` only, run style + cells run, re-run `viewers.py`,
+  and overwrite the digest.
 - Recompute G-AUDIT-FINDING with `audit finding --stem <stem>` and
   present the same gate again.
 
@@ -176,4 +184,6 @@
   record-outcome, or return to the dispatcher before Close audit.
 - Call `evaluate` or `put`.
 - Name ROC / confusion_matrix / permutation_importance from docs
-  memory when they are absent from this turn's `help()` trees.
+  memory when they are absent from this turn's `accessors.txt`
+  trees.
+- Put the extra-view `write_text` in `audit/<stem>.py`.
