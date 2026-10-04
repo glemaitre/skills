@@ -12,10 +12,11 @@ pixi run hash-check     # verify hashes match the on-disk skills (no writes)
 pixi run evals-check    # verify generated evals.json files match eval prompts
 pixi run validate       # validate .catalog.json structure (skills, categories, workflows)
 pixi run check-versions # verify the version matches across all declaring sources
+pixi run integration-validate # verify integration scenario files and the seed snapshot
 pixi run bump-major     # bump the major version across all version sources
 pixi run bump-minor     # bump the minor version across all version sources
 pixi run bump-patch     # bump the patch version across all version sources
-pixi run check          # composite: hash-check + evals-check + validate + check-versions
+pixi run check          # composite: hash-check + evals-check + validate + check-versions + integration-validate
 ```
 
 `pixi run check` is what CI invokes via `prefix-dev/setup-pixi` — see
@@ -71,6 +72,32 @@ it by hand, so a release bump can't leave one file lagging behind:
 
 Run directly with `python tools/check_versions.py` or via
 `pixi run check-versions`.
+
+## integration_scenario.py
+
+Validates, copies, prints, checks, and runs the scenarios under
+`integration/scenarios/`. A scenario is a seed workspace, ordered
+replies, filesystem snapshots, and a driver file. Manual checks stay
+available. `run` launches Cursor Agent, Claude Code, OpenCode, or Pi.
+See [`integration/README.md`](../integration/README.md).
+
+`validate` checks ids, the driver, fork links, expect keys, relative
+paths, and that the seed matches the `setup-open` snapshot. `pixi run
+check` includes this step.
+
+```bash
+python tools/integration_scenario.py materialize california-housing --dest ../housing
+python tools/integration_scenario.py prompt california-housing --turn setup-open
+python tools/integration_scenario.py check california-housing --workspace ../housing --turn setup-open
+python tools/integration_scenario.py run california-housing --harness claude --workspace ../housing
+python tools/integration_scenario.py run california-housing --harness pi --workspace ../housing --interactive
+```
+
+`run` uses the harness already authenticated on the machine. It does not
+install one, and it will not use the `cursor` editor in place of
+`cursor-agent`. `--interactive` shows the TUI. Headless output is streamed
+and stored under `.transcripts/integration/<run-id>/` with `result.json`.
+Auto-approval applies to that workspace only. The journey can run `pixi`.
 
 ## bump_version.py
 
