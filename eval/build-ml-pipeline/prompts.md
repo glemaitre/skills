@@ -755,3 +755,5 @@ violated.
 - Substitute `sklearn.Pipeline` / `make_pipeline`.
 - Run `pip install graphviz`.
 - Call `env add` or `env graphviz` from this skill.
+- Skip the figure because `pipeline.html` already exists or
+  because the SVG step was marked optional.

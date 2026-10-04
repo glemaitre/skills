@@ -13,7 +13,10 @@ description: >
 
   HOW TO USE: run `python -m skore_skills frame show`. Read each
   reference named in `questions` once, ask every key in `missing`
-  in one message, write every answered cell, and stop the turn.
+  in one message, and write every answered cell. If a key is
+  still unanswered, ask it and stop. If the write fills every
+  required cell, run `frame show` again and AskUserQuestion
+  Lock / Modify / Stop, then stop. Do not lock in that turn.
   If that command is missing, or the problem is not classification
   or regression, read `references/fallback.md` and do not invent
   the closed menu.
@@ -86,7 +89,16 @@ wrapper CLI.
    that split in the folds question and write `predefined` if
    they choose it. Do not offer it otherwise. Do not write
    `prefit` in the table. Once any decision cell is filled and
-   Status is not `locked`, set Status to `draft`. Stop this turn.
+   Status is not `locked`, set Status to `draft`. If any key in
+   `missing` is still unanswered, ask those keys and stop. Do
+   not invent their values. Do not show the lock menu. If the
+   write fills every required cell, run
+   `python -m skore_skills frame show` again in this turn. When
+   that returns `ask` / `confirm_lock`, follow step 7 in this
+   same turn. Do not defer the lock question. If the second
+   `frame show` still returns `missing_keys`, ask those keys
+   and stop. Do not set Status to `locked`. The sentences that
+   filled the cells are not the Lock choice.
 6. When the user named one cell and Status is `draft`, do not
    use the lock menu as the change. Run
    `python -m skore_skills frame clear --cell <key>` for that

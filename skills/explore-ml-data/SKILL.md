@@ -18,8 +18,8 @@ description: >
   package root or a root `JOURNAL.md` while setup is pending.
 
   HOW TO USE: G-TABULAR via `add-python-package`, infer or ask
-  the target, load `plot-ml-figure` if installed, then ask
-  keep-exploring vs close.
+  the target, load `plot-ml-figure` if installed, then ask the
+  five-option continuation board, including Close.
 ---
 
 # Explore ML Data
@@ -65,8 +65,8 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 
 | You came here for… | → next |
 |---|---|
-| First EDA (triage or free-text) | → write md; then keep-exploring vs close |
-| Keep exploring | → pre-defined option, query, automatic exploration, or describe a plot; no end-turn yet |
+| First EDA (triage or free-text) | → write md; then the five-option continuation board |
+| Continuation pick | → pre-defined option, query, automatic exploration, or describe a plot; no end-turn yet |
 | Close this stage | → convert / site / git end-turn / `triage-ml-task` if installed |
 | Methodology concern while EDA is done | → skip G-DATA-ANALYSIS; Keep exploring § Automatic exploration (named concern skips the canned survey) |
 | Changed data source or "also plot X" | → overwrite `data_analysis/data_analysis.*`, refresh JOURNAL |
@@ -183,7 +183,7 @@ Details: `references/cell_anatomy.md`. Extra recipes:
       + extras.json
 - [ ] Author data_analysis.md + JOURNAL
 - [ ] Preview `site build` if `policy.site` (skip on G-DATA-ANALYSIS skip)
-- [ ] AskUserQuestion keep exploring vs close (skip if user
+- [ ] AskUserQuestion five options, including Close (skip if user
       already closed the turn)
 ```
 
@@ -266,7 +266,7 @@ not write or execute the notebook.
    `[data_analysis/data_analysis.md](../data_analysis/data_analysis.md)`.
    Skip path: Status row only. Do not convert or `git end-turn` on
    skip.
-6. **Keep exploring vs close** — unless the user already closed
+6. **Continuation board** — unless the user already closed
    the turn (“EDA is done”, “close the turn”): if `policy.site`
    is true and `export-ml-site` is installed, run
    `python -m skore_skills site build` first. Skip in one line
@@ -279,11 +279,23 @@ not write or execute the notebook.
    `data_analysis/data_analysis.md` plus `report.html` and
    `html/data_analysis.html` when the build ran. Do not
    `notebook convert` or `git end-turn` on this preview. Then
-   **AskUserQuestion** one pick. Neither option is recommended
-   or preselected. After the first md, always ask (including
-   when triage sent you here). Close → End of turn
-   (User-facing close). Do not rewrite `data_analysis.md` on
-   Close. Duplicate / target / leakage stay in Modelling
+   **AskUserQuestion** one pick. None is recommended or
+   preselected. After the first md, always ask (including
+   when triage sent you here). Do not say “extra-analyses” or
+   “standard extra analysis” on this board.
+
+   | Label | Subtitle |
+   |---|---|
+   | Choose additional pre-defined option | Name only items that apply: interactions / pairplot, PCA, hypothesis tests, subgroup, time-series, text or geo, join keys / coverage (2+ families) |
+   | Provide a query to extend the exploration | Describe an analysis to add to the notebook (table, test, or plot) |
+   | Automatic exploration related to the data and problem | Do in-depth research related to the problem and data that we are exploring |
+   | Describe a plot | You name a chart and I add cells for it |
+   | Close | End this stage. Do not add another analysis. |
+
+   Close → End of turn (User-facing close). Do not rewrite
+   `data_analysis.md` on Close. The other four picks go to
+   **Keep exploring** and do not ask this board again for the
+   same pick. Duplicate / target / leakage stay in Modelling
    implications, not only Open questions.
 
 If the original prompt already named extras (e.g. PCA), include
@@ -297,9 +309,9 @@ G-DATA-ANALYSIS.
 
 Methodology concern while `status.data_analysis` is present
 (leakage / “research this”): skip G-DATA-ANALYSIS; do not
-overwrite the notebook; go to **Keep exploring** § research
-with that named concern (skip the canned extra-analysis
-survey).
+overwrite the notebook; go to **Keep exploring** § Automatic
+exploration with that named concern (skip the canned
+extra-analysis survey).
 
 Always load `plot-ml-figure` if installed before writing or
 rewriting figure cells. The template is not a license to skip
@@ -311,32 +323,27 @@ then leave the figure/grid as the cell output.
 ## Keep exploring
 
 No convert, no `git end-turn`. Do not run a **second** `site
-build` on this four-pick extras menu until the md is rewritten.
+build` until the md is rewritten. Do not say “extra-analyses”
+or “standard extra analysis” **anywhere this turn** (chat,
+checklists, or the board). The file
+`references/extra_analyses.md` may be named as a path only.
+The continuation board was already asked. Handle the picked
+label. Do not ask keep-versus-close, and do not repeat the
+board for this pick.
 
-1. **AskUserQuestion** one pick, none recommended. Do not say
-   “extra-analyses” or “standard extra analysis” **anywhere
-   this turn** (chat, checklists, or the board). The file
-   `references/extra_analyses.md` may be named as a path only.
-
-   | Label | Subtitle |
-   |---|---|
-   | Choose additional pre-defined option | Name only items that apply: interactions / pairplot, PCA, hypothesis tests, subgroup, time-series, text or geo, join keys / coverage (2+ families) |
-   | Provide a query to extend the exploration | Describe an analysis to add to the notebook (table, test, or plot) |
-   | Automatic exploration related to the data and problem | Do in-depth research related to the problem and data that we are exploring |
-   | Describe a plot | You name a chart and I add cells for it |
-
-2. **Pre-defined option** — the recipe file
+1. **Pre-defined option** — the recipe file
    `references/extra_analyses.md` (path only; do not say
    “extra-analyses” in chat). Its own `allow_multiple` board,
    all unchecked. Load
    `plot-ml-figure` if installed before figure cells.
-3. **Query** — wait for the user’s analysis request. Append
+2. **Query** — wait for the user’s analysis request. Append
    cells (load `plot-ml-figure` if a figure). Not the canned
-   research survey. Then step 6.
-4. **Automatic exploration** — load `research-ml-practice`
+   research survey. Then the refresh step.
+3. **Automatic exploration** — load `research-ml-practice`
    if installed with stage `data_analysis` and the canned
    survey concern below. Missing skill → one-line skip and
-   return to step 1. Do not ask intake. Pass JOURNAL,
+   re-ask the five-option board without another `site build`.
+   Do not ask intake. Pass JOURNAL,
    `data_analysis.md` (implications + open questions), and
    `scratch/data_analysis/extras.json` as **context**. The
    worker abstracts the **problem class** (no dataset proper
@@ -367,13 +374,13 @@ build` on this four-pick extras menu until the md is rewritten.
    **depth**, then the same **`measure`** board. Summarize
    as above if tools did not run; do not say to drop a raw
    column.
-5. **Describe a plot** — load `plot-ml-figure` if installed;
+4. **Describe a plot** — load `plot-ml-figure` if installed;
    append cells.
-6. Picks that change the `.py`: `style`, `cells run`, refresh
+5. Picks that change the `.py`: `style`, `cells run`, refresh
    facts, rewrite `data_analysis.md` from JSON/PNGs/HTML
    (implications from **results**). Then preview `site build` if
-   `policy.site` and re-ask keep vs close (run path step 6). Do
-   not invent domain checklists.
+   `policy.site` and re-ask the five-option board (run path
+   step 6). Do not invent domain checklists.
 
 ## Dispatch
 
