@@ -210,6 +210,7 @@
         "On `ask`, let `review-ml-experiment` preview the audit cost and ask Review / Skip / Stop. Do not load `audit-ml-pipeline` from this dispatcher.",
         "After Review, load `manage-ml-backlog` in record-outcome mode with the returned digest, locator, and G-AUDIT-FINDING.",
         "Record before `notebook convert` and `site build`.",
+        "Run `python -m skore_skills notebook convert experiments/01_baseline.py --html` after record-outcome and before site build.",
         "Convert `audit/01_baseline.py --html` here, after record-outcome and before site build, together with the experiment script.",
         "Write 2\u20136 sentences from the digest, name `report.html` and `html/01_baseline.html` instead of the design-note markdown, and include locator plus G-AUDIT-FINDING in the user-facing close.",
         "Run `python -m skore_skills git end-turn --stage implement` last.",
@@ -217,6 +218,7 @@
         "The response does NOT: Run `cells run` from this dispatcher before Review.",
         "The response does NOT: Leave History `planned` in any journal excerpt you author.",
         "The response does NOT: Skip `audit/01_baseline.py` because the audit skill was supposed to convert it.",
+        "The response does NOT: Skip `experiments/01_baseline.py` because it already contains `skore.evaluate`, or because the unfitted-snapshot reference forbids `notebook convert`.",
         "The response does NOT: Add `<!-- results-embed: audit -->`.",
         "The response does NOT: Open idea triage inside record-outcome mode.",
         "The response does NOT: Write the journal files directly instead of dispatching."

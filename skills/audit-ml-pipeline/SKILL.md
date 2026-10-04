@@ -14,9 +14,8 @@ description: >
   STOP when `status.setup.pending` is non-empty (load
   `setup-ml-project`), or when there is no approved design, no
   report, or no agent feature: explain and send the user to
-  setup, `evaluate-ml-pipeline`, or `model-ml-pipeline`. A
-  declined git is not asked again. Also stop for raw-data
-  exploration or sourcing a future experiment.
+  setup, `evaluate-ml-pipeline`, or `model-ml-pipeline`. Also
+  stop for raw-data exploration or sourcing a future experiment.
 
   HOW TO USE: confirm journal, experiment, smoke, and report;
   place the file from `templates/audit.py`; copy
@@ -47,7 +46,7 @@ Authoring hints stay in this skill. `style` is ruff only.
 
 | Came here from… | After audit, next is… |
 |---|---|
-| `model-ml-pipeline` (implement loop) | → Return to the dispatcher for convert / site / git end-turn |
+| `model-ml-pipeline` (implement loop) | → Return. The caller runs `notebook convert experiments/<stem>.py` and `notebook convert audit/<stem>.py` (`--html` when the site is on), then site build and `git end-turn --stage implement`. Do not convert here. |
 | User free-text ("audit 02", "re-audit 04") | → Surface metrics, then own the close (see § End of turn) |
 | Re-run of an existing experiment | → Re-execute the existing audit file; surface diff if metrics changed |
 
@@ -474,7 +473,11 @@ Paste JSON `finding` verbatim. The CLI streams the digest to stdout when the des
 
 Direct close only. When `model-ml-pipeline` or
 `evaluate-ml-pipeline` owns this turn, do not convert here. That
-caller converts `audit/<stem>.py` with the experiment script.
+caller runs `python -m skore_skills notebook convert
+experiments/<stem>.py` and the same command on
+`audit/<stem>.py`, with `--html` when `policy.site` is true.
+Converting only the audit file does not finish the close. The
+unfitted-snapshot ban does not apply.
 
 On a direct close, if `policy.notebooks` is true and
 `export-ml-notebook` is installed, run
@@ -546,8 +549,17 @@ Identical stems, 1:1. By the time the experiment shows `done` in
 digest, JSON `finding`, JSON `locator`, and an optional
 headline to that caller. Stop. Do not run record-outcome,
 `notebook convert`, `site build`, `git end-turn`, or triage
-here — the caller owns that close. Do not paste the direct-audit
-close as a preview of what the dispatcher will run.
+here. When the caller is `model-ml-pipeline` or
+`evaluate-ml-pipeline`, tell it to run both when
+`policy.notebooks` is true: `python -m skore_skills notebook
+convert experiments/<stem>.py` and `python -m skore_skills
+notebook convert audit/<stem>.py` (`--html` when `policy.site`
+is true), then `site build` and that caller's `git end-turn`
+(`--stage implement` from model, `--stage evaluate` from
+evaluate). Converting only the audit file does not finish that
+close. The unfitted-snapshot ban does not apply. Do not paste
+the direct-audit close as a preview of what the dispatcher
+will run.
 
 **Direct free-text audit, after Close audit:** this skill owns the close. Run
 `python -m skore_skills loop artifacts --stem <stem>` (`record`
