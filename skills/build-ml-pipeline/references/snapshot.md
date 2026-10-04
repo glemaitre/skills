@@ -13,8 +13,12 @@ predates the marker). Add or update `experiments/<stem>.py`:
 markdown plus a code cell that builds the unfitted
 `build_learner()`, writes the same HTML path, and leaves
 `learner` as the last expression. Do not add `skore.evaluate` or
-`project.put` here. Do not `notebook convert` if the experiment
-file already contains `skore.evaluate`.
+`project.put` here. Do not `notebook convert` this unfitted
+snapshot if the experiment file already contains
+`skore.evaluate`. That ban is only for this snapshot, before
+the first evaluation. `model-ml-pipeline` and
+`evaluate-ml-pipeline` still convert `experiments/<stem>.py`
+at close.
 
 `DataOp.skb.draw_graph()` to `pipeline.svg` is optional only
 before the first draw, and only when `dot` is set. If `dot` is

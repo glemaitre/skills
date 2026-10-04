@@ -53,6 +53,9 @@ Checks four invariants:
 3. Every skill entry uses a known `category` and a permitted
    `subcategory` (or `null` when the category takes none).
 4. Every workflow's `includes` list references known skill ids.
+5. Every `SKILL.md` description is shorter than 1024 characters.
+   The count is the folded `description: >` text, including the
+   final newline YAML clip chomping keeps.
 
 Run directly with `python tools/validate_catalog.py` or via
 `pixi run validate`.

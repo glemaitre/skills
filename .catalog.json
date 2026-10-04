@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "c8d51f3f1615a60af034e7919fa2f305daeff0f3eb3cf2f828608de9187ab82a",
+  "catalog_hash": "3f185a6a35f3c7ffe80a28a2420d8ccf6844d678470fdf20dd64a5fc116a45b1",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "cc03fdda1814281a9bd5ef49e5a9e116d29f432059bc1f9c99dcc09cb98859fe"
+      "hash": "d2515278263d9f8db0f76db97da581c4cd08847f080452aedef2d7d3e3833a0f"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "c5458b1b39bac58075e3462fb79a45a53d52c032123cf7ff96dae212790f750c"
+      "hash": "4cc3e58ad86c6cdadf67079b710c56d8c904f56a2daeb331a89c575ced6e07ca"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "0fd714914f86d57ecbd19b9c9c83d82ef2838d2cb9ee29f2972870f262ee75e5"
+      "hash": "c693b2eb927e93ac0a6798fd0d3881ed919fd39dd7a66362155a74ba4b8eb659"
     },
     {
       "id": "manage-ml-backlog",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "fdb55648239a8497ca0463786b9d92476b6b3eac5f1980c7de31c255a98ddb17"
+      "hash": "513cf400457e707e9f37abc811ccf37b9f21462b9f3a7f0397fedce872b03b3e"
     },
     {
       "id": "choose-python-library",

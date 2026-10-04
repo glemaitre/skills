@@ -317,6 +317,9 @@ and `frame show` already returned `proceed` with a non-null
 - After Review, load `manage-ml-backlog` in record-outcome mode
   with the returned digest, locator, and G-AUDIT-FINDING.
 - Record before `notebook convert` and `site build`.
+- Run `python -m skore_skills notebook convert
+  experiments/01_baseline.py --html` after record-outcome and
+  before site build.
 - Convert `audit/01_baseline.py --html` here, after
   record-outcome and before site build, together with the
   experiment script.
@@ -333,6 +336,9 @@ and `frame show` already returned `proceed` with a non-null
 - Leave History `planned` in any journal excerpt you author.
 - Skip `audit/01_baseline.py` because the audit skill was supposed
   to convert it.
+- Skip `experiments/01_baseline.py` because it already contains
+  `skore.evaluate`, or because the unfitted-snapshot reference
+  forbids `notebook convert`.
 - Add `<!-- results-embed: audit -->`.
 - Open idea triage inside record-outcome mode.
 - Write the journal files directly instead of dispatching.
