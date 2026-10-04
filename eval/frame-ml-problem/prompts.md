@@ -351,3 +351,60 @@
 - Write `prefit` or a splitter class in the journal.
 - Record `1` as the way to use the shipped tables.
 - Tell the user to concatenate the two tables.
+
+---
+
+## CASE_14 — A complete answer set asks to lock in the same turn
+
+**User prompt:**
+> Prediction goal: point_predictions. Deployment: iid. Horizon,
+> gap, generalize-to, known at predict, and time role: n/a.
+> Metric role: point_error. Metric: RMSE. Baseline: dummy.
+> Baseline note: mean house value. Folds: 2.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- Status is still the empty placeholder. No decision cell is
+  filled.
+- The first `frame show` returns `ask` / `missing_keys` for
+  every required key.
+- After those cells are written, a second `frame show` returns
+  `ask` / `confirm_lock` with choices `lock`, `modify`, `stop`.
+
+**Must do:**
+- Write every decision from the user message. Set Status to
+  `draft`.
+- Run `frame show` again in this turn.
+- AskUserQuestion with only Lock, Modify, and Stop, in that
+  order, then stop.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Set Status to `locked`.
+- Treat the filled cells as the Lock choice.
+- Defer the lock question to a later turn.
+- Load `build-ml-pipeline`.
+
+---
+
+## CASE_15 — One answered cell does not fill the rest
+
+**User prompt:**
+> Generalize to a column that combines latitude and longitude.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- Status is `draft`. Deployment, horizon, gap, time role, and
+  generalize-to are empty. The other required cells are valid.
+- `frame show` returns `ask` / `missing_keys`. `missing` lists
+  deployment, horizon, gap, time_role, and generalize_to.
+
+**Must do:**
+- Write the generalize-to cell from the user message.
+- Ask every still-unanswered key in `missing` and stop.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Invent deployment, horizon, gap, or time role.
+- AskUserQuestion with Lock, Modify, and Stop.
+- Set Status to `locked`.

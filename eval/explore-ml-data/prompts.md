@@ -304,8 +304,10 @@
   PNGs and leave figures as cell output. Feature-vs-target is
   one faceted `relplot` (`bivariate_grid.png`), last expression
   `g`.
-- After `data_analysis.md`, AskUserQuestion keep exploring vs
-  close (neither option recommended or preselected).
+- After `data_analysis.md`, AskUserQuestion one pick, none
+  recommended: Choose additional pre-defined option; Provide a
+  query to extend the exploration; Automatic exploration related
+  to the data and problem; Describe a plot; Close.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -386,11 +388,13 @@
 - `status.setup.pending` is empty.
 - Default notebook, extras.json, and `data_analysis.md` are on
   disk.
-- User picks **Close** on keep-exploring vs close.
+- User picks **Close** on the five-option continuation board.
 
 **Must do:**
-- AskUserQuestion keep exploring vs close (neither option
-  recommended or preselected).
+- AskUserQuestion one pick, none recommended: Choose additional
+  pre-defined option; Provide a query to extend the exploration;
+  Automatic exploration related to the data and problem;
+  Describe a plot; Close.
 - After Close, write 2–6 sentences of findings and link
   `data_analysis/data_analysis.md`.
 - Run `python -m skore_skills git end-turn --stage data_analysis`
@@ -403,7 +407,7 @@
 
 ---
 
-## CASE_15 — Keep exploring does not end the turn
+## CASE_15 — A continuation pick does not end the turn
 
 **User prompt:**
 > Explore the dataset. Target is MedHouseVal.
@@ -413,25 +417,28 @@
 - `data_analysis/data_analysis.md` was just written.
 - `policy.site` is true.
 - `export-ml-site` is installed.
-- User picks **Keep exploring the data**.
+- The user has not picked Close.
 
 **Must do:**
 - Run `python -m skore_skills site build` after the md and
-  before keep exploring vs close.
+  before the continuation board.
 - Name `report.html` and `html/data_analysis.html`.
-- After **Keep exploring**, AskUserQuestion four picks, none
-  recommended: Choose additional pre-defined option; Provide a
-  query to extend the exploration; Automatic exploration related
-  to the data and problem; Describe a plot.
+- AskUserQuestion one pick, none recommended: Choose additional
+  pre-defined option; Provide a query to extend the exploration;
+  Automatic exploration related to the data and problem;
+  Describe a plot; Close.
+- Choosing one of the four continuations does not run
+  `git end-turn`.
 - Stay in `explore-ml-data`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `python -m skore_skills git end-turn`.
 - Invent a domain-specific checklist skill or `references/domains/`.
-- Run `python -m skore_skills site build` again on the four-pick
-  extras board.
+- Run `python -m skore_skills site build` again on the
+  continuation board.
 - Run `notebook convert` before Close.
+- Ask keep-exploring versus close before that board.
 - Say “extra-analyses” or “standard extra analysis” on that
   board.
 
@@ -444,9 +451,9 @@
 
 **Assumed workspace state:**
 - `status.setup.pending` is empty.
-- EDA markdown exists. User picked Keep exploring, then
-  Automatic exploration related to the data and problem. The
-  prompt already names a leakage concern.
+- EDA markdown exists. User picked **Automatic exploration
+  related to the data and problem**. The prompt already names a
+  leakage concern.
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**
@@ -476,15 +483,14 @@
 
 **Assumed workspace state:**
 - `status.setup.pending` is empty.
-- EDA markdown exists. User picked Keep exploring, then Research
-  this concern.
+- EDA markdown exists. User picked **Automatic exploration
+  related to the data and problem**.
 - `status.skills.research-ml-practice` is false or absent.
 
 **Must do:**
 - One-line skip that `research-ml-practice` is not installed.
-- Stay in the keep-exploring menu (re-ask the four human
-  picks, or keep vs close). Do not say “extra-analyses” on
-  that board.
+- Re-ask the five-option continuation board, including Close.
+  Do not say “extra-analyses” on that board.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -503,7 +509,7 @@
 - `data_analysis/data_analysis.md` exists.
 - JOURNAL § Data understanding records `Status: done`.
 - `status.data_analysis` is present.
-- The user did not pick Keep exploring first.
+- The user did not pick a continuation option first.
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**
@@ -554,8 +560,8 @@
 - `status.setup.pending` is empty.
 - `data_analysis/data_analysis.md` exists with Open questions.
 - JOURNAL names California housing / MedHouseVal.
-- User picked **Keep exploring**, then **Automatic exploration
-  related to the data and problem**.
+- User picked **Automatic exploration related to the data and
+  problem**.
 - `status.skills.research-ml-practice` is true.
 
 **Must do:**
@@ -575,7 +581,7 @@
 - Copy Open questions onto the board without a source.
 - Write a ranked pipeline action table in the survey note.
 - Run `git end-turn` in this pass.
-- Name `Close` as recommended on keep vs close.
+- Name `Close` as recommended on the continuation board.
 
 ---
 
@@ -655,8 +661,8 @@
 - Two families are already in `data_analysis/data_analysis.py`
   (`family_a` with `id`, `y`; `family_b` with `id`, `z`).
 - `data_analysis/data_analysis.md` exists.
-- User picked **Keep exploring**, then **Choose additional
-  pre-defined option**, then **Join keys / coverage**.
+- User picked **Choose additional pre-defined option**, then
+  **Join keys / coverage**.
 
 **Must do:**
 - Append `templates/join_coverage.py` (shared columns and
@@ -696,7 +702,7 @@
 
 ---
 
-## CASE_25 — Site on rebuilds before keep vs close
+## CASE_25 — Site on rebuilds before the continuation board
 
 **User prompt:**
 > Explore the California housing CSV. Target is MedHouseVal.
@@ -713,14 +719,16 @@
 - After `data_analysis.md` and JOURNAL, name
   `python -m skore_skills site build`.
 - Name `report.html` and `html/data_analysis.html`.
-- Then AskUserQuestion keep exploring vs close (neither option
-  recommended or preselected).
+- Then AskUserQuestion one pick, none recommended: Choose
+  additional pre-defined option; Provide a query to extend the
+  exploration; Automatic exploration related to the data and
+  problem; Describe a plot; Close.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `notebook convert` or `git end-turn` before the user picks
   Close.
-- Fail the keep-vs-close gate if site build errors; name the
+- Fail the continuation board if site build errors; name the
   error.
 
 ---
@@ -800,7 +808,7 @@
 
 ---
 
-## CASE_29 — Missing mkdocs-material retries before keep vs close
+## CASE_29 — Missing mkdocs-material retries before the continuation board
 
 **User prompt:**
 > Explore the California housing CSV. Target is MedHouseVal.
@@ -820,12 +828,14 @@
 - After `data_analysis.md` and JOURNAL, load `add-python-package`
   for `mkdocs-material` and run `python -m skore_skills site build`
   again.
-- Then AskUserQuestion keep exploring vs close (neither option
-  recommended or preselected).
+- Then AskUserQuestion one pick, none recommended: Choose
+  additional pre-defined option; Provide a query to extend the
+  exploration; Automatic exploration related to the data and
+  problem; Describe a plot; Close.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `pixi add` or `uv add`.
-- Skip the keep-vs-close gate.
+- Skip the continuation board.
 - Run `notebook convert` or `git end-turn` before the user picks
   Close.

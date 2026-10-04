@@ -1,8 +1,8 @@
 # Extra analyses — append to `data_analysis/data_analysis.py`
 
 Recipes, not a second notebook. Run this board only after the user
-picks **Keep exploring** then **Choose additional pre-defined
-option**. Do not ask extras after the default pass. Then
+picks **Choose additional pre-defined option** on the
+continuation board. Do not ask extras after the default pass. Then
 AskUserQuestion
 `allow_multiple` (all unchecked). Only list items that apply and
 were **not** already in the user prompt. Picks:
