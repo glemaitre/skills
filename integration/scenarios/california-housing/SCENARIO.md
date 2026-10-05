@@ -9,32 +9,27 @@ only the spine.
 
 ## Before the journey
 
-Do this before the spine. Do not search a public skill registry, and do
-not run `npx skills` or `find-skills`.
+The runner has already loaded the `ml-experimentation` skills from the
+checkout at `{{SKILLS_REPO}}` and supplied that checkout's
+`skore_skills` on `PYTHONPATH`.
 
-The skills and `skore-skills` for this run are the checkout at
-`{{SKILLS_REPO}}`.
-
-- Read the `ml-experimentation` workflow in
-  `{{SKILLS_REPO}}/.catalog.json`. For each included skill id, install
-  that skill into `.agents/skills/<id>` in this workspace. Symlink each
-  file and directory from `{{SKILLS_REPO}}/skills/<id>` into that
-  workspace directory. Write a real `.skore-skill.json` there, containing
-  `{"id": "<id>"}`. Do not write that sidecar through a symlink into the
-  checkout.
-- `python -m skore_skills` must import this checkout. Before a project
-  environment exists, editable-install the checkout into the interpreter
-  that will run those commands (`pip install -e` or `uv pip install -e`
-  of `{{SKILLS_REPO}}`). Do not install `skore-skills` from PyPI.
-- After pixi exists, add the same checkout:
+- Start with `skill("setup-ml-project")`. Use `skill("<id>")` for every
+  later skill handoff.
+- Never read a workflow `SKILL.md` directly. Do not search or install
+  public skills, create `.agents/skills`, run `npx skills`, invoke
+  `find-skills`, or reload resources.
+- If `skill("setup-ml-project")` is unavailable, stop immediately and
+  report: `pi install npm:@probabl/pi-skore` is required. Do not continue
+  by reading skill files directly.
+- After pixi is initialized, add this checkout as the editable
+  `skore-skills` dependency:
 
   ```bash
   pixi add --pypi --editable "skore-skills @ {{SKILLS_REPO_URI}}"
   ```
 
-  `setup-python-env` later runs `env add-skore`, which installs the
-  `skore` library and can replace `skore-skills` with the published
-  build. If that happens, run the editable add again before continuing.
+  If `env add-skore` later replaces it with a published build, run this
+  editable add again before continuing.
 
 ## Setup
 

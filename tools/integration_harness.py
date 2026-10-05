@@ -39,6 +39,7 @@ EXIT_INTERRUPT = 130
 EXIT_MISSING = 127
 PI_DEFAULT_PROVIDER = "openrouter"
 PI_DEFAULT_MODEL = "~deepseek/deepseek-flash-latest"
+REPO_SRC = Path(__file__).resolve().parent.parent / "src"
 
 
 class HarnessError(Exception):
@@ -67,6 +68,7 @@ def build_launch(
     interactive: bool,
     model: str | None,
     extra_args: list[str] | None = None,
+    skill_paths: list[Path] | None = None,
 ) -> PreparedLaunch:
     """Return the command for ``harness`` without starting it."""
     if harness not in HARNESSES:
@@ -109,6 +111,8 @@ def build_launch(
             str(driver),
             "--approve",
         ]
+        for path in skill_paths or []:
+            argv.extend(["--skill", str(path)])
         if not interactive:
             argv.extend(["--mode", "json"])
     extra = list(extra_args or [])
@@ -117,6 +121,11 @@ def build_launch(
     argv.append(prompt)
     env = os.environ.copy()
     env.update(extra_env)
+    current_pythonpath = env.get("PYTHONPATH")
+    pythonpath = str(REPO_SRC)
+    if current_pythonpath:
+        pythonpath += os.pathsep + current_pythonpath
+    env["PYTHONPATH"] = pythonpath
     return PreparedLaunch(argv=argv, cwd=workspace, env=env, cleanup=cleanup)
 
 

@@ -104,7 +104,13 @@ workspace. Pi is started with `--approve`, which trusts project-local
 files; Pi does not ask before each tool call. Pi also defaults to
 `--provider openrouter` and `--model ~deepseek/deepseek-flash-latest`.
 Pass `--model` to choose another model, or repeat `--harness-arg` for
-any other flag. The copied `SCENARIO.md` tells the agent to install this
-checkout's skills and `skore-skills` in editable form before the spine.
+any other flag. Install the required extension once with
+`pi install npm:@probabl/pi-skore`.
+
+Before Pi starts, the runner stages all 26 workflow sidecars and passes
+their checkout directories with `--skill`. It also supplies the checkout
+CLI on `PYTHONPATH`. The agent must enter every stage through
+`skill("<id>")`, never by reading `SKILL.md`, and adds the checkout as an
+editable pixi dependency after pixi initialization. No reload is needed.
 The journey may run `pixi`. A non-empty workspace is refused unless
 `--reuse-workspace` is set.

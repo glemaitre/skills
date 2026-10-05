@@ -26,7 +26,12 @@ from tools.integration_harness import (
     build_launch,
     execute_launch,
 )
-from tools.integration_scenario import ensure_workspace, materialize, run_scenario
+from tools.integration_scenario import (
+    ensure_workspace,
+    materialize,
+    run_scenario,
+    stage_workflow_skills,
+)
 
 
 def _driver(directory: Path) -> Path:
@@ -51,6 +56,7 @@ def _launch(
     interactive: bool,
     model: str | None,
     extra_args: list[str] | None = None,
+    skill_paths: list[Path] | None = None,
 ):
     return build_launch(
         harness,
@@ -59,6 +65,7 @@ def _launch(
         interactive=interactive,
         model=model,
         extra_args=extra_args,
+        skill_paths=skill_paths,
     )
 
 
@@ -155,6 +162,37 @@ def test_pi_defaults_and_harness_args(
     assert overridden.argv[overridden.argv.index("--model") + 1] == "custom"
     assert "--thinking" in overridden.argv
     assert overridden.argv[-1] == INITIAL_PROMPT
+
+
+def test_pi_loads_skills_before_prompt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _fake_which(monkeypatch)
+    skills = [tmp_path / "source-a", tmp_path / "source-b"]
+    launch = _launch(
+        "pi",
+        tmp_path / "workspace",
+        interactive=False,
+        model=None,
+        skill_paths=skills,
+    )
+    assert launch.argv.count("--skill") == 2
+    for source in skills:
+        index = launch.argv.index(str(source))
+        assert launch.argv[index - 1] == "--skill"
+        assert index < len(launch.argv) - 1
+    assert launch.argv[-1] == INITIAL_PROMPT
+
+
+def test_launch_prepends_checkout_to_pythonpath(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _fake_which(monkeypatch)
+    monkeypatch.setenv("PYTHONPATH", "existing")
+    launch = _launch("pi", tmp_path, interactive=True, model=None)
+    entries = launch.env["PYTHONPATH"].split(os.pathsep)
+    expected = Path(integration_harness.__file__).resolve().parent.parent / "src"
+    assert entries == [str(expected), "existing"]
 
 
 def test_missing_executables(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -304,10 +342,26 @@ def test_materialize_copies_driver(tmp_path: Path) -> None:
     assert "California housing" in text
     assert "{{SKILLS_REPO}}" not in text
     assert "{{SKILLS_REPO_URI}}" not in text
-    repo = integration_scenario.REPO_ROOT.resolve()
+    repo = integration_scenario.CHECKOUT_ROOT.resolve()
     assert str(repo) in text
     assert repo.as_uri() in text
+    assert 'skill("setup-ml-project")' in text
+    assert "/reload" not in text
+    assert "Symlink each" not in text
     assert (dest / "DATA.md").is_file()
+
+
+def test_stage_workflow_skills_before_launch(tmp_path: Path) -> None:
+    paths = stage_workflow_skills("ml-experimentation", tmp_path)
+    catalog = json.loads(
+        (tmp_path / ".agents" / "skills" / ".catalog.json").read_text(encoding="utf-8")
+    )
+    included = catalog["workflows"][0]["includes"]
+    assert len(paths) == len(included) == 26
+    assert {path.name for path in paths} == set(included)
+    for skill_id in included:
+        sidecar = tmp_path / ".agents" / "skills" / skill_id / ".skore-skill.json"
+        assert json.loads(sidecar.read_text(encoding="utf-8")) == {"id": skill_id}
 
 
 def test_reuse_workspace_rules(tmp_path: Path) -> None:

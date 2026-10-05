@@ -90,6 +90,11 @@ Each harness uses its existing login. Cursor Agent can use
 `CURSOR_API_KEY`. This command does not install a CLI. `cursor` the
 editor is not `cursor-agent`; install the Agent CLI from
 <https://cursor.com/docs/cli> when `cursor-agent` is missing.
+Pi runs require the skill-tool extension:
+
+```bash
+pi install npm:@probabl/pi-skore
+```
 
 Headless flags are Claude `--print` with `stream-json`, OpenCode `run
 --format json`, Cursor Agent `--print` with `stream-json`, and Pi
@@ -103,8 +108,13 @@ to replace an existing file, and deletes only that wrapper afterward.
 Approval flags apply only to the scenario workspace: Claude
 `--permission-mode auto`, OpenCode `--auto`, Cursor Agent `--force` and
 headless `--trust`, and Pi `--approve`. Pi `--approve` trusts
-project-local files; Pi does not ask before every tool call. The scenario
-may run package-manager commands such as `pixi`.
+project-local files; Pi does not ask before every tool call. Before Pi
+starts, the runner writes the selected workflow's sidecars under
+`.agents/skills`, passes every checkout skill with `--skill`, and prepends
+the checkout's `src` to `PYTHONPATH`. Skill discovery and trust therefore
+happen before `before_agent_start`; the agent uses the `skill` tool and
+does not need to reload or read `SKILL.md` directly. The scenario may run
+package-manager commands such as `pixi`.
 
 Logs land in `.transcripts/integration/<run-id>/`: headless `stdout.txt`
 and `stderr.txt`, plus `result.json` with the harness, mode, duration,

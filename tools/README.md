@@ -103,8 +103,12 @@ install one, and it will not use the `cursor` editor in place of
 `--harness-arg` forwards any other token. Headless output is streamed
 and stored under `.transcripts/integration/<run-id>/` with `result.json`.
 Auto-approval applies to that workspace only. The journey can run `pixi`.
-The copied `SCENARIO.md` names this checkout so the agent can install
-its skills and `skore-skills` in editable form.
+Pi requires `pi install npm:@probabl/pi-skore`. Before Pi starts, the
+runner stages the workflow sidecars, passes the checkout skill paths with
+`--skill`, and prepends this checkout's `src` to `PYTHONPATH`. The copied
+`SCENARIO.md` requires extension `skill(...)` calls and adds this
+checkout's `skore-skills` as an editable pixi dependency after pixi is
+initialized.
 
 ## bump_version.py
 

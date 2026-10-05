@@ -39,7 +39,8 @@ from tools.integration_harness import (  # noqa: E402
     execute_launch,
 )
 
-SCENARIOS_ROOT = Path(__file__).resolve().parent.parent / "integration" / "scenarios"
+CHECKOUT_ROOT = Path(__file__).resolve().parent.parent
+SCENARIOS_ROOT = CHECKOUT_ROOT / "integration" / "scenarios"
 REPO_ROOT = SCENARIOS_ROOT.parent.parent
 EXPECT_KEYS = frozenset({"files", "absent", "contains", "contains_any"})
 TURN_KEYS = frozenset({"id", "say", "checkpoint", "expect"})
@@ -374,7 +375,7 @@ def _copy_driver(directory: Path, turns_doc: dict[str, Any], dest: Path) -> Path
     if not source.is_file():
         raise SystemExit(f"{directory.name}: driver {driver_name!r} is missing")
     target = dest / Path(driver_name).name
-    repo = REPO_ROOT.resolve()
+    repo = CHECKOUT_ROOT.resolve()
     text = source.read_text(encoding="utf-8")
     text = text.replace(SKILLS_REPO_URI_PLACEHOLDER, repo.as_uri())
     text = text.replace(SKILLS_REPO_PLACEHOLDER, str(repo))
@@ -401,6 +402,60 @@ def ensure_workspace(name: str, dest: Path, *, reuse: bool) -> None:
     driver_name = turns_doc.get("driver")
     if isinstance(driver_name, str) and not (dest / Path(driver_name).name).is_file():
         _copy_driver(directory, turns_doc, dest)
+
+
+def stage_workflow_skills(workflow_id: str, workspace: Path) -> list[Path]:
+    """Stage install metadata and return source paths for one workflow."""
+    catalog = _load_json(CHECKOUT_ROOT / ".catalog.json")
+    if not isinstance(catalog, dict):
+        raise SystemExit(".catalog.json must contain an object")
+    workflows = catalog.get("workflows")
+    workflow = next(
+        (
+            item
+            for item in workflows or []
+            if isinstance(item, dict) and item.get("id") == workflow_id
+        ),
+        None,
+    )
+    if workflow is None or not isinstance(workflow.get("includes"), list):
+        raise SystemExit(f"unknown or invalid workflow {workflow_id!r}")
+    skill_entries = {
+        item["id"]: item
+        for item in catalog.get("skills") or []
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    selected: list[dict[str, Any]] = []
+    paths: list[Path] = []
+    target = workspace / ".agents" / "skills"
+    target.mkdir(parents=True, exist_ok=True)
+    for skill_id in workflow["includes"]:
+        entry = skill_entries.get(skill_id)
+        if entry is None:
+            raise SystemExit(f"workflow {workflow_id!r} includes unknown skill {skill_id!r}")
+        source = CHECKOUT_ROOT / str(entry.get("path"))
+        if not (source / "SKILL.md").is_file():
+            raise SystemExit(f"skill source is missing: {source}")
+        sidecar_dir = target / skill_id
+        sidecar_dir.mkdir(parents=True, exist_ok=True)
+        (sidecar_dir / ".skore-skill.json").write_text(
+            json.dumps({"id": skill_id}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        selected.append(entry)
+        paths.append(source.resolve())
+    local_catalog = {
+        key: value
+        for key, value in catalog.items()
+        if key not in {"skills", "workflows", "catalog_hash"}
+    }
+    local_catalog["skills"] = selected
+    local_catalog["workflows"] = [workflow]
+    (target / ".catalog.json").write_text(
+        json.dumps(local_catalog, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return paths
 
 
 def run_scenario(
@@ -432,6 +487,12 @@ def run_scenario(
         driver_name = turns_doc.get("driver")
         if not isinstance(driver_name, str):
             raise SystemExit(f"{name}: driver is missing")
+        skill_paths: list[Path] = []
+        if harness == "pi":
+            workflow_id = turns_doc.get("workflow")
+            if not isinstance(workflow_id, str):
+                raise SystemExit(f"{name}: workflow is missing")
+            skill_paths = stage_workflow_skills(workflow_id, workspace)
         launch = build_launch(
             harness,
             workspace=workspace,
@@ -439,6 +500,7 @@ def run_scenario(
             interactive=interactive,
             model=model,
             extra_args=extra_args,
+            skill_paths=skill_paths,
         )
         status = execute_launch(
             launch,
