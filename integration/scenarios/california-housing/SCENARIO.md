@@ -40,9 +40,21 @@ checkout at `{{SKILLS_REPO}}` and supplied that checkout's
 - Python import name: `housing`.
 - Automatic commits: off.
 
+## Exploration
+
+- Run the data analysis. Do not skip it.
+- Tabular library: pandas. Install skrub, matplotlib, and seaborn
+  when they are missing.
+- Target column: `MedHouseVal`. Task: regression.
+- One table: `data/raw/housing.csv`. Do not ask how to group files.
+- When the analysis is written, close this stage. That choice is
+  already made: do not ask again, and do not add a pre-defined
+  option, a query, automatic exploration, or a plot.
+
 ## Framing
 
-- Continue from `DATA.md`. Do not explore the data first.
+- Frame from `DATA.md` and the written data analysis. Do not
+  explore again.
 - Prediction goal: `point_predictions`.
 - Deployment: `iid`.
 - Horizon, gap, generalize-to, known at predict, and time role: `n/a`.
@@ -58,6 +70,9 @@ checkout at `{{SKILLS_REPO}}` and supplied that checkout's
 - Build the locked baseline.
 - Approve the proposal and the design note.
 - Evaluate and keep the report local.
+- When the audit digest is ready, close the audit. That choice is
+  already made: do not ask again, and do not add an additional
+  report view, a custom query, or a custom plot.
 - Review the result.
 
 ## Backlog and next experiment

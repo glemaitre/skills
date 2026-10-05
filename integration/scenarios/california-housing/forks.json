@@ -65,9 +65,9 @@
       }
     },
     {
-      "id": "explore-first",
+      "id": "skip-eda",
       "after": "setup-autocommit",
-      "say": "Explore the data before framing.",
+      "say": "Skip the data analysis.",
       "expect": {
         "files": [
           "journal/JOURNAL.md",
@@ -76,8 +76,14 @@
         ],
         "absent": [
           "journal/01_*.md",
-          "experiments/*.py"
-        ]
+          "experiments/*.py",
+          "data_analysis/data_analysis.md"
+        ],
+        "contains": {
+          "journal/JOURNAL.md": [
+            "| Status | skipped"
+          ]
+        }
       }
     },
     {
