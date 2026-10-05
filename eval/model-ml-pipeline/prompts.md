@@ -403,9 +403,9 @@ and `frame show` already returned `proceed` with a non-null
 **Must do:**
 - Dispatch `build-ml-pipeline`.
 - Require `python -m skore_skills site build` after the unfitted
-  `pipeline.html` snapshot and before the Evaluate question,
-  inside that build.
-- Keep the post-loop `site build` for the fitted diagram.
+  Method snapshot (`pipeline/` or `pipeline.html`) and before
+  the Evaluate question, inside that build.
+- Keep the post-loop `site build` for the same unevaluated report.
 - Name `report.html` when each site build runs.
 
 **Must NOT do:**

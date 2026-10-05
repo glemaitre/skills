@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "3a130af5e98481eb93e6a75eefede870f73771d55cfa140395094a8e3ea70642",
+  "catalog_hash": "8b7f1bfca0441597066b865febedb61b109997d94363e5cbbb00383b90494d02",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "d2515278263d9f8db0f76db97da581c4cd08847f080452aedef2d7d3e3833a0f"
+      "hash": "df72dacc9510dc054a0ec8b6bed7737463afab4a13ca80ed4dacf7426d05c627"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "355f573c60e099e58bfed61c276696c3199cb541d77883972de4c29ff4759f1b"
+      "hash": "3fb159ee14c31534a93afc0213877f11269a638ee54bb4764c2f1120b9c63cfa"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "c881d3ec7a38ee2000fd4df0fcc690f2ce200dd8bc9760d3644aa8c87b1fbb52"
+      "hash": "128d6b030ca61790bebdb91df80cd78dc5c06036a53751beaf688eee4a75a466"
     },
     {
       "id": "manage-ml-backlog",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "fae24abdcb097a0ee107291d2813193337f25c813f1142c31f0a5d2cd86cf3be"
+      "hash": "ec871bf853a27d073a4c8a0924d857bb93beb4240aeab89071d7a417ab33b9a8"
     },
     {
       "id": "choose-python-library",
@@ -237,7 +237,7 @@
       "summary": "Package workspace markdown and existing notebook HTML into an offline MkDocs site.",
       "category": "tooling",
       "subcategory": "project-setup",
-      "hash": "f9e7471a6f345cc129776dc4c5728554a22a745cb92fa3dd9daefe8962f39351"
+      "hash": "6ce91cdf631efa0b24c973b33e2a4ff73131e3207486ca74438f90b5f0a97a52"
     },
     {
       "id": "export-ml-project",

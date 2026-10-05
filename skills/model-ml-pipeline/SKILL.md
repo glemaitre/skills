@@ -180,7 +180,7 @@ duplicate a child's detailed preview.
   `review-ml-experiment` each own the single detailed Before
   execution preview at its actual compute boundary. The dispatcher
   preview is those four phase names only, one short line each. Do
-  not mention `pipeline.html`, a site rebuild, a row-count
+  not mention the Method viewer, a site rebuild, a row-count
   assertion, `skore.evaluate`, or Review / Skip / Stop. Do not list
   their commands (`status`, `frame show`, `design consent`,
   `smoke run`) or a DataOps declaration in this preview. Do not
@@ -233,12 +233,14 @@ also ask in chat whether the note looks right.
    `python -m skore_skills evaluate consent --stem <stem>`
    (Evaluate / Modify / Stop on `ask`, with that JSON `context`
    rendered inline per § Gate context). Build also writes the
-   unfitted `scratch/results/<stem>/pipeline.html` and, when
+   unfitted Method viewer
+   (`scratch/results/<stem>/pipeline/` when `DataOp.skb.report`
+   accepts `eval`, otherwise `pipeline.html`) and, when
    `policy.site` is true and `export-ml-site` is installed, runs
    `site build` after that snapshot and before Evaluate so Method
-   shows the diagram. Missing or skipped EDA does not defer it.
-   The post-loop rebuild is the fitted diagram; it does not
-   replace this one. Do not convert
+   shows that report. Missing or skipped EDA does not defer it.
+   The post-loop rebuild refreshes the same unevaluated report;
+   it does not replace this one. Do not convert
    `experiments/<stem>.py` at this unfitted snapshot if it
    already contains `skore.evaluate`. That ban ends when
    `loop notebooks` returns `convert`.
@@ -370,8 +372,8 @@ Children return locator / digest / finding and do not preview it.
    tokens, then G-AUDIT-FINDING. Index strings, not the narrative.
 5. `site build` only when `policy.site` is true and
    `export-ml-site` is installed:
-   `python -m skore_skills site build`, so the fitted Method
-   diagram and Results replace the construct-time snapshot. Skip
+   `python -m skore_skills site build`, so the Method DataOp
+   report and Results replace the construct-time snapshot. Skip
    in one line otherwise. Site build embeds
    `audit/<stem>.nb.html` under `## Notebooks`; do not add
    `<!-- results-embed: audit -->`. If `site build` errors with
