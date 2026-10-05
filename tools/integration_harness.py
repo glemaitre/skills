@@ -1,12 +1,11 @@
-"""Launch a scenario workspace in Cursor, Claude Code, OpenCode, or Pi.
+"""Launch a scenario workspace in Pi.
 
-The adapters only build commands and a temporary Cursor instruction file.
-They use each harness's existing authentication and do not install binaries.
+The adapter builds the Pi command. It uses Pi's existing authentication
+and does not install the binary.
 """
 
 from __future__ import annotations
 
-import json
 import os
 import shutil
 import signal
@@ -18,21 +17,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import IO, Any
 
-HARNESSES = ("cursor", "claude", "opencode", "pi")
 INITIAL_PROMPT = (
     "Read SCENARIO.md and carry out that unattended journey. "
     "The choices in that file are already authorized. "
     "Stop if the workspace contradicts a choice instead of inventing another one."
-)
-CURSOR_INSTALL = (
-    "cursor-agent is not installed. Install the Cursor Agent CLI from "
-    "https://cursor.com/docs/cli. The cursor editor command cannot run this "
-    "scenario."
-)
-CURSOR_MARKER = "<!-- integration-scenario-runner -->"
-CURSOR_WRAPPER = (
-    f"{CURSOR_MARKER}\n"
-    "Follow `SCENARIO.md` in this workspace. Those choices are already authorized.\n"
 )
 EXIT_TIMEOUT = 124
 EXIT_INTERRUPT = 130
@@ -61,7 +49,6 @@ class PreparedLaunch:
 
 
 def build_launch(
-    harness: str,
     *,
     workspace: Path,
     driver: Path,
@@ -70,107 +57,51 @@ def build_launch(
     extra_args: list[str] | None = None,
     skill_paths: list[Path] | None = None,
 ) -> PreparedLaunch:
-    """Return the command for ``harness`` without starting it."""
-    if harness not in HARNESSES:
-        known = ", ".join(HARNESSES)
-        raise HarnessError(f"unknown harness {harness!r}; known: {known}", code=2)
+    """Return the Pi command without starting it."""
     if not driver.is_file():
         raise HarnessError(f"scenario driver is missing: {driver}", code=1)
-    executable = _require_executable(harness)
-    prompt = INITIAL_PROMPT
-    cleanup: Callable[[], None] = lambda: None
-    extra_env: dict[str, str] = {}
-    if harness == "claude":
-        argv = [
-            executable,
-            "--append-system-prompt-file",
-            str(driver),
-            "--permission-mode",
-            "auto",
-        ]
-        if not interactive:
-            argv.extend(["-p", "--output-format", "stream-json"])
-    elif harness == "opencode":
-        argv = [executable, "run", "--auto", "--dir", str(workspace)]
-        if interactive:
-            argv.append("--interactive")
-        else:
-            argv.extend(["--format", "json"])
-        extra_env["OPENCODE_CONFIG_CONTENT"] = json.dumps(
-            {"instructions": [str(driver.resolve())]}
-        )
-    elif harness == "cursor":
-        cleanup = install_cursor_instructions(workspace)
-        argv = [executable, "--workspace", str(workspace), "--force"]
-        if not interactive:
-            argv.extend(["--print", "--output-format", "stream-json", "--trust"])
-    else:
-        argv = [
-            executable,
-            "--append-system-prompt",
-            str(driver),
-            "--approve",
-        ]
-        for path in skill_paths or []:
-            argv.extend(["--skill", str(path)])
-        if not interactive:
-            argv.extend(["--mode", "json"])
+    argv = [
+        _require_executable(),
+        "--append-system-prompt",
+        str(driver),
+        "--approve",
+    ]
+    for path in skill_paths or []:
+        argv.extend(["--skill", str(path)])
+    if not interactive:
+        argv.extend(["--mode", "json"])
     extra = list(extra_args or [])
-    _append_model(argv, harness, model, extra)
+    _append_model(argv, model, extra)
     argv.extend(extra)
-    argv.append(prompt)
+    argv.append(INITIAL_PROMPT)
     env = os.environ.copy()
-    env.update(extra_env)
     current_pythonpath = env.get("PYTHONPATH")
     pythonpath = str(REPO_SRC)
     if current_pythonpath:
         pythonpath += os.pathsep + current_pythonpath
     env["PYTHONPATH"] = pythonpath
-    return PreparedLaunch(argv=argv, cwd=workspace, env=env, cleanup=cleanup)
+    return PreparedLaunch(
+        argv=argv,
+        cwd=workspace,
+        env=env,
+        cleanup=lambda: None,
+    )
 
 
-def _append_model(
-    argv: list[str],
-    harness: str,
-    model: str | None,
-    extra: list[str],
-) -> None:
+def _append_model(argv: list[str], model: str | None, extra: list[str]) -> None:
     """Add provider and model flags that ``extra`` did not already set."""
-    if harness == "pi" and "--provider" not in extra:
+    if "--provider" not in extra:
         argv.extend(["--provider", PI_DEFAULT_PROVIDER])
     if "--model" in extra:
         return
-    if model:
-        argv.extend(["--model", model])
-    elif harness == "pi":
-        argv.extend(["--model", PI_DEFAULT_MODEL])
+    argv.extend(["--model", model or PI_DEFAULT_MODEL])
 
 
-def install_cursor_instructions(workspace: Path) -> Callable[[], None]:
-    """Write the runner's ``AGENTS.md`` wrapper and return its cleanup."""
-    path = workspace / "AGENTS.md"
-    if path.exists() and path.read_text(encoding="utf-8") != CURSOR_WRAPPER:
-        raise HarnessError(
-            f"{path} already exists; the runner will not overwrite it.",
-            code=1,
-        )
-    path.write_text(CURSOR_WRAPPER, encoding="utf-8")
-
-    def cleanup() -> None:
-        if path.is_file() and path.read_text(encoding="utf-8") == CURSOR_WRAPPER:
-            path.unlink()
-
-    return cleanup
-
-
-def _require_executable(harness: str) -> str:
-    name = "cursor-agent" if harness == "cursor" else harness
-    found = shutil.which(name)
-    if found is not None:
-        return found
-    if harness == "cursor":
-        raise HarnessError(CURSOR_INSTALL)
-    raise HarnessError(f"{name} is not installed.")
+def _require_executable() -> str:
+    found = shutil.which("pi")
+    if found is None:
+        raise HarnessError("pi is not installed.")
+    return found
 
 
 def execute_launch(

@@ -2,8 +2,8 @@
 
 A scenario is a seed workspace, an ordered list of user replies, a driver
 file, and a filesystem snapshot after each reply. Manual replies work in
-Claude Code, OpenCode, Cursor, GitHub Copilot, and Pi. `run` can also
-launch Cursor Agent, Claude Code, OpenCode, or Pi on the spine.
+Claude Code, OpenCode, Cursor, GitHub Copilot, and Pi. `run` launches Pi
+on the spine.
 
 Install the workflow pack named by the scenario, materialize the seed
 into an empty folder, and open that folder in the harness. Paste one
@@ -55,7 +55,7 @@ python tools/integration_scenario.py materialize <scenario> --dest PATH
 python tools/integration_scenario.py prompt <scenario> --turn <id>
 python tools/integration_scenario.py prompt <scenario> --fork <id>
 python tools/integration_scenario.py check <scenario> --workspace PATH --turn <id>
-python tools/integration_scenario.py run <scenario> --harness claude --workspace PATH
+python tools/integration_scenario.py run <scenario> --workspace PATH
 ```
 
 `prompt` writes the reply to stdout. Checkpoint turns also print a copy
@@ -72,48 +72,36 @@ inherits the terminal so the normal TUI is visible and can be interrupted.
 The default is headless: output is streamed and also saved.
 
 ```bash
+python tools/integration_scenario.py run california-housing --workspace ../housing
 python tools/integration_scenario.py run california-housing \
-  --harness claude --workspace ../housing
-python tools/integration_scenario.py run california-housing \
-  --harness opencode --workspace ../housing --interactive
+  --workspace ../housing --interactive
 ```
 
-`--harness` is `cursor`, `claude`, `opencode`, or `pi`. GitHub Copilot
-stays on the manual prompt and check flow. Optional `--model` is passed
-through. Pi defaults to `--provider openrouter` and
-`--model ~deepseek/deepseek-flash-latest` when `--model` is omitted.
-Repeat `--harness-arg` once per extra token. A `--model` or `--provider`
-token there replaces that Pi default. `--timeout` defaults to 3600
-seconds and then terminates the process group. Ctrl-C does the same.
+`run` always launches Pi. Manual prompt and check stay available for any
+harness. Optional `--model` is passed through. Pi defaults to
+`--provider openrouter` and `--model ~deepseek/deepseek-flash-latest`
+when `--model` is omitted. Repeat `--harness-arg` once per extra token.
+A `--model` or `--provider` token there replaces that default.
+`--timeout` defaults to 3600 seconds and then terminates the process
+group. Ctrl-C does the same.
 
-Each harness uses its existing login. Cursor Agent can use
-`CURSOR_API_KEY`. This command does not install a CLI. `cursor` the
-editor is not `cursor-agent`; install the Agent CLI from
-<https://cursor.com/docs/cli> when `cursor-agent` is missing.
-Pi runs require the skill-tool extension:
+Pi uses its existing login. This command does not install Pi. Pi runs
+require the skill-tool extension:
 
 ```bash
 pi install npm:@probabl/pi-skore
 ```
 
-Headless flags are Claude `--print` with `stream-json`, OpenCode `run
---format json`, Cursor Agent `--print` with `stream-json`, and Pi
-`--mode json`. Interactive runs omit those and show the TUI. Claude reads
-the driver with `--append-system-prompt-file`. OpenCode receives it
-through `OPENCODE_CONFIG_CONTENT`. Pi reads it with
-`--append-system-prompt`. Cursor has no system-prompt file, so the runner
-writes a root `AGENTS.md` marked `integration-scenario-runner`, refuses
-to replace an existing file, and deletes only that wrapper afterward.
+Headless Pi uses `--mode json`. `--interactive` inherits the terminal
+and shows the TUI. Pi reads the driver with `--append-system-prompt`.
 
-Approval flags apply only to the scenario workspace: Claude
-`--permission-mode auto`, OpenCode `--auto`, Cursor Agent `--force` and
-headless `--trust`, and Pi `--approve`. Pi `--approve` trusts
-project-local files; Pi does not ask before every tool call. Before Pi
-starts, the runner writes the selected workflow's sidecars under
-`.agents/skills`, passes every checkout skill with `--skill`, and prepends
-the checkout's `src` to `PYTHONPATH`. Skill discovery and trust therefore
-happen before `before_agent_start`; the agent uses the `skill` tool and
-does not need to reload or read `SKILL.md` directly. The scenario may run
+`--approve` trusts project-local files for this workspace. Pi does not
+ask before every tool call. Before Pi starts, the runner writes the
+selected workflow's sidecars under `.agents/skills`, passes every
+checkout skill with `--skill`, and prepends the checkout's `src` to
+`PYTHONPATH`. Skill discovery and trust therefore happen before
+`before_agent_start`; the agent uses the `skill` tool and does not need
+to reload or read `SKILL.md` directly. The scenario may run
 package-manager commands such as `pixi`.
 
 Logs land in `.transcripts/integration/<run-id>/`: headless `stdout.txt`

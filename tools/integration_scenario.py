@@ -1,8 +1,7 @@
 """Copy, print, check, and run harness-neutral integration scenarios.
 
 A scenario is a seed workspace, ordered user replies, a driver file, and
-filesystem snapshots. ``run`` launches Cursor Agent, Claude Code, OpenCode,
-or Pi. It does not install a harness.
+filesystem snapshots. ``run`` launches Pi. It does not install Pi.
 
 Usage
 -----
@@ -11,7 +10,7 @@ Usage
     python tools/integration_scenario.py prompt <scenario> --turn ID
     python tools/integration_scenario.py prompt <scenario> --fork ID
     python tools/integration_scenario.py check <scenario> --workspace PATH --turn ID
-    python tools/integration_scenario.py run <scenario> --harness claude --workspace PATH
+    python tools/integration_scenario.py run <scenario> --workspace PATH
 
 Exits 0 on success, 1 on the first batch of errors.
 """
@@ -33,7 +32,6 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from tools.integration_harness import (  # noqa: E402
-    HARNESSES,
     HarnessError,
     build_launch,
     execute_launch,
@@ -461,7 +459,6 @@ def stage_workflow_skills(workflow_id: str, workspace: Path) -> list[Path]:
 def run_scenario(
     name: str,
     *,
-    harness: str,
     workspace: Path,
     interactive: bool,
     model: str | None,
@@ -469,10 +466,10 @@ def run_scenario(
     reuse: bool,
     extra_args: list[str] | None = None,
 ) -> int:
-    """Launch ``harness`` and check the final spine snapshot."""
+    """Launch Pi and check the final spine snapshot."""
     started = time.monotonic()
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    run_id = f"{stamp}-{harness}-{uuid.uuid4().hex[:8]}"
+    run_id = f"{stamp}-pi-{uuid.uuid4().hex[:8]}"
     log_dir = REPO_ROOT / ".transcripts" / "integration" / run_id
     log_dir.mkdir(parents=True, exist_ok=True)
     status = 1
@@ -487,14 +484,11 @@ def run_scenario(
         driver_name = turns_doc.get("driver")
         if not isinstance(driver_name, str):
             raise SystemExit(f"{name}: driver is missing")
-        skill_paths: list[Path] = []
-        if harness == "pi":
-            workflow_id = turns_doc.get("workflow")
-            if not isinstance(workflow_id, str):
-                raise SystemExit(f"{name}: workflow is missing")
-            skill_paths = stage_workflow_skills(workflow_id, workspace)
+        workflow_id = turns_doc.get("workflow")
+        if not isinstance(workflow_id, str):
+            raise SystemExit(f"{name}: workflow is missing")
+        skill_paths = stage_workflow_skills(workflow_id, workspace)
         launch = build_launch(
-            harness,
             workspace=workspace,
             driver=workspace / Path(driver_name).name,
             interactive=interactive,
@@ -519,13 +513,13 @@ def run_scenario(
                 for err in check_errors:
                     print(f"- {err}", file=sys.stderr)
         elif status != 0:
-            print(f"{harness} exited {status}", file=sys.stderr)
+            print(f"pi exited {status}", file=sys.stderr)
     except HarnessError as exc:
         status = exc.code
         print(str(exc), file=sys.stderr)
     payload = {
         "scenario": name,
-        "harness": harness,
+        "harness": "pi",
         "mode": mode,
         "duration_seconds": round(time.monotonic() - started, 3),
         "exit_status": status,
@@ -616,9 +610,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     check_choice.add_argument("--turn")
     check_choice.add_argument("--fork")
 
-    run_parser = sub.add_parser("run", help="Launch a harness on one scenario.")
+    run_parser = sub.add_parser("run", help="Launch Pi on one scenario.")
     run_parser.add_argument("scenario")
-    run_parser.add_argument("--harness", required=True, choices=HARNESSES)
     run_parser.add_argument("--workspace", type=Path, required=True)
     run_parser.add_argument("--model")
     run_parser.add_argument(
@@ -661,7 +654,6 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "run":
         return run_scenario(
             args.scenario,
-            harness=args.harness,
             workspace=args.workspace,
             interactive=args.interactive,
             model=args.model,

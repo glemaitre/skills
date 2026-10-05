@@ -86,26 +86,21 @@ starts one harness, and checks `iterate-stop` after a zero exit. Forks
 stay manual.
 
 ```bash
+python tools/integration_scenario.py run california-housing --workspace ../housing
 python tools/integration_scenario.py run california-housing \
-  --harness claude --workspace ../housing
-python tools/integration_scenario.py run california-housing \
-  --harness pi --workspace ../housing --interactive
+  --workspace ../housing --interactive
 ```
 
-`--harness` accepts `cursor`, `claude`, `opencode`, and `pi`. Add
-`--interactive` to show the TUI and interrupt it from the terminal. The
-default runs headless, streams the output, and writes logs under
-`.transcripts/integration/<run-id>/`. The harness must already be
-authenticated. `cursor-agent` is required for `--harness cursor`; the
-editor command is not a substitute, and this repo does not install it.
+`run` launches Pi. Add `--interactive` to show the TUI and interrupt it
+from the terminal. The default runs headless, streams the output, and
+writes logs under `.transcripts/integration/<run-id>/`. Pi must already
+be authenticated. This command does not install it.
 
-Claude, OpenCode, and Cursor receive an auto-approval flag for this
-workspace. Pi is started with `--approve`, which trusts project-local
-files; Pi does not ask before each tool call. Pi also defaults to
-`--provider openrouter` and `--model ~deepseek/deepseek-flash-latest`.
-Pass `--model` to choose another model, or repeat `--harness-arg` for
-any other flag. Install the required extension once with
-`pi install npm:@probabl/pi-skore`.
+Pi is started with `--approve`, which trusts project-local files; Pi
+does not ask before each tool call. It defaults to `--provider openrouter`
+and `--model ~deepseek/deepseek-flash-latest`. Pass `--model` to choose
+another model, or repeat `--harness-arg` for any other flag. Install the
+required extension once with `pi install npm:@probabl/pi-skore`.
 
 Before Pi starts, the runner stages all 26 workflow sidecars and passes
 their checkout directories with `--skill`. It also supplies the checkout

@@ -13,7 +13,6 @@ import pytest
 
 from tools import integration_harness, integration_scenario
 from tools.integration_harness import (
-    CURSOR_WRAPPER,
     EXIT_INTERRUPT,
     EXIT_MISSING,
     EXIT_TIMEOUT,
@@ -50,7 +49,6 @@ def _fake_which(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def _launch(
-    harness: str,
     directory: Path,
     *,
     interactive: bool,
@@ -59,7 +57,6 @@ def _launch(
     skill_paths: list[Path] | None = None,
 ):
     return build_launch(
-        harness,
         workspace=directory,
         driver=_driver(directory),
         interactive=interactive,
@@ -69,88 +66,33 @@ def _launch(
     )
 
 
-def test_claude_commands(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_pi_commands(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _fake_which(monkeypatch)
-    headless = _launch("claude", tmp_path, interactive=False, model="sonnet")
-    assert headless.argv == [
-        "/fake/claude",
-        "--append-system-prompt-file",
-        str(tmp_path / "SCENARIO.md"),
-        "--permission-mode",
-        "auto",
-        "-p",
-        "--output-format",
-        "stream-json",
-        "--model",
-        "sonnet",
-        INITIAL_PROMPT,
-    ]
-    interactive = _launch("claude", tmp_path / "tty", interactive=True, model=None)
-    assert "-p" not in interactive.argv
-    assert interactive.argv[-1] == INITIAL_PROMPT
-
-
-def test_opencode_command_and_env(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    _fake_which(monkeypatch)
-    launch = _launch("opencode", tmp_path, interactive=False, model=None)
-    assert launch.argv[:5] == [
-        "/fake/opencode",
-        "run",
-        "--auto",
-        "--dir",
-        str(tmp_path),
-    ]
-    assert "--format" in launch.argv
-    assert "--interactive" not in launch.argv
-    instructions = json.loads(launch.env["OPENCODE_CONFIG_CONTENT"])
-    assert instructions == {"instructions": [str((tmp_path / "SCENARIO.md").resolve())]}
-    shown = _launch("opencode", tmp_path / "tty", interactive=True, model="m")
-    assert "--interactive" in shown.argv
-    assert "--model" in shown.argv
-
-
-def test_cursor_and_pi_commands(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    _fake_which(monkeypatch)
-    cursor = _launch("cursor", tmp_path, interactive=False, model=None)
-    assert cursor.argv[:6] == [
-        "/fake/cursor-agent",
-        "--workspace",
-        str(tmp_path),
-        "--force",
-        "--print",
-        "--output-format",
-    ]
-    assert "--trust" in cursor.argv
-    assert (tmp_path / "AGENTS.md").read_text(encoding="utf-8") == CURSOR_WRAPPER
-    shown = _launch("cursor", tmp_path / "tty", interactive=True, model=None)
-    assert "--print" not in shown.argv
-    pi = _launch("pi", tmp_path / "pi", interactive=False, model="pair")
-    assert pi.argv[:4] == [
+    headless = _launch(tmp_path / "pi", interactive=False, model="pair")
+    assert headless.argv[:4] == [
         "/fake/pi",
         "--append-system-prompt",
         str(tmp_path / "pi" / "SCENARIO.md"),
         "--approve",
     ]
-    assert pi.argv[4:6] == ["--mode", "json"]
-    assert "--print" not in pi.argv
-    assert pi.argv[pi.argv.index("--provider") + 1] == PI_DEFAULT_PROVIDER
-    assert pi.argv[pi.argv.index("--model") + 1] == "pair"
-    assert PI_DEFAULT_MODEL not in pi.argv
+    assert headless.argv[4:6] == ["--mode", "json"]
+    assert "--print" not in headless.argv
+    assert headless.argv[headless.argv.index("--provider") + 1] == PI_DEFAULT_PROVIDER
+    assert headless.argv[headless.argv.index("--model") + 1] == "pair"
+    assert PI_DEFAULT_MODEL not in headless.argv
+    interactive = _launch(tmp_path / "tty", interactive=True, model=None)
+    assert "--mode" not in interactive.argv
+    assert interactive.argv[-1] == INITIAL_PROMPT
 
 
 def test_pi_defaults_and_harness_args(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     _fake_which(monkeypatch)
-    default = _launch("pi", tmp_path / "default", interactive=True, model=None)
+    default = _launch(tmp_path / "default", interactive=True, model=None)
     assert default.argv[default.argv.index("--provider") + 1] == PI_DEFAULT_PROVIDER
     assert default.argv[default.argv.index("--model") + 1] == PI_DEFAULT_MODEL
     overridden = _launch(
-        "pi",
         tmp_path / "extra",
         interactive=False,
         model=None,
@@ -170,7 +112,6 @@ def test_pi_loads_skills_before_prompt(
     _fake_which(monkeypatch)
     skills = [tmp_path / "source-a", tmp_path / "source-b"]
     launch = _launch(
-        "pi",
         tmp_path / "workspace",
         interactive=False,
         model=None,
@@ -189,71 +130,17 @@ def test_launch_prepends_checkout_to_pythonpath(
 ) -> None:
     _fake_which(monkeypatch)
     monkeypatch.setenv("PYTHONPATH", "existing")
-    launch = _launch("pi", tmp_path, interactive=True, model=None)
+    launch = _launch(tmp_path, interactive=True, model=None)
     entries = launch.env["PYTHONPATH"].split(os.pathsep)
     expected = Path(integration_harness.__file__).resolve().parent.parent / "src"
     assert entries == [str(expected), "existing"]
 
 
-def test_missing_executables(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_missing_pi(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(integration_harness.shutil, "which", lambda _name: None)
-    with pytest.raises(HarnessError, match="cursor-agent is not installed") as missing:
-        _launch("cursor", tmp_path, interactive=False, model=None)
+    with pytest.raises(HarnessError, match="pi is not installed") as missing:
+        _launch(tmp_path, interactive=True, model=None)
     assert missing.value.code == EXIT_MISSING
-    with pytest.raises(HarnessError, match="pi is not installed"):
-        _launch("pi", tmp_path / "pi", interactive=True, model=None)
-
-
-def test_cursor_refuses_existing_instructions(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    _fake_which(monkeypatch)
-    (tmp_path / "AGENTS.md").write_text("user instructions\n", encoding="utf-8")
-    with pytest.raises(HarnessError, match="will not overwrite"):
-        _launch("cursor", tmp_path, interactive=False, model=None)
-    assert (tmp_path / "AGENTS.md").read_text(encoding="utf-8") == "user instructions\n"
-
-
-def test_cursor_wrapper_is_removed(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    _fake_which(monkeypatch)
-    launch = _launch("cursor", tmp_path, interactive=True, model=None)
-
-    def popen(*_args, **_kwargs):
-        return _Ready()
-
-    status = execute_launch(
-        launch,
-        interactive=True,
-        timeout=5,
-        stdout_path=tmp_path / "logs" / "stdout.txt",
-        stderr_path=tmp_path / "logs" / "stderr.txt",
-        popen=popen,
-    )
-    assert status == 0
-    assert not (tmp_path / "AGENTS.md").exists()
-
-
-def test_cleanup_runs_when_launch_fails(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    _fake_which(monkeypatch)
-    launch = _launch("cursor", tmp_path, interactive=False, model=None)
-
-    def popen(*_args, **_kwargs):
-        raise OSError("not launched")
-
-    with pytest.raises(OSError, match="not launched"):
-        execute_launch(
-            launch,
-            interactive=False,
-            timeout=5,
-            stdout_path=tmp_path / "logs" / "stdout.txt",
-            stderr_path=tmp_path / "logs" / "stderr.txt",
-            popen=popen,
-        )
-    assert not (tmp_path / "AGENTS.md").exists()
 
 
 def test_headless_streams_output(
@@ -349,6 +236,9 @@ def test_materialize_copies_driver(tmp_path: Path) -> None:
     assert "/reload" not in text
     assert "Symlink each" not in text
     assert (dest / "DATA.md").is_file()
+    housing = dest / "data" / "raw" / "housing.csv"
+    rows = housing.read_text(encoding="utf-8").splitlines()
+    assert len(rows) - 1 >= 5000
 
 
 def test_stage_workflow_skills_before_launch(tmp_path: Path) -> None:
@@ -379,13 +269,12 @@ def test_reuse_workspace_rules(tmp_path: Path) -> None:
 def test_run_records_check_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    _script(tmp_path / "bin" / "claude", code=0)
+    _script(tmp_path / "bin" / "pi", code=0)
     monkeypatch.setenv("PATH", f"{tmp_path / 'bin'}{os.pathsep}{os.environ['PATH']}")
     monkeypatch.setattr(integration_scenario, "REPO_ROOT", tmp_path)
     workspace = tmp_path / "housing"
     status = run_scenario(
         "california-housing",
-        harness="claude",
         workspace=workspace,
         interactive=False,
         model=None,
@@ -395,7 +284,7 @@ def test_run_records_check_failure(
     result = _result(tmp_path)
     assert status == 1
     assert result["exit_status"] == 1
-    assert result["harness"] == "claude"
+    assert result["harness"] == "pi"
     assert result["mode"] == "headless"
     assert result["check_errors"]
     assert (workspace / "SCENARIO.md").is_file()
@@ -410,7 +299,6 @@ def test_run_skips_check_when_harness_fails(
     monkeypatch.setattr(integration_scenario, "REPO_ROOT", tmp_path)
     status = run_scenario(
         "california-housing",
-        harness="pi",
         workspace=tmp_path / "housing",
         interactive=False,
         model=None,
@@ -426,14 +314,13 @@ def test_run_skips_check_when_harness_fails(
     assert "json" in recorded
 
 
-def test_run_reports_missing_cursor_agent(
+def test_run_reports_missing_pi(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setenv("PATH", str(tmp_path))
     monkeypatch.setattr(integration_scenario, "REPO_ROOT", tmp_path)
     status = run_scenario(
         "california-housing",
-        harness="cursor",
         workspace=tmp_path / "housing",
         interactive=False,
         model=None,
@@ -443,7 +330,6 @@ def test_run_reports_missing_cursor_agent(
     result = _result(tmp_path)
     assert status == EXIT_MISSING
     assert result["exit_status"] == EXIT_MISSING
-    assert not (tmp_path / "housing" / "AGENTS.md").exists()
 
 
 def test_run_refuses_nonempty_workspace(tmp_path: Path) -> None:
@@ -453,7 +339,6 @@ def test_run_refuses_nonempty_workspace(tmp_path: Path) -> None:
     with pytest.raises(SystemExit, match="reuse-workspace"):
         run_scenario(
             "california-housing",
-            harness="claude",
             workspace=workspace,
             interactive=False,
             model=None,
