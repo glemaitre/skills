@@ -98,9 +98,13 @@ python tools/integration_scenario.py run california-housing --harness pi --works
 
 `run` uses the harness already authenticated on the machine. It does not
 install one, and it will not use the `cursor` editor in place of
-`cursor-agent`. `--interactive` shows the TUI. Headless output is streamed
+`cursor-agent`. `--interactive` shows the TUI. Pi defaults to OpenRouter
+`~deepseek/deepseek-flash-latest`; `--model` overrides that, and
+`--harness-arg` forwards any other token. Headless output is streamed
 and stored under `.transcripts/integration/<run-id>/` with `result.json`.
 Auto-approval applies to that workspace only. The journey can run `pixi`.
+The copied `SCENARIO.md` names this checkout so the agent can install
+its skills and `skore-skills` in editable form.
 
 ## bump_version.py
 

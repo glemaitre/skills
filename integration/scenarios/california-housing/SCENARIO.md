@@ -7,6 +7,35 @@ stop and explain the contradiction. Do not invent a replacement choice.
 Manual turns and forks remain available for branch tests. This file is
 only the spine.
 
+## Before the journey
+
+Do this before the spine. Do not search a public skill registry, and do
+not run `npx skills` or `find-skills`.
+
+The skills and `skore-skills` for this run are the checkout at
+`{{SKILLS_REPO}}`.
+
+- Read the `ml-experimentation` workflow in
+  `{{SKILLS_REPO}}/.catalog.json`. For each included skill id, install
+  that skill into `.agents/skills/<id>` in this workspace. Symlink each
+  file and directory from `{{SKILLS_REPO}}/skills/<id>` into that
+  workspace directory. Write a real `.skore-skill.json` there, containing
+  `{"id": "<id>"}`. Do not write that sidecar through a symlink into the
+  checkout.
+- `python -m skore_skills` must import this checkout. Before a project
+  environment exists, editable-install the checkout into the interpreter
+  that will run those commands (`pip install -e` or `uv pip install -e`
+  of `{{SKILLS_REPO}}`). Do not install `skore-skills` from PyPI.
+- After pixi exists, add the same checkout:
+
+  ```bash
+  pixi add --pypi --editable "skore-skills @ {{SKILLS_REPO_URI}}"
+  ```
+
+  `setup-python-env` later runs `env add-skore`, which installs the
+  `skore` library and can replace `skore-skills` with the published
+  build. If that happens, run the editable add again before continuing.
+
 ## Setup
 
 - Keep all four pieces selected: Python environment, workspace layout,

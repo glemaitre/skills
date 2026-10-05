@@ -37,6 +37,8 @@ CURSOR_WRAPPER = (
 EXIT_TIMEOUT = 124
 EXIT_INTERRUPT = 130
 EXIT_MISSING = 127
+PI_DEFAULT_PROVIDER = "openrouter"
+PI_DEFAULT_MODEL = "~deepseek/deepseek-flash-latest"
 
 
 class HarnessError(Exception):
@@ -64,6 +66,7 @@ def build_launch(
     driver: Path,
     interactive: bool,
     model: str | None,
+    extra_args: list[str] | None = None,
 ) -> PreparedLaunch:
     """Return the command for ``harness`` without starting it."""
     if harness not in HARNESSES:
@@ -108,12 +111,30 @@ def build_launch(
         ]
         if not interactive:
             argv.extend(["--mode", "json"])
-    if model:
-        argv.extend(["--model", model])
+    extra = list(extra_args or [])
+    _append_model(argv, harness, model, extra)
+    argv.extend(extra)
     argv.append(prompt)
     env = os.environ.copy()
     env.update(extra_env)
     return PreparedLaunch(argv=argv, cwd=workspace, env=env, cleanup=cleanup)
+
+
+def _append_model(
+    argv: list[str],
+    harness: str,
+    model: str | None,
+    extra: list[str],
+) -> None:
+    """Add provider and model flags that ``extra`` did not already set."""
+    if harness == "pi" and "--provider" not in extra:
+        argv.extend(["--provider", PI_DEFAULT_PROVIDER])
+    if "--model" in extra:
+        return
+    if model:
+        argv.extend(["--model", model])
+    elif harness == "pi":
+        argv.extend(["--model", PI_DEFAULT_MODEL])
 
 
 def install_cursor_instructions(workspace: Path) -> Callable[[], None]:

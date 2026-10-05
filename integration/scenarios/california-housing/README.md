@@ -101,5 +101,10 @@ editor command is not a substitute, and this repo does not install it.
 
 Claude, OpenCode, and Cursor receive an auto-approval flag for this
 workspace. Pi is started with `--approve`, which trusts project-local
-files; Pi does not ask before each tool call. The journey may run `pixi`.
-A non-empty workspace is refused unless `--reuse-workspace` is set.
+files; Pi does not ask before each tool call. Pi also defaults to
+`--provider openrouter` and `--model ~deepseek/deepseek-flash-latest`.
+Pass `--model` to choose another model, or repeat `--harness-arg` for
+any other flag. The copied `SCENARIO.md` tells the agent to install this
+checkout's skills and `skore-skills` in editable form before the spine.
+The journey may run `pixi`. A non-empty workspace is refused unless
+`--reuse-workspace` is set.

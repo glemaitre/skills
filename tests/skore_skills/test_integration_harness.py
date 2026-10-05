@@ -6,6 +6,7 @@ import json
 import os
 import stat
 import sys
+from contextlib import suppress
 from pathlib import Path
 
 import pytest
@@ -17,6 +18,8 @@ from tools.integration_harness import (
     EXIT_MISSING,
     EXIT_TIMEOUT,
     INITIAL_PROMPT,
+    PI_DEFAULT_MODEL,
+    PI_DEFAULT_PROVIDER,
     HarnessError,
     PreparedLaunch,
     _wait,
@@ -41,13 +44,21 @@ def _fake_which(monkeypatch: pytest.MonkeyPatch) -> None:
     )
 
 
-def _launch(harness: str, directory: Path, *, interactive: bool, model: str | None):
+def _launch(
+    harness: str,
+    directory: Path,
+    *,
+    interactive: bool,
+    model: str | None,
+    extra_args: list[str] | None = None,
+):
     return build_launch(
         harness,
         workspace=directory,
         driver=_driver(directory),
         interactive=interactive,
         model=model,
+        extra_args=extra_args,
     )
 
 
@@ -119,7 +130,31 @@ def test_cursor_and_pi_commands(
     ]
     assert pi.argv[4:6] == ["--mode", "json"]
     assert "--print" not in pi.argv
-    assert "--model" in pi.argv
+    assert pi.argv[pi.argv.index("--provider") + 1] == PI_DEFAULT_PROVIDER
+    assert pi.argv[pi.argv.index("--model") + 1] == "pair"
+    assert PI_DEFAULT_MODEL not in pi.argv
+
+
+def test_pi_defaults_and_harness_args(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _fake_which(monkeypatch)
+    default = _launch("pi", tmp_path / "default", interactive=True, model=None)
+    assert default.argv[default.argv.index("--provider") + 1] == PI_DEFAULT_PROVIDER
+    assert default.argv[default.argv.index("--model") + 1] == PI_DEFAULT_MODEL
+    overridden = _launch(
+        "pi",
+        tmp_path / "extra",
+        interactive=False,
+        model=None,
+        extra_args=["--provider", "other", "--model", "custom", "--thinking", "high"],
+    )
+    assert overridden.argv.count("--provider") == 1
+    assert overridden.argv.count("--model") == 1
+    assert overridden.argv[overridden.argv.index("--provider") + 1] == "other"
+    assert overridden.argv[overridden.argv.index("--model") + 1] == "custom"
+    assert "--thinking" in overridden.argv
+    assert overridden.argv[-1] == INITIAL_PROMPT
 
 
 def test_missing_executables(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -243,10 +278,8 @@ def test_timeout_kills_the_process_group(tmp_path: Path) -> None:
             os.kill(pids[0], 0)
     finally:
         for pid in pids:
-            try:
+            with suppress(OSError):
                 os.kill(pid, 9)
-            except OSError:
-                pass
 
 
 def test_interrupt_returns_130() -> None:
@@ -269,6 +302,11 @@ def test_materialize_copies_driver(tmp_path: Path) -> None:
     materialize("california-housing", dest, force=False)
     text = (dest / "SCENARIO.md").read_text(encoding="utf-8")
     assert "California housing" in text
+    assert "{{SKILLS_REPO}}" not in text
+    assert "{{SKILLS_REPO_URI}}" not in text
+    repo = integration_scenario.REPO_ROOT.resolve()
+    assert str(repo) in text
+    assert repo.as_uri() in text
     assert (dest / "DATA.md").is_file()
 
 

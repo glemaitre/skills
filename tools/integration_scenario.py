@@ -46,6 +46,8 @@ TURN_KEYS = frozenset({"id", "say", "checkpoint", "expect"})
 FORK_KEYS = frozenset({"id", "after", "say", "expect"})
 SEED_CHECK_TURN = "setup-open"
 FINAL_TURN = "iterate-stop"
+SKILLS_REPO_PLACEHOLDER = "{{SKILLS_REPO}}"
+SKILLS_REPO_URI_PLACEHOLDER = "{{SKILLS_REPO_URI}}"
 
 
 def _load_json(path: Path) -> Any:
@@ -372,7 +374,11 @@ def _copy_driver(directory: Path, turns_doc: dict[str, Any], dest: Path) -> Path
     if not source.is_file():
         raise SystemExit(f"{directory.name}: driver {driver_name!r} is missing")
     target = dest / Path(driver_name).name
-    shutil.copy2(source, target)
+    repo = REPO_ROOT.resolve()
+    text = source.read_text(encoding="utf-8")
+    text = text.replace(SKILLS_REPO_URI_PLACEHOLDER, repo.as_uri())
+    text = text.replace(SKILLS_REPO_PLACEHOLDER, str(repo))
+    target.write_text(text, encoding="utf-8")
     return target
 
 
@@ -406,6 +412,7 @@ def run_scenario(
     model: str | None,
     timeout: float,
     reuse: bool,
+    extra_args: list[str] | None = None,
 ) -> int:
     """Launch ``harness`` and check the final spine snapshot."""
     started = time.monotonic()
@@ -431,6 +438,7 @@ def run_scenario(
             driver=workspace / Path(driver_name).name,
             interactive=interactive,
             model=model,
+            extra_args=extra_args,
         )
         status = execute_launch(
             launch,
@@ -552,6 +560,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     run_parser.add_argument("--workspace", type=Path, required=True)
     run_parser.add_argument("--model")
     run_parser.add_argument(
+        "--harness-arg",
+        action="append",
+        default=None,
+        help="Extra harness argument. Repeat once per token.",
+    )
+    run_parser.add_argument(
         "--interactive",
         action="store_true",
         help="Inherit the terminal and show the harness TUI.",
@@ -591,6 +605,7 @@ def main(argv: list[str] | None = None) -> int:
             model=args.model,
             timeout=args.timeout,
             reuse=args.reuse_workspace,
+            extra_args=args.harness_arg,
         )
     return 2
 

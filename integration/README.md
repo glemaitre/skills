@@ -80,8 +80,11 @@ python tools/integration_scenario.py run california-housing \
 
 `--harness` is `cursor`, `claude`, `opencode`, or `pi`. GitHub Copilot
 stays on the manual prompt and check flow. Optional `--model` is passed
-through. `--timeout` defaults to 3600 seconds and then terminates the
-process group. Ctrl-C does the same.
+through. Pi defaults to `--provider openrouter` and
+`--model ~deepseek/deepseek-flash-latest` when `--model` is omitted.
+Repeat `--harness-arg` once per extra token. A `--model` or `--provider`
+token there replaces that Pi default. `--timeout` defaults to 3600
+seconds and then terminates the process group. Ctrl-C does the same.
 
 Each harness uses its existing login. Cursor Agent can use
 `CURSOR_API_KEY`. This command does not install a CLI. `cursor` the
