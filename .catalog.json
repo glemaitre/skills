@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "3e1ed042038f2ba66bb6168520b7b439e0b21ef8b6a09e41de9c9d476aa78277",
+  "catalog_hash": "3f185a6a35f3c7ffe80a28a2420d8ccf6844d678470fdf20dd64a5fc116a45b1",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "ba41712d5b13dd0fa224aa0f0931ff5a6f7ecd7d8f70754508aec880e47063d4"
+      "hash": "6081b0c7a42b8db36a6ab983103f2a50d88f9a2436816d87e2df490d5c2acdc9"
     },
     {
       "id": "frame-ml-problem",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "51cde0074c94466454fb7b55439eb4767796bbcfebed4113ef67578f71da2197"
+      "hash": "bd6dca500e3d64170640c7c6ef7cfa0713bada609e8d53ca6fb0eef1f1238a76"
     },
     {
       "id": "build-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b5d7134b0362ca598ae7a14a2c1eacd2848eb6373202123d3ea6cbc833754794"
+      "hash": "d2515278263d9f8db0f76db97da581c4cd08847f080452aedef2d7d3e3833a0f"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "c5458b1b39bac58075e3462fb79a45a53d52c032123cf7ff96dae212790f750c"
+      "hash": "4cc3e58ad86c6cdadf67079b710c56d8c904f56a2daeb331a89c575ced6e07ca"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "0fd714914f86d57ecbd19b9c9c83d82ef2838d2cb9ee29f2972870f262ee75e5"
+      "hash": "c693b2eb927e93ac0a6798fd0d3881ed919fd39dd7a66362155a74ba4b8eb659"
     },
     {
       "id": "manage-ml-backlog",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "fdb55648239a8497ca0463786b9d92476b6b3eac5f1980c7de31c255a98ddb17"
+      "hash": "513cf400457e707e9f37abc811ccf37b9f21462b9f3a7f0397fedce872b03b3e"
     },
     {
       "id": "choose-python-library",

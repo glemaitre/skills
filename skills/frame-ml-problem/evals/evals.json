@@ -239,6 +239,44 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 14,
+      "title": "A complete answer set asks to lock in the same turn",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Status is still the empty placeholder. No decision cell is\n  filled.\n- The first `frame show` returns `ask` / `missing_keys` for\n  every required key.\n- After those cells are written, a second `frame show` returns\n  `ask` / `confirm_lock` with choices `lock`, `modify`, `stop`.]\n\nPrediction goal: point_predictions. Deployment: iid. Horizon,\ngap, generalize-to, known at predict, and time role: n/a.\nMetric role: point_error. Metric: RMSE. Baseline: dummy.\nBaseline note: mean house value. Folds: 2.",
+      "expected_output": "Behavioural response satisfying: - Write every decision from the user message. Set Status to `draft`. - Run `frame show` again in this turn. - AskUserQuestion with only Lock, Modify, and Stop, in that order, then stop. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Set Status to `locked`. - Treat the filled cells as the Lock choice.",
+      "files": [],
+      "expectations": [
+        "Write every decision from the user message. Set Status to `draft`.",
+        "Run `frame show` again in this turn.",
+        "AskUserQuestion with only Lock, Modify, and Stop, in that order, then stop.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Set Status to `locked`.",
+        "The response does NOT: Treat the filled cells as the Lock choice.",
+        "The response does NOT: Defer the lock question to a later turn.",
+        "The response does NOT: Load `build-ml-pipeline`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 15,
+      "title": "One answered cell does not fill the rest",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- Status is `draft`. Deployment, horizon, gap, time role, and\n  generalize-to are empty. The other required cells are valid.\n- `frame show` returns `ask` / `missing_keys`. `missing` lists\n  deployment, horizon, gap, time_role, and generalize_to.]\n\nGeneralize to a column that combines latitude and longitude.",
+      "expected_output": "Behavioural response satisfying: - Write the generalize-to cell from the user message. - Ask every still-unanswered key in `missing` and stop. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Invent deployment, horizon, gap, or time role. - AskUserQuestion with Lock, Modify, and Stop.",
+      "files": [],
+      "expectations": [
+        "Write the generalize-to cell from the user message.",
+        "Ask every still-unanswered key in `missing` and stop.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Invent deployment, horizon, gap, or time role.",
+        "The response does NOT: AskUserQuestion with Lock, Modify, and Stop.",
+        "The response does NOT: Set Status to `locked`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

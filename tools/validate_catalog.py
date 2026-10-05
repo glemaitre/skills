@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate ``.catalog.json`` against the on-disk ``skills/`` directory.
 
-The validator enforces four invariants:
+The validator enforces five invariants:
 
 1. Every directory under ``skills/`` has a matching entry in
    ``.catalog.json``'s ``skills`` array, and vice versa.
@@ -11,6 +11,8 @@ The validator enforces four invariants:
    ``subcategory`` for that category (``null`` is required for
    categories that don't take a subcategory).
 4. Every workflow's ``includes`` list references known skill ids.
+5. Every ``SKILL.md`` description is shorter than 1024 characters,
+   counted the way Cursor counts a folded ``description: >`` block.
 
 Usage
 -----
@@ -26,6 +28,59 @@ import argparse
 import json
 import sys
 from pathlib import Path
+
+# Cursor rejects a skill description at this length. The count includes
+# the trailing newline that YAML ``>`` (clip) keeps.
+DESCRIPTION_MAX_LENGTH = 1024
+
+
+def folded_description_length(text: str) -> int | None:
+    """Return the Cursor length of a folded ``description: >`` block.
+
+    Single newlines inside a paragraph become spaces. A blank line
+    becomes a newline. Clip chomping keeps one trailing newline.
+    Returns ``None`` when the file has no description field.
+    """
+    lines = text.splitlines()
+    try:
+        start = next(
+            i for i, line in enumerate(lines) if line.startswith("description:")
+        )
+    except StopIteration:
+        return None
+    header = lines[start]
+    inline = header.split(":", 1)[1].strip()
+    if inline not in {">", ">-", "|", "|-"}:
+        return len(inline.strip("\"'"))
+    body: list[str] = []
+    for line in lines[start + 1 :]:
+        if line and not line.startswith((" ", "\t")):
+            break
+        body.append(line)
+    indents = [len(line) - len(line.lstrip(" ")) for line in body if line.strip()]
+    indent = min(indents) if indents else 0
+    raw = [line[indent:] if len(line) >= indent else "" for line in body]
+    while raw and raw[-1] == "":
+        raw.pop()
+    if inline.startswith("|"):
+        folded = "\n".join(raw)
+    else:
+        paragraphs: list[str] = []
+        current: list[str] = []
+        for line in raw:
+            if line.strip() == "":
+                if current:
+                    paragraphs.append(" ".join(current))
+                    current = []
+            else:
+                current.append(line.strip())
+        if current:
+            paragraphs.append(" ".join(current))
+        folded = "\n".join(paragraphs)
+    if inline in {">", "|"}:
+        folded += "\n"
+    return len(folded)
+
 
 # Allow-list: category -> set of permitted subcategories.
 # An empty set means the category does not take a subcategory
@@ -79,8 +134,16 @@ def validate(catalog_path: Path) -> list[str]:
     for skill in catalog["skills"]:
         sid = skill["id"]
         skill_path = repo_root / skill["path"]
-        if not (skill_path / "SKILL.md").is_file():
+        skill_md = skill_path / "SKILL.md"
+        if not skill_md.is_file():
             errors.append(f"{skill['path']}/SKILL.md is missing")
+        else:
+            length = folded_description_length(skill_md.read_text(encoding="utf-8"))
+            if length is not None and length >= DESCRIPTION_MAX_LENGTH:
+                errors.append(
+                    f"{skill['path']}/SKILL.md description exceeds "
+                    f"{DESCRIPTION_MAX_LENGTH - 1} characters ({length})"
+                )
 
         cat = skill.get("category")
         sub = skill.get("subcategory")

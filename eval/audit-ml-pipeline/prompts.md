@@ -111,8 +111,13 @@
 - Return the digest, G-AUDIT-FINDING from `audit finding`, locator
   from `loop locator`, and optional headline to
   `model-ml-pipeline`.
-- State that the dispatcher owns record-outcome, notebook convert
-  (including `audit/<stem>.py`), site, and git close.
+- State that the dispatcher owns record-outcome, notebook convert,
+  site, and git close.
+- Name both caller commands: `notebook convert
+  experiments/<stem>.py` and `notebook convert audit/<stem>.py`
+  (`--html` when the site is on), then the caller's `git end-turn`
+  (`--stage implement` from model, `--stage evaluate` from
+  evaluate).
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -123,6 +128,8 @@
 - Load `triage-ml-task` from this skill.
 - Dispatch `manage-ml-backlog` from this skill.
 - Run `notebook convert` on `audit/<stem>.py` here.
+- Treat the close as finished after converting only
+  `audit/<stem>.py`.
 - Add `<!-- results-embed: audit -->`.
 
 ---

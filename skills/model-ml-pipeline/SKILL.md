@@ -235,8 +235,9 @@ also ask in chat whether the note looks right.
    shows the diagram. Missing or skipped EDA does not defer it.
    The post-loop rebuild is the fitted diagram; it does not
    replace this one. Do not convert
-   `experiments/<stem>.py` at that point if it already contains
-   `skore.evaluate`.
+   `experiments/<stem>.py` at this unfitted snapshot if it
+   already contains `skore.evaluate`. That ban ends here. The
+   close still converts the experiment script.
 2. Only if the user chose **Evaluate** and `smoke run` is `proceed`: load
    `evaluate-ml-pipeline` only if `status.skills.evaluate-ml-pipeline`
    is true. It reuses the DataOp `cv` and writes
@@ -320,31 +321,16 @@ symbols are written, children use
 
 After **Stop**, or while smoke is red: skip evaluate, audit, and
 record-outcome. This is an explicit no-result close: do not mark
-the experiment done, but still perform the conversion/site steps
-below when applicable, then run
-`python -m skore_skills git end-turn --stage implement` and return
-to triage.
-If `policy.notebooks` is true and `export-ml-notebook` is
-installed, run
-`python -m skore_skills notebook convert experiments/<stem>.py`
-only when the experiment script already exists, and the same
-command on `audit/<stem>.py` when that file exists, with
-`--html` when `policy.site` is also true. `audit-ml-pipeline`
-does not convert on this path. Site build embeds
-`audit/<stem>.nb.html` under `## Notebooks`; do not add
-`<!-- results-embed: audit -->`. Convert re-executes the
-script; say so when it is slow. If convert fails because
-`ipywidgets` is missing, load `add-python-package` for it
-(agent) and convert again. Missing jupytext / nbclient /
-nbconvert → one-line skip naming `add-python-package`; do not
-fail the turn.
+the experiment done, but still run § Close — notebooks and site
+when applicable, then return to triage.
 
 After **Review** or **Skip** (or a missing review skill),
 implement-loop step 4 (record-outcome) runs first, so the journal
 files are on disk before anything is staged. **Stop** skips
 record-outcome. This dispatcher owns the User-facing close.
 Children return locator / digest / finding and do not preview
-this close.
+this close. The User-facing close below names the two
+`notebook convert` commands; run them after that narrative.
 
 ### User-facing close
 
@@ -365,10 +351,38 @@ locator/finding alone.
    among tokens, then G-AUDIT-FINDING (`n/a — audit not run`
    when skipped). Index strings, not the narrative.
 
-Then the same convert/site rules apply. Convert
-`audit/<stem>.py` here when the file exists; the audit skill
-did not. The site appends that viewer to the experiment design
-note's `## Notebooks` section after evaluation.
+Then run § Close — notebooks and site. That is both
+`python -m skore_skills notebook convert experiments/<stem>.py`
+when that file exists and the same command on
+`audit/<stem>.py` when that file exists, with `--html` when
+`policy.site` is also true. The audit skill did not convert
+either file. Converting only the audit file does not finish the
+close. The site appends the audit viewer to the experiment
+design note's `## Notebooks` section after the evaluation
+notebook.
+
+### Close — notebooks and site
+
+This close applies to **Stop**, red smoke, **Review**, **Skip**,
+and a missing review skill. The unfitted-snapshot ban in
+`build-ml-pipeline/references/snapshot.md` does not apply,
+including when `experiments/<stem>.py` already contains
+`skore.evaluate`. Converting only `audit/<stem>.py` does not
+finish the close.
+
+If `policy.notebooks` is true and `export-ml-notebook` is
+installed, run
+`python -m skore_skills notebook convert experiments/<stem>.py`
+when the experiment script already exists, and the same command
+on `audit/<stem>.py` when that file exists, with `--html` when
+`policy.site` is also true. `audit-ml-pipeline` does not convert
+on this path. Site build embeds `audit/<stem>.nb.html` under
+`## Notebooks`; do not add `<!-- results-embed: audit -->`.
+Convert re-executes the script; say so when it is slow. If
+convert fails because `ipywidgets` is missing, load
+`add-python-package` for it (agent) and convert again. Missing
+jupytext / nbclient / nbconvert → one-line skip naming
+`add-python-package`; do not fail the turn.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
 `python -m skore_skills site build` so the fitted Method pipeline
