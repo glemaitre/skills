@@ -58,6 +58,9 @@ checkout at `{{SKILLS_REPO}}` and supplied that checkout's
 - Build the locked baseline.
 - Approve the proposal and the design note.
 - Evaluate and keep the report local.
+- When the audit digest is ready, close the audit. That choice is
+  already made: do not ask again, and do not add an additional
+  report view, a custom query, or a custom plot.
 - Review the result.
 
 ## Backlog and next experiment

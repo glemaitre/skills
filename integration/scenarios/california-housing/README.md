@@ -43,7 +43,7 @@ Modify / Stop is the question.
 | `baseline-choose` | | Choose the locked baseline. Design note stays `planned`. |
 | `baseline-approve` | | Approve, build, and smoke-test. No report yet. |
 | `baseline-evaluate` | | Evaluate and keep the report local. |
-| `baseline-review` | yes | Review. Idea files are `Triage: open`. |
+| `baseline-review` | yes | Close the audit, then review. Idea files are `Triage: open`. |
 | `backlog-promote` | yes | Promote the first idea to `B1`. |
 | `iterate-choose` | | Take that backlog item. `02_*` does not exist yet. |
 | `iterate-approve` | | Approve and smoke-test `02_*`. No second report. |

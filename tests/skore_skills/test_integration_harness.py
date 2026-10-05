@@ -233,6 +233,7 @@ def test_materialize_copies_driver(tmp_path: Path) -> None:
     assert str(repo) in text
     assert repo.as_uri() in text
     assert 'skill("setup-ml-project")' in text
+    assert "close the audit" in text
     assert "/reload" not in text
     assert "Symlink each" not in text
     assert (dest / "DATA.md").is_file()
