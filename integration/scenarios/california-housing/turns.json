@@ -142,12 +142,38 @@
       }
     },
     {
+      "id": "eda-run",
+      "checkpoint": true,
+      "say": "Run the data analysis on `data/raw/housing.csv`. Use pandas. The target is MedHouseVal and the task is regression. There is one table, so do not ask how to group files. When the analysis is written, close this stage. Do not add another analysis.",
+      "expect": {
+        "files": [
+          "data/raw/housing.csv",
+          "data_analysis/data_analysis.py",
+          "data_analysis/data_analysis.md",
+          "data_analysis/data_analysis_*.html",
+          "scratch/data_analysis/extras.json",
+          "journal/JOURNAL.md",
+          "src/housing/pipeline.py"
+        ],
+        "absent": [
+          "journal/01_*.md",
+          "experiments/*.py"
+        ],
+        "contains": {
+          "journal/JOURNAL.md": [
+            "| Status | done"
+          ]
+        }
+      }
+    },
+    {
       "id": "frame-open",
-      "say": "Frame the modeling problem. Continue from the facts in `DATA.md`. Do not explore the data first.",
+      "say": "Frame the modeling problem from the facts in `DATA.md` and the written data analysis. Do not explore again.",
       "expect": {
         "files": [
           "DATA.md",
           "data/raw/housing.csv",
+          "data_analysis/data_analysis.md",
           "pyproject.toml",
           "pixi.toml",
           ".skore",
@@ -202,6 +228,7 @@
         "files": [
           "DATA.md",
           "data/raw/housing.csv",
+          "data_analysis/data_analysis.md",
           "src/housing/pipeline.py",
           "journal/JOURNAL.md"
         ],
@@ -211,6 +238,7 @@
         ],
         "contains": {
           "journal/JOURNAL.md": [
+            "| Status | done",
             "| Status | locked |",
             "| Prediction goal | point_predictions |",
             "| Deployment | iid |",
@@ -408,11 +436,18 @@
           "tests/smoke/test_01_*.py",
           "tests/smoke/test_02_*.py",
           "scratch/results/01_*/report.html",
-          "journal/ideas/*.md"
+          "journal/ideas/*.md",
+          "data_analysis/data_analysis.py",
+          "data_analysis/data_analysis.md"
         ],
         "absent": [
           "scratch/results/02_*/report.html"
         ],
+        "contains": {
+          "journal/JOURNAL.md": [
+            "| Status | done"
+          ]
+        },
         "contains_any": {
           "journal/01_*.md": [
             "**State:** done"

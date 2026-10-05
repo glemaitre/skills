@@ -1,8 +1,9 @@
 # California housing
 
-Manual spine: set up a project, lock a small California housing
-regression, build one baseline, promote one follow-up into the backlog,
-then start that item and stop before its evaluation.
+Manual spine: set up a project, explore the housing table, lock a
+small California housing regression, build one baseline, promote one
+follow-up into the backlog, then start that item and stop before its
+evaluation.
 
 Install the `ml-experimentation` pack in the harness first. The seed is
 only the project. Open the materialized folder as the harness workspace.
@@ -21,11 +22,11 @@ the workspace before replaying a fork from it.
 If a question arrives alone, paste only the matching line and check that
 turn once the agent has stopped again. `baseline-approve` and
 `iterate-approve` are two paragraphs: paste the proposal yes first, then
-the approval, and check after the smoke test. After `frame-open`, if the
-agent still offers exploration, paste `Continue from the facts I stated.`
-The `frame-open` check still applies. After `baseline-choose`, if a menu
-is still on screen, paste that same reply again and check once Approve /
-Modify / Stop is the question.
+the approval, and check after the smoke test. After `eda-run`, if the
+continuation board is still on screen, paste `Close. Do not add
+another analysis.` The `eda-run` check still applies. After
+`baseline-choose`, if a menu is still on screen, paste that same reply
+again and check once Approve / Modify / Stop is the question.
 
 ## Spine
 
@@ -37,7 +38,8 @@ Modify / Stop is the question.
 | `setup-managed` | | Manage the Python environment. |
 | `setup-package` | | Import name `housing`. |
 | `setup-autocommit` | yes | Automatic commits off. Scaffold lands here. |
-| `frame-open` | | Frame from `DATA.md`, without exploratory analysis. |
+| `eda-run` | yes | Run and close the data analysis. No design note yet. |
+| `frame-open` | | Frame from `DATA.md` and the written analysis. |
 | `frame-fill` | | Fill the modeling table. Status stays `draft`. |
 | `frame-lock` | yes | Lock the table. No experiment file yet. |
 | `baseline-choose` | | Choose the locked baseline. Design note stays `planned`. |
@@ -64,7 +66,7 @@ the fork reply instead of continuing the spine.
 | `decline-workspace` | `setup-open` | Uncheck the workspace layout. Keep the Python environment, the editable install, and Git. | No `src/` or `journal/`. |
 | `decline-git` | `setup-open` | Uncheck Git. Keep the Python environment, the workspace layout, and the editable install. | `.skore` records Git declined. No scaffold yet. |
 | `you-pick-name` | `setup-managed` | You pick the import name. | No `src/housing/`. |
-| `explore-first` | `setup-autocommit` | Explore the data before framing. | No `journal/01_*.md` or experiment script. |
+| `skip-eda` | `setup-autocommit` | Skip the data analysis. | Data understanding is `skipped`. No analysis file and no design note. |
 | `lock-same-turn` | `frame-open` | The `frame-fill` values, then `Lock these decisions.` | Status stays `draft`. |
 | `discuss-baseline` | `frame-lock` | Discuss the next step. | Decisions stay locked. No design note. |
 | `stop-design` | `baseline-choose` | Stop. | Design note stays `planned`. No experiment script. |
