@@ -241,15 +241,16 @@
       "id": 13,
       "title": "Planned design note uses one approval gate",
       "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `journal/02_target_transform.md` exists with State `planned`.\n- Question, Motivation, Method, and Risks are filled.\n- `design consent` returns `ask` with choices approve, modify, stop.]\n\nThe design note is written. Approve it and implement.",
-      "expected_output": "Behavioural response satisfying: - Ask one AskUserQuestion, in order: Approve / Modify / Stop. - On Approve, set State to `approved` and Approved by user on to a `YYYY-MM-DD` date, then require `design consent` `proceed` before code. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Also ask in chat whether the note looks right. - Treat \"Approve it and implement\" as approval before the gate.",
+      "expected_output": "Behavioural response satisfying: - Ask one AskUserQuestion, in order: Approve / Modify / Stop. - On Approve, run `design approve --stem 02_target_transform`. Do not type the date. Then require `design consent` `proceed` before code. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Also ask in chat whether the note looks right. - Treat \"Approve it and implement\" as approval before the gate.",
       "files": [],
       "expectations": [
         "Ask one AskUserQuestion, in order: Approve / Modify / Stop.",
-        "On Approve, set State to `approved` and Approved by user on to a `YYYY-MM-DD` date, then require `design consent` `proceed` before code.",
+        "On Approve, run `design approve --stem 02_target_transform`. Do not type the date. Then require `design consent` `proceed` before code.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Also ask in chat whether the note looks right.",
         "The response does NOT: Treat \"Approve it and implement\" as approval before the gate.",
-        "The response does NOT: Write model code while State is still `planned`."
+        "The response does NOT: Write model code while State is still `planned`.",
+        "The response does NOT: Invent a calendar date for Approved by user on."
       ],
       "tools": false,
       "sandbox": [],

@@ -289,6 +289,40 @@ def design_consent_cmd(stem: str) -> None:
         raise click.UsageError(str(exc)) from exc
 
 
+@design_group.command("approve")
+@click.option("--stem", required=True, help="Experiment stem, e.g. 05_new_model.")
+def design_approve_cmd(stem: str) -> None:
+    """Stamp State approved and Approved by user on, then print JSON."""
+    from skore_skills.design_consent import render_design_approve
+
+    try:
+        click.echo(render_design_approve(Path.cwd(), stem), nl=False)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+
+
+@cli.group("eda")
+def eda_group() -> None:
+    """Stamp the data-understanding status date."""
+
+
+@eda_group.command("stamp")
+@click.option(
+    "--status",
+    required=True,
+    type=click.Choice(["done", "skipped"]),
+    help="Data-understanding status to record.",
+)
+def eda_stamp_cmd(status: str) -> None:
+    """Write the data-understanding Status date, then print JSON."""
+    from skore_skills.eda import render_eda_stamp
+
+    try:
+        click.echo(render_eda_stamp(Path.cwd(), status), nl=False)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+
+
 @cli.group("smoke")
 def smoke_group() -> None:
     """Run the per-stem smoke pytest gate."""
