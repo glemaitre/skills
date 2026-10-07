@@ -211,9 +211,10 @@ the JSON `context` inline (§ Gate context), including the site
 preview when `policy.site`, then **AskUserQuestion** (single
 choice), in order: **Approve** / **Modify** / **Stop**. Do not
 also ask in chat whether the note looks right.
-- **Approve** → set `**State:**` to `approved` and
-  `**Approved by user on:**` to today's date (`YYYY-MM-DD`).
-  Re-run `design consent`; code starts only on `proceed`.
+- **Approve** → run
+  `python -m skore_skills design approve --stem <stem>`.
+  Do not type the date. Re-run `design consent`; code starts
+  only on `proceed`.
 - **Modify** → leave `State` `planned`, edit the note, and ask
   this gate again.
 - **Stop** → do not implement.

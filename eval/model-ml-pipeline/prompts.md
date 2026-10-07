@@ -375,8 +375,8 @@ and `frame show` already returned `proceed` with a non-null
 
 **Must do:**
 - Ask one AskUserQuestion, in order: Approve / Modify / Stop.
-- On Approve, set State to `approved` and Approved by user on to
-  a `YYYY-MM-DD` date, then require `design consent` `proceed`
+- On Approve, run `design approve --stem 02_target_transform`.
+  Do not type the date. Then require `design consent` `proceed`
   before code.
 
 **Must NOT do:**
@@ -384,6 +384,7 @@ and `frame show` already returned `proceed` with a non-null
 - Also ask in chat whether the note looks right.
 - Treat "Approve it and implement" as approval before the gate.
 - Write model code while State is still `planned`.
+- Invent a calendar date for Approved by user on.
 
 ---
 

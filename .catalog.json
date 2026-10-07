@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "2bee1c0ccd1d1d9d0b4b80c5e90a6cb7011ff14f6306c02625248bd19cfef629",
+  "catalog_hash": "fdcf33e8debbf7ec8a60dc0fb1a4f02ec58f64b2570f0b3b3e5e74d49cb4675c",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "6081b0c7a42b8db36a6ab983103f2a50d88f9a2436816d87e2df490d5c2acdc9"
+      "hash": "53a72a37bd1dd196def2b63b129241b46fa79e41ac7464156cbbf5a1f3186130"
     },
     {
       "id": "frame-ml-problem",
@@ -21,7 +21,7 @@
       "summary": "Lock the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "bd6dca500e3d64170640c7c6ef7cfa0713bada609e8d53ca6fb0eef1f1238a76"
+      "hash": "01592ba9e2f73bf10980e193a4e29eaf1cf1ce5697e7648b0a511cf39739ce9f"
     },
     {
       "id": "build-ml-pipeline",
@@ -66,7 +66,7 @@
       "summary": "Record experiment outcomes and triage idea files. A promoted idea moves from the Ideas table into a Backlog row.",
       "category": "action",
       "subcategory": null,
-      "hash": "004fdc8b7d3f98577ae4a6b6944647b7cdd2dd36417fcb1b169213052abd4271"
+      "hash": "ba1b1b137887c3f915b99359937e3acbe5db3febd94360a464ee2e01b84245bf"
     },
     {
       "id": "organize-ml-workspace",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, then coordinate modeling choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "ec871bf853a27d073a4c8a0924d857bb93beb4240aeab89071d7a417ab33b9a8"
+      "hash": "8d7e7b6dc637b096602d0f15e4cb53f7511c61069576d38290d039947ceab609"
     },
     {
       "id": "choose-python-library",
