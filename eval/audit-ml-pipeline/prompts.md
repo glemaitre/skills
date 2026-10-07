@@ -10,19 +10,14 @@
 **Assumed workspace state:**
 - `status.setup.pending` is empty.
 - The design is approved, smoke is green, and the persisted report exists.
-- `review consent` returns `ask`. The user has not answered yet.
+- `review consent` returns `audit`.
 
 **Must do:**
 - Run `python -m skore_skills review consent --stem <stem>` before
   the first `cells run`.
-- On `ask`, give a 1–3 sentence preview: local read of the
-  persisted report, every skore check, writes `audit/<stem>.py`,
-  `scratch/audit/<stem>/audit.md`, and
-  `scratch/audit/<stem>/viewers.py`, can be slow. Do not invent
-  minutes. Ask Review / Skip / Stop. Do not `cells run` until
-  Review.
-- After Review, confirm the report with `project.summarize()` and
-  load it with `project.get(id)`.
+- On `audit`, write `audit/<stem>.py` and `cells run`.
+- Confirm the report with `project.summarize()` and load it with
+  `project.get(id)`.
 - Render checks and metrics into the audit digest.
 - Copy `templates/viewers.py` to `scratch/audit/<stem>/viewers.py`
   and run it. It writes
@@ -68,15 +63,14 @@
 - The report exists and smoke is green.
 
 **Must do:**
-- Ask the review gate again before `cells run`, because a re-audit
-  re-runs the checks.
-- Stop at that question. Do not close on this turn.
+- Run `cells run` for the re-audit.
+- Do not run the direct close before Close audit.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Paste `scratch/audit/<stem>/audit.md` wholesale into chat.
 - Run `loop notebooks` before Close audit.
-- Call record-outcome before the re-audit gate is answered.
+- Call record-outcome before Close audit.
 - Run `git commit`.
 
 ---
@@ -183,3 +177,25 @@
   memory when they are absent from this turn's `accessors.txt`
   trees.
 - Put the extra-view `write_text` in `audit/<stem>.py`.
+
+---
+
+## CASE_06 — Fired-check advice follows its docs
+
+**User prompt:**
+> What should we do about this check?
+
+**Assumed workspace state:**
+- The audit digest exists.
+- One `Issues:` line is `SKD004`, with a documentation URL.
+- That page recommends tuning the decision threshold. It does not
+  recommend class weighting or resampling.
+
+**Must do:**
+- Read that documentation URL and apply its recommendation:
+  tune the decision threshold.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Recommend class weighting or resampling.
+- Call `skore.evaluate` or `project.put`.
