@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "a1e92b7b3aef1b9d9f21d2e49c8d98eea66f15f5dd67e22760a07a567ea94034",
+  "catalog_hash": "2e91fca8ad1da3c29005d6c8c0aaea58445ba3ac8b1fd35fba058c257119e21a",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "c2b1def761c0e94bf05b282f5a4340a67dadd7306b061c9990eb180251eac49c"
+      "hash": "c96775ed8f39239955aa22a3f2d0733de6826a3b62f6626b5275fcaae6aeeb7d"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "74f04342c8e92fe04f22f92454faadd181dd8a64a2c556cb8060699514bc5f2f"
+      "hash": "d66b5d354f506fafbd6eb1fea1a671d101cd39ff97eed85da447168e11ae765a"
     },
     {
       "id": "manage-ml-backlog",
@@ -111,7 +111,7 @@
       "summary": "Read the stored report, then write one idea file and one Ideas row per candidate.",
       "category": "meta",
       "subcategory": null,
-      "hash": "283b0229784d02786b10ab7ff85d5fc787295b8f1dc178c58c914a493cf21b92"
+      "hash": "4f91092c4fb8aac7f99327c277f8b78f4133e936a655b02517c3ea1889fd6bb1"
     },
     {
       "id": "shape-user-idea",

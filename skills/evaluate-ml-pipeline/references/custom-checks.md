@@ -82,5 +82,5 @@ checks. Adding a check after `put` changes only the in-memory
 report until another `put`. `add` does not replace built-in SKD
 checks.
 
-Audit reads `report.checks.summarize().frame()`; do not call
+Audit reads the bare `report.checks.summarize()` Display; do not call
 `checks.add` from `audit/` (no `put` there).
