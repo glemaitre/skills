@@ -2,7 +2,7 @@
 name: explore-ml-data
 description: >
   Owns data understanding before any model is designed. Place
-  `data_analysis/data_analysis.py`, run `cells run`, write
+  `data_analysis/data_analysis.py`, execute it once, write
   `data_analysis.md` and JOURNAL § Data understanding. Never
   design the model, edit `src/<pkg>/`, or modify raw data files.
 
@@ -180,7 +180,7 @@ Details: `references/cell_anatomy.md`. Extra recipes:
 - [ ] IPython available or add-python-package
 - [ ] Load plot-ml-figure if installed; place
       data_analysis/data_analysis.py from the template (edit to
-      the live path); cells run
+      the live path); one execution matching notebook policy
 - [ ] scratch/data_analysis/facts.py → <slug>.json per family
       + extras.json
 - [ ] Author data_analysis.md + JOURNAL
@@ -196,7 +196,7 @@ evidence. End of turn only after Close.
 
 After G-DATA-ANALYSIS, G-TABULAR, target, families, and IPython
 are resolved, emit 1–3 natural sentences immediately before the
-first notebook write / `cells run`. Say that this is **local
+first notebook write / execution. Say that this is **local
 computation**: it profiles the confirmed full table family or
 families, runs duplicate / target / bivariate / leakage analyses
 that apply, and writes `data_analysis/` HTML / figures plus
@@ -242,9 +242,16 @@ not write or execute the notebook.
    if installed **before** writing figure cells (including this
    first write). Markdown is about **this** analysis.
    `python -m skore_skills style` after the write.
-2. `python -m skore_skills cells run
-   data_analysis/data_analysis.py` — writes HTML and PNGs. A
-   useless TableReport `repr` in the digest is expected.
+2. Read `status.policy.notebooks` and `status.policy.site`.
+   When notebooks is `true`, run
+   `python -m skore_skills notebook convert
+   data_analysis/data_analysis.py`, adding `--html` only when
+   site is also `true`. This is the one execution and writes the
+   notebook plus the analysis HTML and PNGs; do not also run
+   `cells run`. When notebooks is `null` or `false`, do not
+   change policy: run `python -m skore_skills cells run
+   data_analysis/data_analysis.py` instead. A useless TableReport
+   `repr` in the digest is expected on that path.
 3. Copy `templates/facts.py` → `scratch/data_analysis/facts.py`
    with the same families and target; run it; read
    `scratch/data_analysis/<slug>.json` (each family) and
@@ -273,7 +280,7 @@ not write or execute the notebook.
 6. **Continuation board** — unless the user already closed
    the turn (“EDA is done”, “close the turn”): if `policy.site`
    is true and `export-ml-site` is installed, run
-   `python -m skore_skills site build` first. Skip in one line
+   `python -m skore_skills site build --if-stale` first. Skip in one line
    otherwise. If `site build` errors with `mkdocs-material is
    required`, load `add-python-package` for `mkdocs-material`
    (agent) and build once more. Do not `pixi add` / `uv add`.
@@ -326,8 +333,9 @@ then leave the figure/grid as the cell output.
 
 ## Keep exploring
 
-No convert, no `git end-turn`. Do not run a **second** `site
-build` until the md is rewritten. Do not say “extra-analyses”
+No separate export pass and no `git end-turn`; the policy-matched
+one execution may update the notebook. Do not run a **second**
+site build until the md is rewritten. Do not say “extra-analyses”
 or “standard extra analysis” **anywhere this turn** (chat,
 checklists, or the board). The file
 `references/extra_analyses.md` may be named as a path only.
@@ -383,7 +391,8 @@ board for this pick.
    column.
 4. **Describe a plot** — load `plot-ml-figure` if installed;
    append cells.
-5. Picks that change the `.py`: `style`, `cells run`, refresh
+5. Picks that change the `.py`: `style`, then repeat run-path
+   step 2 so notebook-enabled work executes exactly once; refresh
    facts, rewrite `data_analysis.md` from JSON/PNGs/HTML
    (implications from **results**). Then preview `site build` if
    `policy.site` and re-ask the five-option board (run path
@@ -415,7 +424,8 @@ rewrite `data_analysis.md` in this block.
 
 The user-facing message is a short story plus links. It is not
 Pre-flight, not a dump of markdown, and not JOURNAL table cells
-alone.
+alone. Do not name `site build`, `--if-stale`, or other wrapper
+commands in that message.
 
 1. **Narrative first** — 2–6 sentences of findings for this
    stage, grounded in Modelling implications / the JSON facts
@@ -436,16 +446,19 @@ summary (optional md / site link); it never reaches convert /
 `git end-turn`.
 
 If `policy.notebooks` is true, `export-ml-notebook` is installed,
-run `python -m skore_skills notebook convert
+and this run did not already write a current notebook, run
+`python -m skore_skills notebook convert
 data_analysis/data_analysis.py`, with `--html` when `policy.site`
-is also true. Skip in one line otherwise. If convert fails
+is also true. A notebook produced by run-path step 2 is current:
+do not execute it again merely because the user picked Close.
+Skip in one line otherwise. If convert fails
 because `ipywidgets` is missing, load `add-python-package` for
 it (agent) and convert again. Missing jupytext / nbclient /
 nbconvert → one-line skip naming `add-python-package`;
 do not fail the turn, do not `pixi add`.
 
 Then, if `policy.site` is true, `export-ml-site` is installed, run
-`python -m skore_skills site build` after durable files are on
+`python -m skore_skills site build --if-stale` after durable files are on
 disk. Skip in one line otherwise. If `site build` errors with
 `mkdocs-material is required`, load `add-python-package` for
 `mkdocs-material` (agent) and build once more. Do not

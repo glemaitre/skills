@@ -294,6 +294,65 @@ def test_notebook_convert_html(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     )
 
 
+def test_notebook_convert_writes_digest_from_same_execution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``--digest`` renders outputs without starting a second execution."""
+    src = tmp_path / "audit.py"
+    src.write_text("# %% [markdown]\n# ## Checks\n# %%\n1 + 1\n", encoding="utf-8")
+    payload = {
+        "cells": [
+            {"cell_type": "markdown", "source": "## Checks", "outputs": []},
+            {"cell_type": "code", "source": "1 + 1", "outputs": []},
+        ]
+    }
+    executions = 0
+    written: dict[str, object] = {}
+    monkeypatch.setattr(
+        notebook_mod, "jupytext", SimpleNamespace(read=lambda path: payload)
+    )
+
+    def write(notebook: object, dest: object) -> None:
+        written["notebook"] = notebook
+        Path(dest).write_text("nb", encoding="utf-8")
+
+    monkeypatch.setattr(notebook_mod, "nbformat", _stub_nbformat(write=write))
+
+    class FakeClient:
+        def __init__(
+            self, notebook: object, timeout: int, kernel_name: str, **kwargs: object
+        ) -> None:
+            self.notebook = notebook
+
+        def execute(self) -> object:
+            nonlocal executions
+            executions += 1
+            payload["cells"][2]["outputs"] = [
+                {
+                    "output_type": "execute_result",
+                    "data": {"text/plain": "2"},
+                }
+            ]
+            return self.notebook
+
+    monkeypatch.setattr(notebook_mod, "NotebookClient", FakeClient)
+    digest = tmp_path / "scratch" / "audit.md"
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(
+        cli,
+        ["notebook", "convert", str(src), "--digest", str(digest)],
+    )
+    assert result.exit_code == 0, result.output
+    assert executions == 1
+    text = digest.read_text(encoding="utf-8")
+    assert "## Checks" in text
+    assert "**output:**\n```\n2\n```" in text
+    metadata = written["notebook"]["metadata"]  # type: ignore[index]
+    assert metadata["skore_skills"]["source_sha256"] == (
+        notebook_mod.source_fingerprint(src)
+    )
+
+
 def test_notebook_convert_html_import_error(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

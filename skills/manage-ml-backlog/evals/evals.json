@@ -65,12 +65,12 @@
     {
       "id": 4,
       "title": "Site on rebuilds after backlog",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Audit digest exists with a headline ROC-AUC.\n- Smoke tests passed.\n- History row for `01_baseline` is `running`.\n- `policy.site` is true.\n- `export-ml-site` is installed.]\n\nThe 01_baseline run finished. Record it.",
-      "expected_output": "Behavioural response satisfying: - Copy the headline result into the History row. - Run `python -m skore_skills site build` before git end-turn. - Run `python -m skore_skills git end-turn --stage backlog`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Fail the backlog turn if site build errors. - Run `notebook convert`.",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Audit digest exists with a headline ROC-AUC.\n- Smoke tests passed.\n- History row for `01_baseline` is `running`.\n- `policy.site` is true.\n- `export-ml-site` is installed.\n- The user asked directly. This is not a dispatch from\n  `model-ml-pipeline`, `evaluate-ml-pipeline`, or\n  `audit-ml-pipeline`.]\n\nThe 01_baseline run finished. Record it.",
+      "expected_output": "Behavioural response satisfying: - Copy the headline result into the History row. - Run `python -m skore_skills site build --if-stale` before git end-turn. - Run `python -m skore_skills git end-turn --stage backlog`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Fail the backlog turn if site build errors. - Run `notebook convert`.",
       "files": [],
       "expectations": [
         "Copy the headline result into the History row.",
-        "Run `python -m skore_skills site build` before git end-turn.",
+        "Run `python -m skore_skills site build --if-stale` before git end-turn.",
         "Run `python -m skore_skills git end-turn --stage backlog`.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Fail the backlog turn if site build errors.",

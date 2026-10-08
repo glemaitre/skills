@@ -108,3 +108,26 @@
 - Run `pixi add` or `uv add`.
 - Run `notebook convert`.
 - AskUserQuestion for the site gate.
+
+---
+
+## CASE_06 — Workflow checkpoint skips a current site
+
+**User prompt:**
+> Show me the updated report before I choose the next analysis.
+
+**Assumed workspace state:**
+- `policy.site` is true.
+- The stage finished its Python work and durable Markdown batch.
+- `site build --if-stale` may find unchanged inputs.
+
+**Must do:**
+- Run `python -m skore_skills site build --if-stale` once before
+  the user decision.
+- Link `report.html` whether MkDocs rebuilt or reported the site
+  current.
+
+**Must NOT do:**
+- Rebuild between individual Markdown edits in the same batch.
+- Enable notebook policy.
+- Treat a current-site no-op as an error.

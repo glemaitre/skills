@@ -341,13 +341,13 @@
         "Name this order. A no-tools turn that lists each command satisfies the step. Saying the command was not executed does not fail it. `loop notebooks` continues only on `skip`. `record` is `loop artifacts`, not this gate.",
         "Name `python -m skore_skills loop notebooks --stem <stem>` before record-outcome. On `convert`, name `notebook convert` on every `sources` entry (`--html` when `html` is true), including `experiments/<stem>.py` and `audit/<stem>.py` when that file exists. Do not add `<!-- results-embed: audit -->`.",
         "If the experiment script was converted, name snapshot and `loop locator` before record-outcome.",
-        "Name audit when available, then record-outcome with that locator, then `site build`, then `git end-turn --stage evaluate`.",
+        "Name audit when available, then record-outcome with that locator, then the close-time `site build --if-stale`, then `git end-turn --stage evaluate`. A post-snapshot `site build --if-stale` may also run earlier so the evaluation notebook is visible; it does not replace this close build.",
         "If git returns `invoke`, name `persist-ml-git` and stop, because it returns to triage.",
         "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
         "The response does NOT: Record before the locator exists.",
         "The response does NOT: End the turn, or convert only the audit file, while `action` is `convert`.",
         "The response does NOT: Skip `notebook convert` on `experiments/<stem>.py` because the script already contains `skore.evaluate`.",
-        "The response does NOT: Build the site before record-outcome.",
+        "The response does NOT: Treat the post-snapshot preview as the finished close, or skip the close-time `site build --if-stale` after record-outcome.",
         "The response does NOT: Load triage a second time after `persist-ml-git`."
       ],
       "tools": false,
@@ -538,6 +538,23 @@
         "The response does NOT: Omit `splitter=` or pass the training table into `evaluate`.",
         "The response does NOT: Concatenate the two tables before the call.",
         "The response does NOT: Pass positional `X, y` for a `SkrubLearner`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 28,
+      "title": "Notebook-enabled evaluation executes once",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- Evaluate consent is `proceed`; smoke is green.\n- `policy.notebooks` and `policy.site` are true.\n- Notebook and site export skills are installed.]\n\nEvaluate the approved baseline.",
+      "expected_output": "Behavioural response satisfying: - Execute with `python -m skore_skills notebook convert experiments/01_baseline.py --html`. - After the snapshot, run `python -m skore_skills site build --if-stale` before the next review or user gate. It must NOT: - Run the experiment script separately before notebook convert. - Wait for final close to expose the completed evaluation. - Enable either policy when its value is null or false.",
+      "files": [],
+      "expectations": [
+        "Execute with `python -m skore_skills notebook convert experiments/01_baseline.py --html`.",
+        "After the snapshot, run `python -m skore_skills site build --if-stale` before the next review or user gate.",
+        "The response does NOT: Run the experiment script separately before notebook convert.",
+        "The response does NOT: Wait for final close to expose the completed evaluation.",
+        "The response does NOT: Enable either policy when its value is null or false."
       ],
       "tools": false,
       "sandbox": [],

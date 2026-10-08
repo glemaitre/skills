@@ -188,22 +188,27 @@
 - `policy.notebooks` is true. `policy.site` is true.
 - `export-ml-notebook` and `export-ml-site` are installed.
 - `jupytext`, `nbclient`, `ipywidgets`, and `nbconvert` are installed.
+- The completed EDA execution already wrote a source-current
+  `.ipynb` and `.nb.html`.
 
 **Must do:**
 - Write 2–6 sentences of EDA findings.
 - Name `report.html` and `html/data_analysis.html` in the
   user-facing close. Do not send the user to
   `data_analysis/data_analysis.md` instead.
-- Run `python -m skore_skills notebook convert
-  data_analysis/data_analysis.py --html` before site build.
-- Run `python -m skore_skills site build` before git end-turn.
+- Do not execute `data_analysis.py` again on Close.
+- Run `python -m skore_skills site build --if-stale` before git
+  end-turn; it may report that the site is current.
 - Run `python -m skore_skills git end-turn --stage data_analysis`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Paste the full `data_analysis.md` into chat.
+- Name `site build` or `--if-stale` in the user-facing close.
+  Housekeeping may name the command.
 - Fail the data-analysis turn if site build errors; name the error.
 - Run `cells run` as a substitute for convert.
+- Re-run `notebook convert` for the source-current notebook.
 - Run `git commit` in this skill.
 
 ---
@@ -420,7 +425,7 @@
 - The user has not picked Close.
 
 **Must do:**
-- Run `python -m skore_skills site build` after the md and
+- Run `python -m skore_skills site build --if-stale` after the md and
   before the continuation board.
 - Name `report.html` and `html/data_analysis.html`.
 - AskUserQuestion one pick, none recommended: Choose additional
@@ -437,7 +442,7 @@
 - Invent a domain-specific checklist skill or `references/domains/`.
 - Run `python -m skore_skills site build` again on the
   continuation board.
-- Run `notebook convert` before Close.
+- Run a second notebook execution after the checkpoint.
 - Ask keep-exploring versus close as its own question, instead
   of the five-option board.
 - Say “extra-analyses” or “standard extra analysis” on that
@@ -724,7 +729,7 @@
 
 **Must do:**
 - After `data_analysis.md` and JOURNAL, name
-  `python -m skore_skills site build`.
+  `python -m skore_skills site build --if-stale`.
 - Name `report.html` and `html/data_analysis.html`.
 - Then AskUserQuestion one pick, none recommended: Choose
   additional pre-defined option; Provide a query to extend the
@@ -828,12 +833,12 @@
 - `policy.site` is true.
 - `export-ml-site` is installed.
 - `add-python-package` is installed.
-- `python -m skore_skills site build` printed
+- `python -m skore_skills site build --if-stale` printed
   `mkdocs-material is required; add it with add-python-package`.
 
 **Must do:**
 - After `data_analysis.md` and JOURNAL, load `add-python-package`
-  for `mkdocs-material` and run `python -m skore_skills site build`
+  for `mkdocs-material` and run `python -m skore_skills site build --if-stale`
   again.
 - Then AskUserQuestion one pick, none recommended: Choose
   additional pre-defined option; Provide a query to extend the

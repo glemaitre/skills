@@ -170,6 +170,41 @@ def test_site_build_runs_mkdocs(
     assert "report.html" in (tmp_path / ".gitignore").read_text(encoding="utf-8")
 
 
+def test_site_build_if_stale_skips_until_an_input_changes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Checkpoint builds are cheap when their staged inputs are unchanged."""
+    _scaffold(tmp_path)
+    calls = 0
+
+    def fake_run(argv: list[str], **kwargs: object) -> object:
+        nonlocal calls
+        calls += 1
+        return _ok_mkdocs(tmp_path)(argv)
+
+    monkeypatch.setattr(site_mod.subprocess, "run", fake_run)
+    monkeypatch.chdir(tmp_path)
+    first = CliRunner().invoke(cli, ["site", "build", "--if-stale"])
+    second = CliRunner().invoke(cli, ["site", "build", "--if-stale"])
+    assert first.exit_code == 0, first.output
+    assert second.exit_code == 0, second.output
+    assert "site is current" in second.output
+    assert calls == 1
+
+    asset = tmp_path / "scratch" / "results" / "01_baseline" / "pipeline" / "app.css"
+    asset.parent.mkdir(parents=True)
+    asset.write_text("body {}\n", encoding="utf-8")
+    asset_refresh = CliRunner().invoke(cli, ["site", "build", "--if-stale"])
+    assert asset_refresh.exit_code == 0, asset_refresh.output
+    assert calls == 2
+
+    journal = tmp_path / "journal" / "JOURNAL.md"
+    journal.write_text("# JOURNAL\n\nChanged\n", encoding="utf-8")
+    refreshed = CliRunner().invoke(cli, ["site", "build", "--if-stale"])
+    assert refreshed.exit_code == 0, refreshed.output
+    assert calls == 3
+
+
 def test_site_build_omits_data_understanding_without_eda(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

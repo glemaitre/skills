@@ -278,6 +278,24 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 16,
+      "title": "Journal edit refreshes the live site",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `frame show` asks for `generalize_to`.\n- `policy.site` is true and `export-ml-site` is installed.]\n\nUse grouped validation by hospital.",
+      "expected_output": "Behavioural response satisfying: - Write the answered Modeling decisions cell. - Run `python -m skore_skills site build --if-stale` after the Markdown batch and before the next framing question. - Link `report.html`. It must NOT: - Enable notebooks or site policy. - Build between individual edits in the same Markdown batch. - Run `notebook convert`.",
+      "files": [],
+      "expectations": [
+        "Write the answered Modeling decisions cell.",
+        "Run `python -m skore_skills site build --if-stale` after the Markdown batch and before the next framing question.",
+        "Link `report.html`.",
+        "The response does NOT: Enable notebooks or site policy.",
+        "The response does NOT: Build between individual edits in the same Markdown batch.",
+        "The response does NOT: Run `notebook convert`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

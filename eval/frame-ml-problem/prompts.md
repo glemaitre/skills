@@ -410,3 +410,25 @@
 - Invent deployment, horizon, gap, or time role.
 - AskUserQuestion with Lock, Modify, and Stop.
 - Set Status to `locked`.
+
+---
+
+## CASE_16 — Journal edit refreshes the live site
+
+**User prompt:**
+> Use grouped validation by hospital.
+
+**Assumed workspace state:**
+- `frame show` asks for `generalize_to`.
+- `policy.site` is true and `export-ml-site` is installed.
+
+**Must do:**
+- Write the answered Modeling decisions cell.
+- Run `python -m skore_skills site build --if-stale` after the
+  Markdown batch and before the next framing question.
+- Link `report.html`.
+
+**Must NOT do:**
+- Enable notebooks or site policy.
+- Build between individual edits in the same Markdown batch.
+- Run `notebook convert`.

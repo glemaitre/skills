@@ -89,6 +89,23 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 6,
+      "title": "Workflow checkpoint skips a current site",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `policy.site` is true.\n- The stage finished its Python work and durable Markdown batch.\n- `site build --if-stale` may find unchanged inputs.]\n\nShow me the updated report before I choose the next analysis.",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills site build --if-stale` once before the user decision. - Link `report.html` whether MkDocs rebuilt or reported the site current. It must NOT: - Rebuild between individual Markdown edits in the same batch. - Enable notebook policy. - Treat a current-site no-op as an error.",
+      "files": [],
+      "expectations": [
+        "Run `python -m skore_skills site build --if-stale` once before the user decision.",
+        "Link `report.html` whether MkDocs rebuilt or reported the site current.",
+        "The response does NOT: Rebuild between individual Markdown edits in the same batch.",
+        "The response does NOT: Enable notebook policy.",
+        "The response does NOT: Treat a current-site no-op as an error."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }

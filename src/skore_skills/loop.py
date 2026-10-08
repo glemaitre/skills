@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import json
 import re
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
+from skore_skills.notebook import source_fingerprint
 from skore_skills.policy import load_policy
 
 MISSING_LOCATOR = "n/a — backend did not expose a locator"
@@ -104,6 +106,19 @@ def loop_locator(root: Path, stem: str) -> dict[str, Any]:
     }
 
 
+def _notebook_is_current(src: Path, notebook: Path) -> bool:
+    if not notebook.is_file():
+        return False
+    with suppress(json.JSONDecodeError, OSError, TypeError):
+        payload = json.loads(notebook.read_text(encoding="utf-8"))
+        recorded = (
+            payload.get("metadata", {}).get("skore_skills", {}).get("source_sha256")
+        )
+        if recorded is not None:
+            return recorded == source_fingerprint(src)
+    return notebook.stat().st_mtime_ns >= src.stat().st_mtime_ns
+
+
 def _missing_notebook_sources(root: Path, stem: str, *, html: bool) -> list[str]:
     sources: list[str] = []
     for folder in ("experiments", "audit"):
@@ -112,7 +127,13 @@ def _missing_notebook_sources(root: Path, stem: str, *, html: bool) -> list[str]
             continue
         ipynb = src.with_suffix(".ipynb")
         nb_html = src.with_name(f"{stem}.nb.html")
-        if not ipynb.is_file() or (html and not nb_html.is_file()):
+        notebook_current = _notebook_is_current(src, ipynb)
+        html_current = (
+            nb_html.is_file()
+            and ipynb.is_file()
+            and nb_html.stat().st_mtime_ns >= ipynb.stat().st_mtime_ns
+        )
+        if not notebook_current or (html and not html_current):
             sources.append(f"{folder}/{stem}.py")
     return sources
 

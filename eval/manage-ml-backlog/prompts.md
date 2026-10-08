@@ -95,10 +95,14 @@
 - History row for `01_baseline` is `running`.
 - `policy.site` is true.
 - `export-ml-site` is installed.
+- The user asked directly. This is not a dispatch from
+  `model-ml-pipeline`, `evaluate-ml-pipeline`, or
+  `audit-ml-pipeline`.
 
 **Must do:**
 - Copy the headline result into the History row.
-- Run `python -m skore_skills site build` before git end-turn.
+- Run `python -m skore_skills site build --if-stale` before git
+  end-turn.
 - Run `python -m skore_skills git end-turn --stage backlog`.
 
 **Must NOT do:**

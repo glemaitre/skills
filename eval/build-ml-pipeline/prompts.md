@@ -605,7 +605,7 @@ violated.
 - After the unfitted Method snapshot
   (`scratch/results/01_baseline/pipeline/` when `DataOp.skb.report`
   accepts `eval`, otherwise `pipeline.html`), run
-  `python -m skore_skills site build` before `smoke run` and
+  `python -m skore_skills site build --if-stale` before `smoke run` and
   before the Evaluate question.
 - In the checkpoint, link `report.html` and
   `html/01_baseline.html` (Method DataOp report). Do not link the

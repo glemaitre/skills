@@ -40,6 +40,15 @@ On desktop, site pages are in the top bar (experiments in a
 scrollable dropdown) and the page contents are in a collapsible
 left rail beside a 1200px report column. Mobile uses a drawer.
 
+Workflow stages publish at completed checkpoints, after their
+Python execution and final durable Markdown batch and before the
+next user decision. They call `site build --if-stale`: unchanged
+inputs skip MkDocs. This is coalescing, not a file-save hook; do
+not build between related Markdown edits. Only `policy.site`
+`true` enables these automatic builds. `null` and `false` do not
+change policy. A direct user request to rebuild uses `site build`
+without `--if-stale`.
+
 ## Sequence
 
 1. `python -m skore_skills status`. Read `policy.site`.
@@ -74,7 +83,7 @@ user to approve or continue must rebuild the site **before**
 that AskUserQuestion / consent stop — not only at End of turn.
 
 1. If `policy.site` is true and this skill is installed, run
-   `python -m skore_skills site build`. Skip in one line
+   `python -m skore_skills site build --if-stale`. Skip in one line
    otherwise. If `site build` errors with `mkdocs-material is
    required`, load `add-python-package` for `mkdocs-material`
    (agent) and build once more. Do not `pixi add` / `uv add`.
@@ -87,8 +96,9 @@ that AskUserQuestion / consent stop — not only at End of turn.
    addition, never the context.
 3. Do **not** `notebook convert`, `git end-turn`, or `git commit`
    on this preview rebuild. Do not re-run `site init`.
-4. Convert + a later `site build` remain End of turn after the
-   user **closes** the stage.
+4. Close-time conversion and build remain a freshness safety
+   gate. Current notebooks and site inputs skip execution/build;
+   changed or missing outputs are refreshed.
 
 ## Stop conditions
 

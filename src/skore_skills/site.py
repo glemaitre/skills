@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import re
@@ -17,6 +18,7 @@ HTML_DIR = "html"
 BUILD_DIR = Path("_build")
 DOCS_DIR = BUILD_DIR / "docs"
 GENERATED_CONFIG = BUILD_DIR / CONFIG_NAME
+BUILD_STATE = BUILD_DIR / "site-state.json"
 SITE_ASSETS = Path(__file__).with_name("site_assets")
 STAGED_ASSETS = Path("assets") / "skore"
 GITIGNORE_LINES = (f"{BUILD_DIR.as_posix()}/", f"{HTML_DIR}/")
@@ -717,7 +719,62 @@ def init_site(root: Path, *, force: bool = False) -> Path:
     return gitignore
 
 
-def build_site(root: Path) -> str:
+def _site_input_paths(root: Path) -> list[Path]:
+    paths: list[Path] = []
+    pyproject = root / "pyproject.toml"
+    if pyproject.is_file():
+        paths.append(pyproject)
+    for pattern in (
+        "journal/*.md",
+        "data_analysis/*.md",
+        "data_analysis/*.html",
+        "data_analysis/*.png",
+        "data_analysis/*.jpg",
+        "data_analysis/*.jpeg",
+        "data_analysis/*.svg",
+        "data_analysis/*.gif",
+        "experiments/*.nb.html",
+        "audit/*.nb.html",
+    ):
+        paths.extend(path for path in root.glob(pattern) if path.is_file())
+    results = root / "scratch" / "results"
+    if results.is_dir():
+        paths.extend(path for path in results.rglob("*") if path.is_file())
+    paths.extend(path for path in SITE_ASSETS.rglob("*") if path.is_file())
+    return sorted(set(paths), key=lambda path: path.as_posix())
+
+
+def site_fingerprint(root: Path) -> str:
+    """Return a content fingerprint for every input copied into the site."""
+    digest = hashlib.sha256(root.name.encode())
+    for path in _site_input_paths(root):
+        try:
+            name = path.relative_to(root).as_posix()
+        except ValueError:
+            name = f"bundled/{path.relative_to(SITE_ASSETS).as_posix()}"
+        digest.update(name.encode())
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _site_is_current(root: Path, fingerprint: str) -> bool:
+    state = root / BUILD_STATE
+    if not (
+        state.is_file()
+        and (root / HTML_DIR / "index.html").is_file()
+        and (root / launcher_name(root)).is_file()
+    ):
+        return False
+    try:
+        payload = json.loads(state.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return False
+    return payload.get("fingerprint") == fingerprint
+
+
+def build_site(root: Path, *, if_stale: bool = False) -> str:
     """Stage sources, write ``_build/mkdocs.yml``, and run ``mkdocs build``.
 
     Raises
@@ -729,6 +786,9 @@ def build_site(root: Path) -> str:
     """
     if not is_scaffolded(root):
         raise ValueError("workspace is not scaffolded")
+    fingerprint = site_fingerprint(root)
+    if if_stale and _site_is_current(root, fingerprint):
+        return f"site is current: {root / launcher_name(root)}"
     ensure_site_gitignore(root)
     _docs, pages, stub_home = stage_docs(root)
     write_generated_config(root, pages, stub_home=stub_home)
@@ -750,6 +810,9 @@ def build_site(root: Path) -> str:
         raise RuntimeError(MISSING_INDEX)
     launcher = root / launcher_name(root)
     launcher.write_text(render_launcher(site_title(root)), encoding="utf-8")
+    state = root / BUILD_STATE
+    state.parent.mkdir(parents=True, exist_ok=True)
+    state.write_text(json.dumps({"fingerprint": fingerprint}) + "\n", encoding="utf-8")
     extra = (completed.stdout or "").strip()
     if extra:
         return f"{extra}\n{launcher}"

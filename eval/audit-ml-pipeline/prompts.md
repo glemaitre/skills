@@ -150,11 +150,12 @@
   `scratch/audit/<stem>/accessors.txt`, not in the notebook.
 - A tree's `Displays` group lists one extra view; `api get` confirms
   that method.
+- `policy.notebooks` and `policy.site` are true.
 
 **Must do:**
 - Refresh the execution preview for the selected view because it
   materially changes report rendering; do not repeat it before
-  every style / cells command.
+  every style / execution command.
 - Present Additional report view / Custom query / Custom plot /
   Close audit in that exact order.
 - Offer only accessor names from this turn's `Displays` groups — not
@@ -162,16 +163,18 @@
 - Confirm the selected accessor with `api get`, append it below
   `## Core audit complete` on the same `audit/<stem>.py` as a bare
   Display, write `scratch/results/<stem>/<slug>.html` from
-  `viewers.py` only, run style + cells run, re-run `viewers.py`,
-  and overwrite the digest.
-- Recompute G-AUDIT-FINDING with `audit finding --stem <stem>` and
-  present the same gate again.
+  `viewers.py` only, run style, then execute once with
+  `notebook convert audit/<stem>.py --digest
+  scratch/audit/<stem>/audit.md --html`, and re-run `viewers.py`.
+- Recompute G-AUDIT-FINDING with `audit finding --stem <stem>`.
+- Run `site build --if-stale`, then present the same gate again.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Guess an accessor or show unavailable disabled choices.
-- Convert notebooks, build the site, run git end-turn,
-  record-outcome, or return to the dispatcher before Close audit.
+- Run `cells run` in addition to notebook convert.
+- Run git end-turn, record-outcome, or return to the dispatcher
+  before Close audit.
 - Call `evaluate` or `put`.
 - Name ROC / confusion_matrix / permutation_importance from docs
   memory when they are absent from this turn's `accessors.txt`

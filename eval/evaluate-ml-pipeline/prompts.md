@@ -595,8 +595,10 @@ violated.
 - If the experiment script was converted, name snapshot and
   `loop locator` before record-outcome.
 - Name audit when available, then record-outcome with that
-  locator, then `site build`, then
-  `git end-turn --stage evaluate`.
+  locator, then the close-time `site build --if-stale`, then
+  `git end-turn --stage evaluate`. A post-snapshot
+  `site build --if-stale` may also run earlier so the evaluation
+  notebook is visible; it does not replace this close build.
 - If git returns `invoke`, name `persist-ml-git` and stop,
   because it returns to triage.
 
@@ -607,7 +609,9 @@ violated.
   is `convert`.
 - Skip `notebook convert` on `experiments/<stem>.py` because the
   script already contains `skore.evaluate`.
-- Build the site before record-outcome.
+- Treat the post-snapshot preview as the finished close, or
+  skip the close-time `site build --if-stale` after
+  record-outcome.
 - Load triage a second time after `persist-ml-git`.
 
 ---
@@ -898,3 +902,27 @@ violated.
 - Omit `splitter=` or pass the training table into `evaluate`.
 - Concatenate the two tables before the call.
 - Pass positional `X, y` for a `SkrubLearner`.
+
+---
+
+## CASE_28 — Notebook-enabled evaluation executes once
+
+**User prompt:**
+> Evaluate the approved baseline.
+
+**Assumed workspace state:**
+- Evaluate consent is `proceed`; smoke is green.
+- `policy.notebooks` and `policy.site` are true.
+- Notebook and site export skills are installed.
+
+**Must do:**
+- Execute with `python -m skore_skills notebook convert
+  experiments/01_baseline.py --html`.
+- After the snapshot, run
+  `python -m skore_skills site build --if-stale` before the next
+  review or user gate.
+
+**Must NOT do:**
+- Run the experiment script separately before notebook convert.
+- Wait for final close to expose the completed evaluation.
+- Enable either policy when its value is null or false.

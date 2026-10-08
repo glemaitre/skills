@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -179,6 +180,29 @@ def test_notebooks_experiment_only(tmp_path: Path) -> None:
     present = loop_notebooks(tmp_path, stem)
     assert present["action"] == "skip"
     assert present["reason"] == "already_present"
+
+
+def test_notebooks_changed_source_requires_conversion(tmp_path: Path) -> None:
+    """A source fingerprint prevents an existing stale notebook from passing."""
+    stem = "01_x"
+    _policy(tmp_path, notebooks=True, site=False)
+    source = tmp_path / "experiments" / f"{stem}.py"
+    _touch(source, "# %%\n1\n")
+    _touch(tmp_path / "scratch" / "results" / stem / "report.html")
+    fingerprint = hashlib.sha256(source.read_bytes()).hexdigest()
+    notebook = {
+        "metadata": {"skore_skills": {"source_sha256": fingerprint}},
+        "cells": [],
+    }
+    _touch(
+        tmp_path / "experiments" / f"{stem}.ipynb",
+        json.dumps(notebook),
+    )
+    assert loop_notebooks(tmp_path, stem)["reason"] == "already_present"
+    source.write_text("# %%\n2\n", encoding="utf-8")
+    stale = loop_notebooks(tmp_path, stem)
+    assert stale["action"] == "convert"
+    assert stale["sources"] == [f"experiments/{stem}.py"]
 
 
 def test_notebooks_experiment_and_audit_require_html(tmp_path: Path) -> None:
