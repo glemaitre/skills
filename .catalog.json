@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "d6309a1bb962136d88669f9497ee77cc00dbaf576b130b57c026bd2524282874",
+  "catalog_hash": "8fb2ae30881522cf3958c1607ccbd5be46d8d527263097a39f2a1821d5b1ec7c",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -18,10 +18,10 @@
       "id": "frame-ml-problem",
       "path": "skills/frame-ml-problem",
       "title": "Frame ML Problem",
-      "summary": "Lock the problem, deployment setting, metric, baseline, and fold count before any model code.",
+      "summary": "Record the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "01592ba9e2f73bf10980e193a4e29eaf1cf1ce5697e7648b0a511cf39739ce9f"
+      "hash": "2ce0f8def021315100346a50c3f351495326a308e13cc38296de180e5aca4f7e"
     },
     {
       "id": "build-ml-pipeline",
