@@ -353,6 +353,39 @@ def test_notebook_convert_writes_digest_from_same_execution(
     )
 
 
+def test_render_digest_covers_streams_errors_and_blank_cells(tmp_path: Path) -> None:
+    """Stream, error, and empty cells are part of the audit digest."""
+    src = tmp_path / "audit.py"
+    src.write_text("# %%\n", encoding="utf-8")
+    text = notebook_mod.render_digest(
+        src,
+        {
+            "cells": [
+                {
+                    "cell_type": "code",
+                    "source": "   ",
+                    "outputs": [
+                        {"output_type": "stream", "name": "stderr", "text": "warn\n"},
+                        {"output_type": "execute_result", "data": "2"},
+                        {"output_type": "display_data", "data": {}},
+                        {
+                            "output_type": "error",
+                            "ename": "ValueError",
+                            "evalue": "bad",
+                        },
+                        {"output_type": "unknown"},
+                    ],
+                }
+            ]
+        },
+    )
+    assert "**stderr:**" in text
+    assert "warn" in text
+    assert "**error:** `ValueError: bad`" in text
+    assert "**output:**" not in text
+    assert "```python" not in text
+
+
 def test_notebook_convert_html_import_error(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

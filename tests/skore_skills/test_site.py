@@ -205,6 +205,30 @@ def test_site_build_if_stale_skips_until_an_input_changes(
     assert calls == 3
 
 
+def test_site_build_if_stale_rebuilds_when_state_is_corrupt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A broken freshness record does not skip the build."""
+    _scaffold(tmp_path)
+    calls = 0
+
+    def fake_run(argv: list[str], **kwargs: object) -> object:
+        nonlocal calls
+        calls += 1
+        return _ok_mkdocs(tmp_path)(argv)
+
+    monkeypatch.setattr(site_mod.subprocess, "run", fake_run)
+    monkeypatch.chdir(tmp_path)
+    first = CliRunner().invoke(cli, ["site", "build", "--if-stale"])
+    assert first.exit_code == 0, first.output
+    state = tmp_path / "_build" / "site-state.json"
+    state.write_text("{", encoding="utf-8")
+    again = CliRunner().invoke(cli, ["site", "build", "--if-stale"])
+    assert again.exit_code == 0, again.output
+    assert "site is current" not in again.output
+    assert calls == 2
+
+
 def test_site_build_omits_data_understanding_without_eda(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
