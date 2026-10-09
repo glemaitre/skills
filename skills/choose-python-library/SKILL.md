@@ -32,9 +32,10 @@ Do not name skill ids or the wrapper CLI in the question.
    later extras (tuning). Not `setup-workspace`. Plotting jobs:
    load `plot-ml-figure` if installed; do not present matplotlib
    vs seaborn vs plotly.
-5. Confirm symbols with `python -m skore_skills api get <dotted>`
-   before writing calls. Scope for one package is
-   `python -m skore_skills env route <pkg>`, not a guess.
+5. Confirm symbols with `python -m skore_skills api get <dotted>...`
+   before writing calls. Several symbols go in one call. Scope
+   for one package is `python -m skore_skills env route <pkg>`,
+   not a guess.
 
 ## Stop conditions
 

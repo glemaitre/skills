@@ -293,7 +293,8 @@ also ask in chat whether the note looks right.
 
 Do not duplicate child-skill methodology. Before new library
 symbols are written, children use
-`python -m skore_skills api get <dotted>`.
+`python -m skore_skills api get <dotted>...`. Several symbols
+go in one call.
 
 ## Stop conditions
 
