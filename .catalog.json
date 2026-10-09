@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "2b3b47641b5cc981d382e988c15b95e55caaeaa8f00ed3ffe9d5a4e356b3f806",
+  "catalog_hash": "d3bb34abce5af75419fcc64318cd489bcb36c834a2fa3c97ca28b73c854b7e2f",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "022dfa76d9f6ada0d154b333640663208bd951c39ace679295dd2435e37b6c34"
+      "hash": "2a5b60f7fc15e6dfe7a898fee6017ce377d9f0f2c99e1edba541c9b6c387a890"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -201,7 +201,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
-      "hash": "831f9d9ed211f8972d9dfd1ddecaacb55e2744991a461dab004a1ba3858c5d39"
+      "hash": "b7e8455efd353210924424ce51e2f45988f599f59c5d035ebc105e154363492f"
     },
     {
       "id": "setup-workspace",

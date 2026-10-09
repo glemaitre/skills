@@ -47,7 +47,7 @@ after listing the boxes.
 - [ ] status + env detect
 - [ ] env.managed: null and setup-ml-project installed → load it and stop | null → say unresolved and stop | false and setup already chose unmanaged → name package and manager, return | false → ask, no --execute | true → continue
 - [ ] classify: editable | add-skore | env route then env add
-- [ ] skrub → env graphviz (execute conda/`dot -c` when allowed)
+- [ ] skrub → env graphviz (install conda Graphviz and verify SVG when allowed)
 ```
 
 ## Sequence
@@ -139,22 +139,24 @@ after listing the boxes.
 
    - `dot` is set, or `action` is `conda` and managed →
      `python -m skore_skills env graphviz --execute` (installs
-     conda Graphviz when needed, then always `dot -c` in the
-     composed env).
+     conda Graphviz when needed, then verifies pydot can render
+     SVG in the composed env).
    - `action` is `system` and `dot` is null → AskUserQuestion
      with two options, quoting JSON `instructions` only:
      1. **I will install Graphviz** (default) — do not wait;
         return.
      2. **Please wait until I confirm** — wait, then re-run
-        `env graphviz --execute` so `dot -c` still runs.
+        `env graphviz --execute` to verify SVG rendering.
    - Unmanaged → do not `--execute`. Show `command` (conda) or
      `instructions` (system) from print-only JSON.
 
-   Never invent `brew` / `apt` / `winget` / `dot -c` from
-   memory. Do not pip-install Graphviz or add it as a Python
-   package on uv / poetry / hatch / pip-venv. Refuse that in
-   prose; do not paste `env add graphviz` or `uv add graphviz`
-   as a command fence.
+   If `--execute` fails, quote its repair diagnostic and stop.
+   Never prescribe `dot -c`, admin rights, or a package-manager
+   repair from memory. Never invent `brew` / `apt` / `dnf` /
+   `pacman` / `zypper` / `winget` from memory. Do not pip-install
+   Graphviz or add it as a Python package on uv / poetry / hatch /
+   pip-venv. Refuse that in prose; do not paste
+   `env add graphviz` or `uv add graphviz` as a command fence.
 
 Return when the import is available, when the user confirmed they
 installed it, when they chose to handle it themselves, or when

@@ -1392,6 +1392,17 @@ def test_env_add_skrub_pip_adds_pydot_not_graphviz(
     assert "graphviz" not in result.output
 
 
+def test_env_add_skrub_poetry_adds_pydot_not_graphviz(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Poetry gets pydot but leaves the native Graphviz install to the OS."""
+    monkeypatch.chdir(FIXTURES / "poetry")
+    result = CliRunner().invoke(cli, ["env", "add", "skrub"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == "poetry add skrub pydot"
+    assert "graphviz" not in result.output
+
+
 def test_env_add_skrub_hatch_writes_pydot(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1407,10 +1418,14 @@ def test_env_add_skrub_hatch_writes_pydot(
 
 
 def _graphviz_run(
-    seen: list[list[str]], *, which: str | None = "/usr/bin/dot", dot_c: int = 0
+    seen: list[list[str]],
+    *,
+    which: str | None = "/usr/bin/dot",
+    probe: int = 0,
+    probe_error: str = "RuntimeError: Graphviz returned non-SVG output\n",
 ) -> Any:
     """Return a subprocess.run stand-in for ``env graphviz`` probes."""
-    from skore_skills.env import DOT_C_SNIPPET, WHICH_DOT_SNIPPET
+    from skore_skills.env import GRAPHVIZ_PROBE_SNIPPET, WHICH_DOT_SNIPPET
 
     def fake_run(argv: list[str], **kwargs: Any) -> Any:
         seen.append(list(argv))
@@ -1424,9 +1439,9 @@ def _graphviz_run(
         if snippet == WHICH_DOT_SNIPPET:
             Result.stdout = (which or "") + "\n"
             Result.returncode = 0
-        elif snippet == DOT_C_SNIPPET:
-            Result.returncode = dot_c
-            Result.stderr = "plugin cache locked\n" if dot_c else ""
+        elif snippet == GRAPHVIZ_PROBE_SNIPPET:
+            Result.returncode = probe
+            Result.stderr = probe_error if probe else ""
         return Result()
 
     return fake_run
@@ -1448,13 +1463,13 @@ def test_env_graphviz_pixi_missing_dot_prints_conda_command(
     assert payload["dot"] is None
     assert payload["command"] == ["pixi", "add", "graphviz"]
     assert "graphviz.org/download" in payload["instructions"]
-    assert not any(argv[-1:] == [env_mod.DOT_C_SNIPPET] for argv in seen)
+    assert not any(argv[-1:] == [env_mod.GRAPHVIZ_PROBE_SNIPPET] for argv in seen)
 
 
-def test_env_graphviz_pixi_execute_adds_then_dot_c(
+def test_env_graphviz_pixi_execute_adds_then_probes_svg(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Managed pixi ``--execute`` installs Graphviz then rebuilds the cache."""
+    """Managed pixi ``--execute`` installs Graphviz then verifies SVG."""
     from skore_skills import env as env_mod
 
     monkeypatch.chdir(FIXTURES / "pixi")
@@ -1481,13 +1496,13 @@ def test_env_graphviz_pixi_execute_adds_then_dot_c(
     payload = json.loads(result.output)
     assert payload["dot"] == "/pixi/env/bin/dot"
     assert ["pixi", "add", "graphviz"] in seen
-    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+    assert any(argv[-1] == env_mod.GRAPHVIZ_PROBE_SNIPPET for argv in seen)
 
 
-def test_env_graphviz_dot_present_execute_only_dot_c(
+def test_env_graphviz_dot_present_execute_only_probes_svg(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """When ``dot`` is already on the env PATH, ``--execute`` only runs ``dot -c``."""
+    """An existing Graphviz is verified without reinstalling or mutating it."""
     from skore_skills import env as env_mod
 
     monkeypatch.chdir(FIXTURES / "pixi")
@@ -1501,7 +1516,8 @@ def test_env_graphviz_dot_present_execute_only_dot_c(
     assert payload["dot"] == "/usr/bin/dot"
     assert payload["command"] is None
     assert ["pixi", "add", "graphviz"] not in seen
-    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+    assert any(argv[-1] == env_mod.GRAPHVIZ_PROBE_SNIPPET for argv in seen)
+    assert all("dot -c" not in " ".join(argv) for argv in seen)
 
 
 def test_env_graphviz_uv_missing_dot_refuses_os_execute(
@@ -1524,40 +1540,68 @@ def test_env_graphviz_uv_missing_dot_refuses_os_execute(
     assert not any(argv[:2] == ["uv", "add"] for argv in seen)
 
 
-def test_env_graphviz_uv_dot_present_runs_dot_c(
+def test_env_graphviz_uv_dot_present_probes_svg(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """System Graphviz already on PATH: ``--execute`` still rebuilds the cache."""
+    """Homebrew Graphviz already on PATH is verified without cache writes."""
     from skore_skills import env as env_mod
 
     monkeypatch.chdir(FIXTURES / "uv")
     seen: list[list[str]] = []
     monkeypatch.setattr(
-        env_mod.subprocess, "run", _graphviz_run(seen, which="/usr/bin/dot")
+        env_mod.subprocess,
+        "run",
+        _graphviz_run(seen, which="/opt/homebrew/bin/dot"),
     )
     result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
     assert result.exit_code == 0, result.output
-    assert any(argv[-1] == env_mod.DOT_C_SNIPPET for argv in seen)
+    assert json.loads(result.output)["dot"] == "/opt/homebrew/bin/dot"
+    assert any(argv[-1] == env_mod.GRAPHVIZ_PROBE_SNIPPET for argv in seen)
+    assert not any(argv[:2] == ["uv", "add"] for argv in seen)
+    assert all("dot -c" not in " ".join(argv) for argv in seen)
 
 
-def test_env_graphviz_dot_c_permission_message(
+def test_env_graphviz_svg_probe_failure_prints_repair_message(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A failed ``dot -c`` names admin rerun; the CLI never sudoes."""
+    """A broken renderer names package repair without admin cache mutation."""
     from skore_skills import env as env_mod
-    from skore_skills.env import DOT_C_ADMIN
+    from skore_skills.env import GRAPHVIZ_REPAIR
 
-    monkeypatch.chdir(FIXTURES / "pixi")
+    monkeypatch.chdir(FIXTURES / "uv")
     seen: list[list[str]] = []
     monkeypatch.setattr(
         env_mod.subprocess,
         "run",
-        _graphviz_run(seen, which="/usr/bin/dot", dot_c=1),
+        _graphviz_run(seen, which="/usr/bin/dot", probe=1),
     )
     result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
     assert result.exit_code != 0
-    assert DOT_C_ADMIN in result.output
+    assert GRAPHVIZ_REPAIR in result.output
+    assert "Graphviz returned non-SVG output" in result.output
     assert not any(argv and argv[0] == "sudo" for argv in seen)
+    assert all("dot -c" not in " ".join(argv) for argv in seen)
+
+
+def test_env_graphviz_missing_pydot_prints_probe_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The SVG probe preserves a concise pydot import failure."""
+    from skore_skills import env as env_mod
+    from skore_skills.env import GRAPHVIZ_REPAIR
+
+    monkeypatch.chdir(FIXTURES / "uv")
+    seen: list[list[str]] = []
+    error = "ModuleNotFoundError: No module named 'pydot'\n"
+    monkeypatch.setattr(
+        env_mod.subprocess,
+        "run",
+        _graphviz_run(seen, probe=1, probe_error=error),
+    )
+    result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
+    assert result.exit_code != 0
+    assert error.strip() in result.output
+    assert GRAPHVIZ_REPAIR in result.output
 
 
 def test_env_graphviz_unmanaged_prints_json(
@@ -1805,14 +1849,49 @@ def test_env_add_hatch_execute_syncs(
 def test_graphviz_instructions_follow_the_platform(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Graphviz instructions name the package manager for the host OS."""
+    """Graphviz instructions cover common OS package managers and PATH refresh."""
     from skore_skills import env as env_mod
     from skore_skills.env import system_graphviz_instructions
 
+    monkeypatch.setattr(env_mod.sys, "platform", "darwin")
+    assert system_graphviz_instructions().startswith("brew install graphviz")
     monkeypatch.setattr(env_mod.sys, "platform", "linux")
+    monkeypatch.setattr(
+        env_mod.platform,
+        "freedesktop_os_release",
+        lambda: {"ID": "ubuntu", "ID_LIKE": "debian"},
+    )
     assert system_graphviz_instructions().startswith("sudo apt-get install graphviz")
+    monkeypatch.setattr(
+        env_mod.platform,
+        "freedesktop_os_release",
+        lambda: {"ID": "fedora"},
+    )
+    assert system_graphviz_instructions().startswith("sudo dnf install graphviz")
+    monkeypatch.setattr(
+        env_mod.platform,
+        "freedesktop_os_release",
+        lambda: {"ID": "arch"},
+    )
+    assert system_graphviz_instructions().startswith("sudo pacman -S graphviz")
+    monkeypatch.setattr(
+        env_mod.platform,
+        "freedesktop_os_release",
+        lambda: {"ID": "opensuse-tumbleweed", "ID_LIKE": "suse"},
+    )
+    assert system_graphviz_instructions().startswith("sudo zypper install graphviz")
+
+    def missing_release() -> dict[str, str]:
+        raise OSError
+
+    monkeypatch.setattr(env_mod.platform, "freedesktop_os_release", missing_release)
+    assert system_graphviz_instructions().startswith(
+        "install Graphviz with your system"
+    )
     monkeypatch.setattr(env_mod.sys, "platform", "win32")
-    assert system_graphviz_instructions().startswith("winget install")
+    windows = system_graphviz_instructions()
+    assert windows.startswith("winget install")
+    assert "Restart the terminal or IDE" in windows
     monkeypatch.setattr(env_mod.sys, "platform", "freebsd")
     assert "system package manager" in system_graphviz_instructions()
 
@@ -1896,9 +1975,9 @@ def test_env_graphviz_conda_execute_installs_both_envs(
 def test_env_graphviz_execute_stops_when_install_fails(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A failed conda Graphviz install is returned and ``dot -c`` is not run."""
+    """A failed conda Graphviz install stops before the SVG probe."""
     from skore_skills import env as env_mod
-    from skore_skills.env import DOT_C_SNIPPET, WHICH_DOT_SNIPPET
+    from skore_skills.env import GRAPHVIZ_PROBE_SNIPPET, WHICH_DOT_SNIPPET
 
     monkeypatch.chdir(FIXTURES / "pixi")
     seen: list[list[str]] = []
@@ -1914,14 +1993,14 @@ def test_env_graphviz_execute_stops_when_install_fails(
         snippet = argv[-1] if argv else ""
         if snippet == WHICH_DOT_SNIPPET:
             Result.returncode = 0
-        elif snippet != DOT_C_SNIPPET:
+        elif snippet != GRAPHVIZ_PROBE_SNIPPET:
             Result.returncode = 7
         return Result()
 
     monkeypatch.setattr(env_mod.subprocess, "run", fake_run)
     result = CliRunner().invoke(cli, ["env", "graphviz", "--execute"])
     assert result.exit_code == 7
-    assert all(argv[-1] != DOT_C_SNIPPET for argv in seen)
+    assert all(argv[-1] != GRAPHVIZ_PROBE_SNIPPET for argv in seen)
 
 
 def test_editable_refuses_unmanaged_and_unnamed_package(
