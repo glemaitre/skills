@@ -95,7 +95,14 @@ def notebook_group() -> None:
     is_flag=True,
     help="Also write <stem>.nb.html next to SRC.",
 )
-def notebook_convert(src: Path, out: Path | None, html: bool) -> None:
+@click.option(
+    "--digest",
+    type=click.Path(dir_okay=False, path_type=Path),
+    help="Also write the executed cells as a Markdown digest.",
+)
+def notebook_convert(
+    src: Path, out: Path | None, html: bool, digest: Path | None
+) -> None:
     """Execute SRC with nbclient and write an .ipynb with outputs."""
     from skore_skills.notebook import convert
 
@@ -104,9 +111,11 @@ def notebook_convert(src: Path, out: Path | None, html: bool) -> None:
         forwarded.extend(["--out", os.fspath(out)])
     if html:
         forwarded.append("--html")
+    if digest is not None:
+        forwarded.extend(["--digest", os.fspath(digest)])
     _reexec_library_command(forwarded)
     try:
-        dest = convert(src, out, html=html)
+        dest = convert(src, out, html=html, digest=digest)
     except (ImportError, FileNotFoundError, OSError) as exc:
         raise click.ClickException(str(exc)) from exc
     except Exception as exc:
@@ -141,13 +150,21 @@ def site_init(force: bool) -> None:
 
 
 @site_group.command("build")
-def site_build() -> None:
+@click.option(
+    "--if-stale",
+    is_flag=True,
+    help="Skip MkDocs when all site inputs already match the built output.",
+)
+def site_build(if_stale: bool) -> None:
     """Package Markdown and existing companions into ``html/``."""
     from skore_skills.site import build_site
 
-    _reexec_library_command(["site", "build"])
+    forwarded = ["site", "build"]
+    if if_stale:
+        forwarded.append("--if-stale")
+    _reexec_library_command(forwarded)
     try:
-        click.echo(build_site(Path.cwd()))
+        click.echo(build_site(Path.cwd(), if_stale=if_stale))
     except (ValueError, FileNotFoundError, RuntimeError) as exc:
         raise click.ClickException(str(exc)) from exc
 

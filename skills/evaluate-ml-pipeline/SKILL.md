@@ -54,9 +54,12 @@ skill ids, `G-*` names, or the wrapper CLI.
    is `declined`, stop in one line. A declined `git` or
    `editable` is not asked again; continue. Then
    `python -m skore_skills frame show` without
-   `--revise`. Anything other than `proceed` loads
-   `frame-ml-problem` and stops. `translation` null → stop.
-   Do not write an evaluation call.
+   `--revise`. If `status.modeling_decisions` is not `locked`,
+   including `draft`, return to `model-ml-pipeline` and stop.
+   Do not ask for consent or storage mode, and do not show a
+   `skore.evaluate` call, even as a preview. Anything other
+   than `proceed` loads `frame-ml-problem` and stops.
+   `translation` null → stop. Do not write an evaluation call.
 2. History-dependent pipeline (backward shift, lag, rolling
    window, target shift, or a join with side history): if
    `tests/smoke/test_<stem>.py` is missing or pytest is red,
@@ -96,10 +99,22 @@ skill ids, `G-*` names, or the wrapper CLI.
 6. Write the call in `experiments/NN_*.py` only. See the call
    shapes below. `python -m skore_skills style` after the edit.
    The experiment ends at `report.checks.summarize()`,
-   `project.put`, and a bare `report`.
+   `project.put`, and a bare `report`. Read notebook/site policy
+   before execution. When `policy.notebooks` is `true`, execute
+   once with `python -m skore_skills notebook convert
+   experiments/<stem>.py`, adding `--html` only when
+   `policy.site` is also `true`; do not separately run the
+   script. When notebooks is `null` or `false`, do not change
+   policy and use the composed-dev script execution.
 7. After `put` has stored the report, copy `templates/snapshot.py`
-   to `scratch/results/<stem>/snapshot.py` and run it. Then End
-   of turn. Do not add snapshot writes to the experiment file.
+   to `scratch/results/<stem>/snapshot.py` and run it. When
+   `policy.site` is `true` and `export-ml-site` is installed,
+   run `python -m skore_skills site build --if-stale` after the
+   snapshot and before audit/review or another user gate. This
+   exposes the completed evaluation notebook and result viewers
+   immediately. It does not replace the close-time build after
+   record-outcome. Then End of turn. Do not add snapshot writes
+   to the experiment file.
 
 Every Python probe goes to `scratch/<ts>_<short>.py` and runs
 with the composed-dev Python from `env verify`. No inline
@@ -270,8 +285,9 @@ fails after one `add-python-package` retry for `skrub`, write
 ## End of turn
 
 When `model-ml-pipeline` dispatched this turn, pass JSON
-`locator` up and return. Do not run `loop notebooks`,
-`loop artifacts`, audit, record-outcome, convert, site, or
+`locator` up and return after the live execution and checkpoint
+preview above. Do not run the close-time `loop notebooks`,
+`loop artifacts`, audit, record-outcome, another site build, or
 `git end-turn`.
 
 Otherwise this skill owns the close. First run
@@ -310,17 +326,17 @@ only on `skip`.
    the user's headline, if any, and `n/a — audit not run`.
    Missing backlog skill → one line. Do not write History here.
    Never mark `done` while smoke is red.
-4. Checkpoint, below. Link `report.html` only when `policy.site`
-   is true.
-5. `site build` only when `policy.site` is true and
+4. `site build` only when `policy.site` is true and
    `export-ml-site` is installed:
-   `python -m skore_skills site build`. It embeds
+   `python -m skore_skills site build --if-stale`. It embeds
    `audit/<stem>.nb.html` under `## Notebooks`; do not add
    `<!-- results-embed: audit -->`. If `site build` errors with
    `mkdocs-material is required`, load `add-python-package` for
    `mkdocs-material` (agent) and build once more. Do not
    `pixi add` / `uv add`. Name a build error; do not fail the
    turn.
+5. Checkpoint, below. Link `report.html` only when `policy.site`
+   is true and the checkpoint build succeeded.
 6. `python -m skore_skills git end-turn --stage evaluate`. If
    JSON `action` is `invoke`, load `persist-ml-git` when
    installed and stop. Otherwise load `triage-ml-task` when

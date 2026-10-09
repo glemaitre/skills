@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 from pathlib import Path
+from typing import Any
 
 MISSING = "jupytext and nbclient are required; add them with add-python-package"
 MISSING_IPYWIDGETS = "ipywidgets is required; add it with add-python-package"
@@ -26,7 +28,66 @@ except ImportError:  # pragma: no cover - exercised by hiding the module in test
     ipywidgets = None
 
 
-def convert(src: Path, out: Path | None = None, *, html: bool = False) -> Path:
+def source_fingerprint(src: Path) -> str:
+    """Return the SHA-256 fingerprint stored with a generated notebook."""
+    return hashlib.sha256(src.read_bytes()).hexdigest()
+
+
+def _cells(notebook: Any) -> list[Any]:
+    return notebook.cells if hasattr(notebook, "cells") else notebook["cells"]
+
+
+def _set_source_fingerprint(notebook: Any, fingerprint: str) -> None:
+    metadata = (
+        notebook.metadata
+        if hasattr(notebook, "metadata")
+        else notebook.setdefault("metadata", {})
+    )
+    metadata["skore_skills"] = {"source_sha256": fingerprint}
+
+
+def _value(item: Any, key: str, default: Any = None) -> Any:
+    return getattr(item, key, item.get(key, default))
+
+
+def render_digest(src: Path, notebook: Any) -> str:
+    """Render executed notebook cells as the plain Markdown audit digest."""
+    rendered = [f"# Cells: `{src}`\n"]
+    for index, cell in enumerate(_cells(notebook)):
+        cell_type = _value(cell, "cell_type", "code")
+        marker = "# %% [markdown]" if cell_type == "markdown" else "# %%"
+        rendered.append(f"\n## Cell {index}: `{marker}`\n")
+        source = _value(cell, "source", "")
+        if cell_type == "markdown":
+            rendered.append(f"\n{source.rstrip()}\n")
+            continue
+        if source.strip():
+            rendered.append(f"\n```python\n{source.rstrip()}\n```\n")
+        for output in _value(cell, "outputs", []):
+            output_type = _value(output, "output_type", "")
+            if output_type == "stream":
+                name = _value(output, "name", "stdout")
+                text = _value(output, "text", "")
+                rendered.append(f"\n**{name}:**\n```\n{text}```\n")
+            elif output_type in {"execute_result", "display_data"}:
+                data = _value(output, "data", {})
+                text = data.get("text/plain") if isinstance(data, dict) else None
+                if text is not None:
+                    rendered.append(f"\n**output:**\n```\n{text}\n```\n")
+            elif output_type == "error":
+                name = _value(output, "ename", "Error")
+                value = _value(output, "evalue", "")
+                rendered.append(f"\n**error:** `{name}: {value}`\n")
+    return "".join(rendered)
+
+
+def convert(
+    src: Path,
+    out: Path | None = None,
+    *,
+    html: bool = False,
+    digest: Path | None = None,
+) -> Path:
     """Read a percent-format ``.py``, execute it, and write ``.ipynb``.
 
     Injects ``%matplotlib inline`` for the kernel run so seaborn /
@@ -67,7 +128,7 @@ def convert(src: Path, out: Path | None = None, *, html: bool = False) -> Path:
     dest = src.with_suffix(".ipynb") if out is None else out
     dest.parent.mkdir(parents=True, exist_ok=True)
     notebook = jupytext.read(src)
-    cells = notebook.cells if hasattr(notebook, "cells") else notebook["cells"]
+    cells = _cells(notebook)
     cells.insert(0, nbformat.v4.new_code_cell(INLINE_SETUP))
     client = NotebookClient(
         notebook,
@@ -77,9 +138,13 @@ def convert(src: Path, out: Path | None = None, *, html: bool = False) -> Path:
     )
     client.execute()
     del cells[0]
+    _set_source_fingerprint(notebook, source_fingerprint(src))
     nbformat.write(notebook, dest)
     if html:
         to_html(dest, src.with_name(f"{src.stem}.nb.html"))
+    if digest is not None:
+        digest.parent.mkdir(parents=True, exist_ok=True)
+        digest.write_text(render_digest(src, notebook), encoding="utf-8")
     return dest
 
 

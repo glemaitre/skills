@@ -153,6 +153,17 @@ wrapper CLI.
    `status.skills.persist-ml-git` is true and stop. Otherwise
    load `triage-ml-task` only if that skill is installed.
 
+## Live preview
+
+After any turn that changes `journal/JOURNAL.md` (filled
+decisions, Status, `frame clear`, or lock), coalesce all edits,
+then, when `policy.site` is `true` and `export-ml-site` is
+installed, run `python -m skore_skills site build --if-stale`
+before the next question or stop. Link `report.html` in that
+message. `policy.site` `null` or `false` does not enable or build
+the site. A read-only `frame show` with no Markdown change does
+not build.
+
 ## Stop conditions
 
 - Do not write Python, a pipeline, a test, or a design note.

@@ -156,6 +156,14 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 
 Canonical package policy lives in the CLI; print it with `python -m skore_skills env stack`. `choose-python-library` resolves competing libraries.
 
+When executed notebooks or the documentation site are enabled in a
+workspace, workflow stages publish them at completed checkpoints before
+the next user decision. Python percent files execute once: that run can
+write the notebook, optional notebook HTML, and audit digest together.
+Site checkpoints rebuild only when Markdown, notebook viewers, figures,
+or result viewers changed. Unset or disabled notebook/site policies do
+not enable these artifacts automatically.
+
 ### Compatibility and removed skills
 
 The catalog temporarily retains two deprecated compatibility skills. They are not

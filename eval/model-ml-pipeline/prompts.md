@@ -498,15 +498,17 @@ and `frame show` already returned `proceed` with a non-null
 - `export-ml-site` is installed.
 
 **Must do:**
-- Run `python -m skore_skills site build` after the note is
-  populated and before Approve / Modify / Stop.
-- Name `report.html` and `html/01_dummy.html`.
+- Run `python -m skore_skills site build --if-stale` after the
+  note is populated and before Approve / Modify / Stop.
+- Name `report.html` and `html/01_dummy.html` as the pages to
+  open. The design note may be listed beside them.
 - State the design question, planned change, and recorded risk
   inline, then ask Approve / Modify / Stop and stop there.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Write model, experiment, or pytest code before approval.
+- Open only `journal/01_dummy.md` and omit `report.html`.
 - Run `notebook convert` or `git end-turn` on this preview rebuild.
 - Fail the approval gate if site build errors; name the error.
 
@@ -629,3 +631,26 @@ and `frame show` already returned `proceed` with a non-null
 - Add an estimator or a procedure the row and the fact do not state.
 - Renumber B3.
 - Write model code before the design note is approved.
+
+---
+
+## CASE_23 — Results are published before the close message
+
+**User prompt:**
+> Finish the evaluated baseline.
+
+**Assumed workspace state:**
+- Review returned a digest, locator, and finding.
+- `manage-ml-backlog` record-outcome just updated JOURNAL and
+  `journal/01_baseline.md`.
+- `policy.site` is true and `export-ml-site` is installed.
+
+**Must do:**
+- Run `python -m skore_skills site build --if-stale` after
+  record-outcome and before the user-facing close.
+- Link the freshly built `report.html` and
+  `html/01_baseline.html`.
+
+**Must NOT do:**
+- Send the site link before the Results Markdown is published.
+- Re-execute a source-current experiment notebook at Close.

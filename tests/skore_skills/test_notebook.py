@@ -294,6 +294,98 @@ def test_notebook_convert_html(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     )
 
 
+def test_notebook_convert_writes_digest_from_same_execution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``--digest`` renders outputs without starting a second execution."""
+    src = tmp_path / "audit.py"
+    src.write_text("# %% [markdown]\n# ## Checks\n# %%\n1 + 1\n", encoding="utf-8")
+    payload = {
+        "cells": [
+            {"cell_type": "markdown", "source": "## Checks", "outputs": []},
+            {"cell_type": "code", "source": "1 + 1", "outputs": []},
+        ]
+    }
+    executions = 0
+    written: dict[str, object] = {}
+    monkeypatch.setattr(
+        notebook_mod, "jupytext", SimpleNamespace(read=lambda path: payload)
+    )
+
+    def write(notebook: object, dest: object) -> None:
+        written["notebook"] = notebook
+        Path(dest).write_text("nb", encoding="utf-8")
+
+    monkeypatch.setattr(notebook_mod, "nbformat", _stub_nbformat(write=write))
+
+    class FakeClient:
+        def __init__(
+            self, notebook: object, timeout: int, kernel_name: str, **kwargs: object
+        ) -> None:
+            self.notebook = notebook
+
+        def execute(self) -> object:
+            nonlocal executions
+            executions += 1
+            payload["cells"][2]["outputs"] = [
+                {
+                    "output_type": "execute_result",
+                    "data": {"text/plain": "2"},
+                }
+            ]
+            return self.notebook
+
+    monkeypatch.setattr(notebook_mod, "NotebookClient", FakeClient)
+    digest = tmp_path / "scratch" / "audit.md"
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(
+        cli,
+        ["notebook", "convert", str(src), "--digest", str(digest)],
+    )
+    assert result.exit_code == 0, result.output
+    assert executions == 1
+    text = digest.read_text(encoding="utf-8")
+    assert "## Checks" in text
+    assert "**output:**\n```\n2\n```" in text
+    metadata = written["notebook"]["metadata"]  # type: ignore[index]
+    assert metadata["skore_skills"]["source_sha256"] == (
+        notebook_mod.source_fingerprint(src)
+    )
+
+
+def test_render_digest_covers_streams_errors_and_blank_cells(tmp_path: Path) -> None:
+    """Stream, error, and empty cells are part of the audit digest."""
+    src = tmp_path / "audit.py"
+    src.write_text("# %%\n", encoding="utf-8")
+    text = notebook_mod.render_digest(
+        src,
+        {
+            "cells": [
+                {
+                    "cell_type": "code",
+                    "source": "   ",
+                    "outputs": [
+                        {"output_type": "stream", "name": "stderr", "text": "warn\n"},
+                        {"output_type": "execute_result", "data": "2"},
+                        {"output_type": "display_data", "data": {}},
+                        {
+                            "output_type": "error",
+                            "ename": "ValueError",
+                            "evalue": "bad",
+                        },
+                        {"output_type": "unknown"},
+                    ],
+                }
+            ]
+        },
+    )
+    assert "**stderr:**" in text
+    assert "warn" in text
+    assert "**error:** `ValueError: bad`" in text
+    assert "**output:**" not in text
+    assert "```python" not in text
+
+
 def test_notebook_convert_html_import_error(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

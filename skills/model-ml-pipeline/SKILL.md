@@ -118,10 +118,12 @@ On `design consent` `ask`, the JSON `context` holds those facts:
 `question`, `source`, `files_touched`, `change`, and up to two
 `risks`. Quote them in the message (question and planned change
 first, then the risks the user may push back on). After the note
-is populated, rebuild the site per `export-ml-site` § Preview
-before markdown-review gates **before** asking **Approve** /
-**Modify** / **Stop**. Link `note` next to them, not instead of
-them. An empty field means the note does not state that fact: say
+is populated, and before **Approve** / **Modify** / **Stop**, run
+`python -m skore_skills site build --if-stale` when site policy
+is true. In that same question, open `report.html` and
+`html/<stem>.html`. The design-note markdown may be listed
+beside those pages; it is not the page to review. An empty
+field means the note does not state that fact: say
 the note is not ready for approval and offer to populate it;
 never fill it from memory. Do not `site build` an empty shell.
 
@@ -260,7 +262,7 @@ also ask in chat whether the note looks right.
    (`scratch/results/<stem>/pipeline/` when `DataOp.skb.report`
    accepts `eval`, otherwise `pipeline.html`) and, when
    `policy.site` is true and `export-ml-site` is installed, runs
-   `site build` after that snapshot and before Evaluate so Method
+   `site build --if-stale` after that snapshot and before Evaluate so Method
    shows that report. Missing or skipped EDA does not defer it.
    The post-loop rebuild refreshes the same unevaluated report;
    it does not replace this one. Do not convert
@@ -373,7 +375,18 @@ Children return locator / digest / finding and do not preview it.
    plus `## Results`, then returns. It does not triage idea
    files. Never mark `done` while `smoke run` is `stop`. Missing
    headline becomes `n/a`, never an invented metric.
-4. User-facing close. 2–6 sentences of the result, grounded in
+4. `site build` only when `policy.site` is true and
+   `export-ml-site` is installed:
+   `python -m skore_skills site build --if-stale`, so the Method DataOp
+   report and Results replace the construct-time snapshot. Skip
+   in one line otherwise. Site build embeds
+   `audit/<stem>.nb.html` under `## Notebooks`; do not add
+   `<!-- results-embed: audit -->`. If `site build` errors with
+   `mkdocs-material is required`, load `add-python-package` for
+   `mkdocs-material` (agent) and build once more. Do not
+   `pixi add` / `uv add`. Name a build error; do not fail the
+   turn.
+5. User-facing close. 2–6 sentences of the result, grounded in
    the audit digest when present (Checks + Metrics), else the
    user's headline / `report.txt`. Do not invent a metric. Link
    `[report.html](<workspace>/report.html)` and
@@ -383,19 +396,6 @@ Children return locator / digest / finding and do not preview it.
    script was converted, otherwise the locator evaluate passed
    up, or `n/a — backend did not expose a locator`) first among
    tokens, then G-AUDIT-FINDING. Index strings, not the narrative.
-5. `site build` only when `policy.site` is true and
-   `export-ml-site` is installed:
-   `python -m skore_skills site build`, so the Method DataOp
-   report and Results replace the construct-time snapshot. Skip
-   in one line otherwise. Site build embeds
-   `audit/<stem>.nb.html` under `## Notebooks`; do not add
-   `<!-- results-embed: audit -->`. If `site build` errors with
-   `mkdocs-material is required`, load `add-python-package` for
-   `mkdocs-material` (agent) and build once more. Do not
-   `pixi add` / `uv add`. Name a build error; do not fail the
-   turn. When this step runs, the user-facing close names
-   `report.html` and `html/<stem>.html` and does not also send
-   the user to the markdown.
 6. `python -m skore_skills git end-turn --stage implement`. If
    JSON `action` is `invoke`, load `persist-ml-git` only if
    `status.skills.persist-ml-git` is true and stop; that skill

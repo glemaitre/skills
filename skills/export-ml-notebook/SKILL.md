@@ -29,6 +29,23 @@ it exists, `audit/<stem>.py`. `audit-ml-pipeline` converts
 on-demand conversions, other sources, and turning the flag on
 when it is `null` or false.
 
+## Workflow checkpoint execution
+
+Stage owners read policy before executing a human `# %%` source.
+Only `policy.notebooks` `true` enables automatic notebook
+materialization; `null` and `false` keep the stage's non-notebook
+execution and do not change policy.
+
+When true, `notebook convert` is the stage's **one execution**,
+not a second export pass. Add `--html` only when `policy.site` is
+also true. Audit adds
+`--digest scratch/audit/<stem>/audit.md` so the same kernel run
+writes that digest and no other file. Do not pass
+`audit/<stem>.digest.md` or a path next to the `.py`. Do not
+also run `cells run` or run the script separately. A generated
+notebook records its source fingerprint; `loop notebooks`
+converts again only when the source or required HTML changed.
+
 ## Sequence
 
 1. `python -m skore_skills status`. Read `policy.notebooks` and
@@ -73,7 +90,7 @@ when it is `null` or false.
    path. Do not mention `--html` or `site build` as an optional
    aside.
 5.    After `--html`, if `policy.site` is true, `export-ml-site`
-   is installed, run `python -m skore_skills site build` so the
+   is installed, run `python -m skore_skills site build --if-stale` so the
    viewer is packaged. Run `--html` and `site build` **only**
    when the user asked for HTML or a site viewer. Convert
    without `--html` does not rebuild the site. Skip in one line

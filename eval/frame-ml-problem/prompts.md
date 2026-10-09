@@ -452,3 +452,25 @@
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Load `model-ml-pipeline` or `build-ml-pipeline`.
 - Write a design note.
+
+---
+
+## CASE_17 — Journal edit refreshes the live site
+
+**User prompt:**
+> Use grouped validation by hospital.
+
+**Assumed workspace state:**
+- `frame show` asks for `generalize_to`.
+- `policy.site` is true and `export-ml-site` is installed.
+
+**Must do:**
+- Write the answered Modeling decisions cell.
+- Run `python -m skore_skills site build --if-stale` after the
+  Markdown batch and before the next framing question.
+- Link `report.html`.
+
+**Must NOT do:**
+- Enable notebooks or site policy.
+- Build between individual edits in the same Markdown batch.
+- Run `notebook convert`.

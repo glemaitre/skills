@@ -81,7 +81,7 @@
 **Must do:**
 - Load `add-python-package` for `nbconvert`.
 - Run `python -m skore_skills notebook convert data_analysis/data_analysis.py --html`.
-- Run `python -m skore_skills site build`.
+- Run `python -m skore_skills site build --if-stale`.
 
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
@@ -104,3 +104,24 @@
 **Must NOT do:**
 - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
 - Run `notebook convert` while the flag is false.
+
+---
+
+## CASE_06 — Audit digest and notebook share one execution
+
+**User prompt:**
+> Run the audit and make its notebook available.
+
+**Assumed workspace state:**
+- `policy.notebooks` is true and `policy.site` is true.
+- `audit/01_baseline.py` exists.
+
+**Must do:**
+- Run `notebook convert audit/01_baseline.py --digest
+  scratch/audit/01_baseline/audit.md --html`.
+
+**Must NOT do:**
+- Also run `cells run` or execute the audit script separately.
+- Write the digest to `audit/01_baseline.digest.md` or any path
+  other than `scratch/audit/01_baseline/audit.md`.
+- Change either recorded policy.

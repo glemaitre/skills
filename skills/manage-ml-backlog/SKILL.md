@@ -64,6 +64,14 @@ error: return to `model-ml-pipeline`; do not fabricate B1.
 
 ## Record-outcome mode
 
+This mode is only a dispatch from `model-ml-pipeline`,
+`evaluate-ml-pipeline`, or `audit-ml-pipeline` at that caller's
+end of turn. A user saying the run finished, or "record it", is
+a direct Procedure turn: record the outcome, then End of turn
+(`site build --if-stale` when site policy is true, then
+`git end-turn --stage backlog`). Do not treat that user request
+as this mode.
+
 When `model-ml-pipeline`, `evaluate-ml-pipeline`, or
 `audit-ml-pipeline` calls at end of turn with the normalized
 G-REPORT-LOCATOR, optional headline, and G-AUDIT-FINDING. This is
@@ -247,8 +255,12 @@ locator.
 
 ## End of turn
 
+Direct turns reach here, including a user request to record a
+finished run. Dispatched record-outcome mode returns before this
+section.
+
 If `policy.site` is true, `export-ml-site` is installed, run
-`python -m skore_skills site build`. Do not run
+`python -m skore_skills site build --if-stale`. Do not run
 `notebook convert`. Skip
 in one line otherwise. If `site build` errors with
 `mkdocs-material is required`, load `add-python-package` for
