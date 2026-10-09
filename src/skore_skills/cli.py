@@ -711,10 +711,10 @@ def env_stack() -> None:
 @click.option(
     "--execute",
     is_flag=True,
-    help="Install conda Graphviz when possible and run dot -c.",
+    help="Install conda Graphviz when possible and verify SVG rendering.",
 )
 def env_graphviz(execute: bool) -> None:
-    """Print JSON for Graphviz; optionally install and rebuild the plugin cache."""
+    """Print JSON for Graphviz; optionally install and verify it with pydot."""
     from skore_skills.env import ensure_graphviz
 
     text, code = ensure_graphviz(Path.cwd(), execute=execute)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -50,15 +51,26 @@ _IMPORT_NAMES = {
 }
 CONDA_GRAPHVIZ_MANAGERS = frozenset({"pixi", "conda"})
 GRAPHVIZ_DOCS = "https://graphviz.org/download/"
-DOT_C_ADMIN = (
-    "dot -c failed; rerun dot -c with admin rights if the plugin "
-    "directory is not writable"
+GRAPHVIZ_REPAIR = (
+    "Graphviz SVG rendering failed; repair or reinstall pydot and Graphviz "
+    "with their existing package managers"
 )
-DOT_C_SNIPPET = (
-    "import shutil, subprocess, sys; "
-    "p = shutil.which('dot'); "
-    "sys.exit(1 if not p else subprocess.call([p, '-c']))"
-)
+GRAPHVIZ_PROBE_SNIPPET = """\
+import sys
+import xml.etree.ElementTree as ET
+
+try:
+    import pydot
+
+    graph = pydot.Dot("probe", graph_type="digraph")
+    graph.add_edge(pydot.Edge("source", "target"))
+    root = ET.fromstring(graph.create_svg())
+    if root.tag.rsplit("}", 1)[-1] != "svg":
+        raise RuntimeError("Graphviz returned non-SVG output")
+except Exception as exc:
+    print(f"{type(exc).__name__}: {exc}", file=sys.stderr)
+    sys.exit(1)
+"""
 WHICH_DOT_SNIPPET = "import shutil; print(shutil.which('dot') or '')"
 
 _SKELETON = """\
@@ -723,12 +735,30 @@ def system_graphviz_instructions() -> str:
     if sys.platform == "darwin":
         install = "brew install graphviz"
     elif sys.platform.startswith("linux"):
-        install = "sudo apt-get install graphviz"
+        try:
+            release = platform.freedesktop_os_release()
+        except OSError:
+            release = {}
+        distro = " ".join((release.get("ID", ""), release.get("ID_LIKE", ""))).lower()
+        if any(name in distro for name in ("debian", "ubuntu")):
+            install = "sudo apt-get install graphviz"
+        elif any(name in distro for name in ("fedora", "rhel", "centos")):
+            install = "sudo dnf install graphviz"
+        elif "arch" in distro:
+            install = "sudo pacman -S graphviz"
+        elif any(name in distro for name in ("suse", "opensuse")):
+            install = "sudo zypper install graphviz"
+        else:
+            install = "install Graphviz with your system package manager"
     elif sys.platform == "win32":
         install = "winget install Graphviz.Graphviz"
     else:
         install = "install Graphviz with your system package manager"
-    return f"{install}\nGraphviz installation instructions -> {GRAPHVIZ_DOCS}"
+    return (
+        f"{install}\n"
+        "Restart the terminal or IDE after installation if `dot` is not on PATH.\n"
+        f"Graphviz installation instructions -> {GRAPHVIZ_DOCS}"
+    )
 
 
 def _which_dot(manager: str, root: Path) -> str | None:
@@ -750,8 +780,8 @@ def _which_dot(manager: str, root: Path) -> str | None:
     return path or None
 
 
-def _dot_c_argv(manager: str, root: Path) -> list[str]:
-    return [*dev_run_argv(manager, root=root), "-c", DOT_C_SNIPPET]
+def _graphviz_probe_argv(manager: str, root: Path) -> list[str]:
+    return [*dev_run_argv(manager, root=root), "-c", GRAPHVIZ_PROBE_SNIPPET]
 
 
 def _conda_graphviz_argvs(manager: str, root: Path) -> list[list[str]]:
@@ -771,7 +801,7 @@ def graphviz_status(root: Path) -> tuple[dict[str, Any], int]:
 
     Print-only even when ``env.managed`` is false so the skill can
     show the manager or OS line. ``ensure_graphviz(..., execute=True)``
-    still refuses to install or run ``dot -c`` while unmanaged.
+    still refuses to install or run the SVG probe while unmanaged.
     """
     detected = detect(root)
     manager = detected["env_manager"]
@@ -803,7 +833,7 @@ def graphviz_status(root: Path) -> tuple[dict[str, Any], int]:
 
 
 def ensure_graphviz(root: Path, *, execute: bool = False) -> tuple[str, int]:
-    """Print JSON; ``--execute`` may install conda Graphviz and run ``dot -c``."""
+    """Print JSON; optionally install conda Graphviz and verify SVG rendering."""
     payload, code = graphviz_status(root)
     rendered = json.dumps(payload, indent=2) + "\n"
     if code or not execute:
@@ -821,7 +851,7 @@ def ensure_graphviz(root: Path, *, execute: bool = False) -> tuple[str, int]:
         rendered = json.dumps(payload, indent=2) + "\n"
     if payload["dot"]:
         completed = subprocess.run(
-            _dot_c_argv(manager, root),
+            _graphviz_probe_argv(manager, root),
             check=False,
             cwd=root,
             capture_output=True,
@@ -829,7 +859,7 @@ def ensure_graphviz(root: Path, *, execute: bool = False) -> tuple[str, int]:
         )
         if completed.returncode:
             sys.stderr.write(completed.stderr or "")
-            return rendered + DOT_C_ADMIN + "\n", completed.returncode
+            return rendered + GRAPHVIZ_REPAIR + "\n", completed.returncode
         return rendered, 0
     return rendered, 1
 
