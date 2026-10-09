@@ -21,6 +21,7 @@ description: >
   do not wait.
   Never --execute while managed is false.
 metadata:
+  role: helper
   modelTier: small
 ---
 

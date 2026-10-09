@@ -6,6 +6,7 @@ description: >
   be that skill. Trigger on an ambiguous request, a finished stage,
   a workspace-open session, or "what should we do next".
 metadata:
+  role: entry
   modelTier: medium
 ---
 

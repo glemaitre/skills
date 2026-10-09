@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "adbb97e7ceeb786f51a79d199780d86fb9c2d7f7d11fb27e53a4e271e6a7bec3",
+  "catalog_hash": "5be1c2d8033f82cdf079e86e2d399d48915ab2828020e3cfab9e97fb1a72fb7a",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "8095ce78d6baa33690f9bc37b572dcc7502ce6ddb9e9229ca547786370bc5267"
+      "hash": "aa212c15ad3b793e9f3b573381ab4356164fb2c996f12ecd7669d3f7ae4177a2"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "55c5a1b76ca34a3f574dbb28a54408cbaef847f00b53682e0af5d01ef165af0f"
+      "hash": "75a03d0784ff1c1db8ebbb2696d7befe594a0facdb42d0411e8471025f14f09b"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Structural pytest: prediction count must match the predict-grid row count.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "3941f257c5a779292028681063f8651b72cfee56e33756a268c28fc2f709ae27"
+      "hash": "5cfa1e6186d5320e661ecb077c3fe75ee512de06381259401efdfcbaad271b33"
     },
     {
       "id": "audit-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "f3e00a5777a68d0aa1b0e229ef396b47822bc0defa06cf0c336159dcc74fbe80"
+      "hash": "4a3751f756a556bf9cc305179e533db58135d59fe2aef91e336fa70d3aed1d08"
     },
     {
       "id": "manage-ml-backlog",
@@ -93,7 +93,7 @@
       "summary": "Session owner: list installed entry skills and ask which to run.",
       "category": "meta",
       "subcategory": null,
-      "hash": "6d07e95d47d81d15a0e7992650ef7409da8a9a3b8630f3f0acbdc4f438fd6484"
+      "hash": "3d970d8810bd5f7c6dda1e4200bae46d9d5d6f8708c09b01d261a2bac6eef495"
     },
     {
       "id": "review-ml-choices",
@@ -120,7 +120,7 @@
       "summary": "Shape a user idea or a named artifact into one idea file and one Ideas row after they confirm.",
       "category": "meta",
       "subcategory": null,
-      "hash": "e7cad18263cbc97bd807b24467bd6dc4a7964e26dd99e1fadec848ca65268b15"
+      "hash": "ff57b92a3c26ff8f3b81a6b287248316fbb1137312e39642aab1d409f9e1db0c"
     },
     {
       "id": "search-ml-literature",
@@ -147,7 +147,7 @@
       "summary": "Initialize safe version control for an ML workspace.",
       "category": "action",
       "subcategory": null,
-      "hash": "127ed28c8214059dda7d39c47a199a24d98215b6bd7bf673a61faf72bec5355d"
+      "hash": "0be130782bb9404a6fd56450ddc2b4bcee1da16ba18b63a01e3b49870ea88f8b"
     },
     {
       "id": "persist-ml-git",
@@ -174,7 +174,7 @@
       "summary": "Resolve a library choice and add the selected dependency.",
       "category": "action",
       "subcategory": null,
-      "hash": "c944e78973f89ffda21501d2f0a535a7beb37d3b2c157ead9ed826030a283d58"
+      "hash": "640ae069a0940de1cd6a6455159c82dcc5433dedd9f70e787164c26a6da677e0"
     },
     {
       "id": "plot-ml-figure",
@@ -183,7 +183,7 @@
       "summary": "Pick pandas, seaborn, plotly, or matplotlib before writing figure code.",
       "category": "action",
       "subcategory": null,
-      "hash": "77475bd1a2521547dfd3977e9568de8702513af83e39e3b314afcae228d1896f"
+      "hash": "0f7375d919b742a636d9a801a965c5489cb136167c40e4a662842524eb9947e6"
     },
     {
       "id": "research-ml-practice",
@@ -192,7 +192,7 @@
       "summary": "Literature research for an ML methodology concern.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "ee8ab99c43bfef58295ec375f218581e2a963e33581f000ded864a2db2b80648"
+      "hash": "a05c6290e91f67e2c672bd535733ccb5fafaf1c485a5ad89c145865835012ab6"
     },
     {
       "id": "add-python-package",
@@ -201,7 +201,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
-      "hash": "49d5b6b2e85a59db6da292a0dd796a9ebdd434bd46480e08ef4db8be942146ca"
+      "hash": "d237a56be07653d301f2747e85d70c18be85f25e9645088d7d105867627c41ea"
     },
     {
       "id": "setup-workspace",
@@ -210,7 +210,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "246b1807147e1ee2d716bb20765bb1c447033c16a502445bf2bd1140b7c4cb6b"
+      "hash": "fe0909f8dcd46b054174e4bf22ca018af2c0dea18c35cc05221269faa46d28b1"
     },
     {
       "id": "setup-python-env",
@@ -219,7 +219,7 @@
       "summary": "Detect the env manager and bootstrap the runtime, agent-tools, and composed development environments.",
       "category": "action",
       "subcategory": null,
-      "hash": "a70ee591bde753730febf73f9d6ea7c1b751e2cceb90d6d636aa0b2c2ac1526b"
+      "hash": "eb6cae91c38d9d9e709979b61b8a73f5216cb9be2dd677e9e2fedbc4cf4a83f2"
     },
     {
       "id": "export-ml-notebook",

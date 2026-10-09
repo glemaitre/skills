@@ -23,6 +23,7 @@ description: >
   G-AUDIT-FINDING; then the continue-or-close gate. Resolve
   skore symbols with `api get`.
 metadata:
+  role: helper
   modelTier: medium
 ---
 

@@ -7,6 +7,7 @@ description: >
   Before the first commit, ask once which unknown hidden files and
   review paths to keep tracked.
 metadata:
+  role: helper
   modelTier: small
 ---
 

@@ -21,6 +21,7 @@ description: >
   each ask whose answer is already recorded. One recorded
   answer does not skip the other ask.
 metadata:
+  role: helper
   modelTier: small
 ---
 

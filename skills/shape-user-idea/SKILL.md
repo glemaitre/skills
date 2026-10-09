@@ -7,6 +7,7 @@ description: >
   write History, Backlog, or a design note. Do not pick a backlog
   row.
 metadata:
+  role: helper
   modelTier: medium
 ---
 

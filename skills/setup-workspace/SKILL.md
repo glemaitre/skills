@@ -18,6 +18,7 @@ description: >
   notebooks/site true when both are still unset. For an existing
   layout, stop without scaffolding or inventing files.
 metadata:
+  role: helper
   modelTier: small
 ---
 

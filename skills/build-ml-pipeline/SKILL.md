@@ -18,6 +18,7 @@ description: >
   structural edit. Read the stops and emit Pre-flight before
   code. Confirm new names with `python -m skore_skills api get`.
 metadata:
+  role: helper
   modelTier: big
 ---
 

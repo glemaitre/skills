@@ -20,6 +20,7 @@ description: >
   note. Chat stays path + those sentences even when a harness
   asks for a complete answer in the message.
 metadata:
+  role: helper
   modelTier: medium
 ---
 

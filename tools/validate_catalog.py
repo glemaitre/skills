@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate ``.catalog.json`` against the on-disk ``skills/`` directory.
 
-The validator enforces six invariants:
+The validator enforces seven invariants:
 
 1. Every directory under ``skills/`` has a matching entry in
    ``.catalog.json``'s ``skills`` array, and vice versa.
@@ -15,7 +15,8 @@ The validator enforces six invariants:
    counted the way Cursor counts a folded ``description: >`` block.
 6. Every ``SKILL.md`` ends its frontmatter with an unindented
    ``metadata:`` block whose ``modelTier`` is ``small``, ``medium``,
-   or ``big``.
+   or ``big``. ``role``, when present, is ``entry`` or ``helper``.
+7. At most one skill declares ``metadata.role: entry``.
 
 Usage
 -----
@@ -37,10 +38,8 @@ from pathlib import Path
 # the trailing newline that YAML ``>`` (clip) keeps.
 DESCRIPTION_MAX_LENGTH = 1024
 MODEL_TIERS = {"small", "medium", "big"}
-_MODEL_TIER = re.compile(
-    r"^metadata:\n  modelTier: (small|medium|big)[ \t]*$",
-    re.MULTILINE,
-)
+ROLES = {"entry", "helper"}
+_FIELD = re.compile(r"^  ([A-Za-z]+):[ \t]*(\S+)[ \t]*$")
 
 
 def folded_description_length(text: str) -> int | None:
@@ -91,21 +90,35 @@ def folded_description_length(text: str) -> int | None:
     return len(folded)
 
 
-def declared_model_tier(text: str) -> str | None:
-    """Return ``metadata.modelTier`` when it closes the frontmatter.
+def metadata_fields(text: str) -> dict[str, str] | None:
+    """Return the keys of the unindented ``metadata:`` block.
 
     ``metadata:`` must be unindented. An indented key is inside the
-    folded description and is not a tier declaration.
+    folded description and is not part of this block. Returns
+    ``None`` when the block is missing or a nested line is not
+    ``key: value``.
     """
     if not text.startswith("---\n"):
         return None
     end = text.find("\n---\n", 4)
     if end == -1:
         return None
-    match = _MODEL_TIER.search(text[4:end])
-    if match is None or match.group(1) not in MODEL_TIERS:
+    lines = text[4:end].splitlines()
+    try:
+        start = next(i for i, line in enumerate(lines) if line == "metadata:")
+    except StopIteration:
         return None
-    return match.group(1)
+    fields: dict[str, str] = {}
+    for line in lines[start + 1 :]:
+        if line == "":
+            continue
+        if not line.startswith((" ", "\t")):
+            break
+        match = _FIELD.match(line)
+        if match is None:
+            return None
+        fields[match.group(1)] = match.group(2)
+    return fields
 
 
 # Allow-list: category -> set of permitted subcategories.
@@ -157,6 +170,7 @@ def validate(catalog_path: Path) -> list[str]:
             f"{sorted(missing_folders)}"
         )
 
+    entries: list[str] = []
     for skill in catalog["skills"]:
         sid = skill["id"]
         skill_path = repo_root / skill["path"]
@@ -171,11 +185,21 @@ def validate(catalog_path: Path) -> list[str]:
                     f"{skill['path']}/SKILL.md description exceeds "
                     f"{DESCRIPTION_MAX_LENGTH - 1} characters ({length})"
                 )
-            if declared_model_tier(text) is None:
+            fields = metadata_fields(text)
+            tier = None if fields is None else fields.get("modelTier")
+            if tier not in MODEL_TIERS:
                 errors.append(
                     f"{skill['path']}/SKILL.md metadata.modelTier must be "
                     "small, medium, or big, in an unindented metadata block"
                 )
+            role = None if fields is None else fields.get("role")
+            if role is not None and role not in ROLES:
+                errors.append(
+                    f"{skill['path']}/SKILL.md metadata.role must be "
+                    f"entry or helper, got {role!r}"
+                )
+            if role == "entry":
+                entries.append(sid)
 
         cat = skill.get("category")
         sub = skill.get("subcategory")
@@ -197,6 +221,12 @@ def validate(catalog_path: Path) -> list[str]:
                 f"skill {sid!r}: category {cat!r} takes no subcategory, "
                 f"got {sub!r}"
             )
+
+    if len(entries) > 1:
+        errors.append(
+            "more than one skill declares metadata.role entry: "
+            + ", ".join(entries)
+        )
 
     for workflow in catalog.get("workflows", []):
         unknown = [s for s in workflow.get("includes", []) if s not in catalog_ids]

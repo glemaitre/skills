@@ -25,6 +25,7 @@ description: >
   means fix the pipeline in `build-ml-pipeline`. Do not loosen
   the assertion.
 metadata:
+  role: helper
   modelTier: medium
 ---
 

@@ -8,6 +8,7 @@ description: >
   exploration, pipeline, or eval extras), never during workspace
   setup.
 metadata:
+  role: helper
   modelTier: small
 ---
 

@@ -14,6 +14,7 @@ description: >
   the plot boundary. Missing lib → add-python-package. Confirm
   symbols with `api get`. The caller names the figure directory.
 metadata:
+  role: helper
   modelTier: small
 ---
 

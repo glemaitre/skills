@@ -59,7 +59,8 @@ Checks these invariants:
    final newline YAML clip chomping keeps.
 6. Every `SKILL.md` ends its frontmatter with an unindented
    `metadata:` block whose `modelTier` is `small`, `medium`, or
-   `big`.
+   `big`. `role`, when present, is `entry` or `helper`.
+7. At most one skill declares `metadata.role: entry`.
 
 Run directly with `python tools/validate_catalog.py` or via
 `pixi run validate`.
