@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "5be1c2d8033f82cdf079e86e2d399d48915ab2828020e3cfab9e97fb1a72fb7a",
+  "catalog_hash": "ccb90cd7dd212cebf19637619e72fc9c0624ceac7c7dbee93fe2fc5eb322b6d6",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -102,7 +102,7 @@
       "summary": "Show stored project choices and re-enter the skill that can change one.",
       "category": "meta",
       "subcategory": null,
-      "hash": "b9fbb793ad5f5c7fa8de060f8382d957f24c491bc43ff16d8aa44dbf104eb834"
+      "hash": "f0df7f023d357430f8d03b57de49db6ffd6d153c699d2889b199d482a2ecf873"
     },
     {
       "id": "review-ml-experiment",
@@ -201,7 +201,7 @@
       "summary": "Add a dependency through the project env manager, or ask the user when the environment is user-managed.",
       "category": "action",
       "subcategory": null,
-      "hash": "d237a56be07653d301f2747e85d70c18be85f25e9645088d7d105867627c41ea"
+      "hash": "0577b91169baf26d99961920607c485e1ebf2f7b5a8e57b15309731086bed868"
     },
     {
       "id": "setup-workspace",
@@ -210,7 +210,7 @@
       "summary": "Detect or scaffold the standard ML workspace layout.",
       "category": "action",
       "subcategory": null,
-      "hash": "fe0909f8dcd46b054174e4bf22ca018af2c0dea18c35cc05221269faa46d28b1"
+      "hash": "065480f63160feb050398fdd49fa7d92af8ce67a1b2ce5311f2b747293fa2197"
     },
     {
       "id": "setup-python-env",

@@ -127,9 +127,12 @@ after listing the boxes.
    - `refuse` → stop. Quote `message`. Do not install.
    - `default` → `env add --execute <pkg>`
    - `agent` → `env add --feature agent --execute <pkg>`
-   - `ask` → G-ENV-SCOPE: ask project runtime vs a named optional
-     extra / agent tools. Map the answer to `--feature` / `--group`
-     privately, then `env add` with that flag.
+   - `ask` → One question, then stop. Two options only: the
+     project runtime, or a named optional extra / agent tools.
+     Do not add a context line, a manager command, or a flag to
+     either option. Do not preview `pixi add`. Record only
+     `python -m skore_skills env route <pkg>`. The install
+     command waits until the next turn, after they answer.
 
    When `managed` is true and `scope` is not `refuse`, pass
    `--execute` on that one command. Never paste `pixi add` /
