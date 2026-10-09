@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "f2d170ffbf52ab2432450a2395283523a9059594525984dcc49b8becf466a566",
+  "catalog_hash": "8cd7a64bdfb417fd6a9e2a7f5c785520496999cad3c90e655be8832568d7d726",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "d744c7c1d1b03836a6e78bce51356c1a09887a50ff5094caf05cbe737d5924fb"
+      "hash": "82d916c19a09976d74c6c1a3db11af5f6efa1ace8cfde959745b42b59244b91f"
     },
     {
       "id": "frame-ml-problem",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "8743534192bb9f993a4d6a426400d0cc835c3cab17bbaf88ff101b62f768de33"
+      "hash": "022dfa76d9f6ada0d154b333640663208bd951c39ace679295dd2435e37b6c34"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "66e7e03d5b74dc12690e120d83e723268efaa4d55fde1fba88cfd2f62f863c6f"
+      "hash": "6a05000ad69e04a979fedc8dfa835f1b4039363a71aa92b672706b1b2d6dd3fd"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -57,7 +57,7 @@
       "summary": "Audit a persisted skore report read-only and produce a reusable digest.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "5444a47fe280eb7c9f26151c3e3a5c47fe7001e42422c768d58415351659d4c9"
+      "hash": "7835df97199bd1fdba50ed2e7d6d36d34c8f2c1aab260db7cf4a253f0b3dac9e"
     },
     {
       "id": "manage-ml-backlog",
@@ -111,7 +111,7 @@
       "summary": "Read the stored report, then write one idea file and one Ideas row per candidate.",
       "category": "meta",
       "subcategory": null,
-      "hash": "4f91092c4fb8aac7f99327c277f8b78f4133e936a655b02517c3ea1889fd6bb1"
+      "hash": "0cb90bc2ae90e824cde081e9bfec2ea0dc3fe442471d37a992b885bb9a7495b1"
     },
     {
       "id": "shape-user-idea",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, write the first baseline design note for approval, then coordinate later choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "4d22bb47e07eefb9a6a6bf836690dbc7daab406714a5aa7ede46672def3d6bb0"
+      "hash": "66e720403a9fe1c4b99769756f64ca4bc25aebbc90b4857eef6dbf4ea1288999"
     },
     {
       "id": "choose-python-library",
@@ -225,10 +225,10 @@
       "id": "export-ml-notebook",
       "path": "skills/export-ml-notebook",
       "title": "Export ML Notebook",
-      "summary": "Convert a jupytext percent file into an executed notebook.",
+      "summary": "Write a jupytext percent file out as a notebook with empty outputs.",
       "category": "tooling",
       "subcategory": "code-quality",
-      "hash": "7ac04e1f332b2da40bc9417de790880c28a94899d36072bcf9373c2768e41467"
+      "hash": "420799269f1c8882043ccbbdba0a15dcf5a4d03467b36c754a5003f1f5abc414"
     },
     {
       "id": "export-ml-site",
