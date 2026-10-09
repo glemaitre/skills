@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "A blank journal asks every missing decision",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `journal/JOURNAL.md` exists. Modeling decisions Status is still\n  the empty placeholder.\n- `scratch/data_analysis/extras.json` has `\"task\": \"classification\"`.\n- `python -m skore_skills frame show` returns `ask` /\n  `missing_keys`. `missing` lists prediction_goal, deployment,\n  horizon, gap, time_role, generalize_to, known_at_predict,\n  metric_role, metric, baseline, baseline_note, and folds.\n- `questions` names a reference for each of those keys.\n  prediction_goal candidates are `probabilities`, `point_labels`,\n  and `uncovered`. The horizon and gap questions cite\n  `references/horizon-gap.md` and have no candidates. The\n  baseline question cites `references/baseline.md`.]\n\nWhich comparison metric should we lock before building?",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `journal/JOURNAL.md` exists. Modeling decisions Status is still\n  the empty placeholder.\n- `scratch/data_analysis/extras.json` `targets` is one entry,\n  column `label`, task `classification`.\n- `python -m skore_skills frame show` returns `ask` /\n  `missing_keys`. `missing` lists prediction_goal, deployment,\n  horizon, gap, time_role, generalize_to, known_at_predict,\n  metric_role, metric, baseline, baseline_note, and folds.\n- `questions` names a reference for each of those keys.\n  prediction_goal candidates are `probabilities`, `point_labels`,\n  and `uncovered`. The horizon and gap questions cite\n  `references/horizon-gap.md` and have no candidates. The\n  baseline question cites `references/baseline.md`.]\n\nWhich comparison metric should we lock before building?",
       "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills frame show`. - Read each named reference once, including `references/prediction-goal.md`, `references/horizon-gap.md`, and `references/baseline.md`. - Ask every key in `missing` in one message. Prediction-goal options are only `probabilities`, `point_labels`, and `uncovered`. Say horizon and gap are n/a unless the deployment is time, and generalize-to is n/a unless the deployment is groups. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Write Python, a pipeline, or a splitter constructor. - Ask only the prediction goal and stop.",
       "files": [],
       "expectations": [
@@ -43,7 +43,7 @@
     {
       "id": 5,
       "title": "Clustering uses the fallback, not the closed menu",
-      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `scratch/data_analysis/extras.json` has `\"task\": \"clustering\"`.\n- `frame show` returns `ask` / `uncovered`, `reference`\n  `references/fallback.md`, and `context.task` `clustering`.\n  There is no `candidates` list.]\n\nWe are clustering customers. What should we lock?",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `scratch/data_analysis/extras.json` `targets` is one entry,\n  column `segment`, task `clustering`.\n- `frame show` returns `ask` / `uncovered`, `reference`\n  `references/fallback.md`, `context.task` `clustering`, and\n  `context.targets` `[\"segment\"]`. There is no `candidates` list.]\n\nWe are clustering customers. What should we lock?",
       "expected_output": "Behavioural response satisfying: - Read `references/fallback.md` and no other file under `references/`. - Say the closed menu does not cover clustering. - Ask what a better result means and what the baseline is. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Ask for `probabilities` or `point_labels`. - Write a splitter class or Python.",
       "files": [],
       "expectations": [
@@ -320,6 +320,66 @@
         "The response does NOT: Enable notebooks or site policy.",
         "The response does NOT: Build between individual edits in the same Markdown batch.",
         "The response does NOT: Run `notebook convert`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 18,
+      "title": "Multi-output regression uses the regression menu",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `journal/JOURNAL.md` exists. Modeling decisions Status is still\n  the empty placeholder.\n- `scratch/data_analysis/extras.json` `targets` lists `load` and\n  `temp`, both task `regression`.\n- `python -m skore_skills frame show` returns `ask` /\n  `missing_keys`. prediction_goal candidates are `intervals`,\n  `point_predictions`, and `uncovered`.]\n\nWe predict both `load` and `temp`. Which comparison should we lock?",
+      "expected_output": "Behavioural response satisfying: - Run `python -m skore_skills frame show`. - Ask every key in `missing` in one message. Prediction-goal options are only `intervals`, `point_predictions`, and `uncovered`. - Treat `load` and `temp` as the outputs of one regression problem. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Offer `probabilities` or `point_labels`. - Read `references/fallback.md`.",
+      "files": [],
+      "expectations": [
+        "Run `python -m skore_skills frame show`.",
+        "Ask every key in `missing` in one message. Prediction-goal options are only `intervals`, `point_predictions`, and `uncovered`.",
+        "Treat `load` and `temp` as the outputs of one regression problem.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Offer `probabilities` or `point_labels`.",
+        "The response does NOT: Read `references/fallback.md`.",
+        "The response does NOT: Ask to drop one target so the problem becomes single-output.",
+        "The response does NOT: Write Python or a splitter constructor."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 19,
+      "title": "Mixed targets use the fallback",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `scratch/data_analysis/extras.json` `targets` lists `amount`\n  (`regression`) and `fraud` (`classification`).\n- `frame show` returns `ask` / `uncovered`, `reference`\n  `references/fallback.md`, `context.task` `mixed`, and\n  `context.targets` `[\"amount\", \"fraud\"]`. There is no\n  `candidates` list.]\n\nWe need to predict `amount` and `fraud` together. What should we lock?",
+      "expected_output": "Behavioural response satisfying: - Read `references/fallback.md` and no other file under `references/`. - Say the closed menu does not cover a mix of regression and classification outputs. - Ask what a better result means and what the baseline is. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Offer `intervals`, `probabilities`, or `point_labels` as the joint goal. - Drop one target in order to stay on the closed menu.",
+      "files": [],
+      "expectations": [
+        "Read `references/fallback.md` and no other file under `references/`.",
+        "Say the closed menu does not cover a mix of regression and classification outputs.",
+        "Ask what a better result means and what the baseline is.",
+        "Write Prediction goal `uncovered` plus those two prose cells.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Offer `intervals`, `probabilities`, or `point_labels` as the joint goal.",
+        "The response does NOT: Drop one target in order to stay on the closed menu.",
+        "The response does NOT: Write a splitter class or Python."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
+    },
+    {
+      "id": 20,
+      "title": "Several classification targets use the fallback",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- `scratch/data_analysis/extras.json` `targets` lists `topic` and\n  `priority`, both task `classification`.\n- `frame show` returns `ask` / `uncovered`, `reference`\n  `references/fallback.md`, `context.task`\n  `multioutput-classification`, and `context.targets`\n  `[\"topic\", \"priority\"]`. There is no `candidates` list.]\n\nWe predict both `topic` and `priority`. What should we lock?",
+      "expected_output": "Behavioural response satisfying: - Read `references/fallback.md` and no other file under `references/`. - Say the closed menu does not cover several classification outputs. - Ask what a better result means and what the baseline is. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Offer `probabilities` or `point_labels` for the pair. - Treat the pair as one multiclass column or as multi-output regression.",
+      "files": [],
+      "expectations": [
+        "Read `references/fallback.md` and no other file under `references/`.",
+        "Say the closed menu does not cover several classification outputs.",
+        "Ask what a better result means and what the baseline is.",
+        "Write Prediction goal `uncovered` plus those two prose cells.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Offer `probabilities` or `point_labels` for the pair.",
+        "The response does NOT: Treat the pair as one multiclass column or as multi-output regression.",
+        "The response does NOT: Write a splitter class or Python."
       ],
       "tools": false,
       "sandbox": [],

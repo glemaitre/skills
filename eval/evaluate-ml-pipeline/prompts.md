@@ -935,3 +935,36 @@ violated.
 - `project.put` a second time to build the notebook.
 - Wait for final close to expose the completed evaluation.
 - Enable either policy when its value is null or false.
+
+---
+
+## CASE_29 — Multi-output metrics stay per output
+
+**User prompt:**
+> Evaluate `04_energy`. The locked comparison is MAE, and the
+> outputs are `load` and `temp`.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- The post-smoke answer was Evaluate in this turn.
+- The learner is a SkrubLearner. The prediction DataOp already
+  has `.skb.with_scoring(...)` for the MAE aggregate, before
+  `make_learner`.
+- `frame show` returned `proceed`. `translation.task` is
+  `multioutput-regression`. `translation.targets` is `["load",
+  "temp"]`. `translation.metric` is `MAE`.
+- The X marker has `cv=KFold(n_splits=5)`.
+- `policy.skore_mode` is `local`.
+
+**Must do:**
+- Call `skore.evaluate(learner, data={...})` without `splitter=`.
+- Read `report.metrics.summarize().frame()` and keep the
+  per-output rows. The close may quote the aggregate MAE.
+- Call `project.put(...)`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Average the per-output rows in the experiment file and drop them.
+- Call `report.metrics.add`.
+- Return the learner to build.
+- Pass `scoring=` to `skore.evaluate`.

@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "d3bb34abce5af75419fcc64318cd489bcb36c834a2fa3c97ca28b73c854b7e2f",
+  "catalog_hash": "6f1b16b06f15c3a555c2377f4c38aceefc79e449ce899772635209b3af9e5e41",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -12,7 +12,7 @@
       "summary": "Explore the dataset before designing any model.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "82d916c19a09976d74c6c1a3db11af5f6efa1ace8cfde959745b42b59244b91f"
+      "hash": "a13fca687f31a11b052fdb21c97766838683b943feb9cc3975ab5609547aeac2"
     },
     {
       "id": "frame-ml-problem",
@@ -21,7 +21,7 @@
       "summary": "Record the problem, deployment setting, metric, baseline, and fold count before any model code.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "ae29165f766ace966099479ae3b4470b503cd7f04b6e22afe5339c539bedb8e4"
+      "hash": "6723ed6fdb976dd1898564bf6b2ed8d97d4c10815864b3903b79f800291cdd22"
     },
     {
       "id": "build-ml-pipeline",
@@ -30,7 +30,7 @@
       "summary": "Declare a skrub DataOps graph from the data source to the predictor after framing is locked.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "2a5b60f7fc15e6dfe7a898fee6017ce377d9f0f2c99e1edba541c9b6c387a890"
+      "hash": "3d2db648937b13d43c3a8334af669ab7fc5d503362182767ff3a80a8e3894569"
     },
     {
       "id": "evaluate-ml-pipeline",
@@ -39,7 +39,7 @@
       "summary": "Evaluate one sklearn-compatible learner with the locked validation scheme and persist structured skore reports.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "6a05000ad69e04a979fedc8dfa835f1b4039363a71aa92b672706b1b2d6dd3fd"
+      "hash": "04b0d492d5056b39f3936d76cd8fb49a0664a1ab7fc05339f8e20f6f86927341"
     },
     {
       "id": "smoke-test-ml-pipeline",
@@ -48,7 +48,7 @@
       "summary": "Structural pytest: prediction count must match the predict-grid row count.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "8ffa94c47211205489539a5b4854e4b89a35fe85dd52355bce7f446e40fa7b02"
+      "hash": "dcacdf9adbdf336a6d2dcb7d1d4b3b492adf8470b9ffaa63318f6b86d783758d"
     },
     {
       "id": "audit-ml-pipeline",
