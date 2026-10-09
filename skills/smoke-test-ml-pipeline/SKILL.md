@@ -77,10 +77,10 @@ links); this skill does not narrate the pipeline.
   `dev` env, default + agent).
 - **Symbol from memory is forbidden.** Any skrub /
   scikit-learn name you write in the smoke test must come from
-  `python -m skore_skills api get <dotted>` or a matching cache
-  read **in this turn**. The smoke test is a small file but it imports the
-  predicting-package API surface; the same memory-forbidden rule
-  applies.
+  `python -m skore_skills api get <dotted>...` or a matching cache
+  read **in this turn**. Several symbols go in one call. The smoke
+  test is a small file but it imports the predicting-package API
+  surface; the same memory-forbidden rule applies.
 - **Don't shrink the assertion.** The hard assertion is exact
   row-count equality. Not "approximately equal", not "at least 80%
   of expected rows". A row-count mismatch *is* the failure mode the
@@ -155,7 +155,7 @@ Pre-flight (smoke-test-ml-pipeline):
       portable to any skrub-capable environment
 - [ ] API confirmed for skrub / sklearn symbols used in
       the test: <symbols, or "none">
-      Evidence: python -m skore_skills api get <dotted>
+      Evidence: python -m skore_skills api get <dotted>...
                 | Read scratch/api/<lib>/<version>/<topic>.md (this turn)
                 | Write scratch/api/<lib>/<version>/<topic>.md (this turn)
                 | "n/a — test only uses symbols already present in
