@@ -17,6 +17,8 @@ description: >
   HOW TO USE: before the first declarative line and on every
   structural edit. Read the stops and emit Pre-flight before
   code. Confirm new names with `python -m skore_skills api get`.
+metadata:
+  modelTier: big
 ---
 
 # Build ML Pipeline

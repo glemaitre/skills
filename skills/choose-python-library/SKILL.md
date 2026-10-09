@@ -7,6 +7,8 @@ description: >
   already fixed by the project stack — at first use (tabular
   exploration, pipeline, or eval extras), never during workspace
   setup.
+metadata:
+  modelTier: small
 ---
 
 # Choose Python Library

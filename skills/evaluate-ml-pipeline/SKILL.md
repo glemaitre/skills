@@ -20,6 +20,8 @@ description: >
   HOW TO USE: before any evaluation call. Resolve G-SKORE-MODE,
   read the stops, and emit Pre-flight before code. Confirm
   symbols with `python -m skore_skills api get`.
+metadata:
+  modelTier: medium
 ---
 
 # Evaluate ML Pipeline

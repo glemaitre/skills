@@ -24,6 +24,8 @@ description: >
   `python -m skore_skills smoke run --stem <stem>`. Red JSON
   means fix the pipeline in `build-ml-pipeline`. Do not loosen
   the assertion.
+metadata:
+  modelTier: medium
 ---
 
 # Smoke Test ML Pipeline

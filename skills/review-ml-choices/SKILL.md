@@ -12,6 +12,8 @@ description: >
 
   HOW TO USE: run `review choices`, show that board, then load
   one owning skill. Do not policy set from here.
+metadata:
+  modelTier: small
 ---
 
 # Review ML Choices

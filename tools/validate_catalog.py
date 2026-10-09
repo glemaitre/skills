@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate ``.catalog.json`` against the on-disk ``skills/`` directory.
 
-The validator enforces five invariants:
+The validator enforces six invariants:
 
 1. Every directory under ``skills/`` has a matching entry in
    ``.catalog.json``'s ``skills`` array, and vice versa.
@@ -13,6 +13,9 @@ The validator enforces five invariants:
 4. Every workflow's ``includes`` list references known skill ids.
 5. Every ``SKILL.md`` description is shorter than 1024 characters,
    counted the way Cursor counts a folded ``description: >`` block.
+6. Every ``SKILL.md`` ends its frontmatter with an unindented
+   ``metadata:`` block whose ``modelTier`` is ``small``, ``medium``,
+   or ``big``.
 
 Usage
 -----
@@ -26,12 +29,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
 # Cursor rejects a skill description at this length. The count includes
 # the trailing newline that YAML ``>`` (clip) keeps.
 DESCRIPTION_MAX_LENGTH = 1024
+MODEL_TIERS = {"small", "medium", "big"}
+_MODEL_TIER = re.compile(
+    r"^metadata:\n  modelTier: (small|medium|big)[ \t]*$",
+    re.MULTILINE,
+)
 
 
 def folded_description_length(text: str) -> int | None:
@@ -80,6 +89,23 @@ def folded_description_length(text: str) -> int | None:
     if inline in {">", "|"}:
         folded += "\n"
     return len(folded)
+
+
+def declared_model_tier(text: str) -> str | None:
+    """Return ``metadata.modelTier`` when it closes the frontmatter.
+
+    ``metadata:`` must be unindented. An indented key is inside the
+    folded description and is not a tier declaration.
+    """
+    if not text.startswith("---\n"):
+        return None
+    end = text.find("\n---\n", 4)
+    if end == -1:
+        return None
+    match = _MODEL_TIER.search(text[4:end])
+    if match is None or match.group(1) not in MODEL_TIERS:
+        return None
+    return match.group(1)
 
 
 # Allow-list: category -> set of permitted subcategories.
@@ -138,11 +164,17 @@ def validate(catalog_path: Path) -> list[str]:
         if not skill_md.is_file():
             errors.append(f"{skill['path']}/SKILL.md is missing")
         else:
-            length = folded_description_length(skill_md.read_text(encoding="utf-8"))
+            text = skill_md.read_text(encoding="utf-8")
+            length = folded_description_length(text)
             if length is not None and length >= DESCRIPTION_MAX_LENGTH:
                 errors.append(
                     f"{skill['path']}/SKILL.md description exceeds "
                     f"{DESCRIPTION_MAX_LENGTH - 1} characters ({length})"
+                )
+            if declared_model_tier(text) is None:
+                errors.append(
+                    f"{skill['path']}/SKILL.md metadata.modelTier must be "
+                    "small, medium, or big, in an unindented metadata block"
                 )
 
         cat = skill.get("category")

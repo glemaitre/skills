@@ -21,6 +21,8 @@ description: >
   If that command is missing, or the recorded task is not
   classification, regression, or multi-output regression, read
   `references/fallback.md` and do not invent the closed menu.
+metadata:
+  modelTier: medium
 ---
 
 # Frame ML Problem

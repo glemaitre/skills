@@ -20,6 +20,8 @@ description: >
   name the package and the manager, then return. Do not ask and
   do not wait.
   Never --execute while managed is false.
+metadata:
+  modelTier: small
 ---
 
 # Add Python Package

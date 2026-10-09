@@ -6,6 +6,8 @@ description: >
   topic with no artifact belongs to search-ml-literature. Do not
   write History, Backlog, or a design note. Do not pick a backlog
   row.
+metadata:
+  modelTier: medium
 ---
 
 # Shape User Idea

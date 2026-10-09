@@ -13,7 +13,8 @@
   `true`.
 
 **Must do:**
-- Emit the Pre-flight then ask (do not stop after listing boxes).
+- Read the lookup table and take the matching row (do not stop
+  after listing the rows).
 - Run `status` and `env detect` before any write.
 - AskUserQuestion multi-select of installed pieces (env,
   workspace, editable, git). The question's last line is exactly: Select each

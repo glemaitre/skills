@@ -17,6 +17,8 @@ description: >
   or `src/<pkg>/` already names it, then scaffold, then persist
   notebooks/site true when both are still unset. For an existing
   layout, stop without scaffolding or inventing files.
+metadata:
+  modelTier: small
 ---
 
 # Set Up Workspace
@@ -43,18 +45,22 @@ stay in this skill. `style` is ruff only.
   scaffold; keep existing `pyproject.toml`. No `--force`.
 - Otherwise → **fresh**. Ask G-PKG-NAME, then scaffold.
 
-## Pre-flight
+## Lookup
 
-Tick, then immediately run the matching sequence step. Do not stop
-after listing the boxes.
+Detect the layout, then take the one row that matches and run its
+steps from the Sequence below. Do not stop after reading the table.
 
-```
-- [ ] Layout: fresh | manager-only | existing
-- [ ] G-PKG-NAME: ask if fresh/manager-only (unless policy.package or src/<pkg>/ already names it)
-- [ ] scaffold --package <pkg> | existing: no scaffold, no invent
-- [ ] fresh/manager-only: persist notebooks + site true; install
-- [ ] dispatched → return | standalone → git end-turn --stage setup
-```
+| Layout | Import name | Steps | Notebooks and site |
+|---|---|---|---|
+| fresh | not recorded | 1 (ask), 2, 4, 5 | step 4 |
+| fresh | `policy.package` or `src/<pkg>/` already names it | 1 (no ask), 2, 4, 5 | step 4 |
+| manager-only | not recorded | 1 (ask), 2, 4, 5 | step 4 |
+| manager-only | `policy.package` or `src/<pkg>/` already names it | 1 (no ask), 2, 4, 5 | step 4 |
+| existing | any | 3, 5 | do not ask, persist, or install |
+
+Step 4 does not overwrite a flag that is already `true` or
+`false`. Step 5: a turn dispatched by `setup-ml-project` returns
+to it; a standalone turn runs `git end-turn --stage setup`.
 
 ## Sequence
 

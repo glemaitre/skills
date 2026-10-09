@@ -22,6 +22,8 @@ description: >
   `templates/materialize.py` to scratch; execute once; derive
   G-AUDIT-FINDING; then the continue-or-close gate. Resolve
   skore symbols with `api get`.
+metadata:
+  modelTier: medium
 ---
 
 # Audit ML Pipeline

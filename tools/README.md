@@ -45,7 +45,7 @@ to POSIX so digests are stable across operating systems.
 
 ## validate_catalog.py
 
-Checks four invariants:
+Checks these invariants:
 
 1. Every directory under `skills/` has a matching entry in
    `.catalog.json`'s `skills` array, and vice versa.
@@ -57,6 +57,9 @@ Checks four invariants:
 5. Every `SKILL.md` description is shorter than 1024 characters.
    The count is the folded `description: >` text, including the
    final newline YAML clip chomping keeps.
+6. Every `SKILL.md` ends its frontmatter with an unindented
+   `metadata:` block whose `modelTier` is `small`, `medium`, or
+   `big`.
 
 Run directly with `python tools/validate_catalog.py` or via
 `pixi run validate`.

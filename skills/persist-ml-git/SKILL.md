@@ -5,6 +5,8 @@ description: >
   end-turn hook says invoke. Trigger after
   `python -m skore_skills git end-turn --stage <stage>` returns
   action invoke, or when the user asks to commit this turn's work.
+metadata:
+  modelTier: small
 ---
 
 # Persist ML Git

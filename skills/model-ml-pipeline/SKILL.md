@@ -10,6 +10,8 @@ description: >
   build sub-step), the user's Evaluate (Recommended) / Modify /
   Stop gate, evaluation, and audit. Not for a single action
   already owned by evaluate, audit, or smoke debugging.
+metadata:
+  modelTier: big
 ---
 
 # Model ML Pipeline

@@ -5,6 +5,8 @@ description: >
   Load a skill without asking only when the request is certain to
   be that skill. Trigger on an ambiguous request, a finished stage,
   a workspace-open session, or "what should we do next".
+metadata:
+  modelTier: medium
 ---
 
 # Triage ML Task
