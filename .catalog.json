@@ -3,7 +3,7 @@
   "repository": "probabl-ai/skills",
   "version": "0.7.0",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "8cd7a64bdfb417fd6a9e2a7f5c785520496999cad3c90e655be8832568d7d726",
+  "catalog_hash": "2b3b47641b5cc981d382e988c15b95e55caaeaa8f00ed3ffe9d5a4e356b3f806",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -48,7 +48,7 @@
       "summary": "Structural pytest: prediction count must match the predict-grid row count.",
       "category": "methodology",
       "subcategory": null,
-      "hash": "b47255179cc863910859790e02cd795b3b67495fd31caee100c47dfe0d7ff58a"
+      "hash": "8ffa94c47211205489539a5b4854e4b89a35fe85dd52355bce7f446e40fa7b02"
     },
     {
       "id": "audit-ml-pipeline",
@@ -165,7 +165,7 @@
       "summary": "Require locked problem framing, write the first baseline design note for approval, then coordinate later choices, build, smoke testing, evaluation, and audit.",
       "category": "meta",
       "subcategory": null,
-      "hash": "66e720403a9fe1c4b99769756f64ca4bc25aebbc90b4857eef6dbf4ea1288999"
+      "hash": "e5f8c6dadeeae863e532f3a9b6ca269d506cb18daef5ac54fa8822cfc713e83c"
     },
     {
       "id": "choose-python-library",
@@ -174,7 +174,7 @@
       "summary": "Resolve a library choice and add the selected dependency.",
       "category": "action",
       "subcategory": null,
-      "hash": "61226879350c441da039abd92573279f735b7410ad42e58b966c1dbdbe166c7e"
+      "hash": "31552444d241ab9e50ec55c21f16b4b9ed3998f29d55d0fad1d76efdb558db39"
     },
     {
       "id": "plot-ml-figure",
