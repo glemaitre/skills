@@ -518,6 +518,39 @@ def test_alignment_row_and_corrupt_task_file(tmp_path: Path) -> None:
     ]
 
 
+def test_unusable_target_entries_leave_the_full_menu(tmp_path: Path) -> None:
+    """A targets payload that is not column/task pairs records no task."""
+    _journal(tmp_path)
+    extras = tmp_path / "scratch" / "data_analysis" / "extras.json"
+    full_menu = [
+        "probabilities",
+        "point_labels",
+        "intervals",
+        "point_predictions",
+        "uncovered",
+    ]
+    payloads = [
+        "[]",
+        json.dumps({"targets": {"column": "label", "task": "classification"}}),
+        json.dumps({"targets": []}),
+        json.dumps(
+            {
+                "targets": [
+                    "label",
+                    {"column": 1, "task": "regression"},
+                    {"column": "amount", "task": None},
+                    {"column": " ", "task": "classification"},
+                    {"column": "label", "task": " "},
+                ]
+            }
+        ),
+    ]
+    for text in payloads:
+        _write(extras, text)
+        payload = frame_show(tmp_path)
+        assert _question(payload, "prediction_goal")["candidates"] == full_menu
+
+
 def test_regression_task_offers_interval_goals(tmp_path: Path) -> None:
     """A recorded regression task asks for intervals or point predictions."""
     _journal(tmp_path)
