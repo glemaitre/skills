@@ -172,7 +172,9 @@ Pre-flight (smoke-test-ml-pipeline):
       the failure mode (default: a single horizon-length slice; for
       time series, the most recent N steps such that the target is
       *just* observable for assertion)
-- [ ] Hard assertion wired: `len(predictions) == n_predict_grid_rows`
+- [ ] Hard assertion wired: `len(predictions) == n_predict_grid_rows`,
+      plus output width (1 for one target; `translation.targets`
+      for multi-output regression, including column names)
 - [ ] Soft assertion wired (or explicitly skipped): smoke MAE within
       `3 × CV_MEAN_HARDCODED_FROM_PLAN` (or task-appropriate
       analogue). Value is a literal pulled from the matching
@@ -207,6 +209,12 @@ target-time rows in the predict-time grid. If the pipeline's
 source binding is a directory of raw files, it's the row count of
 the supervised frame derived from the predict env at predict time
 (usable via `build_supervised_frame(predict_dir)`).
+
+`len` counts rows. Also assert the output width: 1 for one
+target. For multi-output regression, the width and, when
+`predict` returns a DataFrame, the column names equal
+`translation.targets`. A matrix with the right row count and
+the wrong outputs is still a shape failure.
 
 ### Soft — the metric-vs-CV gap
 
@@ -339,8 +347,10 @@ a buggy one. What the smoke test still catches in the IID case:
 - Loader bugs that drop or duplicate rows on a smaller input
   than CV used.
 - Shape mismatches between `learner.predict(env)`'s output and
-  the predict-env row count (e.g. an estimator that returns
-  `(N, 2)` predictions when the test only checks `len(...)`).
+  the predict-env row count. `len` on a DataFrame is the row
+  count, so also check the output width. One target has width 1.
+  Multi-output regression must match `translation.targets` in
+  width and column names.
 - Accidental NaN-poisoning when an encoder has never seen a
   category present in the predict subset (the soft assertion
   on smoke-MAE-vs-CV-mean catches this; keep it on).
@@ -387,7 +397,11 @@ def test_NN_<short_name>(train_predict_envs):
     learner.fit(train_env)
     predictions = learner.predict(predict_env)
 
-    # HARD: structural correctness.
+    # HARD: structural correctness. n_outputs is 1 for one target.
+    # Multi-output regression sets n_outputs and target_names from
+    # translation.targets.
+    n_outputs = 1
+    target_names: list[str] = []
     assert len(predictions) == n_predict_grid_rows, (
         f"got {len(predictions)} predictions for "
         f"{n_predict_grid_rows} predict-grid rows — pipeline is "
@@ -395,6 +409,12 @@ def test_NN_<short_name>(train_predict_envs):
         f"and that history-dependent features reference an "
         f"upstream history node, not a per-slice computation."
     )
+    width = predictions.shape[1] if getattr(predictions, "ndim", 1) == 2 else 1
+    assert width == n_outputs, (
+        f"got {width} outputs, expected {n_outputs}"
+    )
+    if target_names:
+        assert list(predictions.columns) == target_names, list(predictions.columns)
 
     # SOFT: predictions are not NaN-poisoned.
     from sklearn.metrics import mean_absolute_error

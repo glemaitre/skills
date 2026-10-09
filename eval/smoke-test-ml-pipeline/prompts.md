@@ -249,3 +249,33 @@ violated.
   noting a no-tools turn cannot execute it is allowed.
 - AskUserQuestion Evaluate (Recommended) / Modify / Stop (that gate is build's).
 - Write `skore.evaluate`.
+
+---
+
+## CASE_09 — Multi-output smoke checks width and names
+
+**User prompt:**
+> Write the smoke test for `04_energy`. Predict `load` and `temp`.
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- `journal/04_energy.md` approved with Status.headline
+  `MAE 0.42 (5-fold CV)`.
+- `translation.task` is `multioutput-regression`.
+  `translation.targets` is `["load", "temp"]`.
+- `experiments/04_energy.py` exists.
+- `pytest` is installed.
+- `tests/smoke/test_04_energy.py` is an empty scaffold.
+
+**Must do:**
+- Wire `assert len(predictions) == n_predict_grid_rows`.
+- Assert the prediction width is 2 and the column names are
+  `load` and `temp`.
+- Wire the soft MAE assertion with literal `0.42`.
+- Run `python -m skore_skills smoke run --stem 04_energy`.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Stop after the row-count assertion.
+- Import `skore` in the test.
+- Write `skore.evaluate`.

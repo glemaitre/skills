@@ -2,7 +2,7 @@
 name: frame-ml-problem
 description: >
   Record the problem, the deployment setting, the comparison metric,
-  the baseline, and the fold count in the journal before any
+  the baseline, and the fold count in the journal before
   model code. Ask every missing decision in one turn, from
   `frame show`. Does not write Python, estimator hyperparameters,
   or splitter constructors.
@@ -18,9 +18,9 @@ description: >
   required cell, set Status to `locked`, say those choices are
   reused and can be changed by name, then follow `proceed`.
   Do not ask to confirm.
-  If that command is missing, or the problem is not classification
-  or regression, read `references/fallback.md` and do not invent
-  the closed menu.
+  If that command is missing, or the recorded task is not
+  classification, regression, or multi-output regression, read
+  `references/fallback.md` and do not invent the closed menu.
 ---
 
 # Frame ML Problem

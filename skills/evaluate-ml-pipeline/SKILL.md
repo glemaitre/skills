@@ -186,12 +186,18 @@ No `Stratified*` for class imbalance. It compresses across-fold
 variance.
 
 The headline is `translation.metric`. A name on the skore
-default list in `build-ml-pipeline` needs no scorer. Any other
-name must already be `.skb.with_scoring(...)` on the prediction
-DataOp. If it is not, return to `build-ml-pipeline` before
-`skore.evaluate`. Do not call `report.metrics.add`. When the
-scorer is attached, that name is a row in
-`report.metrics.summarize().frame()`. `skore.evaluate` has no
+default list in `build-ml-pipeline` needs no scorer, except
+`multioutput-regression`: the default regression metrics are
+per output, and the locked aggregate must already be
+`.skb.with_scoring(...)`. Any other name must already be
+`.skb.with_scoring(...)` on the prediction DataOp. If it is
+not, return to `build-ml-pipeline` before `skore.evaluate`.
+Do not call `report.metrics.add`. When the scorer is attached,
+that name is a row in `report.metrics.summarize().frame()`.
+For `multioutput-regression`, that frame also has one row per
+output. Do not average those rows away in the experiment file.
+The close may quote the locked aggregate; the per-output rows
+stay in the stored report. `skore.evaluate` has no
 `scoring=` argument (`references/custom-metrics.md`). If the
 name is attached and still missing from that frame, the
 predictor class is wrong: it must be the mixin, then

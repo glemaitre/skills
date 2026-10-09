@@ -11,7 +11,8 @@
 - `status.setup.pending` is empty.
 - `journal/JOURNAL.md` exists. Modeling decisions Status is still
   the empty placeholder.
-- `scratch/data_analysis/extras.json` has `"task": "classification"`.
+- `scratch/data_analysis/extras.json` `targets` is one entry,
+  column `label`, task `classification`.
 - `python -m skore_skills frame show` returns `ask` /
   `missing_keys`. `missing` lists prediction_goal, deployment,
   horizon, gap, time_role, generalize_to, known_at_predict,
@@ -79,10 +80,11 @@
 
 **Assumed workspace state:**
 - `status.setup.pending` is empty.
-- `scratch/data_analysis/extras.json` has `"task": "clustering"`.
+- `scratch/data_analysis/extras.json` `targets` is one entry,
+  column `segment`, task `clustering`.
 - `frame show` returns `ask` / `uncovered`, `reference`
-  `references/fallback.md`, and `context.task` `clustering`.
-  There is no `candidates` list.
+  `references/fallback.md`, `context.task` `clustering`, and
+  `context.targets` `["segment"]`. There is no `candidates` list.
 
 **Must do:**
 - Read `references/fallback.md` and no other file under
@@ -474,3 +476,96 @@
 - Enable notebooks or site policy.
 - Build between individual edits in the same Markdown batch.
 - Run `notebook convert`.
+
+---
+
+## CASE_18 — Multi-output regression uses the regression menu
+
+**User prompt:**
+> We predict both `load` and `temp`. Which comparison should we lock?
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- `journal/JOURNAL.md` exists. Modeling decisions Status is still
+  the empty placeholder.
+- `scratch/data_analysis/extras.json` `targets` lists `load` and
+  `temp`, both task `regression`.
+- `python -m skore_skills frame show` returns `ask` /
+  `missing_keys`. prediction_goal candidates are `intervals`,
+  `point_predictions`, and `uncovered`.
+
+**Must do:**
+- Run `python -m skore_skills frame show`.
+- Ask every key in `missing` in one message. Prediction-goal
+  options are only `intervals`, `point_predictions`, and
+  `uncovered`.
+- Treat `load` and `temp` as the outputs of one regression problem.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Offer `probabilities` or `point_labels`.
+- Read `references/fallback.md`.
+- Ask to drop one target so the problem becomes single-output.
+- Write Python or a splitter constructor.
+
+---
+
+## CASE_19 — Mixed targets use the fallback
+
+**User prompt:**
+> We need to predict `amount` and `fraud` together. What should we lock?
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- `scratch/data_analysis/extras.json` `targets` lists `amount`
+  (`regression`) and `fraud` (`classification`).
+- `frame show` returns `ask` / `uncovered`, `reference`
+  `references/fallback.md`, `context.task` `mixed`, and
+  `context.targets` `["amount", "fraud"]`. There is no
+  `candidates` list.
+
+**Must do:**
+- Read `references/fallback.md` and no other file under
+  `references/`.
+- Say the closed menu does not cover a mix of regression and
+  classification outputs.
+- Ask what a better result means and what the baseline is.
+- Write Prediction goal `uncovered` plus those two prose cells.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Offer `intervals`, `probabilities`, or `point_labels` as the
+  joint goal.
+- Drop one target in order to stay on the closed menu.
+- Write a splitter class or Python.
+
+---
+
+## CASE_20 — Several classification targets use the fallback
+
+**User prompt:**
+> We predict both `topic` and `priority`. What should we lock?
+
+**Assumed workspace state:**
+- `status.setup.pending` is empty.
+- `scratch/data_analysis/extras.json` `targets` lists `topic` and
+  `priority`, both task `classification`.
+- `frame show` returns `ask` / `uncovered`, `reference`
+  `references/fallback.md`, `context.task`
+  `multioutput-classification`, and `context.targets`
+  `["topic", "priority"]`. There is no `candidates` list.
+
+**Must do:**
+- Read `references/fallback.md` and no other file under
+  `references/`.
+- Say the closed menu does not cover several classification
+  outputs.
+- Ask what a better result means and what the baseline is.
+- Write Prediction goal `uncovered` plus those two prose cells.
+
+**Must NOT do:**
+- Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).
+- Offer `probabilities` or `point_labels` for the pair.
+- Treat the pair as one multiclass column or as multi-output
+  regression.
+- Write a splitter class or Python.

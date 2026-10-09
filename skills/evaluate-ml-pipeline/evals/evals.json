@@ -561,6 +561,26 @@
       "tools": false,
       "sandbox": [],
       "expect_files": []
+    },
+    {
+      "id": 29,
+      "title": "Multi-output metrics stay per output",
+      "prompt": "[Workspace state \u2014 read but do not narrate back:\n- `status.setup.pending` is empty.\n- The post-smoke answer was Evaluate in this turn.\n- The learner is a SkrubLearner. The prediction DataOp already\n  has `.skb.with_scoring(...)` for the MAE aggregate, before\n  `make_learner`.\n- `frame show` returned `proceed`. `translation.task` is\n  `multioutput-regression`. `translation.targets` is `[\"load\",\n  \"temp\"]`. `translation.metric` is `MAE`.\n- The X marker has `cv=KFold(n_splits=5)`.\n- `policy.skore_mode` is `local`.]\n\nEvaluate `04_energy`. The locked comparison is MAE, and the\noutputs are `load` and `temp`.",
+      "expected_output": "Behavioural response satisfying: - Call `skore.evaluate(learner, data={...})` without `splitter=`. - Read `report.metrics.summarize().frame()` and keep the per-output rows. The close may quote the aggregate MAE. - Call `project.put(...)`. It must NOT: - Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed). - Average the per-output rows in the experiment file and drop them. - Call `report.metrics.add`.",
+      "files": [],
+      "expectations": [
+        "Call `skore.evaluate(learner, data={...})` without `splitter=`.",
+        "Read `report.metrics.summarize().frame()` and keep the per-output rows. The close may quote the aggregate MAE.",
+        "Call `project.put(...)`.",
+        "The response does NOT: Put catalog skill ids, HITL, `G-PKG-NAME` / `G-ENV-MGR` / `G-SKORE-MODE` / `G-TABULAR` / `G-CV-SPLITTER`, or `python -m skore_skills` / `env add` in user-facing questions or the close narrative (trailing `G-REPORT-LOCATOR` / `G-AUDIT-FINDING` and unmanaged `pixi add` / `uv add` / `pip install` lines are allowed).",
+        "The response does NOT: Average the per-output rows in the experiment file and drop them.",
+        "The response does NOT: Call `report.metrics.add`.",
+        "The response does NOT: Return the learner to build.",
+        "The response does NOT: Pass `scoring=` to `skore.evaluate`."
+      ],
+      "tools": false,
+      "sandbox": [],
+      "expect_files": []
     }
   ]
 }
