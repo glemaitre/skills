@@ -21,6 +21,8 @@ description: >
   HOW TO USE: G-TABULAR via `add-python-package`, infer or ask
   the targets, load `plot-ml-figure` if installed, then ask the
   five-option continuation board, including Close.
+metadata:
+  modelTier: medium
 ---
 
 # Explore ML Data
