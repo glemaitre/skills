@@ -17,9 +17,9 @@ TIERS = ("small", "medium", "big")
 TIER_MODES = ("assigned", "all", "small", "medium", "big")
 DEFAULT_TIER = "medium"
 DEFAULT_TIER_MODELS = {
-    "small": "openrouter/qwen/qwen3.7-flash",
+    "small": "openrouter/qwen/qwen3.8-27b",
     "medium": "openrouter/deepseek/deepseek-v4.1-flash",
-    "big": "openrouter/z-ai/glm-5.3",
+    "big": "openrouter/qwen/qwen3.8-max-0902",
 }
 
 SKILLS_DIR = Path(__file__).resolve().parents[2] / "skills"

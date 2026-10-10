@@ -32,8 +32,8 @@ In practice, from a prompt such as:
 you can expect your agent to start experimenting with you. The skills work well with
 models such as Claude Opus and Sonnet and produce great results with smaller models such
 as Qwen 3.7 Flash or DeepSeek v4.1 Flash. Each skill declares `metadata.modelTier`
-(`small`, `medium`, or `big`). The eval maps those tiers to Qwen 3.7 Flash,
-DeepSeek v4.1 Flash, and GLM 5.3. A skill may also declare `metadata.role`
+(`small`, `medium`, or `big`). The eval maps those tiers to Qwen3.8 27B,
+DeepSeek v4.1 Flash, and Qwen3.8 Max. A skill may also declare `metadata.role`
 (`entry` or `helper`) when its caller continues after it loads.
 
 As for agent harnesses, we tested them with Claude Code, OpenCode, Cursor, and GitHub

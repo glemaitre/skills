@@ -139,8 +139,8 @@ Defaults (override in `pixi.toml` or on the CLI):
   (`small`, `medium`, or `big`). `tests/eval/tiers.py` reads that
   field. A missing or unknown tier falls back to medium. The model
   ids are `SKILL_EVAL_TIER_SMALL`, `SKILL_EVAL_TIER_MEDIUM`, and
-  `SKILL_EVAL_TIER_BIG` in `pixi.toml`: Qwen 3.7 Flash, DeepSeek
-  v4.1 Flash, and GLM 5.3.
+  `SKILL_EVAL_TIER_BIG` in `pixi.toml`: Qwen3.8 27B, DeepSeek
+  v4.1 Flash, and Qwen3.8 Max (0902).
 - judge: `~typesafe/jev-latest` (not tiered)
 - mode: `with` (SKILL.md as system prompt)
 - Must-do pass ratio: `0.7` (diagnostic metric only; Must-NOT is
