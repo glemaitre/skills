@@ -35,17 +35,13 @@ required reviewers.
 ## Cutting a release
 
 1. Run `pixi run check`.
-2. Bump the version with `pixi run bump-major`, `pixi run bump-minor`, or
-   `pixi run bump-patch`. Review the diff and merge that commit.
-   [`tools/bump_version.py`](tools/bump_version.py) writes the version into
-   `.catalog.json`, `pyproject.toml`, `pixi.toml`, and the plugin manifests.
-   It leaves commits and tags to you.
-3. Create a [GitHub Release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
-   whose tag is exactly that version, for example `0.8.0`. GitHub can create
-   the tag and the release together. The tag must match `[project].version` in
-   `pyproject.toml` and `version` in `.catalog.json`.
+2. Create a [GitHub Release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
+   on the commit to ship. GitHub can create the tag and the release together.
+   The tag is the release version, for example `0.8.0`.
 
-[`.github/workflows/release.yml`](.github/workflows/release.yml) builds the
-package and publishes it to PyPI.
+[`.github/workflows/release.yml`](.github/workflows/release.yml) writes that
+tag into the package metadata and the catalog embedded in the distributions,
+then publishes them to PyPI. `skore skills install` records the same tag as
+the catalog version when it downloads the release archive.
 
 conda-forge is updated from the PyPI release outside this repository.
