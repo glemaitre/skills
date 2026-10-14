@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any
 
 POLICY_FILENAME = ".skore"
-LEGACY_POLICY_FILENAME = ".skore-workspace.json"
 WORKSPACE_KEY = "workspace"
 
 AUTOCOMMIT_VALUES = ("off", "on")
@@ -47,20 +46,6 @@ POLICY_SET_KEYS = (
     "setup.git",
 )
 
-_POLICY_FLAT_KEYS = frozenset(
-    {
-        "env_manager",
-        "env",
-        "package",
-        "tabular",
-        "skore_mode",
-        "notebooks",
-        "site",
-        "git",
-        "loop",
-        "setup",
-    }
-)
 MANAGED_TRUE = ("true", "on", "yes")
 MANAGED_FALSE = ("false", "off", "no")
 BOOL_KEYS = frozenset({"notebooks", "site"})
@@ -155,11 +140,7 @@ def _load_document(root: Path) -> dict[str, Any]:
 
 
 def load_policy(root: Path) -> dict[str, Any]:
-    """Read the ``workspace`` section, or defaults when missing.
-
-    Also accepts a leftover flat ``.skore-workspace.json`` for one
-    release when ``.skore`` has no ``workspace`` section.
-    """
+    """Read the ``workspace`` section, or defaults when missing."""
     path = policy_path(root)
     if path.is_dir():
         raise ValueError(".skore is a directory; expected a JSON file")
@@ -168,13 +149,6 @@ def load_policy(root: Path) -> dict[str, Any]:
         inner = doc.get(WORKSPACE_KEY)
         if isinstance(inner, dict):
             return _merge_loaded(inner)
-        if _POLICY_FLAT_KEYS & doc.keys() and WORKSPACE_KEY not in doc:
-            return _merge_loaded(doc)
-    legacy = _read_json_object(root / LEGACY_POLICY_FILENAME)
-    if legacy is not None:
-        if isinstance(legacy.get(WORKSPACE_KEY), dict):
-            return _merge_loaded(legacy[WORKSPACE_KEY])
-        return _merge_loaded(legacy)
     return empty_policy()
 
 

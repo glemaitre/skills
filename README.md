@@ -93,7 +93,7 @@ pixi exec --spec skore-cli skore skills install
 If you prefer `npx`, then you can use:
 
 ```bash
-npx skills add probabl-ai/skills
+npx skills add probabl-ai/skore-skills
 ```
 
 ### Alternative — Claude Code plugin marketplace
@@ -102,7 +102,7 @@ If you only use Claude Code and prefer the native plugin flow, this repo is
 also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-code/plugin-marketplaces):
 
 ```bash
-/plugin marketplace add probabl-ai/skills
+/plugin marketplace add probabl-ai/skore-skills
 ```
 
 ```bash
@@ -185,7 +185,7 @@ Catalog ids `python-env-manager` and `python-code-style` have been removed. Run
 ## Website
 
 The catalog page lives in `site/` and is published at
-<https://probabl-ai.github.io/skills/>.
+<https://probabl-ai.github.io/skore-skills/>.
 
 Build it with the `site` Pixi environment, which provides Node.js:
 
