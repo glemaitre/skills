@@ -126,16 +126,6 @@ def test_save_policy_rejects_skore_directory(tmp_path: Path) -> None:
         save_policy(tmp_path, empty_policy())
 
 
-def test_load_legacy_flat_workspace_json(tmp_path: Path) -> None:
-    """One-release read of leftover ``.skore-workspace.json``."""
-    (tmp_path / ".skore-workspace.json").write_text(
-        json.dumps({"env_manager": "uv", "git": {"autocommit": "on"}}) + "\n",
-        encoding="utf-8",
-    )
-    assert snapshot(tmp_path)["policy"]["env_manager"] == "uv"
-    assert snapshot(tmp_path)["policy"]["git"]["autocommit"] == "on"
-
-
 def test_infer_evaluate_until_audit_file(tmp_path: Path) -> None:
     """Smoke without an audit file is evaluate; audit file becomes backlog."""
     (tmp_path / "src").mkdir()
@@ -200,8 +190,8 @@ def test_load_policy_managed_string_aliases(tmp_path: Path) -> None:
     assert load_policy(tmp_path)["env"]["managed"] is False
 
 
-def test_load_policy_ignores_non_object_and_reads_flat_document(tmp_path: Path) -> None:
-    """A JSON list is ignored; a flat ``.skore`` object is the workspace section."""
+def test_load_policy_ignores_non_object_and_flat_document(tmp_path: Path) -> None:
+    """A JSON list and a flat ``.skore`` object are not a workspace policy."""
     from skore_skills.policy import load_policy
 
     (tmp_path / ".skore").write_text("[]\n", encoding="utf-8")
@@ -209,18 +199,7 @@ def test_load_policy_ignores_non_object_and_reads_flat_document(tmp_path: Path) 
     (tmp_path / ".skore").write_text(
         json.dumps({"env_manager": "uv"}) + "\n", encoding="utf-8"
     )
-    assert load_policy(tmp_path)["env_manager"] == "uv"
-
-
-def test_load_legacy_nested_workspace_section(tmp_path: Path) -> None:
-    """A leftover file may already nest keys under ``workspace``."""
-    from skore_skills.policy import load_policy
-
-    (tmp_path / ".skore-workspace.json").write_text(
-        json.dumps({"workspace": {"package": "demo"}}) + "\n",
-        encoding="utf-8",
-    )
-    assert load_policy(tmp_path)["package"] == "demo"
+    assert load_policy(tmp_path) == empty_policy()
 
 
 def test_load_policy_rejects_skore_directory(tmp_path: Path) -> None:
