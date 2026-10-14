@@ -15,7 +15,7 @@ skore-skills = "skore_skills.cli:main"
 
 [project.urls]
 Homepage = "https://probabl.ai"
-Repository = "https://github.com/probabl-ai/skills"
+Repository = "https://github.com/probabl-ai/skore-skills"
 
 [build-system]
 requires = ["hatchling"]

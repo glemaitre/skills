@@ -1,7 +1,7 @@
 # Publish skore-skills to PyPI when a GitHub Release is published.
 #
 # That release is also the source archive ``skore skills install`` downloads
-# from probabl-ai/skills. The tag must be X.Y.Z. It becomes the package
+# from probabl-ai/skore-skills. The tag must be X.Y.Z. It becomes the package
 # version and the catalog version embedded in the distributions.
 #
 # Example of a valid tag: `0.8.0`.
@@ -20,7 +20,7 @@ permissions: {}
 jobs:
   build:
     name: Build package distributions
-    if: ${{ github.repository == 'probabl-ai/skills' }}
+    if: ${{ github.repository == 'probabl-ai/skore-skills' }}
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -62,7 +62,7 @@ jobs:
 
   publish:
     name: Publish package distributions to PyPI using trusted publisher
-    if: ${{ github.repository == 'probabl-ai/skills' }}
+    if: ${{ github.repository == 'probabl-ai/skore-skills' }}
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -84,7 +84,7 @@ jobs:
   clean:
     name: Delete package distributions artifacts
     runs-on: ubuntu-latest
-    if: ${{ (github.repository == 'probabl-ai/skills') && always() }}
+    if: ${{ (github.repository == 'probabl-ai/skore-skills') && always() }}
     permissions:
       actions: write
     needs: [publish]

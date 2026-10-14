@@ -29,7 +29,7 @@ def _write_catalog(target: Path, skill_ids: list[str]) -> None:
     skills = [{"id": name, "path": f"skills/{name}"} for name in skill_ids]
     _write(
         target / ".catalog.json",
-        json.dumps({"sources": {"probabl-ai/skills": {"skills": skills}}}) + "\n",
+        json.dumps({"sources": {"probabl-ai/skore-skills": {"skills": skills}}}) + "\n",
     )
 
 

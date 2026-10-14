@@ -1,7 +1,7 @@
 # Release process
 
 This document describes how to release the `skore-skills` package and the
-skills catalog. You need write access to `probabl-ai/skills` and to the PyPI
+skills catalog. You need write access to `probabl-ai/skore-skills` and to the PyPI
 project.
 
 Releases use semantic versioning:
@@ -10,8 +10,8 @@ Releases use semantic versioning:
 - Patch releases are numbered `X.Y.Z`.
 
 Publishing a GitHub Release creates the source tarball that
-`skore skills install` downloads from `probabl-ai/skills`. The installer reads
-`releases/latest`, then downloads `/repos/probabl-ai/skills/tarball/{tag}` and
+`skore skills install` downloads from `probabl-ai/skore-skills`. The installer reads
+`releases/latest`, then downloads `/repos/probabl-ai/skore-skills/tarball/{tag}` and
 copies each skill from the paths in `.catalog.json`. The same release publishes
 the `skore-skills` wheel and sdist to PyPI.
 
@@ -22,7 +22,7 @@ Before the first publish:
 1. On PyPI, add a trusted publisher for `skore-skills`. Use a pending publisher
    when the project does not exist yet.
    - Owner: `probabl-ai`
-   - Repository: `skills`
+   - Repository: `skore-skills`
    - Workflow: `release.yml`
    - Environment: `release`
 2. On GitHub, create an environment named `release`. Add required reviewers

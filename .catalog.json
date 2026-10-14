@@ -1,6 +1,6 @@
 {
   "name": "probabl-skills",
-  "repository": "probabl-ai/skills",
+  "repository": "probabl-ai/skore-skills",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
   "catalog_hash": "bdd9331fd273b5e7121494b9fbc29ee47c0e0cd7100cc6aee81e63ed777a514c",
   "skills": [
