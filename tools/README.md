@@ -132,7 +132,9 @@ the new version consistently to every source that declares it:
 
 The script refuses to run when those sources disagree. Use `--dry-run`
 to preview the bump without writing files. It does not create git commits
-or tags — review and commit the changes yourself.
+or tags — review and commit the changes yourself. After that commit is
+merged, cut the GitHub Release as described in
+[`RELEASE_PROCESS.md`](../RELEASE_PROCESS.md).
 
 ```bash
 python tools/bump_version.py patch --dry-run
