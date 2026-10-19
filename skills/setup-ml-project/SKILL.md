@@ -1,23 +1,20 @@
 ---
 name: setup-ml-project
 description: >
-  Coordinate ML project setup. Trigger when the user asks to set up
-  or bootstrap a workspace, or when a pipeline stage finds
-  status.setup.pending non-empty. Ask only those pending pieces.
-  The question tells the user to select each piece they want.
-  It starts by saying that before any modeling, the workspace
-  should be set up. Do not say the order the pieces will run.
-  Do not offer a piece that is already done or declined.
-  Then, in that same opening phase, ask the environment manager,
-  whether we manage the env, the import name, and git autocommit
-  — only for pieces the user selects, and answers that are not
-  already recorded. Persist those answers. When Git is selected,
-  run the pre-change snapshot check before any setup write. Ask
-  to commit the current files only when that check says ask. An
-  empty folder or a clean tree records skipped and does not ask.
-  Then run only what the user selects. Git may ask once, just
-  before the first commit, which unknown files to keep. Return
-  to the skill that dispatched this turn.
+  Ask only the pending setup pieces. When Git is selected, commit the current
+  files before setup writes only if that check finds files to preserve.
+  Trigger when the user asks to set up or bootstrap a workspace, or when a
+  pipeline stage finds status.setup.pending non-empty. The question tells the
+  user to select each piece they want. It
+  starts by saying that before any modeling, the workspace should be set up.
+  Do not say the order the pieces will run. Do not offer a piece that is
+  already done or declined. Then, in that same opening phase, ask the
+  environment manager, whether we manage the env, the import name, and git
+  autocommit — only for pieces the user selects, and answers that are not
+  already recorded. Persist those answers. An empty folder or a clean tree records
+  skipped and does not ask. Then run only what the user selects. Git may ask
+  once, just before the first commit, which unknown files to keep. Return to
+  the skill that dispatched this turn.
 metadata:
   modelTier: small
 ---

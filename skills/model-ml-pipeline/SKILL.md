@@ -1,15 +1,15 @@
 ---
 name: model-ml-pipeline
 description: >
-  Deterministic entry point for modeling. On a first landing,
-  write the locked baseline design note and ask for approval.
-  Later landings offer only the choices the workspace justifies
-  (an EDA proposal, Backlog, discussion). A missing
-  modeling lock loads `frame-ml-problem` and stops.
-  After a design is approved, coordinate build (pytest smoke is a
-  build sub-step), the user's Evaluate (Recommended) / Modify /
-  Stop gate, evaluation, and audit. Not for a single action
-  already owned by evaluate, audit, or smoke debugging.
+  Require locked problem framing, write the first baseline design note for
+  approval, then coordinate later choices, build, smoke testing, evaluation,
+  and audit. On a first landing, write the locked baseline design note and ask
+  for approval. Later landings offer only the choices the workspace justifies
+  (an EDA proposal, Backlog, discussion). A missing modeling lock loads
+  `frame-ml-problem` and stops. After a design is approved, coordinate build
+  (pytest smoke is a build sub-step), the user's Evaluate (Recommended) /
+  Modify / Stop gate, evaluation, and audit. Not for a single action already
+  owned by evaluate, audit, or smoke debugging.
 metadata:
   modelTier: big
 ---

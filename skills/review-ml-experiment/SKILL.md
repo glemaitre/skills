@@ -1,11 +1,10 @@
 ---
 name: review-ml-experiment
 description: >
-  Post-evaluate review. Read the stored report, then write one
-  markdown idea file and one Ideas row per candidate. Trigger
-  after a successful evaluate, on "review this stem", or when
-  review consent is audit or proceed. Do not write History,
-  Backlog, or a design note.
+  Read the stored report, then write one idea file and one Ideas row per
+  candidate. Trigger after a successful evaluate, on "review
+  this stem", or when review consent is audit or proceed. Do not write
+  History, Backlog, or a design note.
 metadata:
   modelTier: medium
 ---

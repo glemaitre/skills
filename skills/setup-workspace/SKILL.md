@@ -1,22 +1,19 @@
 ---
 name: setup-workspace
 description: >
-  Detect an existing ML workspace or scaffold a fresh one via
-  `python -m skore_skills scaffold --package <pkg>`. Cookiecutter
-  only: directories, README.md files, and src/<pkg>/ stubs. After
-  a first scaffold, turn executed notebooks and the documentation
-  site on by default (no ask).
+  Detect or scaffold the standard ML workspace layout. Cookiecutter only:
+  directories, README.md files, and src/<pkg>/ stubs. After a first scaffold,
+  turn executed notebooks and the documentation site on by default (no ask).
 
   TRIGGER for a new ML project layout or first scaffold.
 
-  SKIP pipeline, evaluation, exploratory data analysis, and library
-  choice.
+  SKIP pipeline, evaluation, exploratory data analysis, and library choice.
 
-  HOW TO USE: detect first. For a fresh or manager-only layout,
-  resolve G-PKG-NAME via `AskUserQuestion` unless `policy.package`
-  or `src/<pkg>/` already names it, then scaffold, then persist
-  notebooks/site true when both are still unset. For an existing
-  layout, stop without scaffolding or inventing files.
+  HOW TO USE: detect first. For a fresh or manager-only layout, resolve
+  G-PKG-NAME via `AskUserQuestion` unless `policy.package` or `src/<pkg>/`
+  already names it, then scaffold, then persist notebooks/site true when both
+  are still unset. For an existing layout, stop without scaffolding or
+  inventing files.
 metadata:
   role: helper
   modelTier: small

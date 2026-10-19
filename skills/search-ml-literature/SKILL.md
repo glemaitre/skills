@@ -1,11 +1,10 @@
 ---
 name: search-ml-literature
 description: >
-  Search scientific and technical sources for a query and, after
-  the user picks and confirms one direction, write one idea file
-  and its Ideas row. Comes after review, beside the backlog. Do
-  not call research-ml-practice. Do not write History, Backlog,
-  or a design note. Do not pick a winner.
+  Search scientific and technical sources and write one idea file and one
+  Ideas row for the direction the user confirms. Comes after review, beside
+  the backlog. Do not call research-ml-practice. Do not write History,
+  Backlog, or a design note. Do not pick a winner.
 metadata:
   modelTier: medium
 ---

@@ -1,22 +1,20 @@
 ---
 name: build-ml-pipeline
 description: >
-  Declare the pipeline from data source to predictor as a skrub
-  DataOps graph. Stateless steps use `.skb.apply_func`. Stateful
-  steps use `.skb.apply`. After the graph exists, attach the
-  locked splitter and any non-default score. No fit, tune,
-  persistence, or `skore.evaluate`.
+  Declare a skrub DataOps graph from the data source to the predictor after
+  framing is locked. Stateless steps use `.skb.apply_func`. Stateful steps use
+  `.skb.apply`. After the graph exists, attach the locked splitter and any
+  non-default score. No fit, tune, persistence, or `skore.evaluate`.
 
-  TRIGGER when writing or editing any link from data source to
-  predictor (loaders, preprocessing, features, composition,
-  the final estimator), including a pure-Python function on that
-  path, a step added or reordered, a bare `sklearn.Pipeline` as
-  the top-level, or a request to build a pipeline, classifier,
-  or regressor.
+  TRIGGER when writing or editing any link from data source to predictor
+  (loaders, preprocessing, features, composition, the final estimator),
+  including a pure-Python function on that path, a step added or reordered, a
+  bare `sklearn.Pipeline` as the top-level, or a request to build a pipeline,
+  classifier, or regressor.
 
-  HOW TO USE: before the first declarative line and on every
-  structural edit. Read the stops and emit Pre-flight before
-  code. Confirm new names with `python -m skore_skills api get`.
+  HOW TO USE: before the first declarative line and on every structural edit.
+  Read the stops and emit Pre-flight before code. Confirm new names with
+  `python -m skore_skills api get`.
 metadata:
   role: helper
   modelTier: big

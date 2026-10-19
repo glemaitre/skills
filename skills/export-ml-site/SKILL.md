@@ -1,10 +1,10 @@
 ---
 name: export-ml-site
 description: >
-  Package JOURNAL, exploratory data analysis markdown, and design notes into an offline
-  MkDocs site opened via the file:// URL of report.html at the workspace root. Embeds existing notebook HTML
-  companions in their associated reports. Never executes Python. Trigger
-  when the user asks for a website, mkdocs, or documentation site.
+  Package workspace markdown and existing notebook HTML into an offline MkDocs
+  site. Embeds existing notebook HTML companions in their associated reports.
+  Never executes Python. Trigger when the user asks for a website, mkdocs, or
+  documentation site.
 metadata:
   modelTier: small
 ---

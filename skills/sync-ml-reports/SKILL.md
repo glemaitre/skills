@@ -1,12 +1,10 @@
 ---
 name: sync-ml-reports
 description: >
-  Copy skore reports between local, Hub, and MLflow with `skore
-  sync`, and optionally switch the recorded upload destination.
-  Trigger when the user asks to sync or migrate reports, switch
-  skore mode, upload reports to Hub or MLflow, or pull Hub/MLflow
-  reports onto disk. First G-SKORE-MODE pick stays
-  evaluate-ml-pipeline.
+  Copy skore reports between local, Hub, and MLflow, and optionally switch the
+  upload destination. Trigger when the user asks to sync or migrate reports,
+  switch skore mode, upload reports to Hub or MLflow, or pull Hub/MLflow
+  reports onto disk. First G-SKORE-MODE pick stays evaluate-ml-pipeline.
 metadata:
   modelTier: medium
 ---

@@ -121,7 +121,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
 | [setup-python-env](skills/setup-python-env/SKILL.md) | Detect the env manager and bootstrap the runtime, agent-tools, and composed development environments. |
 | [setup-git](skills/setup-git/SKILL.md) | Initialize safe version control, including an optional commit of the tree before setup changes it. |
-| [persist-ml-git](skills/persist-ml-git/SKILL.md) | Commit the current loop stage with the real git CLI when the end-turn hook says invoke. |
+| [persist-ml-git](skills/persist-ml-git/SKILL.md) | Commit the current loop stage when the end-turn hook says invoke. |
 | [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Require locked problem framing, write the first baseline design note for approval, then coordinate later choices, build, smoke testing, evaluation, and audit. |
 | [export-ml-project](skills/export-ml-project/SKILL.md) | Coordinate executed notebooks and an offline MkDocs documentation site. |
 | [sync-ml-reports](skills/sync-ml-reports/SKILL.md) | Copy skore reports between local, Hub, and MLflow, and optionally switch the upload destination. |

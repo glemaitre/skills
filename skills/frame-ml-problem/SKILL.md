@@ -1,26 +1,23 @@
 ---
 name: frame-ml-problem
 description: >
-  Record the problem, the deployment setting, the comparison metric,
-  the baseline, and the fold count in the journal before
-  model code. Ask every missing decision in one turn, from
-  `frame show`. Does not write Python, estimator hyperparameters,
-  or splitter constructors.
+  Record the problem, deployment setting, metric, baseline, and fold count
+  before any model code. Ask every missing decision in one turn, from `frame
+  show`. Does not write Python, estimator hyperparameters, or splitter
+  constructors.
 
-  TRIGGER when the user asks which metric to compare on, how new
-  rows should be split, which baseline to use, or says a problem
-  constraint changed. Not when they ask to run evaluation or CV.
+  TRIGGER when the user asks which metric to compare on, how new rows should
+  be split, which baseline to use, or says a problem constraint changed. Not
+  when they ask to run evaluation or CV.
 
-  HOW TO USE: run `python -m skore_skills frame show`. Read each
-  reference named in `questions` once, ask every key in `missing`
-  in one message, and write every answered value. If a key is
-  still unanswered, ask it and stop. If the write fills every
-  required decision, set Status to `locked`, say those choices are
-  reused and can be changed by name, then follow `proceed`.
-  Do not ask to confirm.
-  If that command is missing, or the recorded task is not
-  classification, regression, or multi-output regression, follow
-  Fallback below and do not invent the closed menu.
+  HOW TO USE: run `python -m skore_skills frame show`. Read each reference
+  named in `questions` once, ask every key in `missing` in one message, and
+  write every answered value. If a key is still unanswered, ask it and stop.
+  If the write fills every required decision, set Status to `locked`, say
+  those choices are reused and can be changed by name, then follow `proceed`.
+  Do not ask to confirm. If that command is missing, or the recorded task is
+  not classification, regression, or multi-output regression, follow Fallback
+  below and do not invent the closed menu.
 metadata:
   modelTier: medium
 ---

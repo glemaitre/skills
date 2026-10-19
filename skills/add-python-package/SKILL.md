@@ -1,25 +1,22 @@
 ---
 name: add-python-package
 description: >
-  Add a Python dependency through the project env manager, or ask
-  the user to install it when env.managed is false. Trigger when a
-  workflow needs a missing import, after choose-python-library
-  picks a library, or for editable install of src/<pkg>/.
+  Add a dependency through the project env manager, or ask the user when the
+  environment is user-managed. Trigger when a workflow needs a missing import,
+  after choose-python-library picks a library, or for editable install of
+  src/<pkg>/.
 
-  SKIP choosing between competing libraries (choose-python-library
-  owns that). SKIP bootstrapping a missing manager directly
-  (setup-python-env). When env.managed is null, load
-  setup-ml-project if it is installed.
+  SKIP choosing between competing libraries (choose-python-library owns that).
+  SKIP bootstrapping a missing manager directly (setup-python-env). When
+  env.managed is null, load setup-ml-project if it is installed.
 
-  HOW TO USE: read status.policy.env.managed, env detect, and
-  env route. Classify this turn first (editable | add-skore |
-  named package). If managed is null, load setup-ml-project and
-  stop. If managed, env add --execute (or --editable).
-  If unmanaged, ask; default is the user handles it — do not wait.
-  When setup-ml-project already chose user-managed this turn,
-  name the package and the manager, then return. Do not ask and
-  do not wait.
-  Never --execute while managed is false.
+  HOW TO USE: read status.policy.env.managed, env detect, and env route.
+  Classify this turn first (editable | add-skore | named package). If managed
+  is null, load setup-ml-project and stop. If managed, env add --execute (or
+  --editable). If unmanaged, ask; default is the user handles it — do not
+  wait. When setup-ml-project already chose user-managed this turn, name the
+  package and the manager, then return. Do not ask and do not wait. Never
+  --execute while managed is false.
 metadata:
   role: helper
   modelTier: small
