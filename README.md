@@ -43,27 +43,25 @@ Copilot and found no significant difference in terms of skill invocation.
 
 ## Install
 
-You can install the skills using the `skore` CLI that you can install from PyPI or from
-conda-forge and run the following command.
-
-First install [skore-cli](https://github.com/probabl-ai/skore-cli):
-```
-# with pip
-pip install skore-cli
-# with uv
-uv tool install skore-cli
-# with pixi
-pixi global install skore-cli
-```
-
-Then run the following command:
+The skills installer is the `skore` command, included in the [`skore`](https://github.com/probabl-ai/skore)
+package on PyPI and conda-forge.
 
 ```bash
-skore skills install
+# with pip
+pip install skore
+# with uv
+uv tool install skore
+# with pixi
+pixi global install skore
+# with conda
+conda install conda-forge::skore
 ```
 
-Install a smaller workflow pack by id when you do not need the full
-companion:
+`skore skills install` with no arguments opens a picker for the source, the
+skills, the agent, and the project or user directory. Without a terminal, that
+same command prints the catalog.
+
+Install a workflow pack by id when you do not need every skill:
 
 ```bash
 skore skills install setup  # workspace, environment, git, export
@@ -73,21 +71,20 @@ skore skills install loop   # triage, explore, model, review, backlog, export
 skore skills install export  # notebooks and documentation site
 ```
 
-`skore skills install ml-experimentation` remains the complete pack,
-containing every active skill. The default `install` / `install all`
-behavior is unchanged.
+`skore skills install ml-experimentation` and `skore skills install all`
+(or `--all`) install every skill in the catalog.
 
-You can use `uvx` or `pixi exec` to install the `skore` CLI and directly run the
-command in an isolated environment:
+You can use `uvx` or `pixi exec` to install `skore` and run the installer in
+an isolated environment:
 
 ```bash
-uvx --from skore-cli skore skills install
+uvx --from skore skore skills install
 ```
 
 or
 
 ```bash
-pixi exec --spec skore-cli skore skills install
+pixi exec --spec skore skore skills install
 ```
 
 If you prefer `npx`, then you can use:
@@ -120,13 +117,13 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [triage-ml-task](skills/triage-ml-task/SKILL.md) | Session owner: list installed entry skills and ask which to run. |
 | [review-ml-choices](skills/review-ml-choices/SKILL.md) | Show stored project choices and re-enter the skill that can change one. |
 | [review-ml-experiment](skills/review-ml-experiment/SKILL.md) | Read the stored report, then write one idea file and one Ideas row per candidate. |
-| [setup-ml-project](skills/setup-ml-project/SKILL.md) | Ask only the setup pieces that are not already recorded. When Git is selected, commit the current files before setup writes only if that check finds files to preserve. |
+| [setup-ml-project](skills/setup-ml-project/SKILL.md) | Ask only the pending setup pieces. When Git is selected, commit the current files before setup writes only if that check finds files to preserve. |
 | [setup-workspace](skills/setup-workspace/SKILL.md) | Detect or scaffold the standard ML workspace layout. |
 | [setup-python-env](skills/setup-python-env/SKILL.md) | Detect the env manager and bootstrap the runtime, agent-tools, and composed development environments. |
 | [setup-git](skills/setup-git/SKILL.md) | Initialize safe version control, including an optional commit of the tree before setup changes it. |
-| [persist-ml-git](skills/persist-ml-git/SKILL.md) | Commit the current loop stage when git end-turn says invoke. |
+| [persist-ml-git](skills/persist-ml-git/SKILL.md) | Commit the current loop stage when the end-turn hook says invoke. |
 | [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md) | Require locked problem framing, write the first baseline design note for approval, then coordinate later choices, build, smoke testing, evaluation, and audit. |
-| [export-ml-project](skills/export-ml-project/SKILL.md) | Coordinate executed notebooks and an offline MkDocs site. |
+| [export-ml-project](skills/export-ml-project/SKILL.md) | Coordinate executed notebooks and an offline MkDocs documentation site. |
 | [sync-ml-reports](skills/sync-ml-reports/SKILL.md) | Copy skore reports between local, Hub, and MLflow, and optionally switch the upload destination. |
 
 ### ML pipeline lifecycle
@@ -159,7 +156,7 @@ also a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-c
 | [export-ml-notebook](skills/export-ml-notebook/SKILL.md) | Write a jupytext percent file out as a notebook with empty outputs. |
 | [export-ml-site](skills/export-ml-site/SKILL.md) | Package workspace markdown and existing notebook HTML into an offline MkDocs site. |
 
-Canonical package policy lives in the CLI; print it with `python -m skore_skills env stack`. `choose-python-library` resolves competing libraries.
+Canonical package policy lives in the CLI; print it with `skore skills tools env stack` (the same command as `python -m skore_skills env stack`). `choose-python-library` resolves competing libraries.
 
 When executed notebooks or the documentation site are enabled in a
 workspace, workflow stages publish them at completed checkpoints before
@@ -169,22 +166,9 @@ Site checkpoints rebuild only when Markdown, notebook viewers, figures,
 or result viewers changed. Unset or disabled notebook/site policies do
 not enable these artifacts automatically.
 
-### Compatibility and removed skills
-
-The catalog temporarily retains two deprecated compatibility skills. They are not
-included in workflow packs:
-
-| Deprecated skill | Replacement |
-| --- | --- |
-| [organize-ml-workspace](skills/organize-ml-workspace/SKILL.md) | Use [setup-workspace](skills/setup-workspace/SKILL.md). |
-| [data-science-python-stack](skills/data-science-python-stack/SKILL.md) | Use [choose-python-library](skills/choose-python-library/SKILL.md) and the canonical package policy. |
-
-Catalog ids `python-env-manager` and `python-code-style` have been removed. Run
-`skore skills remove` on any leftover sidecars and reinstall the setup pack.
-
 ## Website
 
-The catalog page lives in `site/` and is published at
+The getting-started page lives in `site/` and is published at
 <https://probabl-ai.github.io/skore-skills/>.
 
 Build it with the `site` Pixi environment, which provides Node.js:

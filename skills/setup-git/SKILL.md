@@ -1,13 +1,13 @@
 ---
 name: setup-git
 description: >
-  Set up git for an ML workspace after scaffolding. Trigger when the
-  user asks to initialize version control, add ignore rules, or make
-  the first commit. This action owns first-time git setup only.
-  Before the first commit, ask once which unknown hidden files and
-  review paths to keep tracked. When loaded for the pre-change
-  snapshot, commit the current tree before other setup writes,
-  then return.
+  Initialize safe version control, including an optional commit of the tree
+  before setup changes it. Trigger when the user asks to initialize version
+  control, add ignore rules, or make the first commit. This action owns
+  first-time git setup only. Before the first commit, ask once which unknown
+  hidden files and review paths to keep tracked. When loaded for the
+  pre-change snapshot, commit the current tree before other setup writes, then
+  return.
 metadata:
   role: helper
   modelTier: small

@@ -1,10 +1,9 @@
 ---
 name: export-ml-project
 description: >
-  Coordinate on-demand export: executed notebooks and/or an
-  offline MkDocs documentation site. Trigger on a generic
-  "export" request, or to flip the notebooks/site gates after
-  setup.
+  Coordinate executed notebooks and an offline MkDocs documentation site.
+  Trigger on a generic "export" request, or to flip the notebooks/site gates
+  after setup.
 metadata:
   modelTier: small
 ---

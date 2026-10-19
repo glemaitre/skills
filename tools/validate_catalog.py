@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate ``.catalog.json`` against the on-disk ``skills/`` directory.
 
-The validator enforces eight invariants:
+The validator enforces ten invariants:
 
 1. Every directory under ``skills/`` has a matching entry in
    ``.catalog.json``'s ``skills`` array, and vice versa.
@@ -25,6 +25,10 @@ The validator enforces eight invariants:
    ``return to`` (back to the skill that loaded this one) and
    prohibitions ("Do not load ...") are not loads. The entry skill
    is exempt: it is not a caller.
+9. Every catalog skill has one README row under "Skills in detail",
+   and that cell equals the catalog ``summary``.
+10. Every folded ``SKILL.md`` description starts with that summary.
+    Later sentences may follow.
 
 Usage
 -----
@@ -41,6 +45,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 # Cursor rejects a skill description at this length. The count includes
 # the trailing newline that YAML ``>`` (clip) keeps.
@@ -67,12 +72,12 @@ _LOAD = re.compile(
 )
 
 
-def folded_description_length(text: str) -> int | None:
-    """Return the Cursor length of a folded ``description: >`` block.
+def folded_description(text: str) -> str | None:
+    """Return the folded ``description`` text, without clip's trailing newline.
 
     Single newlines inside a paragraph become spaces. A blank line
-    becomes a newline. Clip chomping keeps one trailing newline.
-    Returns ``None`` when the file has no description field.
+    becomes a newline. Returns ``None`` when the file has no description
+    field.
     """
     lines = text.splitlines()
     try:
@@ -84,7 +89,7 @@ def folded_description_length(text: str) -> int | None:
     header = lines[start]
     inline = header.split(":", 1)[1].strip()
     if inline not in {">", ">-", "|", "|-"}:
-        return len(inline.strip("\"'"))
+        return inline.strip("\"'")
     body: list[str] = []
     for line in lines[start + 1 :]:
         if line and not line.startswith((" ", "\t")):
@@ -96,23 +101,98 @@ def folded_description_length(text: str) -> int | None:
     while raw and raw[-1] == "":
         raw.pop()
     if inline.startswith("|"):
-        folded = "\n".join(raw)
-    else:
-        paragraphs: list[str] = []
-        current: list[str] = []
-        for line in raw:
-            if line.strip() == "":
-                if current:
-                    paragraphs.append(" ".join(current))
-                    current = []
-            else:
-                current.append(line.strip())
-        if current:
-            paragraphs.append(" ".join(current))
-        folded = "\n".join(paragraphs)
+        return "\n".join(raw)
+    paragraphs: list[str] = []
+    current: list[str] = []
+    for line in raw:
+        if line.strip() == "":
+            if current:
+                paragraphs.append(" ".join(current))
+                current = []
+        else:
+            current.append(line.strip())
+    if current:
+        paragraphs.append(" ".join(current))
+    return "\n".join(paragraphs)
+
+
+def folded_description_length(text: str) -> int | None:
+    """Return the Cursor length of a folded ``description: >`` block.
+
+    Clip chomping keeps one trailing newline for ``>`` and ``|``.
+    Returns ``None`` when the file has no description field.
+    """
+    folded = folded_description(text)
+    if folded is None:
+        return None
+    lines = text.splitlines()
+    header = next(line for line in lines if line.startswith("description:"))
+    inline = header.split(":", 1)[1].strip()
     if inline in {">", "|"}:
-        folded += "\n"
+        return len(folded) + 1
     return len(folded)
+
+
+_README_ROW = re.compile(r"\| \[([a-z0-9-]+)\]\([^)]+\) \| ([^|]+) \|")
+
+
+def readme_summaries(readme: str) -> tuple[dict[str, str], list[str]]:
+    """Return README skill-table cells and ids that appear more than once."""
+    rows: dict[str, str] = {}
+    duplicates: list[str] = []
+    for match in _README_ROW.finditer(readme):
+        skill_id = match.group(1)
+        if skill_id in rows:
+            duplicates.append(skill_id)
+        rows[skill_id] = match.group(2).strip()
+    return rows, duplicates
+
+
+def summary_alignment_errors(
+    catalog: dict[str, Any],
+    repo_root: Path,
+    skill_text: dict[str, str],
+) -> list[str]:
+    """Return errors when README, catalog summary, and description openings differ."""
+    errors: list[str] = []
+    readme_path = repo_root / "README.md"
+    if not readme_path.is_file():
+        return ["README.md is missing"]
+    rows, duplicates = readme_summaries(readme_path.read_text(encoding="utf-8"))
+    if duplicates:
+        errors.append(
+            "README lists a skill more than once: " + ", ".join(sorted(set(duplicates)))
+        )
+    catalog_ids = [skill["id"] for skill in catalog["skills"]]
+    extra = sorted(set(rows) - set(catalog_ids))
+    if extra:
+        errors.append(f"README lists skill ids that are not in the catalog: {extra}")
+    for skill in catalog["skills"]:
+        skill_id = skill["id"]
+        summary = skill.get("summary")
+        if not isinstance(summary, str) or not summary:
+            errors.append(f"skill {skill_id!r} is missing a summary")
+            continue
+        cell = rows.get(skill_id)
+        if cell is None:
+            errors.append(f"README is missing a row for {skill_id!r}")
+        elif cell != summary:
+            errors.append(
+                f"README description for {skill_id!r} does not match the "
+                "catalog summary"
+            )
+        text = skill_text.get(skill_id)
+        if text is None:
+            continue
+        description = folded_description(text)
+        if description is None:
+            errors.append(f"skills/{skill_id}/SKILL.md is missing a description")
+        elif not description.startswith(summary):
+            errors.append(
+                f"skills/{skill_id}/SKILL.md description does not start with "
+                "the catalog summary"
+            )
+    return errors
 
 
 def metadata_fields(text: str) -> dict[str, str] | None:
@@ -246,6 +326,7 @@ def validate(catalog_path: Path) -> list[str]:
 
     entries: list[str] = []
     declared: dict[str, tuple[str | None, str | None, str]] = {}
+    skill_text: dict[str, str] = {}
     for skill in catalog["skills"]:
         sid = skill["id"]
         skill_path = repo_root / skill["path"]
@@ -254,6 +335,7 @@ def validate(catalog_path: Path) -> list[str]:
             errors.append(f"{skill['path']}/SKILL.md is missing")
         else:
             text = skill_md.read_text(encoding="utf-8")
+            skill_text[sid] = text
             length = folded_description_length(text)
             if length is not None and length >= DESCRIPTION_MAX_LENGTH:
                 errors.append(
@@ -312,6 +394,8 @@ def validate(catalog_path: Path) -> list[str]:
             errors.append(
                 f"workflow {workflow['id']!r} references unknown skill ids: {unknown}"
             )
+
+    errors.extend(summary_alignment_errors(catalog, repo_root, skill_text))
 
     return errors
 

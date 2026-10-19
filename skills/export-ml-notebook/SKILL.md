@@ -1,13 +1,12 @@
 ---
 name: export-ml-notebook
 description: >
-  Write a jupytext percent `# %%` Python file out as an `.ipynb`.
-  `data_analysis/`, `experiments/`, and `audit/` are filled with
-  empty outputs. Pass `--html` when that notebook should also
-  become a viewer on the site. Kernel `notebook convert` stays
-  for a source that is itself the execution. Trigger on notebook,
-  ipynb, HTML, or executed-report requests, or when export-ml-project
-  dispatches notebooks.
+  Write a jupytext percent file out as a notebook with empty outputs.
+  `data_analysis/`, `experiments/`, and `audit/` are filled with empty
+  outputs. Pass `--html` when that notebook should also become a viewer on the
+  site. Kernel `notebook convert` stays for a source that is itself the
+  execution. Trigger on notebook, ipynb, HTML, or executed-report requests, or
+  when export-ml-project dispatches notebooks.
 metadata:
   modelTier: small
 ---

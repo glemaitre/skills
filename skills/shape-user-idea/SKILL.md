@@ -1,11 +1,10 @@
 ---
 name: shape-user-idea
 description: >
-  Shape an idea the user already has, or answer a project question,
-  and write one idea file and its Ideas row after they confirm. A
-  topic with no artifact belongs to search-ml-literature. Do not
-  write History, Backlog, or a design note. Do not pick a backlog
-  row.
+  Shape a user idea or a named artifact into one idea file and one Ideas row
+  after they confirm. A topic with no artifact belongs to
+  search-ml-literature. Do not write History, Backlog, or a design note. Do
+  not pick a backlog row.
 metadata:
   role: helper
   modelTier: medium

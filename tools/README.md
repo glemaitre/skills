@@ -66,6 +66,10 @@ Checks these invariants:
    apply. Loads are `load` / `route to` / `re-enter` / `hand off to`
    instructions; `return to` and prohibitions are not. The entry skill
    is exempt.
+9. Every catalog skill has one README row under "Skills in detail",
+   and that cell equals the catalog `summary`.
+10. Every folded `SKILL.md` description starts with that summary.
+    Later sentences may follow.
 
 Run directly with `python tools/validate_catalog.py` or via
 `pixi run validate`.

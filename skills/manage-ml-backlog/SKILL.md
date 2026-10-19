@@ -1,15 +1,15 @@
 ---
 name: manage-ml-backlog
 description: >
-  Canonical backlog loop step. Record an experiment outcome in
-  History and triage idea files. Summarize open, discarded, and
-  aside ideas in the JOURNAL Ideas table. Move a row into Backlog
-  when it is promoted, and keep the idea file. Also supports the
-  model-entry selection mode: show real B<N> rows supplied by the
-  deterministic CLI and consume one into a proposal. Trigger after
-  audit, when a run finishes, when the user asks what to try next
-  or to triage idea files, or when model-ml-pipeline routes its
-  Backlog choice here. This is cadence, not a methodology owner.
+  Record experiment outcomes and triage idea files. A promoted idea moves from
+  the Ideas table into a Backlog row. Record an experiment outcome in History
+  and triage idea files. Summarize open, discarded, and aside ideas in the
+  JOURNAL Ideas table. Move a row into Backlog when it is promoted, and keep
+  the idea file. Also supports the model-entry selection mode: show real B<N>
+  rows supplied by the deterministic CLI and consume one into a proposal.
+  Trigger after audit, when a run finishes, when the user asks what to try
+  next or to triage idea files, or when model-ml-pipeline routes its Backlog
+  choice here. This is cadence, not a methodology owner.
 metadata:
   modelTier: medium
 ---

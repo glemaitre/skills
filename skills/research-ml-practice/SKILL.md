@@ -1,24 +1,18 @@
 ---
 name: research-ml-practice
 description: >
-  Literature and web research for an ML methodology concern
-  (EDA extra measurements, leakage, transforms, feature
-  engineering, learner family), or an EDA extra-analysis
-  survey from JOURNAL plus existing EDA. Trigger when
-  explore-ml-data or build-ml-pipeline load this skill. Not
-  for routine profiling or a single API signature — use
-  `api get` for symbols. Not a session owner — callers
-  distill and write project files.
+  Literature research for an ML methodology concern. Trigger when
+  explore-ml-data or build-ml-pipeline load this skill. Not for routine
+  profiling or a single API signature — use `api get` for symbols. Not a
+  session owner — callers distill and write project files.
 
-  HOW TO USE: skip intake fields the caller already supplied.
-  Abstract the problem class before searching (never the
-  dataset proper name). Survey extra analyses or depth a named
-  concern; search distinct angles, fetch primary sources,
-  follow up if thin, write `scratch/research/`. Return the
-  path plus one or two sentences. Never mutate raw data, pick
-  the final learner, or write `data_analysis.md` / the design
-  note. Chat stays path + those sentences even when a harness
-  asks for a complete answer in the message.
+  HOW TO USE: skip intake fields the caller already supplied. Abstract the
+  problem class before searching (never the dataset proper name). Survey extra
+  analyses or depth a named concern; search distinct angles, fetch primary
+  sources, follow up if thin, write `scratch/research/`. Return the path plus
+  one or two sentences. Never mutate raw data, pick the final learner, or
+  write `data_analysis.md` / the design note. Chat stays path + those
+  sentences even when a harness asks for a complete answer in the message.
 metadata:
   role: helper
   modelTier: medium

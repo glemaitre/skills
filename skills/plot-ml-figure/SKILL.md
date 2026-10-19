@@ -1,18 +1,17 @@
 ---
 name: plot-ml-figure
 description: >
-  Pick how to write a figure before custom plot code. Trigger when
-  explore-ml-data, evaluate-ml-pipeline, or audit-ml-pipeline is
-  about to save or display a chart, or when the user asks for a
-  plot. Not a session owner. Not for skore/sklearn Display plots
-  that already exist on a report.
+  Pick pandas, seaborn, plotly, or matplotlib before writing figure code.
+  Trigger when explore-ml-data, evaluate-ml-pipeline, or audit-ml-pipeline is
+  about to save or display a chart, or when the user asks for a plot. Not a
+  session owner. Not for skore/sklearn Display plots that already exist on a
+  report.
 
-  HOW TO USE: first match on the tree (owned plot, interactive
-  iframe HTML, seaborn statistical, pandas chart, else
-  matplotlib). In a notebook: save PNG (or HTML) then leave the
-  figure as the cell output; never `plt.close`. Convert polars at
-  the plot boundary. Missing lib → add-python-package. Confirm
-  symbols with `api get`. The caller names the figure directory.
+  HOW TO USE: first match on the tree (owned plot, interactive iframe HTML,
+  seaborn statistical, pandas chart, else matplotlib). In a notebook: save PNG
+  (or HTML) then leave the figure as the cell output; never `plt.close`.
+  Convert polars at the plot boundary. Missing lib → add-python-package.
+  Confirm symbols with `api get`. The caller names the figure directory.
 metadata:
   role: helper
   modelTier: small

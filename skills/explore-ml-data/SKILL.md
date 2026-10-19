@@ -1,26 +1,24 @@
 ---
 name: explore-ml-data
 description: >
-  Owns data understanding before any model is designed. Place
-  `data_analysis/data_analysis.py` and do not execute it. Run
-  `materialize.py` once, write `data_analysis.md` and JOURNAL
-  § Data understanding. Never
+  Explore the dataset before designing any model. Place
+  `data_analysis/data_analysis.py` and do not execute it. Run `materialize.py`
+  once, write `data_analysis.md` and JOURNAL § Data understanding. Never
   design the model, edit `src/<pkg>/`, or modify raw data files.
 
-  TRIGGER when the user asks to explore, profile, or understand
-  the data; triage sent them here (`status.data_analysis`
-  missing); a data source changed; they want to refresh a
-  recorded EDA; or leakage or research arises on a recorded EDA.
+  TRIGGER when the user asks to explore, profile, or understand the data;
+  triage sent them here (`status.data_analysis` missing); a data source
+  changed; they want to refresh a recorded EDA; or leakage or research arises
+  on a recorded EDA.
 
-  STOP when `status.setup.pending` is non-empty (load
-  `setup-ml-project`), when there is no data (send to triage),
-  the request is not raw-data exploration, or EDA is recorded
-  with no refresh and no methodology concern. Do not invent a
-  package root or a root `JOURNAL.md` while setup is pending.
+  STOP when `status.setup.pending` is non-empty (load `setup-ml-project`),
+  when there is no data (send to triage), the request is not raw-data
+  exploration, or EDA is recorded with no refresh and no methodology concern.
+  Do not invent a package root or a root `JOURNAL.md` while setup is pending.
 
-  HOW TO USE: G-TABULAR via `add-python-package`, infer or ask
-  the targets, load `plot-ml-figure` if installed, then ask the
-  five-option continuation board, including Close.
+  HOW TO USE: G-TABULAR via `add-python-package`, infer or ask the targets,
+  load `plot-ml-figure` if installed, then ask the five-option continuation
+  board, including Close.
 metadata:
   modelTier: medium
 ---

@@ -1,12 +1,10 @@
 ---
 name: choose-python-library
 description: >
-  Resolve a genuine choice between Python libraries for one job,
-  then ask `add-python-package` to add the chosen dependency.
-  Trigger for competing-library questions or an optional package not
-  already fixed by the project stack — at first use (tabular
-  exploration, pipeline, or eval extras), never during workspace
-  setup.
+  Resolve a library choice and add the selected dependency. Trigger for
+  competing-library questions or an optional package not already fixed by the
+  project stack — at first use (tabular exploration, pipeline, or eval
+  extras), never during workspace setup.
 metadata:
   role: helper
   modelTier: small

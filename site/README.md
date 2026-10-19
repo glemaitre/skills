@@ -1,8 +1,8 @@
 # Probabl Skills site
 
-Static page for the skills catalog, built with Astro and Tailwind. It is published at <https://probabl-ai.github.io/skore-skills/>.
+Getting-started page for Probabl skills, built with Astro and Tailwind. It is published at <https://probabl-ai.github.io/skore-skills/>.
 
-The page reads skill titles, summaries, categories, and workflow packs from `../.catalog.json` at build time.
+The skill list lives in the repository README. This page does not read `.catalog.json`.
 
 ## Commands
 

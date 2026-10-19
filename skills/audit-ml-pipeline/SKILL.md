@@ -1,27 +1,23 @@
 ---
 name: audit-ml-pipeline
 description: >
-  Read-only audit of one persisted skore report: `audit/NN_<stem>.py`
-  (jupytext percent), 1:1 with `experiments/` and `journal/`.
-  Do not execute it. Run `materialize.py` once. Never call
-  `skore.evaluate` or `project.put`.
+  Audit a persisted skore report read-only and produce a reusable digest. Do
+  not execute it. Run `materialize.py` once. Never call `skore.evaluate` or
+  `project.put`.
 
-  TRIGGER when a completed run needs an audit, the user asks to
-  audit, show, or re-audit an experiment, a re-run overwrote the
-  same `put()` key, or they want a narrative of a past experiment
-  without `journal/ideas/` files.
+  TRIGGER when a completed run needs an audit, the user asks to audit, show,
+  or re-audit an experiment, a re-run overwrote the same `put()` key, or they
+  want a narrative of a past experiment without `journal/ideas/` files.
 
-  STOP when `status.setup.pending` is non-empty (load
-  `setup-ml-project`), or when there is no approved design, no
-  report, or no agent feature: explain and send the user to
-  setup, `evaluate-ml-pipeline`, or `model-ml-pipeline`. Also
-  stop for raw-data exploration or sourcing a future experiment.
+  STOP when `status.setup.pending` is non-empty (load `setup-ml-project`), or
+  when there is no approved design, no report, or no agent feature: explain
+  and send the user to setup, `evaluate-ml-pipeline`, or `model-ml-pipeline`.
+  Also stop for raw-data exploration or sourcing a future experiment.
 
-  HOW TO USE: confirm journal, experiment, smoke, and report;
-  place the file from `templates/audit.py`; copy
-  `templates/materialize.py` to scratch; execute once; derive
-  G-AUDIT-FINDING; then the continue-or-close gate. Resolve
-  skore symbols with `api get`.
+  HOW TO USE: confirm journal, experiment, smoke, and report; place the file
+  from `templates/audit.py`; copy `templates/materialize.py` to scratch;
+  execute once; derive G-AUDIT-FINDING; then the continue-or-close gate.
+  Resolve skore symbols with `api get`.
 metadata:
   role: helper
   modelTier: medium

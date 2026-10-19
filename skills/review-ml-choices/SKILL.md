@@ -1,17 +1,15 @@
 ---
 name: review-ml-choices
 description: >
-  Show the project choices already stored in status and let the
-  user change one by re-entering the skill that owns it. Trigger
-  when the user asks what we decided, what the current settings
-  are, or to change a stored project choice.
+  Show stored project choices and re-enter the skill that can change one.
+  Trigger when the user asks what we decided, what the current settings are,
+  or to change a stored project choice.
 
-  SKIP an explicit sync, export, or “a constraint changed”
-  request — those load sync-ml-reports, export-ml-project, or
-  frame-ml-problem directly.
+  SKIP an explicit sync, export, or “a constraint changed” request — those
+  load sync-ml-reports, export-ml-project, or frame-ml-problem directly.
 
-  HOW TO USE: run `review choices`, show that board, then load
-  one owning skill. Do not policy set from here.
+  HOW TO USE: run `review choices`, show that board, then load one owning
+  skill. Do not policy set from here.
 metadata:
   modelTier: small
 ---

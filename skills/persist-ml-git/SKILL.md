@@ -1,10 +1,9 @@
 ---
 name: persist-ml-git
 description: >
-  Persist the current loop stage with the real git CLI when the
-  end-turn hook says invoke. Trigger after
-  `python -m skore_skills git end-turn --stage <stage>` returns
-  action invoke, or when the user asks to commit this turn's work.
+  Commit the current loop stage when the end-turn hook says invoke. Trigger
+  after `python -m skore_skills git end-turn --stage <stage>` returns action
+  invoke, or when the user asks to commit this turn's work.
 metadata:
   modelTier: small
 ---

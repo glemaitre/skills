@@ -1,29 +1,23 @@
 ---
 name: smoke-test-ml-pipeline
 description: >
-  Owns one experiment's smoke test: a small pytest that fits on
-  part of real `data/` and predicts on a disjoint slice with no
-  pre-history buffer. Prediction count must equal predict-grid
-  rows.
+  Structural pytest: prediction count must match the predict-grid row count.
 
-  TRIGGER when an approved experiment needs its smoke test,
-  `pytest tests/smoke/` fails on row count, the user asks why
-  the smoke test is failing, a pipeline edit needs proof, or
-  the experiment script changes pipeline shape.
+  TRIGGER when an approved experiment needs its smoke test, `pytest
+  tests/smoke/` fails on row count, the user asks why the smoke test is
+  failing, a pipeline edit needs proof, or the experiment script changes
+  pipeline shape.
 
-  STOP when `status.setup.pending` is non-empty (load
-  `setup-ml-project`), or when there is no approved design or
-  no matching experiment script: explain and send the user to
-  setup or stay in `build-ml-pipeline`. A declined git is not
-  asked again. "Why is smoke failing?" stays here. This action
-  does not cover regression tests or CV interpretation. Do not
-  write `skore.evaluate`.
+  STOP when `status.setup.pending` is non-empty (load `setup-ml-project`), or
+  when there is no approved design or no matching experiment script: explain
+  and send the user to setup or stay in `build-ml-pipeline`. A declined git is
+  not asked again. "Why is smoke failing?" stays here. This action does not
+  cover regression tests or CV interpretation. Do not write `skore.evaluate`.
 
   HOW TO USE: `status`, read the journal and experiment, write
-  `tests/smoke/test_NN_*.py`, then
-  `python -m skore_skills smoke run --stem <stem>`. Red JSON
-  means fix the pipeline in `build-ml-pipeline`. Do not loosen
-  the assertion.
+  `tests/smoke/test_NN_*.py`, then `python -m skore_skills smoke run --stem
+  <stem>`. Red JSON means fix the pipeline in `build-ml-pipeline`. Do not
+  loosen the assertion.
 metadata:
   role: helper
   modelTier: medium
