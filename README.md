@@ -166,26 +166,6 @@ Site checkpoints rebuild only when Markdown, notebook viewers, figures,
 or result viewers changed. Unset or disabled notebook/site policies do
 not enable these artifacts automatically.
 
-### Removed skills
-
-These catalog ids are no longer published. Seven of them left in 0.8.0.
-`organize-ml-workspace` and `data-science-python-stack` stayed as compatibility
-stubs for that release and are removed now. `skore skills update` skips an id
-that is missing from the latest release and leaves its directory in place.
-Remove a leftover with `skore skills remove <id>`:
-
-| Removed skill | Replacement |
-| --- | --- |
-| `organize-ml-workspace` | [setup-workspace](skills/setup-workspace/SKILL.md). |
-| `data-science-python-stack` | [choose-python-library](skills/choose-python-library/SKILL.md) and `skore skills tools env stack`. |
-| `iterate-ml-experiment` | [triage-ml-task](skills/triage-ml-task/SKILL.md), [model-ml-pipeline](skills/model-ml-pipeline/SKILL.md), and [manage-ml-backlog](skills/manage-ml-backlog/SKILL.md). |
-| `iterate-from-skore` | [review-ml-experiment](skills/review-ml-experiment/SKILL.md). |
-| `iterate-from-user` | [shape-user-idea](skills/shape-user-idea/SKILL.md) or [search-ml-literature](skills/search-ml-literature/SKILL.md). |
-| `test-ml-pipeline` | [smoke-test-ml-pipeline](skills/smoke-test-ml-pipeline/SKILL.md). |
-| `python-env-manager` | [setup-python-env](skills/setup-python-env/SKILL.md) and [add-python-package](skills/add-python-package/SKILL.md). |
-| `python-code-style` | `skore skills tools style`. Ruff is installed with the agent-tools environment. |
-| `python-api` | `skore skills tools api get`. |
-
 ## Website
 
 The getting-started page lives in `site/` and is published at
