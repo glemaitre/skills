@@ -5,10 +5,10 @@ import InstallerTabs from '../InstallerTabs.astro';
 import PixelGrid from '../PixelGrid.astro';
 
 const installers = [
-  { id: 'pip', label: 'pip', command: 'pip install skore-cli' },
-  { id: 'conda', label: 'conda', command: 'conda install -c conda-forge skore-cli' },
-  { id: 'uv', label: 'uv', command: 'uv tool install skore-cli' },
-  { id: 'pixi', label: 'pixi', command: 'pixi global install skore-cli' },
+  { id: 'pip', label: 'pip', command: 'pip install skore' },
+  { id: 'conda', label: 'conda', command: 'conda install conda-forge::skore' },
+  { id: 'uv', label: 'uv', command: 'uv tool install skore' },
+  { id: 'pixi', label: 'pixi', command: 'pixi global install skore' },
 ];
 
 const agents = [
@@ -35,7 +35,7 @@ const agents = [
             <path d="m4 17 6-6-6-6" />
             <path d="M12 19h8" />
           </svg>
-          <h3 class="mt-5 font-sans text-20">Install our CLI</h3>
+          <h3 class="mt-5 font-sans text-20">Install skore</h3>
           <p class="mt-1.5 text-15 text-black/60">Use the package manager you already have.</p>
         </InstallerTabs>
       </li>

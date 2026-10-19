@@ -2,7 +2,7 @@
   "name": "probabl-skills",
   "repository": "probabl-ai/skore-skills",
   "description": "Skills to support Machine Learning experimentation using the Python ecosystem.",
-  "catalog_hash": "1c62c6986776e1a78e988a2a9b1c913ca3ab0fc34fa8df43d992c4e1e5da2280",
+  "catalog_hash": "ca563dd651ca5bd6e464394fdd6d735c4161de8ae2216e3bfd66358f41eb1238",
   "skills": [
     {
       "id": "explore-ml-data",
@@ -68,24 +68,6 @@
       "hash": "01061b95e9d3a6d4a599b528c1426d2e76d76547933b5d9f55e00d3b6b557f49"
     },
     {
-      "id": "organize-ml-workspace",
-      "path": "skills/organize-ml-workspace",
-      "title": "Organize ML Workspace",
-      "summary": "Deprecated compatibility skill; use setup-workspace.",
-      "category": "tooling",
-      "subcategory": "project-setup",
-      "hash": "bb843f7275563a361d9f46174e11e352f8fc0056c8ab56056459f058501200ea"
-    },
-    {
-      "id": "data-science-python-stack",
-      "path": "skills/data-science-python-stack",
-      "title": "Data Science Python Stack",
-      "summary": "Deprecated compatibility skill; use choose-python-library and the canonical package policy.",
-      "category": "reference",
-      "subcategory": null,
-      "hash": "a1f18a0e517d7dd1d4a7b35b2577ebaacf67f93de2ddb9416188791bb09a3857"
-    },
-    {
       "id": "triage-ml-task",
       "path": "skills/triage-ml-task",
       "title": "Triage ML Task",
@@ -134,7 +116,7 @@
       "id": "setup-ml-project",
       "path": "skills/setup-ml-project",
       "title": "Set Up ML Project",
-      "summary": "Ask setup choices up front. When Git is selected, commit the current files before setup writes only if that check finds files to preserve.",
+      "summary": "Ask only the pending setup pieces. When Git is selected, commit the current files before setup writes only if that check finds files to preserve.",
       "category": "meta",
       "subcategory": null,
       "hash": "6224a849176f61456260c4d9883669f99775d55dd3cc9d79c93191026325d527"
