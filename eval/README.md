@@ -108,7 +108,11 @@ python3 eval/convert_to_evals_json.py build-ml-pipeline  # named skills only
 python3 eval/convert_to_evals_json.py --check      # fail if evals.json is stale
 ```
 
-That writes `skills/<skill>/evals/evals.json`.
+That writes `skills/<skill>/evals/evals.json`. Those fixtures stay in
+the git checkout for `pixi run evals-check` and the local LLM harness.
+[`.gitattributes`](../.gitattributes) marks `skills/*/evals/` as
+`export-ignore`, so the GitHub release archive that
+`skore skills install` copies does not include them.
 
 ## Setup
 

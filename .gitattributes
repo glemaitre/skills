@@ -1,0 +1,4 @@
+# Development-only eval fixtures. Kept in the git checkout for
+# pixi run evals-check and the local LLM harness; omitted from the
+# GitHub release archive that ``skore skills install`` copies.
+skills/*/evals/ export-ignore

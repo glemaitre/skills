@@ -25,9 +25,10 @@ Notes
 -----
 - File path inside a skill is hashed as a POSIX path so digests are
   stable across operating systems.
-- ``.DS_Store``, ``__pycache__/``, ``.pytest_cache/``, ``*.pyc``, and
-  ``.skore-skill.json`` files are skipped: they're build artefacts or
-  local install sidecars, not part of the skill.
+- ``.DS_Store``, ``__pycache__/``, ``.pytest_cache/``, ``*.pyc``,
+  ``.skore-skill.json``, and ``evals/`` are skipped: build artefacts,
+  local install sidecars, or development-only eval fixtures that are
+  omitted from the release archive.
 """
 
 from __future__ import annotations
@@ -45,6 +46,7 @@ EXCLUDED_NAMES = {
     ".pytest_cache",
     ".mypy_cache",
     ".skore-skill.json",
+    "evals",
 }
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 

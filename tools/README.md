@@ -39,8 +39,10 @@ give a stable fingerprint of the whole catalog.
 
 The hash for a skill covers every file under its `path` directory
 recursively, excluding `.DS_Store`, `__pycache__/`, `.pytest_cache/`,
-`.mypy_cache/`, and `*.pyc` / `*.pyo` files. File paths are normalised
-to POSIX so digests are stable across operating systems.
+`.mypy_cache/`, `*.pyc` / `*.pyo` files, and the `evals/` directory
+(development-only fixtures; see [`.gitattributes`](../.gitattributes)).
+File paths are normalised to POSIX so digests are stable across
+operating systems.
 
 ## validate_catalog.py
 
